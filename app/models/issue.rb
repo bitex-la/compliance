@@ -1,5 +1,5 @@
 class Issue < ApplicationRecord
-  belongs_to :person
+  belongs_to :person, optional: true
 
   has_many :domicile_seeds
   has_many :identification_seeds
