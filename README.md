@@ -15,4 +15,11 @@
 ## Start the application
 ```
 foreman start
+```
+
+## Testing
+
+### Running all the tests
+```
+rspec
 ``` 
