@@ -21,9 +21,13 @@ gem 'activeadmin'
 gem 'devise'
 gem 'cancancan'
 gem 'draper'
+gem "paperclip", "4.3.6"
 
 gem 'fast_jsonapi'
 gem 'active_model_serializers', '~> 0.10.0'
+gem 'jsonapi_mapper', :git => 'https://github.com/bitex-la/jsonapi-mapper.git'
+
+gem 'kaminari'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

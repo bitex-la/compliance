@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180206165613) do
+ActiveRecord::Schema.define(version: 20180209150152) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -49,6 +49,10 @@ ActiveRecord::Schema.define(version: 20180206165613) do
     t.string "seed_to_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "document_file_name"
+    t.string "document_content_type"
+    t.integer "document_file_size"
+    t.datetime "document_updated_at"
     t.index ["person_id"], name: "index_attachments_on_person_id"
   end
 
@@ -223,6 +227,32 @@ ActiveRecord::Schema.define(version: 20180206165613) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "quota", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "weight", precision: 10
+    t.decimal "amount", precision: 10
+    t.string "kind"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_quota_on_issue_id"
+    t.index ["person_id"], name: "index_quota_on_person_id"
+    t.index ["replaced_by_id"], name: "index_quota_on_replaced_by_id"
+  end
+
+  create_table "quota_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "weight", precision: 10
+    t.decimal "amount", precision: 10
+    t.string "kind"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "quota_id"
+    t.index ["issue_id"], name: "index_quota_seeds_on_issue_id"
+    t.index ["quota_id"], name: "index_quota_seeds_on_quota_id"
+  end
+
   create_table "relationship_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
     t.string "to"
@@ -260,5 +290,10 @@ ActiveRecord::Schema.define(version: 20180206165613) do
   add_foreign_key "natural_dockets", "issues"
   add_foreign_key "natural_dockets", "natural_dockets", column: "replaced_by_id"
   add_foreign_key "natural_dockets", "people"
+  add_foreign_key "quota", "issues"
+  add_foreign_key "quota", "people"
+  add_foreign_key "quota", "quota", column: "replaced_by_id"
+  add_foreign_key "quota_seeds", "issues"
+  add_foreign_key "quota_seeds", "quota", column: "quota_id"
   add_foreign_key "relationship_seeds", "issues"
 end
