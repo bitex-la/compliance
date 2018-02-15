@@ -1,11 +1,66 @@
 require 'rails_helper'
+require 'helpers/api/v1/issues_helper'
 
-describe '' do
+describe 'an admin user' do
+  let(:admin_user) { create(:admin_user) }
+
   it 'creates a new natural person' do
     # Creates issue via API: Includes seeds for domicile, identification, docket, quota.
+    attachment = Base64.encode64(file_fixture('simple.png').read)
+    issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+      attachment, 
+      'image/png',
+      'file.png'
+    )
+
+    post api_v1_issues_path, params: issue
+
+    issue = Issue.first
+    domicile_seed = DomicileSeed.first
+    expect(Issue.count).to be_equal 1
+    expect(Person.count).to be_equal 1
+    expect(DomicileSeed.count).to be_equal 1
+    expect(DomicileSeed.where(issue: issue).count).to be_equal 1
+    expect(domicile_seed.attachments.count).to be_equal 1
+    assert_response 201
+
     # Admin does not see it as pending
+    visit admin_user_session_path
+    fill_in 'admin_user[email]', with: admin_user.email
+    fill_in 'admin_user[password]', with: admin_user.password
+    click_button 'Login'
+
+    expect(page).to have_content 'Signed in successfully.'
+
     # Admin sees issue in dashboard.
+    expect(page).to have_content issue.id
+
+     # Admin clicks in the issue to see the detail
+    within("//tr[@id='issue_#{issue.id}']//td[@class='col col-actions']") do
+      click_link('View')
+    end
+
+    expect(page).to have_content 'Issue Details'
+    expect(page).to have_content 'domiciles'
+
+    # Admin verify the attachment(s)
+    within("//tr[@id='domicile_seed_#{domicile_seed.id}']") do
+      expect(page).to have_content domicile_seed.attachments.first.document_file_name
+    end
+    
     # Admin sends comments to customer about their identification (it was blurry)
+    click_link('Add comment')
+    expect(page).to have_content 'Post new comment'
+
+    fill_in 'comment[title]', with: 'Domicile document is blurry'
+    fill_in 'comment[body]',  with: 'Please re-send your document' 
+    click_button 'Create Comment'
+
+    expect(issue.reload.comments.count).to be_equal 1
+    within("//tr[@class='row row-commentable']") do
+      click_link("Issue ##{issue.id}")
+    end
+
        # The issue goes away from the dashboard.
     # Customer re-submits identification (we get it via API)
     # Admin accepts the customer data, the issue goes away from the to-do list | Admin dismisses the issue, the person is rejected
