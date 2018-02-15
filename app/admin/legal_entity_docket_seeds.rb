@@ -11,5 +11,19 @@ ActiveAdmin.register LegalEntityDocketSeed do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  begin
+    permit_params :industry, :business_description, :country, :commercial_name, :legal_name, :issue_id
 
+    form do |f|
+      f.inputs "Create new legal entity docket seed" do
+        f.input :issue, required: true
+        f.input :industry
+        f.input :business_description
+        f.input :country
+        f.input :commercial_name
+        f.input :legal_name
+      end
+      f.actions
+    end
+  end
 end

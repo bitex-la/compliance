@@ -3,10 +3,6 @@ require 'helpers/api/v1/issues_helper'
 require 'json'
 
 RSpec.describe Api::V1::IssuesController, type: :controller do
-  before do
-    @request.headers["Content-Type"] = 'application/vnd.api+json'
-  end
-
   describe 'creating an Issue' do
     let(:basic_issue) { Api::V1::IssuesHelper.basic_issue }
     let(:invalid_basic_issue)  { Api::V1::IssuesHelper.invalid_basic_issue }

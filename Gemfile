@@ -22,6 +22,7 @@ gem 'devise'
 gem 'cancancan'
 gem 'draper'
 gem "paperclip", "4.3.6"
+gem 'country_select'
 
 gem 'fast_jsonapi'
 gem 'active_model_serializers', '~> 0.10.0'
@@ -32,6 +33,9 @@ gem 'kaminari'
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails'
+  gem 'capybara'
+  gem 'selenium-webdriver', '3.5.2'
+  gem 'geckodriver-helper'
   gem 'factory_bot_rails'
   gem 'dotenv-rails'
 end

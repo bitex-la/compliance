@@ -11,5 +11,17 @@ ActiveAdmin.register QuotaSeed do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  begin
+    permit_params :weight, :amount, :kind, :issue_id
 
+    form do |f|
+      f.inputs "Create new quota seed" do
+        f.input :issue, required: true
+        f.input :weight
+        f.input :amount
+        f.input :kind
+      end
+      f.actions
+    end
+  end
 end

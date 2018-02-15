@@ -3,11 +3,19 @@ class Api::V1::ApiController < ApplicationController
 
   def validate_processable
     if params[:data].blank?
-      error = JsonApi::Error.new
-      error.source = {}
-      error.detail = "Missing `data` Member at document's top level."
-    
-      json_response JsonApi::ErrorsSerializer.call(error), 422
+      errors = []
+
+      errors << JsonApi::Error.new({
+        links:   {},
+        status:  422,
+        code:    "data_not_found",
+        title:   "Missing `data` Member at document's top level",
+        detail:  "Missing `data` Member at document's top level",
+        source:  { },
+        meta:    {}
+      })  
+      error_data, status = JsonApi::ErrorsSerializer.call(errors)
+      json_response error_data, status
     end  
   end
 end

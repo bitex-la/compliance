@@ -28,7 +28,7 @@ class Issue::IssueCreator
   private
   
   def self.map_out(attributes)
-    person_scope = look_scope_by_id(attributes[:data][:relationships][:person])
+    person_scope = look_scope_by_id(attributes[:data], :person)
 
     JsonapiMapper.doc(attributes, 
       issue: [:person, 
@@ -95,8 +95,8 @@ class Issue::IssueCreator
     )
   end 
 
-  def self.look_scope_by_id(object)
-    return '' if object.nil?
-    object[:data][:id].to_s.start_with?('@') ? '' : object[:data][:id]
+  def self.look_scope_by_id(object, key)
+    return '' if object[:relationships].nil?
+    object[:relationships][key][:data][:id].to_s.start_with?('@') ? '' : object[:relationships][key][:data][:id]
   end
 end

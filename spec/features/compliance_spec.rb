@@ -1,10 +1,46 @@
 require 'rails_helper'
+require 'helpers/api/v1/issues_helper'
 
 describe '' do
+  let(:admin_user) { create(:admin_user) }
+
   it 'creates a new natural person' do
     # Creates issue via API: Includes seeds for domicile, identification, docket, quota.
+    attachment = Base64.encode64(file_fixture('simple.png').read)
+    issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+      attachment, 
+      'image/png',
+      'file.png'
+    )
+
+    post api_v1_issues_path, params: issue
+
+    issue = Issue.first
+    expect(Issue.count).to be_equal 1
+    expect(Person.count).to be_equal 1
+    expect(DomicileSeed.count).to be_equal 1
+    expect(DomicileSeed.where(issue: issue).count).to be_equal 1
+    expect(DomicileSeed.first.attachments.count).to be_equal 1
+    assert_response 201
+
     # Admin does not see it as pending
+    visit admin_user_session_path
+    fill_in 'admin_user[email]', with: admin_user.email
+    fill_in 'admin_user[password]', with: admin_user.password
+    click_button 'Login'
+
+    expect(page).to have_content 'Signed in successfully.'
+
     # Admin sees issue in dashboard.
+    expect(page).to have_content issue.id
+    within("//tr[@id='issue_#{issue.id}']") do
+      click_link('View')
+    end
+
+    expect(page).to have_content 'Issue Details'
+
+    
+
     # Admin sends comments to customer about their identification (it was blurry)
        # The issue goes away from the dashboard.
     # Customer re-submits identification (we get it via API)

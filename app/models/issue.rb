@@ -10,6 +10,8 @@ class Issue < ApplicationRecord
 
   has_many :comments, as: :commentable
 
+  scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
+
   def get_seeds
     domicile_seeds + 
     identification_seeds +

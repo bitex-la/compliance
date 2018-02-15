@@ -12,4 +12,17 @@ ActiveAdmin.register IdentificationSeed do
 #   permitted
 # end
 
+  begin
+    permit_params :kind, :number, :issuer, :issue_id
+
+    form do |f|
+      f.inputs "Create new identification seed" do
+        f.input :issue, required: true
+        f.input :kind
+        f.input :number
+        f.input :issuer
+      end
+      f.actions
+    end
+  end
 end
