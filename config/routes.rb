@@ -7,7 +7,6 @@ Rails.application.routes.draw do
     resources :issues do
     end
     resources :domicile_seeds do
-      
     end
   end
 

@@ -23,7 +23,6 @@ gem 'cancancan'
 gem 'draper'
 gem "paperclip", "4.3.6"
 gem 'country_select'
-
 gem 'aasm'
 
 gem 'fast_jsonapi'
@@ -36,7 +35,6 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails'
   gem 'capybara'
-  gem 'selenium-webdriver', '3.5.2'
   gem 'geckodriver-helper'
   gem 'factory_bot_rails'
   gem 'dotenv-rails'
@@ -47,6 +45,7 @@ group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'foreman'
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

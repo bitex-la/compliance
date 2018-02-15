@@ -15,15 +15,15 @@ ActiveAdmin.register_page "Dashboard" do
         panel "Recent Issues" do
           table_for Issue.recent(1, 10) do |i|
             i.column("ID") { |issue|
-              link_to(issue.id, admin_issue_path(issue)) 
+              link_to(issue.id, issue_path(issue)) 
             }
             i.column("Person") { |issue|
-              link_to(issue.person.id, admin_person_path(issue.person)) 
+              link_to(issue.person.id, person_path(issue.person)) 
             }
             i.column("Comments") { |issue|
               [ 
                 "#{issue.comments.count} comments",
-                link_to('View', admin_issue_comments_path(issue))
+                link_to('View', issue_comments_path(issue))
               ].join("&nbsp;").html_safe
             }
             i.column("Created at") { |issue|
@@ -33,7 +33,7 @@ ActiveAdmin.register_page "Dashboard" do
               issue.updated_at 
             }
             i.column("Actions") { |issue|
-            link_to("View", admin_issue_path(issue))
+            link_to("View", issue_path(issue))
             }
           end
         end
@@ -47,7 +47,7 @@ ActiveAdmin.register_page "Dashboard" do
     #     panel "Recent Posts" do
     #       ul do
     #         Post.recent(5).map do |post|
-    #           li link_to(post.title, admin_post_path(post))
+    #           li link_to(post.title, post_path(post))
     #         end
     #       end
     #     end

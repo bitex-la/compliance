@@ -21,8 +21,8 @@ ActiveAdmin.register Issue do
       row 'Comments' do 
         [
           "#{issue.comments.count} comments",
-          link_to('Add comment', new_admin_issue_comment_path(issue)),
-          link_to('View comments', admin_issue_comments_path(issue))
+          link_to('Add comment', new_issue_comment_path(issue)),
+          link_to('View comments', issue_comments_path(issue))
         ].join("<br />").html_safe
       end
     end 
@@ -31,7 +31,7 @@ ActiveAdmin.register Issue do
       panel 'legal entity dockets' do
         table_for issue.legal_entity_docket_seeds do |l|
           l.column("ID") do |seed|
-            link_to(seed.id, admin_legal_entity_docket_seed_path(seed))
+            link_to(seed.id, legal_entity_docket_seed_path(seed))
           end
           l.column("Industry")             { |seed| seed.industry }
           l.column("Business Description") { |seed| seed.business_description }
@@ -44,10 +44,10 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           l.column("") { |seed|
-            link_to("View", admin_legal_entity_docket_seed_path(seed))
+            link_to("View", legal_entity_docket_seed_path(seed))
           }
           l.column("") { |seed|
-            link_to("Edit", edit_admin_legal_entity_docket_seed_path(seed))
+            link_to("Edit", edit_legal_entity_docket_seed_path(seed))
           }
         end
       end
@@ -57,7 +57,7 @@ ActiveAdmin.register Issue do
       panel 'natural dockets' do
         table_for issue.natural_docket_seeds do |n|
           n.column("ID") do |seed|
-            link_to(seed.id, admin_natural_docket_seed_path(seed))
+            link_to(seed.id, natural_docket_seed_path(seed))
           end
           n.column("First Name")      { |seed| seed.first_name }
           n.column("Last Name")       { |seed| seed.last_name }
@@ -71,10 +71,10 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           n.column("") { |seed|
-            link_to("View", admin_natural_docket_seed_path(seed))
+            link_to("View", natural_docket_seed_path(seed))
           }
           n.column("") { |seed|
-            link_to("Edit", edit_admin_natural_docket_seed_path(seed))
+            link_to("Edit", edit_natural_docket_seed_path(seed))
           }
         end
       end
@@ -84,7 +84,7 @@ ActiveAdmin.register Issue do
       panel 'Quotas' do
         table_for issue.quota_seeds do |q|
           q.column("ID") do |seed|
-            link_to(seed.id, admin_quota_seed_path(seed))
+            link_to(seed.id, quota_seed_path(seed))
           end
           q.column("Weight") { |seed| seed.weight }
           q.column("Amount") { |seed| seed.amount }
@@ -95,10 +95,10 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           q.column("") { |seed|
-            link_to("View", admin_quota_seed_path(seed))
+            link_to("View", quota_seed_path(seed))
           }
           q.column("") { |seed|
-            link_to("Edit", edit_admin_quota_seed_path(seed))
+            link_to("Edit", edit_quota_seed_path(seed))
           }
         end
       end
@@ -108,7 +108,7 @@ ActiveAdmin.register Issue do
       panel 'domiciles' do
         table_for issue.domicile_seeds do |d|
           d.column("ID") do |seed|
-            link_to(seed.id, admin_domicile_seed_path(seed))
+            link_to(seed.id, domicile_seed_path(seed))
           end
           d.column("Country")         { |seed| seed.country }
           d.column("State")           { |seed| seed.state }
@@ -124,10 +124,10 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           d.column("") { |seed|
-            link_to("View", admin_domicile_seed_path(seed))
+            link_to("View", domicile_seed_path(seed))
           }
           d.column("") { |seed|
-            link_to("Edit", edit_admin_domicile_seed_path(seed))
+            link_to("Edit", edit_domicile_seed_path(seed))
           }
         end
       end
@@ -137,7 +137,7 @@ ActiveAdmin.register Issue do
       panel 'Identifications' do
         table_for issue.identification_seeds do |i|
           i.column("ID") do |seed|
-            link_to(seed.id, admin_identification_seed_path(seed))
+            link_to(seed.id, identification_seed_path(seed))
           end
           i.column("Kind")    { |seed| seed.kind }
           i.column("Number")  { |seed| seed.number }
@@ -148,10 +148,10 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           i.column("") { |seed|
-            link_to("View", admin_identification_seed_path(seed))
+            link_to("View", identification_seed_path(seed))
           }
           i.column("") { |seed|
-            link_to("Edit", edit_admin_identification_seed_path(seed))
+            link_to("Edit", edit_identification_seed_path(seed))
           }
         end
       end
