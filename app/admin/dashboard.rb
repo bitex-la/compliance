@@ -20,13 +20,19 @@ ActiveAdmin.register_page "Dashboard" do
             i.column("Person") { |issue|
               link_to(issue.person.id, admin_person_path(issue.person)) 
             }
+            i.column("Comments") { |issue|
+              [ 
+                "#{issue.comments.count} comments",
+                link_to('View', admin_issue_comments_path(issue))
+              ].join("&nbsp;").html_safe
+            }
             i.column("Created at") { |issue|
               issue.created_at 
             }
             i.column("Updated at") { |issue|
               issue.updated_at 
             }
-            i.column("") { |issue|
+            i.column("Actions") { |issue|
             link_to("View", admin_issue_path(issue))
             }
           end

@@ -18,6 +18,13 @@ ActiveAdmin.register Issue do
       row :created_at
       row :updated_at
       row :person
+      row 'Comments' do 
+        [
+          "#{issue.comments.count} comments",
+          link_to('Add comment', new_admin_issue_comment_path(issue)),
+          link_to('View comments', admin_issue_comments_path(issue))
+        ].join("<br />").html_safe
+      end
     end 
 
     if issue.legal_entity_docket_seeds.count > 0

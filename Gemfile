@@ -24,6 +24,8 @@ gem 'draper'
 gem "paperclip", "4.3.6"
 gem 'country_select'
 
+gem 'aasm'
+
 gem 'fast_jsonapi'
 gem 'active_model_serializers', '~> 0.10.0'
 gem 'jsonapi_mapper', :git => 'https://github.com/bitex-la/jsonapi-mapper.git'

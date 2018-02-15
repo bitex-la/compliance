@@ -34,18 +34,33 @@ describe 'an admin user' do
 
     # Admin sees issue in dashboard.
     expect(page).to have_content issue.id
-    within("//tr[@id='issue_#{issue.id}']") do
+
+     # Admin clicks in the issue to see the detail
+    within("//tr[@id='issue_#{issue.id}']//td[@class='col col-actions']") do
       click_link('View')
     end
 
     expect(page).to have_content 'Issue Details'
     expect(page).to have_content 'domiciles'
 
+    # Admin verify the attachment(s)
     within("//tr[@id='domicile_seed_#{domicile_seed.id}']") do
       expect(page).to have_content domicile_seed.attachments.first.document_file_name
     end
     
     # Admin sends comments to customer about their identification (it was blurry)
+    click_link('Add comment')
+    expect(page).to have_content 'Post new comment'
+
+    fill_in 'comment[title]', with: 'Domicile document is blurry'
+    fill_in 'comment[body]',  with: 'Please re-send your document' 
+    click_button 'Create Comment'
+
+    expect(issue.reload.comments.count).to be_equal 1
+    within("//tr[@class='row row-commentable']") do
+      click_link("Issue ##{issue.id}")
+    end
+
        # The issue goes away from the dashboard.
     # Customer re-submits identification (we get it via API)
     # Admin accepts the customer data, the issue goes away from the to-do list | Admin dismisses the issue, the person is rejected
