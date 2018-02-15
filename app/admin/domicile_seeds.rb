@@ -69,5 +69,4 @@ ActiveAdmin.register DomicileSeed do
       end
     end
   end
-
 end

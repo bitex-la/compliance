@@ -31,6 +31,11 @@ ActiveAdmin.register Issue do
           l.column("Country")              { |seed| seed.country }
           l.column("Commercial Name")      { |seed| seed.commercial_name }
           l.column("Legal Name")           { |seed| seed.legal_name }
+          l.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
           l.column("") { |seed|
             link_to("View", admin_legal_entity_docket_seed_path(seed))
           }
@@ -53,6 +58,11 @@ ActiveAdmin.register Issue do
           n.column("Nationality")     { |seed| seed.nationality }
           n.column("Gender")          { |seed| seed.gender }
           n.column("Marital Status")  { |seed| seed.marital_status }
+          n.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
           n.column("") { |seed|
             link_to("View", admin_natural_docket_seed_path(seed))
           }
@@ -72,6 +82,11 @@ ActiveAdmin.register Issue do
           q.column("Weight") { |seed| seed.weight }
           q.column("Amount") { |seed| seed.amount }
           q.column("Kind")   { |seed| seed.kind }
+          q.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
           q.column("") { |seed|
             link_to("View", admin_quota_seed_path(seed))
           }
@@ -120,6 +135,11 @@ ActiveAdmin.register Issue do
           i.column("Kind")    { |seed| seed.kind }
           i.column("Number")  { |seed| seed.number }
           i.column("Issuer")  { |seed| seed.issuer }
+          i.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
           i.column("") { |seed|
             link_to("View", admin_identification_seed_path(seed))
           }

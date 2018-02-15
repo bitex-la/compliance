@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'helpers/api/v1/issues_helper'
 
-describe '' do
+describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
 
   it 'creates a new natural person' do
@@ -16,11 +16,12 @@ describe '' do
     post api_v1_issues_path, params: issue
 
     issue = Issue.first
+    domicile_seed = DomicileSeed.first
     expect(Issue.count).to be_equal 1
     expect(Person.count).to be_equal 1
     expect(DomicileSeed.count).to be_equal 1
     expect(DomicileSeed.where(issue: issue).count).to be_equal 1
-    expect(DomicileSeed.first.attachments.count).to be_equal 1
+    expect(domicile_seed.attachments.count).to be_equal 1
     assert_response 201
 
     # Admin does not see it as pending
@@ -38,9 +39,12 @@ describe '' do
     end
 
     expect(page).to have_content 'Issue Details'
+    expect(page).to have_content 'domiciles'
 
+    within("//tr[@id='domicile_seed_#{domicile_seed.id}']") do
+      expect(page).to have_content domicile_seed.attachments.first.document_file_name
+    end
     
-
     # Admin sends comments to customer about their identification (it was blurry)
        # The issue goes away from the dashboard.
     # Customer re-submits identification (we get it via API)

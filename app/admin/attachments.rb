@@ -1,13 +1,13 @@
 ActiveAdmin.register Attachment do
 
-  IMAGEABLE_CONTENT_TYPES = [
+  IMAGEABLE_CONTENT_TYPES ||= [
     'image/jpeg', 
     'image/jpg',
     'image/gif', 
     'image/png',
   ]
 
-  DOWNLOADABLE_CONTENT_TYPES = [
+  DOWNLOADABLE_CONTENT_TYPES ||= [
     'application/pdf',
     'application/zip',
     'application/x-rar-compressed'
