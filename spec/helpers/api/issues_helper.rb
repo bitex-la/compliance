@@ -1,5 +1,5 @@
 require 'spec_helper'
-module Api::V1::IssuesHelper
+module Api::IssuesHelper
   def self.issue_without_person
     {
       data: {

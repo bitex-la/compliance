@@ -1,13 +1,13 @@
 require 'rails_helper'
-require 'helpers/api/v1/issues_helper'
+require 'helpers/api/issues_helper'
 require 'json'
 
-RSpec.describe Api::V1::IssuesController, type: :controller do
-  describe 'creating an Issue' do
-    let(:basic_issue) { Api::V1::IssuesHelper.basic_issue }
-    let(:invalid_basic_issue)  { Api::V1::IssuesHelper.invalid_basic_issue }
-    let(:issue_without_person) { Api::V1::IssuesHelper.issue_without_person }
+RSpec.describe Api::IssuesController, type: :controller do
+  let(:basic_issue) { Api::IssuesHelper.basic_issue }
+  let(:invalid_basic_issue)  { Api::IssuesHelper.invalid_basic_issue }
+  let(:issue_without_person) { Api::IssuesHelper.issue_without_person }
 
+  describe 'creating an Issue' do
     it 'responds with an Unprocessable Entity HTTP code (422) when body is empty' do
       post :create,  params: {}
       assert_response 422
@@ -22,7 +22,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
     it 'creates a new issue associated to an existent person' do
       person = Person.create
-      issue  = Api::V1::IssuesHelper.issue_with_current_person(person.id)
+      issue  = Api::IssuesHelper.issue_with_current_person(person.id)
       post :create, params: issue
       expect(Issue.count).to be_equal 1
       expect(Person.count).to be_equal 1
@@ -33,7 +33,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
     describe 'creates a new issue with a domicile seed' do
       it 'including a png file attachment' do
         attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(
           attachment, 
           'image/png',
           'file.png'
@@ -44,7 +44,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a jpg file attachment' do
         attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(
           attachment,
           'image/jpg',
           'file.jpg'
@@ -55,7 +55,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a gif file attachment' do
         attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(
           attachment,
           'image/gif',
           'file.gif'
@@ -66,7 +66,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a pdf file attachment' do
         attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(
           attachment,
           'application/pdf',
           'file.pdf'
@@ -77,7 +77,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a zip file attachment' do
         attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(
           attachment,
           'application/zip',
           'file.zip'
@@ -90,7 +90,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
     describe 'creates a new issue with an identification seed' do
       it 'including a png file attachment' do
         attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::V1::IssuesHelper.issue_with_identification_seed(
+        issue  = Api::IssuesHelper.issue_with_identification_seed(
           attachment, 
           'image/png',
           'file.png'
@@ -101,7 +101,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a jpg file attachment' do
         attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::V1::IssuesHelper.issue_with_identification_seed(
+        issue  = Api::IssuesHelper.issue_with_identification_seed(
           attachment,
           'image/jpg',
           'file.jpg'
@@ -112,7 +112,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a gif file attachment' do
         attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::V1::IssuesHelper.issue_with_identification_seed(
+        issue  = Api::IssuesHelper.issue_with_identification_seed(
           attachment,
           'image/gif',
           'file.gif'
@@ -123,7 +123,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a pdf file attachment' do
         attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::V1::IssuesHelper.issue_with_identification_seed(
+        issue  = Api::IssuesHelper.issue_with_identification_seed(
           attachment,
           'application/pdf',
           'file.pdf'
@@ -134,7 +134,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a zip file attachment' do
         attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::V1::IssuesHelper.issue_with_identification_seed(
+        issue  = Api::IssuesHelper.issue_with_identification_seed(
           attachment,
           'application/zip',
           'file.zip'
@@ -147,7 +147,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
     describe 'creates a new issue with a natural docket seed' do
       it 'including a png file attachment' do
         attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::V1::IssuesHelper.issue_with_natural_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
           attachment, 
           'image/png',
           'file.png'
@@ -158,7 +158,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a jpg file attachment' do
         attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::V1::IssuesHelper.issue_with_natural_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
           attachment,
           'image/jpg',
           'file.jpg'
@@ -169,7 +169,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a gif file attachment' do
         attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::V1::IssuesHelper.issue_with_natural_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
           attachment,
           'image/gif',
           'file.gif'
@@ -180,7 +180,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a pdf file attachment' do
         attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::V1::IssuesHelper.issue_with_natural_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
           attachment,
           'application/pdf',
           'file.pdf'
@@ -191,7 +191,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a zip file attachment' do
         attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::V1::IssuesHelper.issue_with_natural_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
           attachment,
           'application/zip',
           'file.zip'
@@ -204,7 +204,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
     describe 'creates a new issue with a legal entity docket seed' do
       it 'including a png file attachment' do
         attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::V1::IssuesHelper.issue_with_legal_entity_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
           attachment, 
           'image/png',
           'file.png'
@@ -215,7 +215,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a jpg file attachment' do
         attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::V1::IssuesHelper.issue_with_legal_entity_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
           attachment,
           'image/jpg',
           'file.jpg'
@@ -226,7 +226,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a gif file attachment' do
         attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::V1::IssuesHelper.issue_with_legal_entity_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
           attachment,
           'image/gif',
           'file.gif'
@@ -237,7 +237,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a pdf file attachment' do
         attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::V1::IssuesHelper.issue_with_legal_entity_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
           attachment,
           'application/pdf',
           'file.pdf'
@@ -248,7 +248,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a zip file attachment' do
         attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::V1::IssuesHelper.issue_with_legal_entity_docket_seed(
+        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
           attachment,
           'application/zip',
           'file.zip'
@@ -261,7 +261,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
     describe 'creates a new issue with a quota seed' do
       it 'including a png file attachment' do
         attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::V1::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_quota_seed(
           attachment, 
           'image/png',
           'file.png'
@@ -272,7 +272,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a jpg file attachment' do
         attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::V1::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_quota_seed(
           attachment,
           'image/jpg',
           'file.jpg'
@@ -283,7 +283,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a gif file attachment' do
         attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::V1::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_quota_seed(
           attachment,
           'image/gif',
           'file.gif'
@@ -294,7 +294,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a pdf file attachment' do
         attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::V1::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_quota_seed(
           attachment,
           'application/pdf',
           'file.pdf'
@@ -305,7 +305,7 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
 
       it 'including a zip file attachment' do
         attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::V1::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_quota_seed(
           attachment,
           'application/zip',
           'file.zip'
@@ -327,6 +327,25 @@ RSpec.describe Api::V1::IssuesController, type: :controller do
       expect(Issue.count).to be_equal 0
       expect(Person.count).to be_equal 0
       assert_response 422
+    end
+  end
+
+  describe 'getting an issue' do
+    it 'responds with a not found error 404 when the issue does not exist' do
+      get :show, params: {id: 1}
+      assert_response 404
+    end
+
+    it 'shows all the person info when the issue exist' do  
+      attachment = Base64.encode64(file_fixture('simple.png').read)
+      issue  = Api::IssuesHelper.issue_with_domicile_seed(
+        attachment, 
+        'image/png',
+        'file.png'
+      )
+      post :create, params: issue
+      get :show, params: {id: Issue.first.id}
+      assert_response 200
     end
   end
 

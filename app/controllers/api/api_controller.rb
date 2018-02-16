@@ -1,4 +1,4 @@
-class Api::V1::ApiController < ApplicationController
+class Api::ApiController < ApplicationController
   include ApiResponse
 
   def validate_processable

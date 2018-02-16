@@ -6,13 +6,13 @@ Rails.application.routes.draw do
   concern :api_base do
     resources :issues do
     end
+    resources :people do
+    end
     resources :domicile_seeds do
     end
   end
 
   namespace :api do  
-    namespace :v1 do
-      concerns :api_base
-    end
+    concerns :api_base
   end  
 end

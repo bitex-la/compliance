@@ -1,4 +1,4 @@
-class Api::V1::IssuesController < Api::V1::ApiController
+class Api::IssuesController < Api::ApiController
   before_action :validate_processable, only: [:create, :update]
   protect_from_forgery :except => [:create]
 
@@ -14,9 +14,27 @@ class Api::V1::IssuesController < Api::V1::ApiController
   def show
     begin 
       issue = Issue.find(params[:id])
-      json_response JsonApi::ModelSerializer.call(issue), 200
+      options = {}
+      options[:include] = [
+        :domicile_seeds,
+        :identification_seeds,
+        :natural_docket_seeds,
+        :legal_entity_docket_seeds,
+        :quota_seeds
+      ]
+      json_response JsonApi::ModelSerializer.call(issue, options), 200
     rescue ActiveRecord::RecordNotFound
-      json_response({ error: 'not found' }, 404)
+      errors = []
+      errors << JsonApi::Error.new({
+        links:   {},
+        status:  404,
+        code:    "issue_not_found",
+        title:   "issue not found",
+        detail:  "issue_not_found",
+        source:  {},
+        meta:    {}
+      })
+      error_response(errors)
     end
   end
 
@@ -25,8 +43,7 @@ class Api::V1::IssuesController < Api::V1::ApiController
     if errors.empty?
       json_response JsonApi::ModelSerializer.call(issue), 201
     else
-      error_data, status = JsonApi::ErrorsSerializer.call(errors)
-      json_response error_data, status
+      error_response(errors)
     end
   end
 end

@@ -1,5 +1,5 @@
 require 'rails_helper'
-require 'helpers/api/v1/issues_helper'
+require 'helpers/api/issues_helper'
 
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
@@ -7,13 +7,13 @@ describe 'an admin user' do
   it 'creates a new natural person' do
     # Creates issue via API: Includes seeds for domicile, identification, docket, quota.
     attachment = Base64.encode64(file_fixture('simple.png').read)
-    issue  = Api::V1::IssuesHelper.issue_with_domicile_seed(
+    issue  = Api::IssuesHelper.issue_with_domicile_seed(
       attachment, 
       'image/png',
       'file.png'
     )
 
-    post api_v1_issues_path, params: issue
+    post api_issues_path, params: issue
 
     issue = Issue.first
     domicile_seed = DomicileSeed.first
