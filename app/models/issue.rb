@@ -2,7 +2,7 @@ class Issue < ApplicationRecord
   include AASM
   belongs_to :person
 
-  has_many :domicile_seeds
+  has_one :domicile_seed
   has_many :identification_seeds
   has_many :natural_docket_seeds
   has_many :legal_entity_docket_seeds

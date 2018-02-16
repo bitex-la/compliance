@@ -6,14 +6,11 @@ describe 'an admin user' do
 
   it 'creates a new natural person' do
     # Creates issue via API: Includes seeds for domicile, identification, docket, quota.
-    attachment = Base64.encode64(file_fixture('simple.png').read)
-    issue  = Api::IssuesHelper.issue_with_domicile_seed(
-      attachment, 
+    post api_issues_path, params: Api::IssuesHelper.issue_with_domicile_seed(
+      Base64.encode64(file_fixture('simple.png').read),
       'image/png',
       'file.png'
     )
-
-    post api_issues_path, params: issue
 
     issue = Issue.first
     domicile_seed = DomicileSeed.first
@@ -22,13 +19,11 @@ describe 'an admin user' do
     expect(DomicileSeed.count).to be_equal 1
     expect(DomicileSeed.where(issue: issue).count).to be_equal 1
     expect(domicile_seed.attachments.count).to be_equal 1
+
     assert_response 201
 
     # Admin does not see it as pending
-    visit admin_user_session_path
-    fill_in 'admin_user[email]', with: admin_user.email
-    fill_in 'admin_user[password]', with: admin_user.password
-    click_button 'Login'
+    login_as admin_user
 
     expect(page).to have_content 'Signed in successfully.'
 
@@ -65,6 +60,26 @@ describe 'an admin user' do
     # Customer re-submits identification (we get it via API)
     # Admin accepts the customer data, the issue goes away from the to-do list | Admin dismisses the issue, the person is rejected
     # Worldcheck is run on the customer, customer is accepted when there are no hits, issue is closed. | Customer had hits, admin needs to check manually.
+  end
+
+  describe 'when admin edits an issue' do
+    it 'can edit the domicile' do
+      post api_issues_path, params: Api::IssuesHelper.issue_with_domicile_seed(
+        Base64.encode64(file_fixture('simple.png').read),
+        'image/png',
+        'file.png'
+      )
+      login_as admin_user
+      issue = Issue.first
+
+      print page.body
+      within("//tr[@id='issue_#{issue.id}']//td[@class='col col-actions']") do
+        click_link('Edit')
+      end
+    end
+
+    it 'can edit quotas' do
+    end
   end
 
   it 'keeps track of usage quotas' do
