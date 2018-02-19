@@ -48,7 +48,7 @@ ActiveAdmin.register Issue do
       row :person
     end 
 
-    if issue.legal_entity_docket_seeds.count > 0
+    if issue.legal_entity_docket_seeds.any?
       panel 'legal entity dockets' do
         table_for issue.legal_entity_docket_seeds do |l|
           l.column("ID") do |seed|
@@ -74,7 +74,7 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.natural_docket_seeds.count > 0
+    if issue.natural_docket_seeds.any?
       panel 'natural dockets' do
         table_for issue.natural_docket_seeds do |n|
           n.column("ID") do |seed|
@@ -101,7 +101,7 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.quota_seeds.count > 0
+    if issue.quota_seeds.any?
       panel 'Quotas' do
         table_for issue.quota_seeds do |q|
           q.column("ID") do |seed|
@@ -125,7 +125,7 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.domicile_seeds.count > 0
+    if issue.domicile_seeds.any?
       panel 'domiciles' do
         table_for issue.domicile_seeds do |d|
           d.column("ID") do |seed|
@@ -154,7 +154,7 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.identification_seeds.count > 0
+    if issue.identification_seeds.any?
       panel 'Identifications' do
         table_for issue.identification_seeds do |i|
           i.column("ID") do |seed|

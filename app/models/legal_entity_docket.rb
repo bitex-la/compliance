@@ -4,4 +4,6 @@ class LegalEntityDocket < ApplicationRecord
 
   has_many :legal_entity_docket_seeds
   has_many :attachments, as: :seed_to
+
+  scope :current, ->(person) { where(person: person, replaced_by_id: nil) }
 end
