@@ -13,6 +13,17 @@ ActiveAdmin.register Issue do
 # end
 # permit_params :country, :state, :city, :street_address, :street_number, :postal_code, :floor, :apartment, :issue_id
   #
+
+  actions :all, :except => :destroy
+
+  action_item :approve, only: :show do
+    link_to 'Approve', '/'
+  end
+
+  action_item :add_observation, only: :show do
+    link_to 'Add Observation', '/'
+  end
+
   form do |f|
     if f.object.persisted?
       f.inputs 'Basics' do
@@ -20,20 +31,63 @@ ActiveAdmin.register Issue do
       end
     end
 
-    f.has_many :domicile_seeds do |df|
-      df.inputs "Create new domicile seed" do
-        df.input :country
-        df.input :state
-        df.input :city
-        df.input :street_address
-        df.input :street_number
-        df.input :postal_code
-        df.input :floor
-        df.input :apartment
+    ArbreHelpers.has_one_form self, f, "Identification", :identification_seed do |idf|
+      idf.input :number
+      idf.input :kind
+      idf.input :issuer
+      ArbreHelpers.has_many_form self, idf, :attachments do |af|
+        af.input :document, as: :file, label: "File", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
+        af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
       end
+    end
 
-      if df.object.try(:persisted?)
-        span link_to 'Show', df.object
+    ArbreHelpers.has_one_form self, f, "Domicile", :domicile_seed do |df|
+      df.input :country
+      df.input :state
+      df.input :city
+      df.input :street_address
+      df.input :street_number
+      df.input :postal_code
+      df.input :floor
+      df.input :apartment
+      ArbreHelpers.has_many_form self, df, :attachments do |af|
+        af.input :document, as: :file, label: "File", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
+        af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
+      end
+    end 
+    
+    ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |nf|
+      nf.input :first_name
+      nf.input :last_name
+      nf.input :birth_date, start_year: 1900
+      nf.input :nationality
+      nf.input :gender
+      nf.input :marital_status
+      ArbreHelpers.has_many_form self, nf, :attachments do |af|
+        af.input :document, as: :file, label: "File", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
+        af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
+      end
+    end
+
+    ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |lf|
+      lf.input :industry
+      lf.input :business_description
+      lf.input :country
+      lf.input :commercial_name
+      lf.input :legal_name
+      ArbreHelpers.has_many_form self, lf, :attachments do |af|
+        af.input :document, as: :file, label: "File", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
+        af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
+      end
+    end
+
+    ArbreHelpers.has_many_form self, f, :quota_seeds do |qf|
+      qf.input :weight 
+      qf.input :amount
+      qf.input :kind
+      ArbreHelpers.has_many_form self, qf, :attachments do |af|
+        af.input :document, as: :file, label: "File", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
+        af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
       end
     end
 
@@ -48,9 +102,9 @@ ActiveAdmin.register Issue do
       row :person
     end 
 
-    if issue.legal_entity_docket_seeds.any?
+    if issue.legal_entity_docket_seed.present?
       panel 'legal entity dockets' do
-        table_for issue.legal_entity_docket_seeds do |l|
+        table_for issue.legal_entity_docket_seed do |l|
           l.column("ID") do |seed|
             link_to(seed.id, legal_entity_docket_seed_path(seed))
           end
@@ -74,9 +128,9 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.natural_docket_seeds.any?
+    if issue.natural_docket_seed.present?
       panel 'natural dockets' do
-        table_for issue.natural_docket_seeds do |n|
+        table_for issue.natural_docket_seed do |n|
           n.column("ID") do |seed|
             link_to(seed.id, natural_docket_seed_path(seed))
           end
@@ -125,9 +179,9 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.domicile_seeds.any?
+    if issue.domicile_seed.present?
       panel 'domiciles' do
-        table_for issue.domicile_seeds do |d|
+        table_for issue.domicile_seed do |d|
           d.column("ID") do |seed|
             link_to(seed.id, domicile_seed_path(seed))
           end
@@ -154,9 +208,9 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.identification_seeds.any?
+    if issue.identification_seed.present?
       panel 'Identifications' do
-        table_for issue.identification_seeds do |i|
+        table_for issue.identification_seed do |i|
           i.column("ID") do |seed|
             link_to(seed.id, identification_seed_path(seed))
           end

@@ -32,10 +32,10 @@ class Issue::IssueCreator
 
     JsonapiMapper.doc(attributes, 
       issue: [:person, 
-        :domicile_seeds, 
-        :identification_seeds, 
-        :natural_docket_seeds,
-        :legal_entity_docket_seeds,
+        :domicile_seed, 
+        :identification_seed, 
+        :natural_docket_seed,
+        :legal_entity_docket_seed,
         :quota_seeds,
         id: ''
       ],

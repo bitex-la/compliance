@@ -1,10 +1,10 @@
 class IssueSerializer
   include FastJsonapi::ObjectSerializer
   belongs_to :person
-  has_many :domicile_seeds
-  has_many :identification_seeds
-  has_many :natural_docket_seeds
-  has_many :legal_entity_docket_seeds
+  has_one :domicile_seed
+  has_one :identification_seed
+  has_one :natural_docket_seed
+  has_one :legal_entity_docket_seed
   has_many :relationship_seeds
   has_many :quota_seeds
 end
