@@ -3,4 +3,5 @@ class LegalEntityDocket < ApplicationRecord
   belongs_to :person
 
   has_many :legal_entity_docket_seeds
+  has_many :attachments, as: :seed_to
 end

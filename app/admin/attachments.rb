@@ -25,6 +25,7 @@ ActiveAdmin.register Attachment do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  menu false
 
   begin
     permit_params :id, :document, :person_id

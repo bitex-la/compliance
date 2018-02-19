@@ -1,5 +1,5 @@
 ActiveAdmin.register Comment do
-  belongs_to :issue
+  belongs_to :person
 # See permitted parameters documentation:
 # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
 #
@@ -12,6 +12,8 @@ ActiveAdmin.register Comment do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  menu false
+  
   begin
     permit_params :id, :title, :body, :commentable_id
 

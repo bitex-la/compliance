@@ -11,6 +11,7 @@ ActiveAdmin.register IdentificationSeed do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+menu false
 
   begin
     permit_params :kind, :number, :issuer, :issue_id

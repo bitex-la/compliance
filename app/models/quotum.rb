@@ -3,4 +3,5 @@ class Quotum < ApplicationRecord
   belongs_to :person
 
   has_many :quota_seeds
+  has_many :attachments, as: :seed_to
 end

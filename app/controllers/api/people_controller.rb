@@ -41,6 +41,6 @@ class Api::PeopleController < Api::ApiController
       json_response JsonApi::ModelSerializer.call(person), 201
     else
       error_response(errors)
-    end
+    end	
   end
 end

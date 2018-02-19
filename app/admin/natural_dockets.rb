@@ -11,6 +11,7 @@ ActiveAdmin.register NaturalDocket do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  menu false
 
   begin
     permit_params :first_name, :last_name, :birth_date, :nationality, :gender, :marital_status, :issue_id, :person_id, :replaced_by_id

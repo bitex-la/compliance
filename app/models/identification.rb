@@ -3,4 +3,5 @@ class Identification < ApplicationRecord
   belongs_to :person
 
   has_many :identification_seeds
+  has_many :attachments, as: :seed_to
 end

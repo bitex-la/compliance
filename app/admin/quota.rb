@@ -12,4 +12,6 @@ ActiveAdmin.register Quotum do
 #   permitted
 # end
 
+menu false
+
 end

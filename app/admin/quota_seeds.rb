@@ -11,6 +11,8 @@ ActiveAdmin.register QuotaSeed do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  menu false
+
   begin
     permit_params :weight, :amount, :kind, :issue_id
 

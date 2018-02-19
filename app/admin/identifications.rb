@@ -12,6 +12,8 @@ ActiveAdmin.register Identification do
 #   permitted
 # end
 
+menu false  
+
 begin
   permit_params :kind, :number, :issuer, :issue_id, :person_id, :replaced_by_id
 

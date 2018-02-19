@@ -11,6 +11,7 @@ ActiveAdmin.register Domicile do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  menu false
 
   begin
     permit_params :country, :state, :city, :street_address, :street_number, :postal_code, :floor, :apartment, :issue_id, :person_id, :replaced_by_id

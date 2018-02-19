@@ -11,6 +11,8 @@ ActiveAdmin.register LegalEntityDocket do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+  menu false
+
   begin
     permit_params :industry, :business_description, :country, :commercial_name, :legal_name, :issue_id, :person_id, :replaced_by_id
 
