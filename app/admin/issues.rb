@@ -11,6 +11,34 @@ ActiveAdmin.register Issue do
 #   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
+# permit_params :country, :state, :city, :street_address, :street_number, :postal_code, :floor, :apartment, :issue_id
+  #
+  form do |f|
+    if f.object.persisted?
+      f.inputs 'Basics' do
+        f.input :person_id
+      end
+    end
+
+    f.has_many :domicile_seeds do |df|
+      df.inputs "Create new domicile seed" do
+        df.input :country
+        df.input :state
+        df.input :city
+        df.input :street_address
+        df.input :street_number
+        df.input :postal_code
+        df.input :floor
+        df.input :apartment
+      end
+
+      if df.object.try(:persisted?)
+        span link_to 'Show', df.object
+      end
+    end
+
+    f.actions
+  end
 
   show do
     attributes_table do
