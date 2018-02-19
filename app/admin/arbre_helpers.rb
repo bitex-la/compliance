@@ -35,8 +35,8 @@ module ArbreHelpers
 
   def self.has_many_form(context, builder, relationship, &fields)
     builder.has_many relationship do |f|
-      instance_exec(f, &fields)
-      if f.object.persisted? && context.respond_to?(:link_to)
+      instance_exec(f, context, &fields)
+      if f.object.persisted?
         f.template.concat(context.link_to "Show", f.object)
       end 
     end

@@ -81,11 +81,11 @@ ActiveAdmin.register Issue do
       end
     end
 
-    ArbreHelpers.has_many_form self, f, :quota_seeds do |qf|
+    ArbreHelpers.has_many_form self, f, :quota_seeds do |qf, context|
       qf.input :weight 
       qf.input :amount
       qf.input :kind
-      ArbreHelpers.has_many_form self, qf, :attachments do |af|
+      ArbreHelpers.has_many_form context, qf, :attachments do |af|
         af.input :document, as: :file, label: "File", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
         af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
       end
