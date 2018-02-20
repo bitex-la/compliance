@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180219150246) do
+ActiveRecord::Schema.define(version: 20180220130323) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -263,12 +263,14 @@ ActiveRecord::Schema.define(version: 20180219150246) do
 
   create_table "relationship_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
-    t.string "to"
-    t.string "from"
     t.string "kind"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "person_to_id"
+    t.bigint "person_from_id"
     t.index ["issue_id"], name: "index_relationship_seeds_on_issue_id"
+    t.index ["person_from_id"], name: "index_relationship_seeds_on_person_from_id"
+    t.index ["person_to_id"], name: "index_relationship_seeds_on_person_to_id"
   end
 
   add_foreign_key "attachments", "people"
@@ -305,4 +307,6 @@ ActiveRecord::Schema.define(version: 20180219150246) do
   add_foreign_key "quota_seeds", "issues"
   add_foreign_key "quota_seeds", "quota", column: "quota_id"
   add_foreign_key "relationship_seeds", "issues"
+  add_foreign_key "relationship_seeds", "people", column: "person_from_id"
+  add_foreign_key "relationship_seeds", "people", column: "person_to_id"
 end
