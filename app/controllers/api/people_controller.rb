@@ -1,22 +1,17 @@
 class Api::PeopleController < Api::ApiController
   def index
+    scope = Person.all
     page, per_page = Util::PageCalculator.call(params, 0, 10)
-    people = Person.all.page(page).per(per_page)
-
-    options = {}
-    options[:meta] = { total_pages: (Person.count.to_f / per_page).ceil }
-    json_response JsonApi::ModelSerializer.call(people, options), 200
+    people = scope.page(page).per(per_page)
+    jsonapi_response people,
+      meta: { total_pages: (scope.count.to_f / per_page).ceil }
   end
 
   def show
     begin 
-      person = Person.find(params[:id])
-      options = {}
-      options[:include] = [
-        :issues,
-        :natural_dockets,
-      ]
-      json_response JsonApi::ModelSerializer.call(person, options), 200
+      jsonapi_response Person.find(params[:id]), {
+        include: [:issues, :natural_dockets]
+      }
     rescue ActiveRecord::RecordNotFound
       errors = []
       errors << JsonApi::Error.new({

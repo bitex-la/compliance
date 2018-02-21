@@ -81,7 +81,7 @@ ActiveAdmin.register Issue do
       end
     end
 
-    ArbreHelpers.has_many_form self, f, :quota_seeds do |qf, context|
+    ArbreHelpers.has_many_form self, f, :allowance_seeds do |qf, context|
       qf.input :weight 
       qf.input :amount
       qf.input :kind
@@ -155,11 +155,11 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.quota_seeds.any?
-      panel 'Quotas' do
-        table_for issue.quota_seeds do |q|
+    if issue.allowance_seeds.any?
+      panel 'Allowances' do
+        table_for issue.allowance_seeds do |q|
           q.column("ID") do |seed|
-            link_to(seed.id, quota_seed_path(seed))
+            link_to(seed.id, allowance_seed_path(seed))
           end
           q.column("Weight") { |seed| seed.weight }
           q.column("Amount") { |seed| seed.amount }
@@ -170,10 +170,10 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           q.column("") { |seed|
-            link_to("View", quota_seed_path(seed))
+            link_to("View", allowance_seed_path(seed))
           }
           q.column("") { |seed|
-            link_to("Edit", edit_quota_seed_path(seed))
+            link_to("Edit", edit_allowance_seed_path(seed))
           }
         end
       end

@@ -6,5 +6,5 @@ class IssueSerializer
   has_one :natural_docket_seed
   has_one :legal_entity_docket_seed
   has_many :relationship_seeds
-  has_many :quota_seeds
+  has_many :allowance_seeds
 end

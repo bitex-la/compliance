@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :quota, class: Quotum do
+  factory :allowance do
     association :person, factory: :empty_person
     issue nil
   end

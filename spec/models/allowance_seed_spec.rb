@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe QuotaSeed, type: :model do
+RSpec.describe AllowanceSeed, type: :model do
   let(:invalid_seed) { described_class.new }
-  let(:valid_seed)   { create(:quota_seed) }
+  let(:valid_seed)   { create(:allowance_seed) }
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid

@@ -24,7 +24,7 @@ describe Person do
             identifications: {data: []},
             natural_dockets: {data: []},
             legal_entity_dockets: {data: []},
-            quotas: {data: []}
+            allowances: {data: []}
           }
         },
         included: [
@@ -37,7 +37,7 @@ describe Person do
               natural_docket_seed: {data: nil},
               legal_entity_docket_seed: {data: nil},
               relationship_seeds: {data: []},
-              quota_seeds: {data: []}
+              allowance_seeds: {data: []}
             }
           }
         ]
@@ -45,9 +45,39 @@ describe Person do
     end
 
     it 'shows all the person info when the person exist' do
-      person = Person.create
+      person = create :full_natural_person
       get "/api/people/#{person.id}"
       assert_response 200
+			pp JSON.parse(response.body)
+			next
+      JSON.parse(response.body).deep_symbolize_keys.should == {
+        data: {
+          type: 'people',
+          id: Person.last.id.to_s,
+          relationships: {
+            issues: {data: [{ type: 'issue', id: Issue.last.id.to_s }] },
+            domiciles: {data: []},
+            identifications: {data: []},
+            natural_dockets: {data: []},
+            legal_entity_dockets: {data: []},
+            allowances: {data: []}
+          }
+        },
+        included: [
+          { type: 'issue',
+            id: Issue.last.id.to_s,
+            relationships: {
+              person: {data: {id: Person.last.id.to_s, type: "people"}},
+              domicile_seed: {data: nil},
+              identification_seed: {data: nil},
+              natural_docket_seed: {data: nil},
+              legal_entity_docket_seed: {data: nil},
+              relationship_seeds: {data: []},
+              allowance_seeds: {data: []}
+            }
+          }
+        ]
+      }
     end
 
     it 'responds with a not found error 404 when the person does not exist' do

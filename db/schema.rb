@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180220130323) do
+ActiveRecord::Schema.define(version: 20180221195008) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -41,6 +41,32 @@ ActiveRecord::Schema.define(version: 20180220130323) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "allowance_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "weight", precision: 10
+    t.decimal "amount", precision: 10
+    t.string "kind"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "quota_id"
+    t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
+    t.index ["quota_id"], name: "index_allowance_seeds_on_quota_id"
+  end
+
+  create_table "allowances", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "weight", precision: 10
+    t.decimal "amount", precision: 10
+    t.string "kind"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_allowances_on_issue_id"
+    t.index ["person_id"], name: "index_allowances_on_person_id"
+    t.index ["replaced_by_id"], name: "index_allowances_on_replaced_by_id"
   end
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -235,32 +261,6 @@ ActiveRecord::Schema.define(version: 20180220130323) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "quota", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.decimal "weight", precision: 10
-    t.decimal "amount", precision: 10
-    t.string "kind"
-    t.bigint "issue_id"
-    t.bigint "person_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "replaced_by_id"
-    t.index ["issue_id"], name: "index_quota_on_issue_id"
-    t.index ["person_id"], name: "index_quota_on_person_id"
-    t.index ["replaced_by_id"], name: "index_quota_on_replaced_by_id"
-  end
-
-  create_table "quota_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.decimal "weight", precision: 10
-    t.decimal "amount", precision: 10
-    t.string "kind"
-    t.bigint "issue_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "quota_id"
-    t.index ["issue_id"], name: "index_quota_seeds_on_issue_id"
-    t.index ["quota_id"], name: "index_quota_seeds_on_quota_id"
-  end
-
   create_table "relationship_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
     t.string "kind"
@@ -273,6 +273,11 @@ ActiveRecord::Schema.define(version: 20180220130323) do
     t.index ["person_to_id"], name: "index_relationship_seeds_on_person_to_id"
   end
 
+  add_foreign_key "allowance_seeds", "allowances", column: "quota_id"
+  add_foreign_key "allowance_seeds", "issues"
+  add_foreign_key "allowances", "allowances", column: "replaced_by_id"
+  add_foreign_key "allowances", "issues"
+  add_foreign_key "allowances", "people"
   add_foreign_key "attachments", "people"
   add_foreign_key "domicile_seeds", "domiciles"
   add_foreign_key "domicile_seeds", "issues"
@@ -301,11 +306,6 @@ ActiveRecord::Schema.define(version: 20180220130323) do
   add_foreign_key "natural_dockets", "natural_dockets", column: "replaced_by_id"
   add_foreign_key "natural_dockets", "people"
   add_foreign_key "observations", "issues"
-  add_foreign_key "quota", "issues"
-  add_foreign_key "quota", "people"
-  add_foreign_key "quota", "quota", column: "replaced_by_id"
-  add_foreign_key "quota_seeds", "issues"
-  add_foreign_key "quota_seeds", "quota", column: "quota_id"
   add_foreign_key "relationship_seeds", "issues"
   add_foreign_key "relationship_seeds", "people", column: "person_from_id"
   add_foreign_key "relationship_seeds", "people", column: "person_to_id"

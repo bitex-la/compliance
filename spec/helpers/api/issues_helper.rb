@@ -305,7 +305,7 @@ module Api::IssuesHelper
     }
   end
 
-  def self.issue_with_quota_seed(attachment, content_type, file_name)
+  def self.issue_with_allowance_seed(attachment, content_type, file_name)
     {
       data: {
         type: "issue",
@@ -319,11 +319,11 @@ module Api::IssuesHelper
               type: "person"
             }
           },
-          quota_seeds: {
+          allowance_seeds: {
             data: [
             {
               id: "@1",
-              type: "quota_seed"
+              type: "allowance_seed"
             }
             ]
           }
@@ -335,7 +335,7 @@ module Api::IssuesHelper
           id: "@1"
         },
         {
-          type: "quota_seed",
+          type: "allowance_seed",
           id: "@1",
           attributes: {
             weight: 10,

@@ -258,60 +258,60 @@ describe Issue do
       end
     end
 
-    describe 'creates a new issue with a quota seed' do
+    describe 'creates a new issue with a allowance seed' do
       it 'including a png file attachment' do
         attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_allowance_seed(
           attachment, 
           'image/png',
           'file.png'
         )
         post '/api/issues', params: issue
-        assert_issue_creation('QuotaSeed')
+        assert_issue_creation('AllowanceSeed')
       end
 
       it 'including a jpg file attachment' do
         attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_allowance_seed(
           attachment,
           'image/jpg',
           'file.jpg'
         )
         post '/api/issues', params: issue
-        assert_issue_creation('QuotaSeed')
+        assert_issue_creation('AllowanceSeed')
       end
 
       it 'including a gif file attachment' do
         attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_allowance_seed(
           attachment,
           'image/gif',
           'file.gif'
         )
         post '/api/issues', params: issue
-        assert_issue_creation('QuotaSeed')
+        assert_issue_creation('AllowanceSeed')
       end
 
       it 'including a pdf file attachment' do
         attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_allowance_seed(
           attachment,
           'application/pdf',
           'file.pdf'
         )
         post '/api/issues', params: issue
-        assert_issue_creation('QuotaSeed')
+        assert_issue_creation('AllowanceSeed')
       end
 
       it 'including a zip file attachment' do
         attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::IssuesHelper.issue_with_quota_seed(
+        issue  = Api::IssuesHelper.issue_with_allowance_seed(
           attachment,
           'application/zip',
           'file.zip'
         )
         post '/api/issues', params: issue
-        assert_issue_creation('QuotaSeed')
+        assert_issue_creation('AllowanceSeed')
       end
     end
 

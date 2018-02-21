@@ -1,6 +1,6 @@
-class QuotaSeedSerializer
+class AllowanceSeedSerializer
   include FastJsonapi::ObjectSerializer
   attributes :weight, :amount, :kind
   belongs_to :issue
-  belongs_to :quota
+  belongs_to :allowance
 end

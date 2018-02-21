@@ -15,7 +15,7 @@ class Issue < ApplicationRecord
 
   HAS_MANY = %i{
     relationship_seeds
-    quota_seeds
+    allowance_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
@@ -35,7 +35,7 @@ class Issue < ApplicationRecord
     seeds << natural_docket_seed if natural_docket_seed.present?
     seeds << legal_entity_docket_seed if legal_entity_docket_seed.present?
     seeds += relationship_seeds 
-    seeds += quota_seeds  
+    seeds += allowance_seeds  
     seeds << domicile_seed if domicile_seed.present?
     seeds
   end

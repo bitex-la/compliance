@@ -5,7 +5,7 @@ describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
 
   it 'Reviews a user created via api' do
-    # Creates issue via API: Includes seeds for domicile, identification, docket, quota.
+    # Creates issue via API: Includes seeds for domicile, identification, docket, allowance.
     post api_issues_path, params: Api::IssuesHelper.issue_with_domicile_seed(
       Base64.encode64(file_fixture('simple.png').read),
       'image/png',
@@ -78,18 +78,18 @@ describe 'an admin user' do
       end
     end
 
-    it 'can edit quotas' do
+    it 'can edit allowances' do
     end
   end
 
-  it 'keeps track of usage quotas' do
-    # A funding event is received via API that overruns the customer quota
-    # A quota issue is created,
+  it 'keeps track of usage allowances' do
+    # A funding event is received via API that overruns the customer allowance
+    # A allowance issue is created,
     # An admin reviews the issue, decides to require more information, the person is now 'invalid' | An admin dismisses the issue, customer remains valid
     # The customer sends further data (via API) (along with a comment)
     # An admin reviews the data and decides it's not enough. (and places further comments)
     # The customer finally attaches all the required documents
-    # The admin accepts the documents, assigns a value and periodicity to the new quotas backed by the documents. 
+    # The admin accepts the documents, assigns a value and periodicity to the new allowances backed by the documents. 
   end
 
   it 'registers associated accounts and bitcoin addresses' do

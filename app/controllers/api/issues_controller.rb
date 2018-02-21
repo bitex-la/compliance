@@ -20,7 +20,7 @@ class Api::IssuesController < Api::ApiController
         :identification_seeds,
         :natural_docket_seeds,
         :legal_entity_docket_seeds,
-        :quota_seeds
+        :allowance_seeds
       ]
       json_response JsonApi::ModelSerializer.call(issue, options), 200
     rescue ActiveRecord::RecordNotFound

@@ -36,7 +36,7 @@ class Issue::IssueCreator
         :identification_seed, 
         :natural_docket_seed,
         :legal_entity_docket_seed,
-        :quota_seeds,
+        :allowance_seeds,
         id: ''
       ],
       person: [id: person_scope],
@@ -78,7 +78,7 @@ class Issue::IssueCreator
         :attachments,
         id: ''
       ],
-      quota_seed: [
+      allowance_seed: [
         :weight,
         :amount,
         :kind,

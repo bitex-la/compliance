@@ -125,25 +125,25 @@ ActiveAdmin.register Person do
       end
     end
   
-    if person.quotas.any?
-      panel 'Quotas' do
-        table_for Quota,current(person) do |q|
-          q.column("ID") do |quota|
-            link_to(quota.id, quota_path(quota))
+    if person.allowances.any?
+      panel 'Allowances' do
+        table_for Allowance, current(person) do |q|
+          q.column("ID") do |allowance|
+            link_to(allowance.id, allowance_path(allowance))
           end
-          q.column("Weight") { |quota| quota.weight }
-          q.column("Amount") { |quota| quota.amount }
-          q.column("Kind")   { |quota| quota.kind }
-          q.column("Attachments") do |quota|
-            quota.attachments
+          q.column("Weight") { |allowance| allowance.weight }
+          q.column("Amount") { |allowance| allowance.amount }
+          q.column("Kind")   { |allowance| allowance.kind }
+          q.column("Attachments") do |allowance|
+            allowance.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
               .join("<br />").html_safe
           end
-          q.column("") { |quota|
-            link_to("View", quota_path(quota))
+          q.column("") { |allowance|
+            link_to("View", allowance_path(allowance))
           }
-          q.column("") { |quota|
-            link_to("Edit", edit_quota_path(quota))
+          q.column("") { |allowance|
+            link_to("Edit", edit_allowance_path(allowance))
           }
         end
       end
