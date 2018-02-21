@@ -41,7 +41,6 @@ class Api::IssuesController < Api::ApiController
   def create
     issue, errors = Issue::IssueCreator.call(params.permit!.to_h)
     if errors.empty?
-      puts issue.inspect
       json_response JsonApi::ModelSerializer.call(issue), 201
     else
       error_response(errors)

@@ -1,6 +1,7 @@
 class Api::ApiController < ApplicationController
   include ApiResponse
 
+  # ToDo: Deprecate and use mapper.
   def validate_processable
     if params[:data].blank?
       errors = []

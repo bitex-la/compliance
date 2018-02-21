@@ -1,6 +1,7 @@
 class Issue < ApplicationRecord
   include AASM
-  belongs_to :person
+  belongs_to :person, optional: true
+  validates :person, presence: true
 
   HAS_ONE = %i{
     domicile_seed

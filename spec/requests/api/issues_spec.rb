@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'helpers/api/issues_helper'
 require 'json'
 
-RSpec.describe Api::IssuesController, type: :controller do
+describe Issue do
   let(:basic_issue) { Api::IssuesHelper.basic_issue }
   let(:invalid_basic_issue)  { Api::IssuesHelper.invalid_basic_issue }
   let(:issue_without_person) { Api::IssuesHelper.issue_without_person }
@@ -13,7 +13,7 @@ RSpec.describe Api::IssuesController, type: :controller do
       assert_response 422
     end
 
-    it 'creates a new basic one' do
+    it 'creates a new person, then populates the issue' do
       post :create, params: basic_issue
       expect(Issue.count).to be_equal 1
       expect(Person.count).to be_equal 1

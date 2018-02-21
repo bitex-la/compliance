@@ -1,7 +1,4 @@
 class Api::PeopleController < Api::ApiController
-  before_action :validate_processable, only: [:create, :update]
-  protect_from_forgery :except => [:create]
-
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     people = Person.all.page(page).per(per_page)
@@ -36,11 +33,24 @@ class Api::PeopleController < Api::ApiController
   end
 
   def create
-    person, errors = People::PeopleCreator.call(params.permit!.to_h)
-    if errors.empty?
-      json_response JsonApi::ModelSerializer.call(person), 201
+    document = {
+      data: {
+        type: 'people',
+        id: '@1',
+        relationships: {
+          issues: { data: [{ type: 'issues', id: '@1' }] }
+        }
+      },
+      included: [{ type: 'issues', id: '@1' }]
+    }
+
+    mapper = JsonapiMapper.doc_unsafe! document,
+      [:people, :issues], people: [:issues], issues: []
+
+    if mapper.save_all
+      jsonapi_response mapper.data, {include: [:issues]}, 201
     else
-      error_response(errors)
+      json_response mapper.all_errors, 422
     end	
   end
 end

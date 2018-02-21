@@ -4,7 +4,7 @@ require 'helpers/api/issues_helper'
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
 
-  it 'creates a new natural person' do
+  it 'Reviews a user created via api' do
     # Creates issue via API: Includes seeds for domicile, identification, docket, quota.
     post api_issues_path, params: Api::IssuesHelper.issue_with_domicile_seed(
       Base64.encode64(file_fixture('simple.png').read),
