@@ -1,6 +1,5 @@
-class PersonSerializer
+class PeopleSerializer
   include FastJsonapi::ObjectSerializer
-  set_type :people
   has_many :issues
   has_many :domiciles
   has_many :identifications

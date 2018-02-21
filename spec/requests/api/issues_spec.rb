@@ -9,12 +9,12 @@ describe Issue do
 
   describe 'creating an Issue' do
     it 'responds with an Unprocessable Entity HTTP code (422) when body is empty' do
-      post :create,  params: {}
+      post '/api/issues',  params: {}
       assert_response 422
     end
 
     it 'creates a new person, then populates the issue' do
-      post :create, params: basic_issue
+      post '/api/issues', params: basic_issue
       expect(Issue.count).to be_equal 1
       expect(Person.count).to be_equal 1
       assert_response 201
@@ -23,7 +23,7 @@ describe Issue do
     it 'creates a new issue associated to an existent person' do
       person = Person.create
       issue  = Api::IssuesHelper.issue_with_current_person(person.id)
-      post :create, params: issue
+      post '/api/issues', params: issue
       expect(Issue.count).to be_equal 1
       expect(Person.count).to be_equal 1
       expect(Issue.first.person.id).to be_equal person.id
@@ -38,7 +38,7 @@ describe Issue do
           'image/png',
           'file.png'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('DomicileSeed')
       end
 
@@ -49,7 +49,7 @@ describe Issue do
           'image/jpg',
           'file.jpg'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('DomicileSeed')
       end
 
@@ -60,7 +60,7 @@ describe Issue do
           'image/gif',
           'file.gif'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('DomicileSeed')
       end
 
@@ -71,7 +71,7 @@ describe Issue do
           'application/pdf',
           'file.pdf'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('DomicileSeed')
       end
 
@@ -82,7 +82,7 @@ describe Issue do
           'application/zip',
           'file.zip'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('DomicileSeed')
       end
     end
@@ -95,7 +95,7 @@ describe Issue do
           'image/png',
           'file.png'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('IdentificationSeed')
       end
 
@@ -106,7 +106,7 @@ describe Issue do
           'image/jpg',
           'file.jpg'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('IdentificationSeed')
       end
 
@@ -117,7 +117,7 @@ describe Issue do
           'image/gif',
           'file.gif'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('IdentificationSeed')
       end
 
@@ -128,7 +128,7 @@ describe Issue do
           'application/pdf',
           'file.pdf'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('IdentificationSeed')
       end
 
@@ -139,7 +139,7 @@ describe Issue do
           'application/zip',
           'file.zip'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('IdentificationSeed')
       end
     end
@@ -152,7 +152,7 @@ describe Issue do
           'image/png',
           'file.png'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('NaturalDocketSeed')
       end
 
@@ -163,7 +163,7 @@ describe Issue do
           'image/jpg',
           'file.jpg'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('NaturalDocketSeed')
       end
 
@@ -174,7 +174,7 @@ describe Issue do
           'image/gif',
           'file.gif'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('NaturalDocketSeed')
       end
 
@@ -185,7 +185,7 @@ describe Issue do
           'application/pdf',
           'file.pdf'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('NaturalDocketSeed')
       end
 
@@ -196,7 +196,7 @@ describe Issue do
           'application/zip',
           'file.zip'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('NaturalDocketSeed')
       end
     end
@@ -209,7 +209,7 @@ describe Issue do
           'image/png',
           'file.png'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('LegalEntityDocketSeed')
       end
 
@@ -220,7 +220,7 @@ describe Issue do
           'image/jpg',
           'file.jpg'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('LegalEntityDocketSeed')
       end
 
@@ -231,7 +231,7 @@ describe Issue do
           'image/gif',
           'file.gif'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('LegalEntityDocketSeed')
       end
 
@@ -242,7 +242,7 @@ describe Issue do
           'application/pdf',
           'file.pdf'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('LegalEntityDocketSeed')
       end
 
@@ -253,7 +253,7 @@ describe Issue do
           'application/zip',
           'file.zip'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('LegalEntityDocketSeed')
       end
     end
@@ -266,7 +266,7 @@ describe Issue do
           'image/png',
           'file.png'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('QuotaSeed')
       end
 
@@ -277,7 +277,7 @@ describe Issue do
           'image/jpg',
           'file.jpg'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('QuotaSeed')
       end
 
@@ -288,7 +288,7 @@ describe Issue do
           'image/gif',
           'file.gif'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('QuotaSeed')
       end
 
@@ -299,7 +299,7 @@ describe Issue do
           'application/pdf',
           'file.pdf'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('QuotaSeed')
       end
 
@@ -310,20 +310,20 @@ describe Issue do
           'application/zip',
           'file.zip'
         )
-        post :create, params: issue
+        post '/api/issues', params: issue
         assert_issue_creation('QuotaSeed')
       end
     end
 
     it 'notifies that person id is invalid' do
-      post :create, params: invalid_basic_issue
+      post '/api/issues', params: invalid_basic_issue
       expect(Issue.count).to be_equal 0
       expect(Person.count).to be_equal 0
       assert_response 404
     end
 
     it 'notifies that person is not associated' do
-      post :create, params: issue_without_person
+      post '/api/issues', params: issue_without_person
       expect(Issue.count).to be_equal 0
       expect(Person.count).to be_equal 0
       assert_response 422
@@ -332,7 +332,7 @@ describe Issue do
 
   describe 'getting an issue' do
     it 'responds with a not found error 404 when the issue does not exist' do
-      get :show, params: {id: 1}
+      get '/api/issues/1'
       assert_response 404
     end
 
@@ -343,8 +343,8 @@ describe Issue do
         'image/png',
         'file.png'
       )
-      post :create, params: issue
-      get :show, params: {id: Issue.first.id}
+      post '/api/issues', params: issue
+      get  "/api/issues/#{Issue.first.id}"
       assert_response 200
     end
   end

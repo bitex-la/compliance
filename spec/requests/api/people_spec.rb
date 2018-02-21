@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'helpers/api/people_helper'
 
-describe People do
+describe Person do
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do
       Person.count.should == 0
@@ -46,12 +46,12 @@ describe People do
 
     it 'shows all the person info when the person exist' do
       person = Person.create
-      get :show, params: {id: person.id}
+      get "/api/people/#{person.id}"
       assert_response 200
     end
 
     it 'responds with a not found error 404 when the person does not exist' do
-      get :show, params: {id: 1}
+      get "/api/people/1"
       assert_response 404
     end
 

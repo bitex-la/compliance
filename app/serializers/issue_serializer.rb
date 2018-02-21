@@ -1,6 +1,6 @@
 class IssueSerializer
   include FastJsonapi::ObjectSerializer
-  belongs_to :person
+  belongs_to :person, record_type: :people
   has_one :domicile_seed
   has_one :identification_seed
   has_one :natural_docket_seed

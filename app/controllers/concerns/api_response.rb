@@ -5,7 +5,11 @@ module ApiResponse
 
   def jsonapi_response(resource, options = {}, status = 200)
     klass = resource.try(:klass) || resource.class
-    body = "#{klass}Serializer".constantize.new(resource, options).serialized_json 
+    if klass == Person
+      body = "PeopleSerializer".constantize.new(resource, options).serialized_json 
+    else
+      body = "#{klass}Serializer".constantize.new(resource, options).serialized_json 
+    end
     json_response body, status
   end
 
