@@ -36,7 +36,28 @@ module Api::IssuesHelper
   end
 
   def self.basic_issue
-    { data: nil }
+    {
+      data: {
+        type: "issue",
+        attributes: {
+          
+        },
+        relationships: {
+          people: {
+            data: {
+              id: "@1",
+              type: "people"
+            }
+          }
+        }
+      },
+      included: [
+        {
+          type: "people",
+          id: "@1"
+        }
+      ]
+    }
   end
 
   def self.invalid_basic_issue

@@ -19,7 +19,7 @@ describe Person do
           type: 'people',
           id: Person.last.id.to_s,
           relationships: {
-            issues: {data: [{ type: 'issue', id: Issue.last.id.to_s }] },
+            issues: {data: [{ type: 'issues', id: Issue.last.id.to_s }] },
             domiciles: {data: []},
             identifications: {data: []},
             natural_dockets: {data: []},
@@ -28,7 +28,7 @@ describe Person do
           }
         },
         included: [
-          { type: 'issue',
+          { type: 'issues',
             id: Issue.last.id.to_s,
             relationships: {
               person: {data: {id: Person.last.id.to_s, type: "people"}},
@@ -48,14 +48,12 @@ describe Person do
       person = create :full_natural_person
       get "/api/people/#{person.id}"
       assert_response 200
-			pp JSON.parse(response.body)
-			next
       JSON.parse(response.body).deep_symbolize_keys.should == {
         data: {
           type: 'people',
-          id: Person.last.id.to_s,
+          id: person.id.to_s,
           relationships: {
-            issues: {data: [{ type: 'issue', id: Issue.last.id.to_s }] },
+            issues: {data: [{ type: 'issues', id: Issue.last.id.to_s }] },
             domiciles: {data: []},
             identifications: {data: []},
             natural_dockets: {data: []},
@@ -64,16 +62,16 @@ describe Person do
           }
         },
         included: [
-          { type: 'issue',
+          { type: 'issues',
             id: Issue.last.id.to_s,
             relationships: {
-              person: {data: {id: Person.last.id.to_s, type: "people"}},
-              domicile_seed: {data: nil},
-              identification_seed: {data: nil},
-              natural_docket_seed: {data: nil},
+              person: {data: {id: person.id.to_s, type: "people"}},
+              domicile_seed: {data: {id: DomicileSeed.first.id.to_s, type: "domicile_seeds"}},
+              identification_seed: {data: {id: IdentificationSeed.first.id.to_s, type: "identification_seeds"}},
+              natural_docket_seed: {data: {id: NaturalDocketSeed.first.id.to_s, type: "natural_docket_seeds"}},
               legal_entity_docket_seed: {data: nil},
               relationship_seeds: {data: []},
-              allowance_seeds: {data: []}
+              allowance_seeds: {data: AllowanceSeed.where(issue: Issue.last).map{ |x| {id: x.id.to_s, type: "allowance_seeds" }}}
             }
           }
         ]
