@@ -3,15 +3,16 @@ module FastJsonapiCandy
     extend ActiveSupport::Concern
 
     included do
+      @naming = Garden::Naming.new(name)
       include Serializer
       build_belongs_to :person
-      has_one :seed, record_type: "#{name[0..-11].underscore}_seeds"
+      has_one :seed, record_type: @naming.seed_plural
       build_has_many :attachments
     end
 
     class_methods do
       def derive_seed_serializer! 
-        Object.const_set "#{name[0..-11]}SeedSerializer", Class.new do
+        Object.const_set @naming.seed_serializer, Class.new do
           include FastJsonapiCandy::PersonThingSeed
         end
       end
@@ -22,11 +23,12 @@ module FastJsonapiCandy
     extend ActiveSupport::Concern
 
     included do
+      naming = Garden::Naming.new(name)
       include Serializer
       build_belongs_to :issue
-      belongs_to :fruit, record_type: name[0..-15].undescore.pluralize
+      belongs_to :fruit, record_type: naming.plural
       build_has_many :attachments
-      attributes *"#{name[0..-15]}Serializer".constantize.attributes_to_serialize.keys
+      attributes *naming.serializer.constantize.attributes_to_serialize.keys
     end
   end
 
@@ -35,7 +37,7 @@ module FastJsonapiCandy
 
     included do
       include FastJsonapi::ObjectSerializer
-      set_type name[0..-11].pluralize.underscore
+      set_type Garden::Naming.new(name).plural
     end
 
     class_methods do
