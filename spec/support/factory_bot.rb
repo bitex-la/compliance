@@ -31,8 +31,8 @@ module FactoryBot
             factory factory_name do 
               after(:create) do |resource, evaluator|
                 create("#{factory_name}_seed",
-                  :issue => resource.person.issues.first,
-                  resource_name => resource)
+                  issue: resource.person.issues.first,
+                  fruit: resource)
               end
             end
           end

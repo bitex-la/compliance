@@ -5,7 +5,7 @@ module FastJsonapiCandy
     included do
       include Serializer
       build_belongs_to :person
-      build_has_one "#{name.underscore[0..-12]}_seed"
+      has_one :seed, record_type: "#{name[0..-11].underscore}_seeds"
       build_has_many :attachments
     end
 
@@ -23,7 +23,8 @@ module FastJsonapiCandy
 
     included do
       include Serializer
-      build_belongs_to :issue, name.underscore[0..-17].to_sym
+      build_belongs_to :issue
+      belongs_to :fruit, record_type: name[0..-15].undescore.pluralize
       build_has_many :attachments
       attributes *"#{name[0..-15]}Serializer".constantize.attributes_to_serialize.keys
     end

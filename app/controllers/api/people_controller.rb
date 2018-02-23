@@ -41,7 +41,7 @@ class Api::PeopleController < Api::ApiController
       [:people, :issues], people: [:issues], issues: []
 
     if mapper.save_all
-      jsonapi_response mapper.data
+      jsonapi_response mapper.data, {}, 201
     else
       json_response mapper.all_errors, 422
     end	

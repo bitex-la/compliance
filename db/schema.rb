@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180223151424) do
+ActiveRecord::Schema.define(version: 20180223183826) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -71,8 +71,8 @@ ActiveRecord::Schema.define(version: 20180223151424) do
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "person_id"
-    t.integer "seed_to_id"
-    t.string "seed_to_type"
+    t.integer "attached_to_id"
+    t.string "attached_to_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "document_file_name"
@@ -268,11 +268,21 @@ ActiveRecord::Schema.define(version: 20180223151424) do
     t.string "kind"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "person_to_id"
-    t.bigint "person_from_id"
+    t.bigint "related_person_id"
     t.index ["issue_id"], name: "index_relationship_seeds_on_issue_id"
-    t.index ["person_from_id"], name: "index_relationship_seeds_on_person_from_id"
-    t.index ["person_to_id"], name: "index_relationship_seeds_on_person_to_id"
+    t.index ["related_person_id"], name: "index_relationship_seeds_on_related_person_id"
+  end
+
+  create_table "relationships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "relationship_seed_id"
+    t.bigint "person_id"
+    t.bigint "related_person_id"
+    t.string "kind"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id"], name: "index_relationships_on_person_id"
+    t.index ["related_person_id"], name: "index_relationships_on_related_person_id"
+    t.index ["relationship_seed_id"], name: "index_relationships_on_relationship_seed_id"
   end
 
   add_foreign_key "allowance_seeds", "allowances"
@@ -309,6 +319,8 @@ ActiveRecord::Schema.define(version: 20180223151424) do
   add_foreign_key "natural_dockets", "people"
   add_foreign_key "observations", "issues"
   add_foreign_key "relationship_seeds", "issues"
-  add_foreign_key "relationship_seeds", "people", column: "person_from_id"
-  add_foreign_key "relationship_seeds", "people", column: "person_to_id"
+  add_foreign_key "relationship_seeds", "people", column: "related_person_id"
+  add_foreign_key "relationships", "people"
+  add_foreign_key "relationships", "people", column: "related_person_id"
+  add_foreign_key "relationships", "relationship_seeds"
 end

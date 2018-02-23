@@ -18,6 +18,10 @@ describe Person do
         data: {
           type: 'people',
           id: Person.last.id.to_s,
+          attributes: {
+            enabled: false,
+            risk: nil
+          },
           relationships: {
             issues: {data: [{ type: 'issues', id: Issue.last.id.to_s }] },
             domiciles: {data: []},
@@ -118,7 +122,7 @@ describe Person do
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
-            domicile_seed: {data: {
+            seed: {data: {
               type: "domicile_seeds",
               id: issue.domicile_seed.id.to_s
             }},
@@ -134,7 +138,7 @@ describe Person do
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
-            identification_seed: {data: {
+            seed: {data: {
               type: "identification_seeds",
               id: issue.identification_seed.id.to_s,
             }},
@@ -153,7 +157,7 @@ describe Person do
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
-            natural_docket_seed: { data: {
+            seed: { data: {
               id: issue.natural_docket_seed.id.to_s,
               type: "natural_docket_seeds"
             }},
@@ -169,7 +173,7 @@ describe Person do
           },
           relationships: {
             person: { data: {id: person.id.to_s, type:"people"}},
-            allowance_seed: {data: {
+            seed: {data: {
               type: "allowance_seeds",
               id: issue.allowance_seeds.first.id.to_s
             }},
@@ -185,7 +189,7 @@ describe Person do
           },
           relationships: {
             person: {data: {id: person.id.to_s, type:"people"}},
-            allowance_seed: {data: {
+            seed: {data: {
               type: "allowance_seeds",
               id: person.allowances.last.id.to_s
             }},
