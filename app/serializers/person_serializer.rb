@@ -1,10 +1,6 @@
 class PersonSerializer
-  include FastJsonapi::ObjectSerializer
-  set_type :people
-  has_many :issues, record_type: :issues
-  has_many :domiciles
-  has_many :identifications
-  has_many :natural_dockets
-  has_many :legal_entity_dockets
-  has_many :allowances
+  include FastJsonapiCandy::Serializer
+  attributes :enabled, :risk
+  build_has_many :issues, :domiciles, :identifications, :natural_dockets,
+    :legal_entity_dockets, :allowances
 end

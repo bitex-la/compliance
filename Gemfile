@@ -36,7 +36,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'geckodriver-helper'
-  gem 'factory_bot_rails'
+  gem 'factory_bot'
   gem 'dotenv-rails'
 end
 

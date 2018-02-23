@@ -46,36 +46,157 @@ describe Person do
 
     it 'shows all the person info when the person exist' do
       person = create :full_natural_person
+      issue = person.issues.first
+
       get "/api/people/#{person.id}"
       assert_response 200
-      JSON.parse(response.body).deep_symbolize_keys.should == {
-        data: {
-          type: 'people',
-          id: person.id.to_s,
+      json_response = JSON.parse(response.body).deep_symbolize_keys
+
+      json_response[:data].should == {
+        type: 'people',
+        id: person.id.to_s,
+        attributes: {
+          enabled: true,
+          risk: 'medium',
+        },
+        relationships: {
+          issues: {data: [{ type: 'issues', id: issue.id.to_s }] },
+          domiciles: {data: [{
+            id: person.domiciles.last.id.to_s,
+            type: "domiciles"
+          }]},
+          identifications: {data: [{
+            id: person.identifications.last.id.to_s,
+            type: "identifications"
+          }]},
+          natural_dockets: {data: [{
+            id: person.natural_dockets.last.id.to_s,
+            type: "natural_dockets"
+          }]},
+          legal_entity_dockets: {data: []},
+          allowances: {data: person.allowances.map{ |x|
+            {id: x.id.to_s, type: "allowances" }
+          }}
+        }
+      }
+
+      expected_included = [
+        { type: 'issues',
+          id: issue.id.to_s,
           relationships: {
-            issues: {data: [{ type: 'issues', id: Issue.last.id.to_s }] },
-            domiciles: {data: []},
-            identifications: {data: []},
-            natural_dockets: {data: []},
-            legal_entity_dockets: {data: []},
-            allowances: {data: []}
+            person: {data: {id: person.id.to_s, type: "people"}},
+            domicile_seed: { data: {
+              id: issue.domicile_seed.id.to_s,
+              type: "domicile_seeds"
+            }},
+            identification_seed: { data: {
+              id: issue.identification_seed.id.to_s,
+              type: "identification_seeds"
+            }},
+            natural_docket_seed: {data: {
+              id: issue.natural_docket_seed.id.to_s,
+              type: "natural_docket_seeds"
+            }},
+            legal_entity_docket_seed: {data: nil},
+            relationship_seeds: {data: []},
+            allowance_seeds: {data: issue.allowance_seeds.map{ |x|
+              {id: x.id.to_s, type: "allowance_seeds" }
+            }}
           }
         },
-        included: [
-          { type: 'issues',
-            id: Issue.last.id.to_s,
-            relationships: {
-              person: {data: {id: person.id.to_s, type: "people"}},
-              domicile_seed: {data: {id: DomicileSeed.first.id.to_s, type: "domicile_seeds"}},
-              identification_seed: {data: {id: IdentificationSeed.first.id.to_s, type: "identification_seeds"}},
-              natural_docket_seed: {data: {id: NaturalDocketSeed.first.id.to_s, type: "natural_docket_seeds"}},
-              legal_entity_docket_seed: {data: nil},
-              relationship_seeds: {data: []},
-              allowance_seeds: {data: AllowanceSeed.where(issue: Issue.last).map{ |x| {id: x.id.to_s, type: "allowance_seeds" }}}
-            }
+        { type: "domiciles",
+          id: person.domiciles.last.id.to_s,
+          attributes: {
+            country: "Argentina",
+            state: "Buenos Aires",
+            city: "C.A.B.A",
+            street_address: "Cullen",
+            street_number: "5229",
+            postal_code: "1432",
+            floor: "5",
+            apartment: "A"
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type: "people"}},
+            domicile_seed: {data: {
+              type: "domicile_seeds",
+              id: issue.domicile_seed.id.to_s
+            }},
+            attachments:{data:[]}
           }
-        ]
-      }
+        },
+        { type: "identifications",
+          id: person.identifications.last.id.to_s,
+          attributes: {
+            kind: "ID",
+            number: "2545566",
+            issuer: "Argentina"
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type: "people"}},
+            identification_seed: {data: {
+              type: "identification_seeds",
+              id: issue.identification_seed.id.to_s,
+            }},
+            attachments:{data:[]}
+          }
+        },
+        { type: "natural_dockets",
+          id: person.natural_dockets.first.id.to_s,
+          attributes: {
+            first_name: "Joe",
+            last_name: "Doe",
+            birth_date: "2018-02-23",
+            nationality: "Argentina",
+            gender: "Male",
+            marital_status: "Single"
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type: "people"}},
+            natural_docket_seed: { data: {
+              id: issue.natural_docket_seed.id.to_s,
+              type: "natural_docket_seeds"
+            }},
+            attachments:{data:[]}
+          }
+        },
+        { type: "allowances",
+          id: person.allowances.first.id.to_s,
+          attributes: {
+            weight: 1000,
+            amount: 1000,
+            kind:"USD"
+          },
+          relationships: {
+            person: { data: {id: person.id.to_s, type:"people"}},
+            allowance_seed: {data: {
+              type: "allowance_seeds",
+              id: issue.allowance_seeds.first.id.to_s
+            }},
+            attachments:{data:[]}
+          }
+        },
+        { type: "allowances",
+          id: person.allowances.last.id.to_s,
+          attributes: {
+            weight: 1000,
+            amount: 1000,
+            kind: "USD"
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type:"people"}},
+            allowance_seed: {data: {
+              type: "allowance_seeds",
+              id: person.allowances.last.id.to_s
+            }},
+            attachments:{data:[]}
+          }
+        }
+      ]
+
+      json_response[:included].each_with_index do |got, i|
+        got.should == expected_included[i]
+      end
     end
 
     it 'responds with a not found error 404 when the person does not exist' do

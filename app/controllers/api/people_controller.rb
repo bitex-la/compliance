@@ -9,9 +9,7 @@ class Api::PeopleController < Api::ApiController
 
   def show
     begin 
-      jsonapi_response Person.find(params[:id]), {
-        include: [:issues, :natural_dockets]
-      }
+      jsonapi_response Person.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       errors = []
       errors << JsonApi::Error.new({
@@ -43,7 +41,7 @@ class Api::PeopleController < Api::ApiController
       [:people, :issues], people: [:issues], issues: []
 
     if mapper.save_all
-      jsonapi_response mapper.data, {include: [:issues]}, 201
+      jsonapi_response mapper.data
     else
       json_response mapper.all_errors, 422
     end	

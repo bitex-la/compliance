@@ -1,6 +1,7 @@
-FactoryBot.define do
-  factory :identification do
-    issue nil
-    association :person, factory: :empty_person
-  end
-end
+FactoryBot.define_persons_item_and_seed(:identification,
+  full_natural_person_identification: proc {
+    number '2545566'
+    kind   'ID'
+    issuer 'Argentina'
+  }
+)

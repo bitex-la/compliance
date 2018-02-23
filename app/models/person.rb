@@ -1,9 +1,15 @@
 class Person < ApplicationRecord
-  has_many :issues
-  has_many :domiciles
-  has_many :identifications
-  has_many :natural_dockets
-  has_many :legal_entity_dockets
-  has_many :allowances
+  HAS_MANY = %i{
+    issues
+    domiciles
+    identifications
+    natural_dockets
+    legal_entity_dockets
+    allowances
+  }.each do |relationship|
+    has_many relationship
+  end
+
   has_many :comments, as: :commentable
+  enum risk: %i(low medium high)
 end

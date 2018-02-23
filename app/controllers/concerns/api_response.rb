@@ -3,9 +3,10 @@ module ApiResponse
     render json: object, status: status
   end
 
-  def jsonapi_response(resource, options = {}, status = 200)
-    klass = resource.try(:klass) || resource.class
-    body = "#{klass.to_s}Serializer".constantize.new(resource, options).serialized_json 
+  def jsonapi_response(it, options = {}, status = 200)
+    serializer = "#{it.try(:klass) || it.class}Serializer".constantize
+		options[:include] = serializer.relationships_to_serialize.keys
+    body = serializer.new(it, options).serialized_json 
     json_response body, status
   end
 

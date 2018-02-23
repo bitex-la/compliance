@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180221195008) do
+ActiveRecord::Schema.define(version: 20180223151424) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -50,9 +50,9 @@ ActiveRecord::Schema.define(version: 20180221195008) do
     t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "quota_id"
+    t.bigint "allowance_id"
+    t.index ["allowance_id"], name: "index_allowance_seeds_on_allowance_id"
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
-    t.index ["quota_id"], name: "index_allowance_seeds_on_quota_id"
   end
 
   create_table "allowances", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -259,6 +259,8 @@ ActiveRecord::Schema.define(version: 20180221195008) do
   create_table "people", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.integer "risk"
   end
 
   create_table "relationship_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -273,7 +275,7 @@ ActiveRecord::Schema.define(version: 20180221195008) do
     t.index ["person_to_id"], name: "index_relationship_seeds_on_person_to_id"
   end
 
-  add_foreign_key "allowance_seeds", "allowances", column: "quota_id"
+  add_foreign_key "allowance_seeds", "allowances"
   add_foreign_key "allowance_seeds", "issues"
   add_foreign_key "allowances", "allowances", column: "replaced_by_id"
   add_foreign_key "allowances", "issues"
