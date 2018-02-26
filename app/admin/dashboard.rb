@@ -28,7 +28,6 @@ ActiveAdmin.register_page "Dashboard" do
             }
             i.column("Actions") { |issue|
               span link_to("View", issue_path(issue))
-              span link_to("Edit", edit_issue_path(issue))
             }
           end
         end

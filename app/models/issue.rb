@@ -22,6 +22,7 @@ class Issue < ApplicationRecord
   end
 
   has_many :observations
+  accepts_nested_attributes_for :observations, allow_destroy: true
 
   scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
 

@@ -5,22 +5,15 @@ describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
 
   it 'Reviews a user created via api' do
-    # Creates issue via API: Includes seeds for domicile, identification, docket, allowance.
-    post api_issues_path, params: Api::IssuesHelper.issue_with_domicile_seed(
-      Base64.encode64(file_fixture('simple.png').read),
-      'image/png',
-      'file.png'
-    )
+    person = create :new_natural_person
+    issue = person.issues.first
 
-    issue = Issue.first
-    domicile_seed = DomicileSeed.first
-    expect(Issue.count).to be_equal 1
-    expect(Person.count).to be_equal 1
-    expect(DomicileSeed.count).to be_equal 1
-    expect(DomicileSeed.where(issue: issue).count).to be_equal 1
-    expect(domicile_seed.attachments.count).to be_equal 1
-
-    assert_response 201
+    Issue.count.should == 1
+    Person.count.should == 1 
+    DomicileSeed.count.should == 1
+    IdentificationSeed.count.should == 1
+    NaturalDocketSeed.count.should == 1
+    AllowanceSeed.count.should == 2
 
     # Admin does not see it as pending
     login_as admin_user
@@ -35,26 +28,42 @@ describe 'an admin user' do
       click_link('View')
     end
 
-    expect(page).to have_content 'Issue Details'
-    expect(page).to have_content 'domiciles'
+    expect(page).to have_content 'Identification'
+    expect(page).to have_content 'Domicile'
+    expect(page).to have_content 'Natural Docket'
+    expect(page).to have_content 'Allowance seed'
 
     # Admin verify the attachment(s)
-    within("//tr[@id='domicile_seed_#{domicile_seed.id}']") do
-      expect(page).to have_content domicile_seed.attachments.first.document_file_name
+    have_xpath("//li[@class='has_many_container attachments']", count: 4)
+    within first("//li[@class='has_many_container attachments']") do
+      within first("/fieldset[@class='inputs has_many_fields']") do
+       click_link 'Show'
+      end
     end
+
+    expect(page).to have_content 'Attachment Details'
+    expect(page).to have_content IdentificationSeed.first.attachments.first.document_file_name
+    
+    click_link "Issue #{issue.id}"
+   
+
+
+    # within("//tr[@id='domicile_seed_#{domicile_seed.id}']") do
+    #  expect(page).to have_content domicile_seed.attachments.first.document_file_name
+    #end
     
     # Admin sends comments to customer about their identification (it was blurry)
-    click_link('Add comment')
-    expect(page).to have_content 'Post new comment'
+    #click_link('Add comment')
+    #expect(page).to have_content 'Post new comment'
 
-    fill_in 'comment[title]', with: 'Domicile document is blurry'
-    fill_in 'comment[body]',  with: 'Please re-send your document' 
-    click_button 'Create Comment'
+    #fill_in 'comment[title]', with: 'Domicile document is blurry'
+    #fill_in 'comment[body]',  with: 'Please re-send your document' 
+    #click_button 'Create Comment'
 
-    expect(issue.reload.comments.count).to be_equal 1
-    within("//tr[@class='row row-commentable']") do
-      click_link("Issue ##{issue.id}")
-    end
+    #expect(issue.reload.comments.count).to be_equal 1
+    #within("//tr[@class='row row-commentable']") do
+    #  click_link("Issue ##{issue.id}")
+    #end
 
        # The issue goes away from the dashboard.
     # Customer re-submits identification (we get it via API)

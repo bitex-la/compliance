@@ -29,7 +29,7 @@ module ArbreHelpers
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
     builder.inputs(title, for: [relationship, b_object], &fields)
     if b_object.persisted?
-      context.span context.link_to("Show", b_object)
+      context.span context.link_to("Show", b_object, target: '_blank')
     end
   end
 
@@ -37,7 +37,7 @@ module ArbreHelpers
     builder.has_many relationship do |f|
       instance_exec(f, context, &fields)
       if f.object.persisted?
-        f.template.concat(context.link_to "Show", f.object)
+        f.template.concat(context.link_to "Show", f.object, target: '_blank')
       end 
     end
   end

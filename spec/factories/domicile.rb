@@ -8,5 +8,10 @@ FactoryBot.define_persons_item_and_seed(:domicile,
     postal_code     '1432'
     floor           '5'
     apartment       'A'
+    after(:create) do |thing|
+      %i(jpg png gif pdf zip).each do |name|
+        create "#{name}_attachment", attached_to: thing
+      end
+    end
   }
 )

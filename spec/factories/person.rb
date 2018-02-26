@@ -3,6 +3,15 @@ FactoryBot.define do
     enabled false
   end
 
+  factory :new_natural_person, class: Person do
+    enabled false
+    risk nil
+
+    after(:create) do |person, evaluator|
+      create :full_natural_person_issue, person: person
+    end
+  end
+
   factory :full_natural_person, class: Person do
     enabled true
     risk :medium

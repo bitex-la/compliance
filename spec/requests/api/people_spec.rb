@@ -150,7 +150,7 @@ describe Person do
           attributes: {
             first_name: "Joe",
             last_name: "Doe",
-            birth_date: "2018-02-23",
+            birth_date: "2018-02-26",
             nationality: "Argentina",
             gender: "Male",
             marital_status: "Single"
@@ -158,8 +158,8 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-              id: issue.natural_docket_seed.id.to_s,
-              type: "natural_docket_seeds"
+	      type: "natural_docket_seeds",	    
+              id: issue.natural_docket_seed.id.to_s
             }},
             attachments:{data:[]}
           }

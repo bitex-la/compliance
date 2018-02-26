@@ -1,6 +1,6 @@
 class Attachment < ApplicationRecord
   belongs_to :person, optional: true
-  belongs_to :seed_to, polymorphic: true, optional: true
+  belongs_to :attached_to, polymorphic: true, optional: true
   has_attached_file :document, optional: true
 
   validates_attachment :document,

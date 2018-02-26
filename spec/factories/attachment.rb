@@ -1,5 +1,8 @@
 FactoryBot.define do
-  factory :attachment do
-    association :person, factory: :empty_person
+   %i(jpg png gif pdf zip
+   ).each do |type|
+    factory "#{type}_attachment", class: Attachment do
+      document { File.new("#{Rails.root}/spec/fixtures/files/simple.#{type}") }
+    end
   end
 end

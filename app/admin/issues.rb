@@ -24,6 +24,14 @@ ActiveAdmin.register Issue do
     link_to 'Add Observation', '/'
   end
 
+  controller do
+    def show
+      super do |format|
+        redirect_to edit_issue_url and return if resource.new?
+      end
+    end
+  end
+
   form do |f|
     if f.object.persisted?
       f.inputs 'Basics' do
@@ -51,7 +59,7 @@ ActiveAdmin.register Issue do
       df.input :floor
       df.input :apartment
       ArbreHelpers.has_many_form self, df, :attachments do |af|
-        af.input :document, as: :file, label: "File", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
+        af.input :document, as: :file, label: "File #{af.object.document_file_name}", hint: af.object.document.nil? ? af.template.content_tag(:span, "No File Yet") : af.template.link_to('click to enlarge', af.object.document.url, target: '_blank')
         af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
       end
     end 
@@ -159,7 +167,7 @@ ActiveAdmin.register Issue do
       panel 'Allowances' do
         table_for issue.allowance_seeds do |q|
           q.column("ID") do |seed|
-            link_to(seed.id, allowance_seed_path(seed))
+            link_to(seed.id, allowance_seeds_path(seed))
           end
           q.column("Weight") { |seed| seed.weight }
           q.column("Amount") { |seed| seed.amount }
@@ -170,7 +178,7 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           q.column("") { |seed|
-            link_to("View", allowance_seed_path(seed))
+            link_to("View", allowance_seeds_path(seed))
           }
           q.column("") { |seed|
             link_to("Edit", edit_allowance_seed_path(seed))
