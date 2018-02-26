@@ -126,7 +126,9 @@ describe Person do
               type: "domicile_seeds",
               id: issue.domicile_seed.id.to_s
             }},
-            attachments:{data:[]}
+            attachments:{
+              data: person.domiciles.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
           }
         },
         { type: "identifications",
@@ -142,7 +144,9 @@ describe Person do
               type: "identification_seeds",
               id: issue.identification_seed.id.to_s,
             }},
-            attachments:{data:[]}
+            attachments:{
+              data: person.identifications.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
           }
         },
         { type: "natural_dockets",
@@ -161,7 +165,9 @@ describe Person do
 	      type: "natural_docket_seeds",	    
               id: issue.natural_docket_seed.id.to_s
             }},
-            attachments:{data:[]}
+            attachments:{
+              data: person.natural_dockets.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
           }
         },
         { type: "allowances",
@@ -174,10 +180,12 @@ describe Person do
           relationships: {
             person: { data: {id: person.id.to_s, type:"people"}},
             seed: {data: {
-              type: "allowance_seeds",
-              id: issue.allowance_seeds.first.id.to_s
+              id: issue.allowance_seeds.first.id.to_s,
+              type: "allowance_seeds"
             }},
-            attachments:{data:[]}
+            attachments:{
+              data: person.allowances.first.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
           }
         },
         { type: "allowances",
@@ -190,10 +198,12 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type:"people"}},
             seed: {data: {
-              type: "allowance_seeds",
-              id: person.allowances.last.id.to_s
+              id: issue.allowance_seeds.last.id.to_s,
+              type: "allowance_seeds"
             }},
-            attachments:{data:[]}
+            attachments:{
+              data: person.allowances.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
           }
         }
       ]
