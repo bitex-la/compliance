@@ -11,10 +11,10 @@ module FastJsonapiCandy
     end
 
     class_methods do
-      def derive_seed_serializer! 
-        Object.const_set @naming.seed_serializer, Class.new do
-          include FastJsonapiCandy::PersonThingSeed
-        end
+      def derive_seed_serializer!
+        klass = Class.new
+        Object.const_set(@naming.seed_serializer, klass)
+        klass.class_eval{ include FastJsonapiCandy::PersonThingSeed }  
       end
     end
   end
@@ -26,9 +26,11 @@ module FastJsonapiCandy
       naming = Garden::Naming.new(name)
       include Serializer
       build_belongs_to :issue
-      belongs_to :fruit, record_type: naming.plural
+      belongs_to :fruit, record_type: naming.plural, id_method_name: "#{naming.fruit.downcase}_id"
       build_has_many :attachments
-      attributes *naming.serializer.constantize.attributes_to_serialize.keys
+      if naming.serializer.constantize.attributes_to_serialize.nil?
+      end
+      attributes *naming.serializer.constantize.attributes_to_serialize.try(:keys) 
     end
   end
 

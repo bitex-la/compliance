@@ -69,6 +69,6 @@ RSpec.configure do |config|
 
   Capybara.configure do |config|
     #config.run_server = false
-    #config.default_driver = :firefox
+    config.default_driver = :firefox
   end
 end

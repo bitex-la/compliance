@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180223183826) do
+ActiveRecord::Schema.define(version: 20180227133728) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -249,11 +249,22 @@ ActiveRecord::Schema.define(version: 20180223183826) do
     t.index ["replaced_by_id"], name: "index_natural_dockets_on_replaced_by_id"
   end
 
+  create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "subject"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "observations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "note"
+    t.text "reply"
+    t.bigint "observation_reason_id"
     t.index ["issue_id"], name: "index_observations_on_issue_id"
+    t.index ["observation_reason_id"], name: "index_observations_on_observation_reason_id"
   end
 
   create_table "people", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

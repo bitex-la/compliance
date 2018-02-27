@@ -13,31 +13,22 @@ describe Issue do
       assert_response 422
     end
 
-    it 'creates a new person, then populates the issue' do
-=begin      
-      post '/api/issues', params: basic_issue
-      expect(Issue.count).to be_equal 1
-      expect(Person.count).to be_equal 1
-      assert_response 201
-=end
-      #puts Issue.all.inspect
-      #Person.count.should == 0
-      #Issue.count.should == 0
-
-      post '/api/issues', params: { data: nil }
-
-      #Person.count.should == 1
-      #Issue.count.should == 1
-      pp JSON.parse(response.body).deep_symbolize_keys
-    end
-
     it 'creates a new issue associated to an existent person' do
       person = Person.create
-      issue  = Api::IssuesHelper.issue_with_current_person(person.id)
-      post '/api/issues', params: issue
-      expect(Issue.count).to be_equal 1
-      expect(Person.count).to be_equal 1
-      expect(Issue.first.person.id).to be_equal person.id
+      attachment = Base64.encode64(file_fixture('simple.png').read)
+      issue  = Api::IssuesHelper.issue_with_domicile_seed(
+          attachment, 
+          'image/png',
+          'file.png'
+        )  
+   
+      post "/api/people/#{person.id}/issues", params: issue
+      Issue.count.should == 1
+      Person.count.should == 1
+      Issue.first.person.should == person
+      DomicileSeed.count.should == 1     
+      DomicileSeed.last.issue.should == Issue.first
+
       assert_response 201
     end
 

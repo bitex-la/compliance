@@ -36,25 +36,78 @@ class Api::IssuesController < Api::ApiController
   end
 
   def create
-    document = {
-      data: {
-        type: 'issues',
-        id: '@1',
-        relationships: {
-          people: { data: [{ type: 'people', id: '@1' }] }
-        }
-      },
-      included: [{ type: 'people', id: '@1' }]
-    }
+    person = Person.find(params[:person_id])
 
-    debugger
-    mapper = JsonapiMapper.doc_unsafe! document,
-      [:issues, :people], people: [], issues: [:people]
-  
+    mapper = JsonapiMapper.doc params.permit!.to_h,
+      issues: [
+        :domicile_seed,
+        :identification_seed,
+	:natural_docket_seed,
+	:legal_entity_docket_seed,
+        :allowance_seeds,
+        id: nil, 
+	person_id: person.id   
+      ], 
+      domicile_seeds: [
+        :country,
+        :state,
+        :city,
+        :street_address,
+        :street_number,
+        :postal_code,
+        :floor,
+        :apartment,
+        :attachments,
+        id: nil
+      ],
+      identification_seeds: [
+        :kind,
+        :number,
+        :issuer,
+        :attachments,
+        id: nil
+      ],
+      natural_docket_seeds: [
+        :first_name,
+        :last_name,
+        :birth_date,
+        :nationality,
+        :gender,
+        :marital_status,
+        :attachments,
+        id: nil
+      ],
+      legal_entity_docket_seeds: [
+        :industry,
+        :business_description,
+        :country,
+        :commercial_name,
+        :legal_name,
+        :attachments,
+        id: nil
+      ],
+      allowance_seeds: [
+        :weight,
+        :amount,
+        :kind,
+        :attachments,
+        id: nil
+      ],
+      attachments: [
+        :document,
+        :document_file_name,
+        :document_content_type,
+        id: nil, 
+	person_id: person.id
+      ]
+ 
     if mapper.save_all
       jsonapi_response mapper.data, {include: [:people]}, 201
     else
       json_response mapper.all_errors, 422
     end	
+  end
+
+  def update
   end
 end

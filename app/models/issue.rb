@@ -25,10 +25,20 @@ class Issue < ApplicationRecord
   accepts_nested_attributes_for :observations, allow_destroy: true
 
   scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
+  scope :un_observed, -> { where(aasm_state: 'new') } 
 
   aasm do
     state :new, :initial => true
-  end
+    state :observed
+
+    event :observe do
+      transitions from: :new, to: :observed
+    end
+
+    event :edit do
+      transitions from: :observed, to: :new
+    end 
+ end
 
   def get_seeds
     seeds = [] 

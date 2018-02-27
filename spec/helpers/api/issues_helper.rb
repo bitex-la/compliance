@@ -17,7 +17,7 @@ module Api::IssuesHelper
   def self.issue_with_current_person(person_id)
     {
       data: {
-        type: "issue",
+        type: "issues",
         attributes: {
           
         },
@@ -25,7 +25,7 @@ module Api::IssuesHelper
           person: {
             data: {
               id: person_id,
-              type: "person"
+              type: "people"
             }
           }
         }
@@ -83,34 +83,23 @@ module Api::IssuesHelper
   def self.issue_with_domicile_seed(attachment, content_type, file_name)
     {
       data: {
-        type: "issue",
+        id: "@1",
+        type: "issues",
         attributes: {
           
         },
         relationships: {
-          person: {
+          domicile_seed: {
             data: {
               id: "@1",
-              type: "person"
+              type: "domicile_seeds"
             }
-          },
-          domicile_seeds: {
-            data: [
-              {
-                id: "@1",
-                type: "domicile_seed"
-              }
-            ],
           }
         }
       },
-      included:[
+      included: [
         {
-          type: "person",
-          id: "@1"
-        },
-        {
-          type: "domicile_seed",
+          type: "domicile_seeds",
           id: "@1",
           attributes: {
             country: "argentina",
@@ -123,16 +112,19 @@ module Api::IssuesHelper
             apartment: "a"
           },
           relationships: {
+            issue: {
+              data: {id: "@1", type: 'issues'}
+            },
             attachments: {
               data: [{
                 id: "@1",
-                type: "attachment"
+                type: "attachments"
               }]
             }
           }
         },
         {
-          type: "attachment",
+          type: "attachments",
           id: "@1",
           attributes: {
             document: "data:#{content_type};base64,#{attachment.delete!("\n")}",

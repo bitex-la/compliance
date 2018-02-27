@@ -40,7 +40,6 @@ describe Person do
               identification_seed: {data: nil},
               natural_docket_seed: {data: nil},
               legal_entity_docket_seed: {data: nil},
-              relationship_seeds: {data: []},
               allowance_seeds: {data: []}
             }
           }
@@ -102,7 +101,6 @@ describe Person do
               type: "natural_docket_seeds"
             }},
             legal_entity_docket_seed: {data: nil},
-            relationship_seeds: {data: []},
             allowance_seeds: {data: issue.allowance_seeds.map{ |x|
               {id: x.id.to_s, type: "allowance_seeds" }
             }}

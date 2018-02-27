@@ -99,6 +99,11 @@ ActiveAdmin.register Issue do
       end
     end
 
+    ArbreHelpers.has_many_form self, f, :observations do |of|
+      of.input :observation_reason
+      of.input :note
+    end
+
     f.actions
   end
 
