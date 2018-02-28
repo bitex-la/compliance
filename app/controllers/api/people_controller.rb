@@ -8,21 +8,7 @@ class Api::PeopleController < Api::ApiController
   end
 
   def show
-    begin 
-      jsonapi_response Person.find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      errors = []
-      errors << JsonApi::Error.new({
-        links:   {},
-        status:  404,
-        code:    "person_not_found",
-        title:   "person not found",
-        detail:  "person_not_found",
-        source:  {},
-        meta:    {}
-      })
-      error_response(errors)
-    end
+    jsonapi_response Person.find(params[:id])
   end
 
   def create

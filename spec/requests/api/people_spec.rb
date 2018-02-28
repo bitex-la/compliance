@@ -14,7 +14,7 @@ describe Person do
 
       response.status.should == 201
 
-      JSON.parse(response.body).deep_symbolize_keys.should == {
+      json_response.should == {
         data: {
           type: 'people',
           id: Person.last.id.to_s,

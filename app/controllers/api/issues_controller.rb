@@ -4,37 +4,12 @@ class Api::IssuesController < Api::ApiController
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     issues = Issue.all.page(page).per(per_page)
-
-    options = {}
-    options[:meta] = { total_pages: (Issue.count.to_f / per_page).ceil }
-    json_response JsonApi::ModelSerializer.call(issues, options), 200
+    options = { meta: { total_pages: (Issue.count.to_f / per_page).ceil } }
+    jsonapi_response issues, options, 200
   end
 
   def show
-    begin 
-      issue = Issue.find(params[:id])
-      options = {}
-      options[:include] = [
-        :domicile_seed,
-        :identification_seed,
-        :natural_docket_seed,
-        :legal_entity_docket_seed,
-        :allowance_seeds
-      ]
-      jsonapi_response issue, options, 200
-    rescue ActiveRecord::RecordNotFound
-      errors = []
-      errors << JsonApi::Error.new({
-        links:   {},
-        status:  404,
-        code:    "issue_not_found",
-        title:   "issue not found",
-        detail:  "issue_not_found",
-        source:  {},
-        meta:    {}
-      })
-      error_response(errors)
-    end
+    jsonapi_response(Issue.find(params[:id]), {}, 200)
   end
 
   def create
@@ -104,30 +79,20 @@ class Api::IssuesController < Api::ApiController
       ]
  
     if mapper.save_all
-      jsonapi_response mapper.data, {include: [:people]}, 201
+      jsonapi_response mapper.data, {}, 201
     else
       json_response mapper.all_errors, 422
     end	
   end
 
   def update
-    begin
-      issue = Issue.find(params[:id])
-      options = {}
-      options[:include] = [
+    issue = Person.find(params[:person_id]).issues.find(params[:id])
+    mapper = JsonapiMapper.doc params.permit!.to_h,
+      issues: [
         :domicile_seed,
         :identification_seed,
         :natural_docket_seed,
         :legal_entity_docket_seed,
-        :allowance_seeds
-      ]
-      
-      mapper = JsonapiMapper.doc params.permit!.to_h,
-      issues: [
-        :domicile_seed,
-        :identification_seed,
-	:natural_docket_seed,
-	:legal_entity_docket_seed,
         :allowance_seeds,
         id: issue.id,
         person_id: issue.person.id 
@@ -181,27 +146,13 @@ class Api::IssuesController < Api::ApiController
         :document,
         :document_file_name,
         :document_content_type,
-	person_id: issue.person.id
+        person_id: issue.person.id
       ] 
 
-      if mapper.save_all
-        jsonapi_response mapper.data, options, 200
-      else
-        json_response mapper.all_errors, 422
-      end	      
-
-    rescue ActiveRecord::RecordNotFound
-      errors = []
-      errors << JsonApi::Error.new({
-        links:   {},
-        status:  404,
-        code:    "issue_not_found",
-        title:   "issue not found",
-        detail:  "issue_not_found",
-        source:  {},
-        meta:    {}
-      })
-      error_response(errors)
-    end 
+    if mapper.save_all
+      jsonapi_response mapper.data, {}, 200
+    else
+      json_response mapper.all_errors, 422
+    end	      
   end
 end

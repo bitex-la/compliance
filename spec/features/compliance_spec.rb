@@ -74,25 +74,27 @@ describe 'an admin user' do
 
   describe 'when admin edits an issue' do
     it 'can edit the domicile' do
-      post api_issues_path, params: Api::IssuesHelper.issue_with_domicile_seed(
-        Base64.encode64(file_fixture('simple.png').read),
-        'image/png',
-        'file.png'
-      )
+      post api_person_issues_path(create(:full_natural_person).id),
+        params: Api::IssuesHelper.issue_with_domicile_seed(:png)
       login_as admin_user
-      issue = Issue.first
 
-      print page.body
-      within("//tr[@id='issue_#{issue.id}']//td[@class='col col-actions']") do
-        click_link('Edit')
+      issue = Issue.last
+      within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
+        click_link('View')
       end
+      pending
+      fail
     end
 
     it 'can edit allowances' do
+      pending
+      fail
     end
   end
 
   it 'keeps track of usage allowances' do
+    pending
+    fail
     # A funding event is received via API that overruns the customer allowance
     # A allowance issue is created,
     # An admin reviews the issue, decides to require more information, the person is now 'invalid' | An admin dismisses the issue, customer remains valid
@@ -103,11 +105,17 @@ describe 'an admin user' do
   end
 
   it 'registers associated accounts and bitcoin addresses' do
+    pending
+    fail
   end
 
   it 'performs periodic checks using third party databases' do
+    pending
+    fail
   end
 
   it 'exports the customer data signed by bitex' do
+    pending
+    fail
   end
 end

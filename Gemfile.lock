@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/bitex-la/jsonapi-mapper.git
-  revision: 498fae556a1643f3e29a314fda9d9ee3261a82b4
+  revision: 305bf1edcb2588b281ed9533877db806f3582649
   specs:
-    jsonapi_mapper (0.1.5)
+    jsonapi_mapper (0.1.6)
       activemodel (~> 5.1, >= 5.1.4)
       activesupport (~> 5.1, >= 5.1.4)
 

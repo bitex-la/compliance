@@ -5,6 +5,7 @@ module FastJsonapiCandy
     included do
       @naming = Garden::Naming.new(name)
       include Serializer
+      set_type @naming.plural
       build_belongs_to :person
       has_one :seed, record_type: @naming.seed_plural
       build_has_many :attachments
@@ -25,6 +26,7 @@ module FastJsonapiCandy
     included do
       naming = Garden::Naming.new(name)
       include Serializer
+      set_type naming.seed_plural
       build_belongs_to :issue
       belongs_to :fruit, record_type: naming.plural, id_method_name: "#{naming.fruit.underscore}_id"
       build_has_many :attachments
@@ -39,7 +41,6 @@ module FastJsonapiCandy
 
     included do
       include FastJsonapi::ObjectSerializer
-      set_type Garden::Naming.new(name).plural
     end
 
     class_methods do

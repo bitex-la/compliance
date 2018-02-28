@@ -1,5 +1,7 @@
 require 'spec_helper'
-module Api::IssuesHelper
+class Api::IssuesHelper
+  include RSpec::Rails::FixtureFileUploadSupport
+
   def self.issue_without_person
     {
       data: {
@@ -80,20 +82,16 @@ module Api::IssuesHelper
     }
   end
 
-  def self.issue_with_domicile_seed(attachment, content_type, file_name)
+  def self.issue_with_domicile_seed(attachment_type)
+    mime, bytes = 
     {
       data: {
         id: "@1",
         type: "issues",
-        attributes: {
-          
-        },
+        attributes: { },
         relationships: {
           domicile_seed: {
-            data: {
-              id: "@1",
-              type: "domicile_seeds"
-            }
+            data: { id: "@1", type: "domicile_seeds" }
           }
         }
       },
@@ -123,20 +121,12 @@ module Api::IssuesHelper
             }
           }
         },
-        {
-          type: "attachments",
-          id: "@1",
-          attributes: {
-            document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
-            document_file_name: file_name,
-            document_content_type: content_type
-          }
-        }
+        attachment_for(attachment_type, '@1')
       ]
     }
   end
 
-  def self.issue_with_identification_seed(attachment, content_type, file_name)
+  def self.issue_with_identification_seed(attachment_type)
     {
       data: {
         type: "issues",
@@ -171,20 +161,12 @@ module Api::IssuesHelper
             }
           }
         },
-        {
-          type: "attachments",
-          id: "@1",
-          attributes: {
-            document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
-            document_file_name: file_name,
-            document_content_type: content_type
-          }
-        }
+        attachment_for(attachment_type, '@1')
       ]
     }
   end
 
-  def self.issue_with_natural_docket_seed(attachment, content_type, file_name)
+  def self.issue_with_natural_docket_seed(attachment_type)
     {
       data: {
         type: "issues",
@@ -222,20 +204,12 @@ module Api::IssuesHelper
             }
           }
         },
-        {
-          type: "attachments",
-          id: "@1",
-          attributes: {
-            document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
-            document_file_name: file_name,
-            document_content_type: content_type
-          }
-        }
+        attachment_for(attachment_type, '@1')
       ]
     }
   end
 
-  def self.issue_with_legal_entity_docket_seed(attachment, content_type, file_name)
+  def self.issue_with_legal_entity_docket_seed(attachment_type)
     {
       data: {
         type: "issues",
@@ -272,20 +246,12 @@ module Api::IssuesHelper
             }
           }
         },
-        {
-          type: "attachments",
-          id: "@1",
-          attributes: {
-            document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
-            document_file_name: file_name,
-            document_content_type: content_type
-          }
-        }
+        attachment_for(attachment_type, '@1')
       ]
     }
   end
 
-  def self.issue_with_allowance_seed(attachment, content_type, file_name)
+  def self.issue_with_allowance_seed(attachment_type)
     {
       data: {
         type: "issues",
@@ -319,16 +285,31 @@ module Api::IssuesHelper
             }
           }
         },
-        {
-          type: "attachments",
-          id: "@1",
-          attributes: {
-            document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
-            document_file_name: file_name,
-            document_content_type: content_type
-          }
-        }
+        attachment_for(attachment_type, '@1')
       ]
+    }
+  end
+
+  def self.attachment_for(ext, id)
+    mime = case ext
+    when :png, :jpg, :gif then "image/#{ext}"
+    when :pdf, :zip then "application/#{ext}"
+    when :rar then "application/x-rar-compressed"
+    else raise "No fixture for #{ext} files"
+    end
+      
+    fixtures = RSpec.configuration.file_fixture_path
+    path = Pathname.new(File.join(fixtures, "simple.#{ext}"))
+    bytes = Base64.encode64(path.read).delete!("\n")
+
+    {
+      type: "attachments",
+      id: id,
+      attributes: {
+        document: "data:#{mime};base64,#{bytes}",
+        document_file_name: "file.#{ext}",
+        document_content_type: mime
+      }
     }
   end
 end

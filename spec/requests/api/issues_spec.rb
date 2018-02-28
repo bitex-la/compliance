@@ -22,84 +22,42 @@ describe Issue do
       assert_response 422
     end
 
-    describe 'creates a new issue with a domicile seed' do
-      it 'including a png file attachment' do
-      	attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::IssuesHelper.issue_with_domicile_seed(
-          attachment, 
-          'image/png',
-          'file.png'
-        )  
-   
-        post "/api/people/#{person.id}/issues", params: issue
+    %i(png gif pdf jpg zip).each do |ext|
+      describe "receives a #{ext} attachment and" do
+        it 'creates a new issue with a domicile seed' do
+          issue  = Api::IssuesHelper.issue_with_domicile_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["DomicileSeed"]) 
+          assert_response 201
+        end
 
-        assert_issue_integrity(["DomicileSeed"]) 
-        assert_response 201
-      end
-    end
+        it 'creates a new issue with an identification seed' do
+          issue  = Api::IssuesHelper.issue_with_identification_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["IdentificationSeed"]) 
+          assert_response 201
+        end
 
-    describe 'creates a new issue with an identification seed' do
-      it 'including a pdf file attachment' do
-      	attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::IssuesHelper.issue_with_identification_seed(
-          attachment, 
-          'application/pdf',
-          'file.pdf'
-        )  
-   
-        post "/api/people/#{person.id}/issues", params: issue
+        it 'creates a new issue with a natural docket seed' do
+          issue  = Api::IssuesHelper.issue_with_natural_docket_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["NaturalDocketSeed"]) 
+          assert_response 201
+        end
 
-        assert_issue_integrity(["IdentificationSeed"]) 
-        assert_response 201
-      end
-    end
+        it 'creates a new issue with a legal entity docket seed' do
+          issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["LegalEntityDocketSeed"]) 
+          assert_response 201
+        end
 
-
-    describe 'creates a new issue with a natural docket seed' do
-      it 'including a jpg file attachment' do
-      	attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
-          attachment, 
-          'image/jpg',
-          'file.jpg'
-        )  
-  
-        post "/api/people/#{person.id}/issues", params: issue
-
-        assert_issue_integrity(["NaturalDocketSeed"]) 
-        assert_response 201
-      end
-    end
-
-    describe 'creates a new issue with a legal entity docket seed' do
-      it 'including a zip file attachment' do
-      	attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
-          attachment, 
-          'application/zip',
-          'file.zip'
-        )  
-  
-        post "/api/people/#{person.id}/issues", params: issue
-
-        assert_issue_integrity(["LegalEntityDocketSeed"]) 
-        assert_response 201
-      end
-    end
-
-    describe 'creates a new issue with a allowance seed' do
-      it 'including a gif file attachment' do
-      	attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::IssuesHelper.issue_with_allowance_seed(
-          attachment, 
-          'image/gif',
-          'file.gif'
-        )  
-  
-        post "/api/people/#{person.id}/issues", params: issue
-
-        assert_issue_integrity(["AllowanceSeed"]) 
-        assert_response 201
+        it 'creates a new issue with a allowance seed' do
+          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["AllowanceSeed"]) 
+          assert_response 201
+        end
       end
     end
   end
@@ -112,21 +70,12 @@ describe Issue do
 
     describe 'update a issue with a domicile seed' do
       it 'modifiying the domicile info' do
-        attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue_payload  = Api::IssuesHelper.issue_with_domicile_seed(
-          attachment, 
-          'image/png',
-          'file.png'
-        )   
-        post "/api/people/#{person.id}/issues", params: issue_payload
+        post "/api/people/#{person.id}/issues",
+          params: Api::IssuesHelper.issue_with_domicile_seed(:png)
         assert_issue_integrity(["DomicileSeed"])
+        issue_document = json_response
 
-        domicile_seed = DomicileSeed.first
-
-        issue_payload[:data][:id] = Issue.first.id 
-        issue_payload[:data][:relationships][:domicile_seed][:data][:id] = domicile_seed.id
-        issue_payload[:included][0][:id] = domicile_seed.id
-        issue_payload[:included][0][:attributes] = {
+        issue_document[:included][1][:attributes] = {
           country: "Argentina",
           state: "Baires", 
           street_address: "Mitre",
@@ -136,17 +85,21 @@ describe Issue do
           apartment: "N/A"	  
         } 
        
-        patch "/api/people/#{person.id}/issues/#{Issue.first.id}", params: issue_payload 
- 
+        patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
+          params: JSON.dump(issue_document),
+          headers: {"CONTENT_TYPE" => 'application/json' }
+
         assert_response 200
-        domicile_seed.reload
-        domicile_seed.country.should == "Argentina"
-        domicile_seed.state.should == "Baires"
-        domicile_seed.city == "CABA"
-        domicile_seed.street_address == 'Mitre'
-        domicile_seed.postal_code == "1341"
-        domicile_seed.floor == "1"
-        domicile_seed.apartment == "N/A"
+        DomicileSeed.first.tap do |seed|
+          seed.reload
+          seed.country.should == "Argentina"
+          seed.state.should == "Baires"
+          seed.city == "CABA"
+          seed.street_address == 'Mitre'
+          seed.postal_code == "1341"
+          seed.floor == "1"
+          seed.apartment == "N/A"
+        end
       end 
     end
   end
@@ -158,18 +111,15 @@ describe Issue do
     end
 
     it 'shows all the person info when the issue exist' do  
-      attachment = Base64.encode64(file_fixture('simple.png').read)
-      issue  = Api::IssuesHelper.issue_with_domicile_seed(
-        attachment, 
-        'image/png',
-        'file.png'
-      )
+      issue  = Api::IssuesHelper.issue_with_domicile_seed(:png)
       post "/api/people/#{person.id}/issues", params: issue
+      response_for_post = response.body
 
       assert_issue_integrity(["DomicileSeed"])
   
       get  "/api/people/#{person.id}/issues/#{Issue.first.id}"
       assert_response 200
+      response.body.should == response_for_post
     end
   end
 end
