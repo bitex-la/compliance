@@ -139,34 +139,23 @@ module Api::IssuesHelper
   def self.issue_with_identification_seed(attachment, content_type, file_name)
     {
       data: {
-        type: "issue",
+        type: "issues",
         attributes: {
           
         },
         relationships: {
-          person: {
-            data: {
-              id: "@1",
-              type: "person"
-            }
-          },
-          identification_seeds: {
-            data: [
+          identification_seed: {
+            data: 
             {
               id: "@1",
-              type: "identification_seed"
-            }
-            ]
+              type: "identification_seeds"
+            }            
           }
         }
       },
       included:[
         {
-          type: "person",
-          id: "@1"
-        },
-        {
-          type: "identification_seed",
+          type: "identification_seeds",
           id: "@1",
           attributes: {
             kind: "passport",
@@ -177,13 +166,13 @@ module Api::IssuesHelper
             attachments: {
               data: [{
                 id: "@1",
-                type: "attachment"
+                type: "attachments"
               }]
             }
           }
         },
         {
-          type: "attachment",
+          type: "attachments",
           id: "@1",
           attributes: {
             document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
@@ -198,34 +187,23 @@ module Api::IssuesHelper
   def self.issue_with_natural_docket_seed(attachment, content_type, file_name)
     {
       data: {
-        type: "issue",
+        type: "issues",
         attributes: {
           
         },
         relationships: {
-          person: {
-            data: {
-              id: "@1",
-              type: "person"
-            }
-          },
-          natural_docket_seeds: {
-            data: [
+          natural_docket_seed: {
+            data: 
             {
               id: "@1",
-              type: "natural_docket_seed"
+              type: "natural_docket_seeds"
             }
-            ]
           }
         }
       },
       included:[
         {
-          type: "person",
-          id: "@1"
-        },
-        {
-          type: "natural_docket_seed",
+          type: "natural_docket_seeds",
           id: "@1",
           attributes: {
             first_name: "joe",
@@ -239,13 +217,13 @@ module Api::IssuesHelper
             attachments: {
               data: [{
                 id: "@1",
-                type: "attachment"
+                type: "attachments"
               }]
             }
           }
         },
         {
-          type: "attachment",
+          type: "attachments",
           id: "@1",
           attributes: {
             document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
@@ -260,34 +238,23 @@ module Api::IssuesHelper
   def self.issue_with_legal_entity_docket_seed(attachment, content_type, file_name)
     {
       data: {
-        type: "issue",
+        type: "issues",
         attributes: {
           
         },
         relationships: {
-          person: {
-            data: {
-              id: "@1",
-              type: "person"
-            }
-          },
-          legal_entity_docket_seeds: {
-            data: [
+          legal_entity_docket_seed: {
+            data:
             {
               id: "@1",
-              type: "legal_entity_docket_seed"
+              type: "legal_entity_docket_seeds"
             }
-            ]
           }
         }
       },
       included:[
         {
-          type: "person",
-          id: "@1"
-        },
-        {
-          type: "legal_entity_docket_seed",
+          type: "legal_entity_docket_seeds",
           id: "@1",
           attributes: {
             industry: "software",
@@ -300,13 +267,13 @@ module Api::IssuesHelper
             attachments: {
               data: [{
                 id: "@1",
-                type: "attachment"
+                type: "attachments"
               }]
             }
           }
         },
         {
-          type: "attachment",
+          type: "attachments",
           id: "@1",
           attributes: {
             document: "data:#{content_type};base64,#{attachment.delete!("\n")}",
@@ -321,34 +288,22 @@ module Api::IssuesHelper
   def self.issue_with_allowance_seed(attachment, content_type, file_name)
     {
       data: {
-        type: "issue",
-        attributes: {
-          
+        type: "issues",
+        attributes: {        
         },
         relationships: {
-          person: {
-            data: {
-              id: "@1",
-              type: "person"
-            }
-          },
           allowance_seeds: {
-            data: [
-            {
+            data: 
+             [{
               id: "@1",
-              type: "allowance_seed"
-            }
-            ]
+              type: "allowance_seeds"
+             }]
           }
         }
       },
       included:[
         {
-          type: "person",
-          id: "@1"
-        },
-        {
-          type: "allowance_seed",
+          type: "allowance_seeds",
           id: "@1",
           attributes: {
             weight: 10,
@@ -359,13 +314,13 @@ module Api::IssuesHelper
             attachments: {
               data: [{
                 id: "@1",
-                type: "attachment"
+                type: "attachments"
               }]
             }
           }
         },
         {
-          type: "attachment",
+          type: "attachments",
           id: "@1",
           attributes: {
             document: "data:#{content_type};base64,#{attachment.delete!("\n")}",

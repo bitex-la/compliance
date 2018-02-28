@@ -3,338 +3,110 @@ require 'helpers/api/issues_helper'
 require 'json'
 
 describe Issue do
-  let(:basic_issue) { Api::IssuesHelper.basic_issue }
-  let(:invalid_basic_issue)  { Api::IssuesHelper.invalid_basic_issue }
-  let(:issue_without_person) { Api::IssuesHelper.issue_without_person }
+  let(:person) { create(:empty_person) }
+  
+  def assert_issue_integrity(seed_list = [])
+    Issue.count.should == 1
+    Person.count.should == 1
+    Issue.first.person.should == person
+    seed_list.each do |seed_type|
+      seed_type.constantize.count.should == 1
+      seed_type.constantize.last.issue.should == Issue.first
+      seed_type.constantize.last.attachments.count.should == 1
+    end
+  end
 
   describe 'updating an Issue' do
     it 'responds with an Unprocessable Entity HTTP code (422) when body is empty' do
-      post '/api/issues',  params: {}
+      post "/api/people/#{person.id}/issues",  params: {}
       assert_response 422
     end
 
-    it 'creates a new issue associated to an existent person' do
-      person = Person.create
-      attachment = Base64.encode64(file_fixture('simple.png').read)
-      issue  = Api::IssuesHelper.issue_with_domicile_seed(
+    describe 'creates a new issue with a domicile seed' do
+      it 'including a png file attachment' do
+      	attachment = Base64.encode64(file_fixture('simple.png').read)
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(
           attachment, 
           'image/png',
           'file.png'
         )  
    
-      post "/api/people/#{person.id}/issues", params: issue
-      Issue.count.should == 1
-      Person.count.should == 1
-      Issue.first.person.should == person
-      DomicileSeed.count.should == 1     
-      DomicileSeed.last.issue.should == Issue.first
+        post "/api/people/#{person.id}/issues", params: issue
 
-      assert_response 201
-    end
-
-    describe 'creates a new issue with a domicile seed' do
-      it 'including a png file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.png').read)
-        issue  = Api::IssuesHelper.issue_with_domicile_seed(
-          attachment, 
-          'image/png',
-          'file.png'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('DomicileSeed')
-      end
-
-      it 'including a jpg file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::IssuesHelper.issue_with_domicile_seed(
-          attachment,
-          'image/jpg',
-          'file.jpg'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('DomicileSeed')
-      end
-
-      it 'including a gif file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::IssuesHelper.issue_with_domicile_seed(
-          attachment,
-          'image/gif',
-          'file.gif'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('DomicileSeed')
-      end
-
-      it 'including a pdf file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::IssuesHelper.issue_with_domicile_seed(
-          attachment,
-          'application/pdf',
-          'file.pdf'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('DomicileSeed')
-      end
-
-      it 'including a zip file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::IssuesHelper.issue_with_domicile_seed(
-          attachment,
-          'application/zip',
-          'file.zip'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('DomicileSeed')
+        assert_issue_integrity(["DomicileSeed"]) 
+        assert_response 201
       end
     end
 
     describe 'creates a new issue with an identification seed' do
-      it 'including a png file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.png').read)
+      it 'including a pdf file attachment' do
+      	attachment = Base64.encode64(file_fixture('simple.pdf').read)
         issue  = Api::IssuesHelper.issue_with_identification_seed(
           attachment, 
-          'image/png',
-          'file.png'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('IdentificationSeed')
-      end
-
-      it 'including a jpg file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::IssuesHelper.issue_with_identification_seed(
-          attachment,
-          'image/jpg',
-          'file.jpg'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('IdentificationSeed')
-      end
-
-      it 'including a gif file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::IssuesHelper.issue_with_identification_seed(
-          attachment,
-          'image/gif',
-          'file.gif'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('IdentificationSeed')
-      end
-
-      it 'including a pdf file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::IssuesHelper.issue_with_identification_seed(
-          attachment,
           'application/pdf',
           'file.pdf'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('IdentificationSeed')
-      end
+        )  
+   
+        post "/api/people/#{person.id}/issues", params: issue
 
-      it 'including a zip file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::IssuesHelper.issue_with_identification_seed(
-          attachment,
-          'application/zip',
-          'file.zip'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('IdentificationSeed')
+        assert_issue_integrity(["IdentificationSeed"]) 
+        assert_response 201
       end
     end
 
+
     describe 'creates a new issue with a natural docket seed' do
-      it 'including a png file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.png').read)
+      it 'including a jpg file attachment' do
+      	attachment = Base64.encode64(file_fixture('simple.jpg').read)
         issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
           attachment, 
-          'image/png',
-          'file.png'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('NaturalDocketSeed')
-      end
-
-      it 'including a jpg file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
-          attachment,
           'image/jpg',
           'file.jpg'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('NaturalDocketSeed')
-      end
+        )  
+  
+        post "/api/people/#{person.id}/issues", params: issue
 
-      it 'including a gif file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
-          attachment,
-          'image/gif',
-          'file.gif'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('NaturalDocketSeed')
-      end
-
-      it 'including a pdf file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
-          attachment,
-          'application/pdf',
-          'file.pdf'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('NaturalDocketSeed')
-      end
-
-      it 'including a zip file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::IssuesHelper.issue_with_natural_docket_seed(
-          attachment,
-          'application/zip',
-          'file.zip'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('NaturalDocketSeed')
+        assert_issue_integrity(["NaturalDocketSeed"]) 
+        assert_response 201
       end
     end
 
     describe 'creates a new issue with a legal entity docket seed' do
-      it 'including a png file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.png').read)
+      it 'including a zip file attachment' do
+      	attachment = Base64.encode64(file_fixture('simple.zip').read)
         issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
           attachment, 
-          'image/png',
-          'file.png'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('LegalEntityDocketSeed')
-      end
-
-      it 'including a jpg file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
-          attachment,
-          'image/jpg',
-          'file.jpg'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('LegalEntityDocketSeed')
-      end
-
-      it 'including a gif file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
-          attachment,
-          'image/gif',
-          'file.gif'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('LegalEntityDocketSeed')
-      end
-
-      it 'including a pdf file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
-          attachment,
-          'application/pdf',
-          'file.pdf'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('LegalEntityDocketSeed')
-      end
-
-      it 'including a zip file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(
-          attachment,
           'application/zip',
           'file.zip'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('LegalEntityDocketSeed')
+        )  
+  
+        post "/api/people/#{person.id}/issues", params: issue
+
+        assert_issue_integrity(["LegalEntityDocketSeed"]) 
+        assert_response 201
       end
     end
 
     describe 'creates a new issue with a allowance seed' do
-      it 'including a png file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.png').read)
+      it 'including a gif file attachment' do
+      	attachment = Base64.encode64(file_fixture('simple.gif').read)
         issue  = Api::IssuesHelper.issue_with_allowance_seed(
           attachment, 
-          'image/png',
-          'file.png'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('AllowanceSeed')
-      end
-
-      it 'including a jpg file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.jpg').read)
-        issue  = Api::IssuesHelper.issue_with_allowance_seed(
-          attachment,
-          'image/jpg',
-          'file.jpg'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('AllowanceSeed')
-      end
-
-      it 'including a gif file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.gif').read)
-        issue  = Api::IssuesHelper.issue_with_allowance_seed(
-          attachment,
           'image/gif',
           'file.gif'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('AllowanceSeed')
+        )  
+  
+        post "/api/people/#{person.id}/issues", params: issue
+
+        assert_issue_integrity(["AllowanceSeed"]) 
+        assert_response 201
       end
-
-      it 'including a pdf file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.pdf').read)
-        issue  = Api::IssuesHelper.issue_with_allowance_seed(
-          attachment,
-          'application/pdf',
-          'file.pdf'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('AllowanceSeed')
-      end
-
-      it 'including a zip file attachment' do
-        attachment = Base64.encode64(file_fixture('simple.zip').read)
-        issue  = Api::IssuesHelper.issue_with_allowance_seed(
-          attachment,
-          'application/zip',
-          'file.zip'
-        )
-        post '/api/issues', params: issue
-        assert_issue_creation('AllowanceSeed')
-      end
-    end
-
-    it 'notifies that person id is invalid' do
-      post '/api/issues', params: invalid_basic_issue
-      expect(Issue.count).to be_equal 0
-      expect(Person.count).to be_equal 0
-      assert_response 404
-    end
-
-    it 'notifies that person is not associated' do
-      post '/api/issues', params: issue_without_person
-      expect(Issue.count).to be_equal 0
-      expect(Person.count).to be_equal 0
-      assert_response 422
     end
   end
 
   describe 'getting an issue' do
     it 'responds with a not found error 404 when the issue does not exist' do
-      get '/api/issues/1'
+      get "/api/people/#{person.id}/issues/1"
       assert_response 404
     end
 
@@ -345,19 +117,12 @@ describe Issue do
         'image/png',
         'file.png'
       )
-      post '/api/issues', params: issue
-      get  "/api/issues/#{Issue.first.id}"
+      post "/api/people/#{person.id}/issues", params: issue
+
+      assert_issue_integrity(["DomicileSeed"])
+  
+      get  "/api/people/#{person.id}/issues/#{Issue.first.id}"
       assert_response 200
     end
   end
-
-  def assert_issue_creation(seed_type)
-    expect(Issue.count).to be_equal 1
-    expect(Person.count).to be_equal 1
-    expect(seed_type.constantize.count).to be_equal 1
-    expect(seed_type.constantize.where(issue: Issue.first).count).to be_equal 1
-    expect(seed_type.constantize.first.attachments.count).to be_equal 1
-    assert_response 201
-  end
-
 end

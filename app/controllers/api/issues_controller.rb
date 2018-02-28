@@ -1,4 +1,6 @@
 class Api::IssuesController < Api::ApiController
+  before_action :validate_processable, only: [:create, :update] 
+ 
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     issues = Issue.all.page(page).per(per_page)
@@ -13,13 +15,13 @@ class Api::IssuesController < Api::ApiController
       issue = Issue.find(params[:id])
       options = {}
       options[:include] = [
-        :domicile_seeds,
-        :identification_seeds,
-        :natural_docket_seeds,
-        :legal_entity_docket_seeds,
+        :domicile_seed,
+        :identification_seed,
+        :natural_docket_seed,
+        :legal_entity_docket_seed,
         :allowance_seeds
       ]
-      json_response JsonApi::ModelSerializer.call(issue, options), 200
+      jsonapi_response issue, options, 200
     rescue ActiveRecord::RecordNotFound
       errors = []
       errors << JsonApi::Error.new({
