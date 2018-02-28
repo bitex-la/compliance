@@ -63,44 +63,55 @@ describe Issue do
   end
 
   describe 'Updating an issue' do
-    it 'responds with 422 when the payload is not valid' do
-      patch "/api/people/#{person.id}/issues/1"
-      assert_response 422
+    it 'responds with 404 when issue does not exist' do
+      person = create :full_natural_person
+      patch "/api/people/#{person.id}/issues/#{Issue.last.id + 100}"
+      assert_response 404
     end
 
-    describe 'update a issue with a domicile seed' do
-      it 'modifiying the domicile info' do
-        post "/api/people/#{person.id}/issues",
-          params: Api::IssuesHelper.issue_with_domicile_seed(:png)
-        assert_issue_integrity(["DomicileSeed"])
-        issue_document = json_response
+    it 'responds with 404 when issue belongs to someone else' do
+      person = create :full_natural_person
+      other = create :full_natural_person
+      patch "/api/people/#{person.id}/issues/#{other.issues.last.id}"
+      assert_response 404
+    end
 
-        issue_document[:included][1][:attributes] = {
-          country: "Argentina",
-          state: "Baires", 
-          street_address: "Mitre",
-          street_number: "6782",
-          postal_code: "1341",
-          floor: "1",
-          apartment: "N/A"	  
-        } 
-       
-        patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
-          params: JSON.dump(issue_document),
-          headers: {"CONTENT_TYPE" => 'application/json' }
+    it 'responds to an observation changing the domicile' do
+      post "/api/people/#{person.id}/issues",
+        params: Api::IssuesHelper.issue_with_domicile_seed(:png)
+      create(:observation, issue: Issues.last)
+      assert_issue_integrity(["DomicileSeed"])
+      issue_document = json_response
 
-        assert_response 200
-        DomicileSeed.first.tap do |seed|
-          seed.reload
-          seed.country.should == "Argentina"
-          seed.state.should == "Baires"
-          seed.city == "CABA"
-          seed.street_address == 'Mitre'
-          seed.postal_code == "1341"
-          seed.floor == "1"
-          seed.apartment == "N/A"
-        end
-      end 
+      issue_document[:included][1][:attributes] = {
+        country: "Argentina",
+        state: "Baires", 
+        street_address: "Mitre",
+        street_number: "6782",
+        postal_code: "1341",
+        floor: "1",
+        apartment: "N/A"	  
+      } 
+      issue_document[:included][2][:attributes] = {
+        reply: "Mire, mejor me cambio la dirección"
+      }
+      issue_document[:data][:attributes][:observed].should be_truthy
+
+      patch "/api/people/#{person.id}/issues/#{person.issues.last.id}",
+        params: JSON.dump(issue_document),
+        headers: {"CONTENT_TYPE" => 'application/json' }
+      assert_response 200
+
+      DomicileSeed.first.tap do |seed|
+        seed.reload
+        seed.country.should == "Argentina"
+        seed.state.should == "Baires"
+        seed.city == "CABA"
+        seed.street_address == 'Mitre'
+        seed.postal_code == "1341"
+        seed.floor == "1"
+        seed.apartment == "N/A"
+      end
     end
   end
 

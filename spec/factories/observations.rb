@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :observation do
-    issue nil
+    observation_reason
+    note "Si puede ser, sinó no se moleste."
   end
 end

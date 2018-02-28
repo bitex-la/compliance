@@ -1,6 +1,10 @@
 module ApiResponse
-  rescue_from ActiveRecord::RecordInvalid, with: :jsonapi_422
-  rescue_from ActiveRecord::RecordNotFound, with: :jsonapi_404
+  extend ActiveSupport::Concern
+
+  included do
+    rescue_from ActiveRecord::RecordInvalid, with: :jsonapi_422
+    rescue_from ActiveRecord::RecordNotFound, with: :jsonapi_404
+  end
 
   def json_response(object, status = 200)
     render json: object, status: status
@@ -36,6 +40,6 @@ module ApiResponse
       detail:  text,
       source:  {},
       meta:    {}
-    }]})
+    }]}, status)
   end
 end

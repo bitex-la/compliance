@@ -1,6 +1,4 @@
 class Api::IssuesController < Api::ApiController
-  before_action :validate_processable, only: [:create, :update] 
- 
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     issues = Issue.all.page(page).per(per_page)
@@ -15,69 +13,9 @@ class Api::IssuesController < Api::ApiController
   def create
     person = Person.find(params[:person_id])
 
-    mapper = JsonapiMapper.doc params.permit!.to_h,
-      issues: [
-        :domicile_seed,
-        :identification_seed,
-	:natural_docket_seed,
-	:legal_entity_docket_seed,
-        :allowance_seeds,
-        id: nil, 
-	person_id: person.id   
-      ], 
-      domicile_seeds: [
-        :country,
-        :state,
-        :city,
-        :street_address,
-        :street_number,
-        :postal_code,
-        :floor,
-        :apartment,
-        :attachments,
-        id: nil
-      ],
-      identification_seeds: [
-        :kind,
-        :number,
-        :issuer,
-        :attachments,
-        id: nil
-      ],
-      natural_docket_seeds: [
-        :first_name,
-        :last_name,
-        :birth_date,
-        :nationality,
-        :gender,
-        :marital_status,
-        :attachments,
-        id: nil
-      ],
-      legal_entity_docket_seeds: [
-        :industry,
-        :business_description,
-        :country,
-        :commercial_name,
-        :legal_name,
-        :attachments,
-        id: nil
-      ],
-      allowance_seeds: [
-        :weight,
-        :amount,
-        :kind,
-        :attachments,
-        id: nil
-      ],
-      attachments: [
-        :document,
-        :document_file_name,
-        :document_content_type,
-        id: nil, 
-	person_id: person.id
-      ]
- 
+    mapper = get_issue_jsonapi_mapper(person.id)
+    return jsonapi_422(nil) unless mapper.data
+
     if mapper.save_all
       jsonapi_response mapper.data, {}, 201
     else
@@ -87,15 +25,30 @@ class Api::IssuesController < Api::ApiController
 
   def update
     issue = Person.find(params[:person_id]).issues.find(params[:id])
-    mapper = JsonapiMapper.doc params.permit!.to_h,
+    mapper = get_issue_jsonapi_mapper(issue.person.id, issue.id)
+    return jsonapi_422(nil) unless mapper.data
+
+    if mapper.save_all
+      jsonapi_response mapper.data, {}, 200
+    else
+      json_response mapper.all_errors, 422
+    end	      
+  end
+
+  private
+
+  def get_issue_jsonapi_mapper(person_id, issue_id = nil)
+    seed_scope = issue_id ? { issue_id: issue_id } : { id: nil }
+
+    JsonapiMapper.doc params.permit!.to_h,
       issues: [
         :domicile_seed,
         :identification_seed,
         :natural_docket_seed,
         :legal_entity_docket_seed,
         :allowance_seeds,
-        id: issue.id,
-        person_id: issue.person.id 
+        id: issue_id, 
+        person_id: person_id
       ], 
       domicile_seeds: [
         :country,
@@ -107,14 +60,14 @@ class Api::IssuesController < Api::ApiController
         :floor,
         :apartment,
         :attachments,
-        issue_id: issue.id
+        seed_scope
       ],
       identification_seeds: [
         :kind,
         :number,
         :issuer,
         :attachments,
-        issue_id: issue.id
+        seed_scope
       ],
       natural_docket_seeds: [
         :first_name,
@@ -124,7 +77,7 @@ class Api::IssuesController < Api::ApiController
         :gender,
         :marital_status,
         :attachments,
-        issue_id: issue.id
+        seed_scope
       ],
       legal_entity_docket_seeds: [
         :industry,
@@ -133,26 +86,20 @@ class Api::IssuesController < Api::ApiController
         :commercial_name,
         :legal_name,
         :attachments,
-        issue_id: issue.id
+        seed_scope
       ],
       allowance_seeds: [
         :weight,
         :amount,
         :kind,
         :attachments,
-        issue_id: issue.id
+        seed_scope
       ],
       attachments: [
         :document,
         :document_file_name,
         :document_content_type,
-        person_id: issue.person.id
-      ] 
-
-    if mapper.save_all
-      jsonapi_response mapper.data, {}, 200
-    else
-      json_response mapper.all_errors, 422
-    end	      
+        person_id: person_id
+      ]
   end
 end
