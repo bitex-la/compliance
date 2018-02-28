@@ -16,7 +16,7 @@ describe Issue do
     end
   end
 
-  describe 'updating an Issue' do
+  describe 'Creating an Issue' do
     it 'responds with an Unprocessable Entity HTTP code (422) when body is empty' do
       post "/api/people/#{person.id}/issues",  params: {}
       assert_response 422
@@ -104,7 +104,54 @@ describe Issue do
     end
   end
 
-  describe 'getting an issue' do
+  describe 'Updating an issue' do
+    it 'responds with 422 when the payload is not valid' do
+      patch "/api/people/#{person.id}/issues/1"
+      assert_response 422
+    end
+
+    describe 'update a issue with a domicile seed' do
+      it 'modifiying the domicile info' do
+        attachment = Base64.encode64(file_fixture('simple.png').read)
+        issue_payload  = Api::IssuesHelper.issue_with_domicile_seed(
+          attachment, 
+          'image/png',
+          'file.png'
+        )   
+        post "/api/people/#{person.id}/issues", params: issue_payload
+        assert_issue_integrity(["DomicileSeed"])
+
+        domicile_seed = DomicileSeed.first
+
+        issue_payload[:data][:id] = Issue.first.id 
+        issue_payload[:data][:relationships][:domicile_seed][:data][:id] = domicile_seed.id
+        issue_payload[:included][0][:id] = domicile_seed.id
+        issue_payload[:included][0][:attributes] = {
+          country: "Argentina",
+          state: "Baires", 
+          street_address: "Mitre",
+          street_number: "6782",
+          postal_code: "1341",
+          floor: "1",
+          apartment: "N/A"	  
+        } 
+       
+        patch "/api/people/#{person.id}/issues/#{Issue.first.id}", params: issue_payload 
+ 
+        assert_response 200
+        domicile_seed.reload
+        domicile_seed.country.should == "Argentina"
+        domicile_seed.state.should == "Baires"
+        domicile_seed.city == "CABA"
+        domicile_seed.street_address == 'Mitre'
+        domicile_seed.postal_code == "1341"
+        domicile_seed.floor == "1"
+        domicile_seed.apartment == "N/A"
+      end 
+    end
+  end
+
+  describe 'Getting an issue' do
     it 'responds with a not found error 404 when the issue does not exist' do
       get "/api/people/#{person.id}/issues/1"
       assert_response 404

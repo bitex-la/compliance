@@ -111,5 +111,97 @@ class Api::IssuesController < Api::ApiController
   end
 
   def update
+    begin
+      issue = Issue.find(params[:id])
+      options = {}
+      options[:include] = [
+        :domicile_seed,
+        :identification_seed,
+        :natural_docket_seed,
+        :legal_entity_docket_seed,
+        :allowance_seeds
+      ]
+      
+      mapper = JsonapiMapper.doc params.permit!.to_h,
+      issues: [
+        :domicile_seed,
+        :identification_seed,
+	:natural_docket_seed,
+	:legal_entity_docket_seed,
+        :allowance_seeds,
+        id: issue.id,
+        person_id: issue.person.id 
+      ], 
+      domicile_seeds: [
+        :country,
+        :state,
+        :city,
+        :street_address,
+        :street_number,
+        :postal_code,
+        :floor,
+        :apartment,
+        :attachments,
+        issue_id: issue.id
+      ],
+      identification_seeds: [
+        :kind,
+        :number,
+        :issuer,
+        :attachments,
+        issue_id: issue.id
+      ],
+      natural_docket_seeds: [
+        :first_name,
+        :last_name,
+        :birth_date,
+        :nationality,
+        :gender,
+        :marital_status,
+        :attachments,
+        issue_id: issue.id
+      ],
+      legal_entity_docket_seeds: [
+        :industry,
+        :business_description,
+        :country,
+        :commercial_name,
+        :legal_name,
+        :attachments,
+        issue_id: issue.id
+      ],
+      allowance_seeds: [
+        :weight,
+        :amount,
+        :kind,
+        :attachments,
+        issue_id: issue.id
+      ],
+      attachments: [
+        :document,
+        :document_file_name,
+        :document_content_type,
+	person_id: issue.person.id
+      ] 
+
+      if mapper.save_all
+        jsonapi_response mapper.data, options, 200
+      else
+        json_response mapper.all_errors, 422
+      end	      
+
+    rescue ActiveRecord::RecordNotFound
+      errors = []
+      errors << JsonApi::Error.new({
+        links:   {},
+        status:  404,
+        code:    "issue_not_found",
+        title:   "issue not found",
+        detail:  "issue_not_found",
+        source:  {},
+        meta:    {}
+      })
+      error_response(errors)
+    end 
   end
 end
