@@ -12,7 +12,7 @@ module ApiResponse
 
   def jsonapi_response(it, options = {}, status = 200)
     serializer = "#{it.try(:klass) || it.class}Serializer".constantize
-		options[:include] = serializer.relationships_to_serialize.keys
+    options[:include] = serializer.relationships_to_serialize.keys
     ser = serializer.new(it, options)
     body = ser.serialized_json 
     json_response body, status

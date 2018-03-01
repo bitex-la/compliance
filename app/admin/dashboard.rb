@@ -13,7 +13,7 @@ ActiveAdmin.register_page "Dashboard" do
     columns do
       column do
         panel "Pending Issues" do
-          table_for Issue.un_observed do |i|
+          table_for Issue.reviewable do |i|
             i.column("ID") { |issue|
               link_to(issue.id, issue_path(issue)) 
             }

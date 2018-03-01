@@ -25,19 +25,51 @@ class Issue < ApplicationRecord
   accepts_nested_attributes_for :observations, allow_destroy: true
 
   scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
-  scope :un_observed, -> { where(aasm_state: 'new') } 
+  
+  scope :just_created, -> { where('aasm_state=?', 'new') } 
+  scope :replicated, -> { where('aasm_state=?', 'replicated') }
+  scope :reviewable, -> { just_created.or(replicated) }
 
   aasm do
     state :new, :initial => true
     state :observed
+    state :replicated
+    state :dismissed
+    state :rejected
+    state :accepted
+    state :abandoned
 
     event :observe do
       transitions from: :new, to: :observed
+      transitions from: :replicated, to: :observed
     end
 
-    event :edit do
-      transitions from: :observed, to: :new
+    event :replicate do
+      transitions from: :observed, to: :replicated
+    end
+
+    event :dismiss do
+      transitions from: :new, to: :dismissed
+      transitions from: :replicated, to: :dismissed
+      transitions from: :observed, to: :dismissed
     end 
+
+    event :reject do
+      transitions from: :new, to: :rejected
+      transitions from: :observed, to: :rejected
+      transitions from: :replicated, to: :rejected
+    end
+
+    event :accept do
+      transitions from: :new, to: :accepted
+      transitions from: :replicated, to: :accepted 
+    end 
+
+    event :abandon do
+      transitions from: :new, to: :abandoned
+      transitions from: :observed, to: :abandoned
+      transitions from: :replicated, to: :abandoned
+    end
  end
 
   def get_seeds

@@ -24,6 +24,7 @@ class Api::IssuesController < Api::ApiController
   end
 
   def update
+    debugger
     issue = Person.find(params[:person_id]).issues.find(params[:id])
     mapper = get_issue_jsonapi_mapper(issue.person.id, issue.id)
     return jsonapi_422(nil) unless mapper.data
@@ -47,6 +48,7 @@ class Api::IssuesController < Api::ApiController
         :natural_docket_seed,
         :legal_entity_docket_seed,
         :allowance_seeds,
+        :observations,
         id: issue_id, 
         person_id: person_id
       ], 
@@ -93,6 +95,11 @@ class Api::IssuesController < Api::ApiController
         :amount,
         :kind,
         :attachments,
+        seed_scope
+      ],
+      observations: [
+        :note,
+        :reply,
         seed_scope
       ],
       attachments: [

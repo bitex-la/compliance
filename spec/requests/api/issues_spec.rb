@@ -79,9 +79,12 @@ describe Issue do
     it 'responds to an observation changing the domicile' do
       post "/api/people/#{person.id}/issues",
         params: Api::IssuesHelper.issue_with_domicile_seed(:png)
-      create(:observation, issue: Issues.last)
+      create(:observation, issue: Issue.last)
+ 
       assert_issue_integrity(["DomicileSeed"])
       issue_document = json_response
+
+      pp issue_document
 
       issue_document[:included][1][:attributes] = {
         country: "Argentina",
@@ -92,10 +95,15 @@ describe Issue do
         floor: "1",
         apartment: "N/A"	  
       } 
-      issue_document[:included][2][:attributes] = {
-        reply: "Mire, mejor me cambio la dirección"
+      issue_document[:included][2] = {
+        type: 'observations',
+        id: Observation.last.id,
+        attributes: {
+          reply: "Mire, mejor me cambio la dirección"
+        }
       }
-      issue_document[:data][:attributes][:observed].should be_truthy
+
+      pp issue_document
 
       patch "/api/people/#{person.id}/issues/#{person.issues.last.id}",
         params: JSON.dump(issue_document),
@@ -112,6 +120,8 @@ describe Issue do
         seed.floor == "1"
         seed.apartment == "N/A"
       end
+
+      Issue.last.replicated?.should be_truthy 
     end
   end
 

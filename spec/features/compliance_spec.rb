@@ -53,18 +53,36 @@ describe 'an admin user' do
     click_button 'Update Issue'    
 
     Observation.where(issue: issue).count.should == 1
+    Issue.first.observed?.should be_truthy
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
-    
+  
     expect(page).to_not have_content(issue.id)
 
-    issue.reload 
-    issue.domicile_seed.attachments.count == 1
-    issue.new?.should == true
+    get "/api/people/#{person.id}/issues/#{Issue.first.id}"
 
-    within("#issue_#{issue.id} td.col.col-actions") do
-      click_link('View')
+    issue_document = JSON.parse(response.body).deep_symbolize_keys
+    pp issue_document
+
+    issue_document[:included][4][:attributes][:number] = '1234567890'
+    issue_document[:included][4][:attributes][:issuer] = 'Colombia'
+    issue_document[:included][7][:attributes] = {reply: "Va de vuelta el documento!!!"}
+
+    pp issue_document
+
+    patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
+      params: JSON.dump(issue_document),
+      headers: {"CONTENT_TYPE" => 'application/json' }
+    assert_response 200
+
+    Issue.first.replicated?.should be_truthy 
+    Observation.first.reply should_not be_nil
+
+    IdentificationSeed.first.tap do |seed|
+      seed.reload
+      seed.issuer.should == "Colombia"
+      seed.number.should == "1234567890"
     end
 
     # Customer re-submits identification (we get it via API)
