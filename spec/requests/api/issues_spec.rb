@@ -84,8 +84,6 @@ describe Issue do
       assert_issue_integrity(["DomicileSeed"])
       issue_document = json_response
 
-      pp issue_document
-
       issue_document[:included][1][:attributes] = {
         country: "Argentina",
         state: "Baires", 
@@ -102,8 +100,6 @@ describe Issue do
           reply: "Mire, mejor me cambio la dirección"
         }
       }
-
-      pp issue_document
 
       patch "/api/people/#{person.id}/issues/#{person.issues.last.id}",
         params: JSON.dump(issue_document),

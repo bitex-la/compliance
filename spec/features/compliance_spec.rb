@@ -69,8 +69,6 @@ describe 'an admin user' do
     issue_document[:included][4][:attributes][:issuer] = 'Colombia'
     issue_document[:included][7][:attributes] = {reply: "Va de vuelta el documento!!!"}
 
-    pp issue_document
-
     patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
       params: JSON.dump(issue_document),
       headers: {"CONTENT_TYPE" => 'application/json' }
@@ -120,6 +118,16 @@ describe 'an admin user' do
     # An admin reviews the data and decides it's not enough. (and places further comments)
     # The customer finally attaches all the required documents
     # The admin accepts the documents, assigns a value and periodicity to the new allowances backed by the documents. 
+  end
+
+  it 'lets admins run blacklist checks manually' do
+    pending
+    fail
+  end
+
+  it 'lets clients run blacklist checks via api' do
+    pending
+    fail
   end
 
   it 'registers associated accounts and bitcoin addresses' do

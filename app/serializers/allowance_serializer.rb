@@ -1,5 +1,5 @@
 class AllowanceSerializer
-  include FastJsonapiCandy::PersonThing
+  include FastJsonapiCandy::Fruit
   attributes :weight, :amount, :kind 
   derive_seed_serializer!
 end

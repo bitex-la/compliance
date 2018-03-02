@@ -1,5 +1,5 @@
 module FastJsonapiCandy
-  module PersonThing
+  module Fruit
     extend ActiveSupport::Concern
 
     included do
@@ -15,12 +15,12 @@ module FastJsonapiCandy
       def derive_seed_serializer!
         klass = Class.new
         Object.const_set(@naming.seed_serializer, klass)
-        klass.class_eval{ include FastJsonapiCandy::PersonThingSeed }  
+        klass.class_eval{ include FastJsonapiCandy::Seed }  
       end
     end
   end
 
-  module PersonThingSeed
+  module Seed
     extend ActiveSupport::Concern
 
     included do
@@ -28,11 +28,16 @@ module FastJsonapiCandy
       include Serializer
       set_type naming.seed_plural
       build_belongs_to :issue
-      belongs_to :fruit, record_type: naming.plural, id_method_name: "#{naming.fruit.underscore}_id"
+      belongs_to :fruit,
+        record_type: naming.plural,
+        id_method_name: "#{naming.fruit.underscore}_id"
       build_has_many :attachments
-      if naming.serializer.constantize.attributes_to_serialize.nil?
+
+      if attrs = naming.serializer.constantize.attributes_to_serialize
+        attributes *attrs.try(:keys)
+      else
+        raise "Cannot derive #{name} as seed has no attributes."
       end
-      attributes *naming.serializer.constantize.attributes_to_serialize.try(:keys) 
     end
   end
 

@@ -82,4 +82,8 @@ class Issue < ApplicationRecord
     seeds << domicile_seed if domicile_seed.present?
     seeds
   end
+
+  def state
+    aasm_state
+  end
 end
