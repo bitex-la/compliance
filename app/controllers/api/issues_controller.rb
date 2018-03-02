@@ -24,7 +24,6 @@ class Api::IssuesController < Api::ApiController
   end
 
   def update
-    debugger
     issue = Person.find(params[:person_id]).issues.find(params[:id])
     mapper = get_issue_jsonapi_mapper(issue.person.id, issue.id)
     return jsonapi_422(nil) unless mapper.data
