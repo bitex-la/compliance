@@ -27,7 +27,7 @@ ActiveAdmin.register Issue do
   controller do
     def show
       super do |format|
-        redirect_to edit_issue_url and return if resource.new?
+        redirect_to edit_issue_url and return if resource.new? || resource.observed? || resource.replicated?
       end
     end
   end
@@ -101,6 +101,7 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :observations do |of|
       of.input :observation_reason
+      of.input :scope
       of.input :note
     end
 

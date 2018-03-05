@@ -49,6 +49,7 @@ describe 'an admin user' do
     # Admin sends an observation to customer about their identification (it was blurry)
     click_link 'Add New Observation' 
     select observation_reason.subject.truncate(140), from: "issue[observations_attributes][0][observation_reason_id]", visible: false
+    select 'Client', from: 'issue[observations_attributes][0][scope]', visible: false
     fill_in 'issue[observations_attributes][0][note]', with: 'Please re-send your document'
     click_button 'Update Issue'    
 
@@ -64,6 +65,7 @@ describe 'an admin user' do
 
     issue_document = JSON.parse(response.body).deep_symbolize_keys
 
+    # Customer re-submit his identification, via API
     issue_document[:included][4][:attributes][:number] = '1234567890'
     issue_document[:included][4][:attributes][:issuer] = 'Colombia'
     issue_document[:included][7][:attributes] = {reply: "Va de vuelta el documento!!!"}
@@ -82,7 +84,6 @@ describe 'an admin user' do
       seed.number.should == "1234567890"
     end
 
-    # Customer re-submits identification (we get it via API)
     # Admin accepts the customer data, the issue goes away from the to-do list | Admin dismisses the issue, the person is rejected
     # Worldcheck is run on the customer, customer is accepted when there are no hits, issue is closed. | Customer had hits, admin needs to check manually.
   end

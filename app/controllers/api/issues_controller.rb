@@ -99,6 +99,7 @@ class Api::IssuesController < Api::ApiController
       observations: [
         :note,
         :reply,
+        :scope,
         seed_scope
       ],
       attachments: [
