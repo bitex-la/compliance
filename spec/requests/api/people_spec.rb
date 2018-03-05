@@ -34,13 +34,9 @@ describe Person do
         included: [
           { type: 'issues',
             id: Issue.last.id.to_s,
-<<<<<<< HEAD
             attributes: {
               state: "new",
             },
-=======
-            attributes: {aasm_state: "new"},
->>>>>>> 44136401a4febfda92115e0362e9fdcb53d80e63
             relationships: {
               person: {data: {id: Person.last.id.to_s, type: "people"}},
               domicile_seed: {data: nil},
@@ -94,13 +90,9 @@ describe Person do
       expected_included = [
         { type: 'issues',
           id: issue.id.to_s,
-<<<<<<< HEAD
           attributes: {
             state: "new",
           },
-=======
-          attributes: {aasm_state: "new"},
->>>>>>> 44136401a4febfda92115e0362e9fdcb53d80e63
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             domicile_seed: { data: {
