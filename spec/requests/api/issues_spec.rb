@@ -82,6 +82,7 @@ describe Issue do
       create(:observation, issue: Issue.last)
  
       assert_issue_integrity(["DomicileSeed"])
+
       issue_document = json_response
 
       issue_document[:included][1][:attributes] = {

@@ -5,6 +5,10 @@ RSpec.configure do |config|
 end
 
 module FactoryBot
+  def self.get_person_from_thing(thing)
+    thing.class.name.include?("Seed") ? thing.issue.person : thing.person
+  end
+  
   # See garden.rb for more details about the Garden, Seed and Fruit metaphor.
   def self.define_persons_item_and_seed(resource_name, factories)
     seed_class = Garden::Naming.new(resource_name).seed
