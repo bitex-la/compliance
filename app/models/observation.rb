@@ -10,6 +10,6 @@ class Observation < ApplicationRecord
   end
 
   def replicate_issue
-    issue.replicate!
+    issue.replicate! unless issue.replicated?
   end
 end

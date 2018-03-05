@@ -63,13 +63,10 @@ describe 'an admin user' do
     get "/api/people/#{person.id}/issues/#{Issue.first.id}"
 
     issue_document = JSON.parse(response.body).deep_symbolize_keys
-    pp issue_document
 
     issue_document[:included][4][:attributes][:number] = '1234567890'
     issue_document[:included][4][:attributes][:issuer] = 'Colombia'
     issue_document[:included][7][:attributes] = {reply: "Va de vuelta el documento!!!"}
-
-    pp issue_document
 
     patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
       params: JSON.dump(issue_document),
@@ -77,7 +74,7 @@ describe 'an admin user' do
     assert_response 200
 
     Issue.first.replicated?.should be_truthy 
-    Observation.first.reply should_not be_nil
+    Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
       seed.reload

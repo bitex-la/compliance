@@ -82,9 +82,8 @@ describe Issue do
       create(:observation, issue: Issue.last)
  
       assert_issue_integrity(["DomicileSeed"])
-      issue_document = json_response
 
-      pp issue_document
+      issue_document = json_response
 
       issue_document[:included][1][:attributes] = {
         country: "Argentina",
