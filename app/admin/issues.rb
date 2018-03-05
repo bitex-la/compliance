@@ -1,33 +1,27 @@
 ActiveAdmin.register Issue do
-# See permitted parameters documentation:
-# https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-#
-# permit_params :list, :of, :attributes, :on, :model
-#
-# or
-#
-# permit_params do
-#   permitted = [:permitted, :attributes]
-#   permitted << :other if params[:action] == 'create' && current_user.admin?
-#   permitted
-# end
-# permit_params :country, :state, :city, :street_address, :street_number, :postal_code, :floor, :apartment, :issue_id
-  #
 
   actions :all, :except => :destroy
 
-  action_item :approve, only: :show do
-    link_to 'Approve', '/'
-  end
+  %i(approve reject dismiss).each do |action|
+    action_item action, only: :edit, if: lambda { resource.send("may_#{action}?") } do
+      link_to action.to_s.titleize, [action, :issue], method: :post
+    end
 
-  action_item :add_observation, only: :show do
-    link_to 'Add Observation', '/'
+    member_action action, method: :post do
+      resource.send("#{action}!")
+      redirect_to action: :show
+    end
   end
 
   controller do
+    def edit
+      @page_title = resource.name
+      super
+    end
+
     def show
       super do |format|
-        redirect_to edit_issue_url and return if resource.new? || resource.observed? || resource.replicated?
+        redirect_to edit_issue_url and return if resource.new? || resource.observed? || resource.answered?
       end
     end
   end

@@ -118,7 +118,7 @@ describe Issue do
         seed.apartment == "N/A"
       end
 
-      Issue.last.replicated?.should be_truthy 
+      Issue.last.should be_answered
     end
   end
 

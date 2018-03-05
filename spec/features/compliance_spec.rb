@@ -75,7 +75,7 @@ describe 'an admin user' do
       headers: {"CONTENT_TYPE" => 'application/json' }
     assert_response 200
 
-    Issue.first.replicated?.should be_truthy 
+    Issue.first.answered?.should be_truthy 
     Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
@@ -84,6 +84,18 @@ describe 'an admin user' do
       seed.number.should == "1234567890"
     end
 
+    visit '/'
+
+    within("#issue_#{issue.id} td.col.col-actions") do
+      click_link('View')
+    end
+
+    page.should have_content 'Reject'
+    page.should have_content 'Dismiss'
+
+    click_link 'Approve'
+
+    Issue.last.should be_approved
     # Admin accepts the customer data, the issue goes away from the to-do list | Admin dismisses the issue, the person is rejected
     # Worldcheck is run on the customer, customer is accepted when there are no hits, issue is closed. | Customer had hits, admin needs to check manually.
   end

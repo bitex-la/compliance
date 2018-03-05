@@ -27,48 +27,48 @@ class Issue < ApplicationRecord
   scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
   
   scope :just_created, -> { where('aasm_state=?', 'new') } 
-  scope :replicated, -> { where('aasm_state=?', 'replicated') }
-  scope :reviewable, -> { just_created.or(replicated) }
+  scope :answered, -> { where('aasm_state=?', 'answered') }
+  scope :reviewable, -> { just_created.or(answered) }
 
   aasm do
-    state :new, :initial => true
+    state :new, initial: true
     state :observed
-    state :replicated
+    state :answered
     state :dismissed
     state :rejected
-    state :accepted
+    state :approved
     state :abandoned
 
     event :observe do
       transitions from: :new, to: :observed
-      transitions from: :replicated, to: :observed
+      transitions from: :answered, to: :observed
     end
 
-    event :replicate do
-      transitions from: :observed, to: :replicated
+    event :answer do
+      transitions from: :observed, to: :answered
     end
 
     event :dismiss do
       transitions from: :new, to: :dismissed
-      transitions from: :replicated, to: :dismissed
+      transitions from: :answered, to: :dismissed
       transitions from: :observed, to: :dismissed
     end 
 
     event :reject do
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
-      transitions from: :replicated, to: :rejected
+      transitions from: :answered, to: :rejected
     end
 
-    event :accept do
-      transitions from: :new, to: :accepted
-      transitions from: :replicated, to: :accepted 
+    event :approve do
+      transitions from: :new, to: :approved
+      transitions from: :answered, to: :approved 
     end 
 
     event :abandon do
       transitions from: :new, to: :abandoned
       transitions from: :observed, to: :abandoned
-      transitions from: :replicated, to: :abandoned
+      transitions from: :answered, to: :abandoned
     end
  end
 
@@ -85,5 +85,9 @@ class Issue < ApplicationRecord
 
   def state
     aasm_state
+  end
+
+  def name
+    "Issue #{id} - #{state}"
   end
 end
