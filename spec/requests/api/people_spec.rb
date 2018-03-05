@@ -34,13 +34,15 @@ describe Person do
         included: [
           { type: 'issues',
             id: Issue.last.id.to_s,
+            attributes: {aasm_state: "new"},
             relationships: {
               person: {data: {id: Person.last.id.to_s, type: "people"}},
               domicile_seed: {data: nil},
               identification_seed: {data: nil},
               natural_docket_seed: {data: nil},
               legal_entity_docket_seed: {data: nil},
-              allowance_seeds: {data: []}
+              allowance_seeds: {data: []},
+              observations: {data: []}
             }
           }
         ]
@@ -86,6 +88,7 @@ describe Person do
       expected_included = [
         { type: 'issues',
           id: issue.id.to_s,
+          attributes: {aasm_state: "new"},
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             domicile_seed: { data: {
@@ -103,7 +106,8 @@ describe Person do
             legal_entity_docket_seed: {data: nil},
             allowance_seeds: {data: issue.allowance_seeds.map{ |x|
               {id: x.id.to_s, type: "allowance_seeds" }
-            }}
+            }},
+            observations: {data: []}
           }
         },
         { type: "domiciles",
