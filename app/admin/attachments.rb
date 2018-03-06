@@ -13,18 +13,6 @@ ActiveAdmin.register Attachment do
     'application/x-rar-compressed'
   ]
 
-# See permitted parameters documentation:
-# https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-#
-# permit_params :list, :of, :attributes, :on, :model
-#
-# or
-#
-# permit_params do
-#   permitted = [:permitted, :attributes]
-#   permitted << :other if params[:action] == 'create' && current_user.admin?
-#   permitted
-# end
   menu false
 
   begin
@@ -45,12 +33,12 @@ ActiveAdmin.register Attachment do
       row :created_at
       row :updated_at
       row :issue do
-        if issue = attachment.attached_to_seed.issue
+        if issue = attachment.attached_to_seed.try(:issue)
           link_to "Issue #{issue.id}", edit_issue_path(issue)
         end
       end
       row :person do
-        if person = attachment.attached_to_fruit.person
+        if person = attachment.attached_to_fruit.try(:person)
           link_to "Person #{person.id}", person_path(person)
         end
       end

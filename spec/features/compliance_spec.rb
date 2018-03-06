@@ -29,6 +29,10 @@ describe 'an admin user' do
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
+    page.current_path.should == "/issues/#{Issue.last.id}/edit"
+
+    visit "/issues/#{Issue.last.id}"
+    page.current_path.should == "/issues/#{Issue.last.id}/edit"
 
     expect(page).to have_content 'Identification'
     expect(page).to have_content 'Domicile'
@@ -57,7 +61,7 @@ describe 'an admin user' do
     click_button 'Update Issue'    
 
     Observation.where(issue: issue).count.should == 1
-    Issue.first.observed?.should be_truthy
+    Issue.first.should be_observed
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
@@ -69,16 +73,24 @@ describe 'an admin user' do
     issue_document = JSON.parse(response.body).deep_symbolize_keys
 
     # Customer re-submit his identification, via API
-    issue_document[:included][4][:attributes][:number] = '1234567890'
-    issue_document[:included][4][:attributes][:issuer] = 'Colombia'
-    issue_document[:included][7][:attributes] = {reply: "Va de vuelta el documento!!!"}
+    issue_document[:included]
+      .find{|x| x[:type] == 'identification_seeds' }
+      .tap do |i|
+        i[:attributes][:number] = '1234567890'
+        i[:attributes][:issuer] = 'Colombia'
+      end
+    issue_document[:included]
+      .find{|x| x[:type] == 'observations' }
+      .tap do |i|
+        i[:attributes] = {reply: "Va de vuelta el documento!!!"}
+      end
 
     patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
       params: JSON.dump(issue_document),
       headers: {"CONTENT_TYPE" => 'application/json' }
     assert_response 200
 
-    Issue.first.answered?.should be_truthy 
+    Issue.first.should be_answered
     Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
@@ -102,6 +114,9 @@ describe 'an admin user' do
     Observation.last.should be_answered
     click_link 'Dashboard' 
     expect(page).to_not have_content(issue.id)
+
+    visit "/issues/#{Issue.last.id}/edit"
+    page.current_path.should == "/issues/#{Issue.last.id}"
   end
 
   it "Dismisses an issue that had only bogus data" do

@@ -41,4 +41,20 @@ module ArbreHelpers
       end 
     end
   end
+
+  def self.has_many_attachments(context, form)
+    ArbreHelpers.has_many_form context, form, :attachments do |af|
+      document = af.object.document
+      hint = if document.nil?
+        context.content_tag(:span, "No File Yet")
+      else
+        context.link_to('Click to enlarge', af.object.document.url, target: '_blank')
+      end
+
+      af.input :document, as: :file, hint: hint,
+        label: "File #{af.object.document_file_name}"
+
+      af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
+    end
+  end
 end

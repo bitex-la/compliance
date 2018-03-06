@@ -21,7 +21,7 @@ ActiveAdmin.register Person do
     
     if person.natural_dockets.any?
       panel 'Natural Docket' do
-        table_for NaturalDocket.current(person) do |n|
+        table_for person.natural_dockets.current do |n|
           n.column("ID") do |docket|
             link_to(docket.id, natural_docket_path(docket))
           end
@@ -48,7 +48,7 @@ ActiveAdmin.register Person do
   
     if person.legal_entity_dockets.any?
       panel 'Legal Entity Docket' do
-        table_for LegalEntityDocket.current(person) do |l|
+        table_for person.legal_entity_dockets.current do |l|
           l.column("ID") do |docket|
             link_to(docket.id, legal_entity_docket_path(docket))
           end
@@ -74,7 +74,7 @@ ActiveAdmin.register Person do
   
     if person.identifications.any?
       panel 'Identification' do
-        table_for Identification.current(person) do |i|
+        table_for person.identifications.current do |i|
           i.column("ID") do |identification|
             link_to(identification.id, identification_path(identification))
           end
@@ -82,7 +82,7 @@ ActiveAdmin.register Person do
           i.column("Number")  { |identification| identification.number }
           i.column("Issuer")  { |identification| identification.issuer }
           i.column("Attachments") do |identification|
-            domicile.attachments
+            identification.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
               .join("<br />").html_safe
           end
@@ -98,7 +98,7 @@ ActiveAdmin.register Person do
   
     if person.domiciles.any?
       panel 'Domiciles' do
-        table_for Domicile.current(person) do |d|
+        table_for person.domiciles.current do |d|
           d.column("ID") do |domicile|
             link_to(domicile.id, domicile_path(domicile))
           end
@@ -127,7 +127,7 @@ ActiveAdmin.register Person do
   
     if person.allowances.any?
       panel 'Allowances' do
-        table_for Allowance, current(person) do |q|
+        table_for person.allowances.current do |q|
           q.column("ID") do |allowance|
             link_to(allowance.id, allowance_path(allowance))
           end

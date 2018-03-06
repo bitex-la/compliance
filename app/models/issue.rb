@@ -83,6 +83,10 @@ class Issue < ApplicationRecord
     aasm_state
   end
 
+  def editable?
+    new? || observed? || answered?
+  end
+
   def name
     "Issue #{id} - #{state}"
   end
