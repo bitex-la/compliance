@@ -8,14 +8,37 @@ module Garden
     extend ActiveSupport::Concern
 
     included do
-      naming = Naming.new(name)
+      cattr_accessor :naming { Naming.new(name) }
       belongs_to :issue
-      belongs_to :fruit, class_name: naming.fruit,
-        foreign_key: naming.foreign_key, optional: true
-      has_many :attachments, as: :attached_to
+      belongs_to :fruit, class_name: naming.fruit, optional: true
+      has_many :attachments, as: :attached_to_seed
+
+      if column_names.include?('replaces_id')
+        belongs_to :replaces, class_name: naming.fruit, optional: true
+      end
 
       accepts_nested_attributes_for :attachments, :allow_destroy => true
     end  
+
+    def harvest!
+      fruit = self.class.naming.fruit.constantize.new(attributes.except(
+        *%w(id created_at updated_at issue_id fruit_id replaces_id)
+      ))
+      fruit.person = issue.person
+      fruit.save!
+      update!(fruit: fruit)
+      attachments.each{|a| a.update!(attached_to_fruit: fruit) }
+
+      if respond_to?(:replaces)
+        replaces.update!(replaced_by: fruit) if replaces
+      else
+        fruit.person.send(self.class.naming.plural)
+          .current.where('id != ?', fruit.id)
+          .update_all(replaced_by_id: fruit.id)
+      end
+
+      fruit
+    end
   end
 
   module Fruit
@@ -23,10 +46,14 @@ module Garden
 
     included do
       belongs_to :person 
-      has_one  :seed, required: false, class_name: Naming.new(name).seed
-      has_many :attachments, as: :attached_to
+      has_one :seed, required: false, class_name: Naming.new(name).seed,
+        foreign_key: :fruit_id
+      belongs_to :replaced_by, required: false, class_name: name
+      has_one :replaces, required: false, class_name: name,
+        foreign_key: :replaced_by_id
+      has_many :attachments, as: :attached_to_fruit
 
-      scope :current, ->(person) { where(person: person, replaced_by_id: nil) }
+      scope :current, -> { where(replaced_by_id: nil) }
     end
   end
 
@@ -53,10 +80,6 @@ module Garden
 
     def seed_serializer
       fruit('SeedSerializer')
-    end
-
-    def foreign_key
-      "#{base}_id"
     end
 
     def plural

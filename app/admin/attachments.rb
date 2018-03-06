@@ -44,14 +44,18 @@ ActiveAdmin.register Attachment do
       row :id
       row :created_at
       row :updated_at
-      row "Issue" do
-        if attachment.attached_to.class.name.include? 'Seed'  
-          link_to "Issue #{attachment.attached_to.issue.id}", edit_issue_path(attachment.attached_to.issue)
-        else
-          link_to "Person #{attachment.person.id}", person_path(attachment.person)
+      row :issue do
+        if issue = attachment.attached_to_seed.issue
+          link_to "Issue #{issue.id}", edit_issue_path(issue)
         end
       end
-      row :attached_to
+      row :person do
+        if person = attachment.attached_to_fruit.person
+          link_to "Person #{person.id}", person_path(person)
+        end
+      end
+      row :attached_to_seed
+      row :attached_to_fruit
       row :document_file_name
       row :document_content_type
       row :document_file_size

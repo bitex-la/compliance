@@ -12,4 +12,8 @@ class Person < ApplicationRecord
 
   has_many :comments, as: :commentable
   enum risk: %i(low medium high)
+
+  def natural_docket
+    natural_dockets.current.first
+  end
 end

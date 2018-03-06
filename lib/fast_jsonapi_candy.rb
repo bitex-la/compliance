@@ -28,9 +28,7 @@ module FastJsonapiCandy
       include Serializer
       set_type naming.seed_plural
       build_belongs_to :issue
-      belongs_to :fruit,
-        record_type: naming.plural,
-        id_method_name: "#{naming.fruit.underscore}_id"
+      belongs_to :fruit, record_type: naming.plural
       build_has_many :attachments
 
       if attrs = naming.serializer.constantize.attributes_to_serialize

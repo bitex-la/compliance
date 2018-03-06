@@ -20,8 +20,8 @@ FactoryBot.define do
       # A full natural person should have at least the issue that created it.
       # Here we start with a basic issue for this person, then the full
       # factories inject their seeds into the basic_issue in their after :create
+      create :basic_issue, person: person, aasm_state: 'approved'
       %i(
-        basic_issue
         full_domicile
         full_natural_person_identification
         full_natural_docket

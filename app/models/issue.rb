@@ -4,10 +4,8 @@ class Issue < ApplicationRecord
   validates :person, presence: true
 
   HAS_ONE = %i{
-    domicile_seed
     natural_docket_seed
     legal_entity_docket_seed
-    identification_seed
   }.each do |relationship|  
     has_one relationship, required: false
     accepts_nested_attributes_for relationship, allow_destroy: true
@@ -16,6 +14,8 @@ class Issue < ApplicationRecord
   HAS_MANY = %i{
     relationship_seeds
     allowance_seeds
+    domicile_seeds
+    identification_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
@@ -55,12 +55,19 @@ class Issue < ApplicationRecord
     end 
 
     event :reject do
+      after do
+        person.update(enabled: false)
+      end
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
       transitions from: :answered, to: :rejected
     end
 
     event :approve do
+      after do
+        person.update(enabled: true)
+        harvest_all!
+      end
       transitions from: :new, to: :approved
       transitions from: :answered, to: :approved 
     end 
@@ -70,17 +77,6 @@ class Issue < ApplicationRecord
       transitions from: :observed, to: :abandoned
       transitions from: :answered, to: :abandoned
     end
- end
-
-  def get_seeds
-    seeds = [] 
-    seeds << identification_seed if identification_seed.present?
-    seeds << natural_docket_seed if natural_docket_seed.present?
-    seeds << legal_entity_docket_seed if legal_entity_docket_seed.present?
-    seeds += relationship_seeds 
-    seeds += allowance_seeds  
-    seeds << domicile_seed if domicile_seed.present?
-    seeds
   end
 
   def state
@@ -89,5 +85,10 @@ class Issue < ApplicationRecord
 
   def name
     "Issue #{id} - #{state}"
+  end
+
+  def harvest_all!
+    HAS_MANY.each{|assoc| send(assoc).map(&:harvest!) }
+    HAS_ONE.each{|assoc| send(assoc).try(:harvest!) }
   end
 end

@@ -5,10 +5,6 @@ RSpec.configure do |config|
 end
 
 module FactoryBot
-  def self.get_person_from_thing(thing)
-    thing.class.name.include?("Seed") ? thing.issue.person : thing.person
-  end
-  
   # See garden.rb for more details about the Garden, Seed and Fruit metaphor.
   def self.define_persons_item_and_seed(resource_name, factories)
     seed_class = Garden::Naming.new(resource_name).seed
@@ -21,6 +17,13 @@ module FactoryBot
         factories.each do |factory_name, block|
           factory "#{factory_name}_base" do
             instance_eval(&block)
+
+            after(:create) do |thing, evaluator|
+              next unless evaluator.add_all_attachments
+              %i(jpg png gif pdf zip).each do |name|
+                create "#{name}_attachment", thing: thing
+              end
+            end
 
             factory("#{factory_name}_seed", class: seed_class)
             

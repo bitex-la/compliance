@@ -42,8 +42,8 @@ class Api::IssuesController < Api::ApiController
 
     JsonapiMapper.doc params.permit!.to_h,
       issues: [
-        :domicile_seed,
-        :identification_seed,
+        :domicile_seeds,
+        :identification_seeds,
         :natural_docket_seed,
         :legal_entity_docket_seed,
         :allowance_seeds,

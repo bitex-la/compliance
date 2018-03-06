@@ -15,7 +15,6 @@ describe Garden::Naming do
       n = Garden::Naming.new('natural_dockets')
       n.base.should == 'natural_docket'
       n.fruit.should == 'NaturalDocket'
-      n.foreign_key.should == 'natural_docket_id'
       n.seed.should == 'NaturalDocketSeed'
       n.plural.should == 'natural_dockets'
       n.seed_plural.should == 'natural_docket_seeds'

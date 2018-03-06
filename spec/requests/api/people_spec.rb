@@ -39,8 +39,8 @@ describe Person do
             },
             relationships: {
               person: {data: {id: Person.last.id.to_s, type: "people"}},
-              domicile_seed: {data: nil},
-              identification_seed: {data: nil},
+              domicile_seeds: {data: []},
+              identification_seeds: {data: []},
               natural_docket_seed: {data: nil},
               legal_entity_docket_seed: {data: nil},
               allowance_seeds: {data: []},
@@ -95,14 +95,14 @@ describe Person do
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
-            domicile_seed: { data: {
-              id: issue.domicile_seed.id.to_s,
+            domicile_seeds: { data: [{
+              id: issue.domicile_seeds.first.id.to_s,
               type: "domicile_seeds"
-            }},
-            identification_seed: { data: {
-              id: issue.identification_seed.id.to_s,
+            }]},
+            identification_seeds: { data: [{
+              id: issue.identification_seeds.first.id.to_s,
               type: "identification_seeds"
-            }},
+            }]},
             natural_docket_seed: {data: {
               id: issue.natural_docket_seed.id.to_s,
               type: "natural_docket_seeds"
@@ -130,7 +130,7 @@ describe Person do
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: {data: {
               type: "domicile_seeds",
-              id: issue.domicile_seed.id.to_s
+              id: issue.domicile_seeds.first.id.to_s
             }},
             attachments:{
               data: person.domiciles.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -148,7 +148,7 @@ describe Person do
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: {data: {
               type: "identification_seeds",
-              id: issue.identification_seed.id.to_s,
+              id: issue.identification_seeds.last.id.to_s,
             }},
             attachments:{
               data: person.identifications.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}

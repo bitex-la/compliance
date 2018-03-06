@@ -6,10 +6,6 @@ FactoryBot.define_persons_item_and_seed(:natural_docket,
     nationality    'Argentina'
     gender         'Male'
     marital_status 'Single'
-    after(:create) do |thing|
-      %i(jpg png gif pdf zip).each do |name|
-        create "#{name}_attachment", attached_to: thing, person: FactoryBot.get_person_from_thing(thing)    
-      end
-    end
+    transient{ add_all_attachments true }
   }
 )

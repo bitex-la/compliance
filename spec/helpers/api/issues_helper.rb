@@ -90,8 +90,8 @@ class Api::IssuesHelper
         type: "issues",
         attributes: { },
         relationships: {
-          domicile_seed: {
-            data: { id: "@1", type: "domicile_seeds" }
+          domicile_seeds: {
+            data: [{ id: "@1", type: "domicile_seeds" }]
           }
         }
       },
@@ -134,12 +134,8 @@ class Api::IssuesHelper
           
         },
         relationships: {
-          identification_seed: {
-            data: 
-            {
-              id: "@1",
-              type: "identification_seeds"
-            }            
+          identification_seeds: {
+            data: [{ id: "@1", type: "identification_seeds" }]
           }
         }
       },

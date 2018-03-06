@@ -4,7 +4,7 @@ require 'helpers/api/issues_helper'
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
 
-  it 'Reviews a user created via api' do
+  it 'Reviews and approves a user created via api' do
     person = create :new_natural_person
     issue = person.issues.first
 
@@ -48,9 +48,12 @@ describe 'an admin user' do
 
     # Admin sends an observation to customer about their identification (it was blurry)
     click_link 'Add New Observation' 
-    select observation_reason.subject.truncate(140), from: "issue[observations_attributes][0][observation_reason_id]", visible: false
+    select observation_reason.subject.truncate(140),
+      from: "issue[observations_attributes][0][observation_reason_id]",
+      visible: false
     select 'Client', from: 'issue[observations_attributes][0][scope]', visible: false
-    fill_in 'issue[observations_attributes][0][note]', with: 'Please re-send your document'
+    fill_in 'issue[observations_attributes][0][note]',
+      with: 'Please re-send your document'
     click_button 'Update Issue'    
 
     Observation.where(issue: issue).count.should == 1
@@ -99,8 +102,40 @@ describe 'an admin user' do
     Observation.last.should be_answered
     click_link 'Dashboard' 
     expect(page).to_not have_content(issue.id)
-    # Admin accepts the customer data, the issue goes away from the to-do list | Admin dismisses the issue, the person is rejected
-    # Worldcheck is run on the customer, customer is accepted when there are no hits, issue is closed. | Customer had hits, admin needs to check manually.
+  end
+
+  it "Dismisses an issue that had only bogus data" do
+    person = create :new_natural_person
+    issue = person.issues.last
+    login_as admin_user
+    visit "/issues/#{issue.id}"
+    click_link 'Dismiss'
+
+    issue.reload.should be_dismissed
+    person.reload.should_not be_enabled
+
+    visit "/"
+    expect(page).to_not have_content(issue.id)
+  end
+
+  it "Rejects an issue because an observation went unanswered" do
+    person = create :new_natural_person, enabled: true
+    person.should be_enabled
+    issue = person.issues.last
+    login_as admin_user
+    visit "/issues/#{issue.id}"
+    click_link 'Reject'
+
+    issue.reload.should be_rejected
+    person.reload.should_not be_enabled
+
+    visit "/"
+    expect(page).to_not have_content(issue.id)
+  end
+
+  it "Abandons an issue that was inactive" do
+    pending
+    fail
   end
 
   describe 'when admin edits an issue' do
@@ -118,6 +153,23 @@ describe 'an admin user' do
     end
 
     it 'can edit allowances' do
+      pending
+      fail
+    end
+  end
+
+  it 'manually enables/disables and sets risk for a person' do
+    pending
+    fail
+  end
+
+  describe 'when running checks' do
+    it 'runs it through a robot' do
+      pending
+      fail
+    end
+
+    it 'runs it manually' do
       pending
       fail
     end
