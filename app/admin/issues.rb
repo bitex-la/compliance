@@ -239,5 +239,21 @@ ActiveAdmin.register Issue do
         end
       end
     end
+
+    if issue.observations.any?
+      panel 'Observations' do
+        table_for issue.observations do |o|
+          o.column("ID") do |obv|
+            link_to(obv.id, observation_path(obv))
+          end
+          o.column("Created at") { |obv| obv.created_at }
+          o.column("Updated at") { |obv| obv.updated_at } 
+          o.column("Note")    { |obv| obv.note }
+          o.column("Reply")   { |obv| obv.reply }
+          o.column("Reason")  { |obv| obv.observation_reason.subject }
+          o.column("Scope")   { |obv| obv.scope }  
+        end
+      end
+    end
   end
 end

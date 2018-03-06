@@ -96,6 +96,9 @@ describe 'an admin user' do
     click_link 'Approve'
 
     Issue.last.should be_approved
+    Observation.last.should be_answered
+    click_link 'Dashboard' 
+    expect(page).to_not have_content(issue.id)
     # Admin accepts the customer data, the issue goes away from the to-do list | Admin dismisses the issue, the person is rejected
     # Worldcheck is run on the customer, customer is accepted when there are no hits, issue is closed. | Customer had hits, admin needs to check manually.
   end
