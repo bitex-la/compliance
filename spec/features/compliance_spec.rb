@@ -65,7 +65,6 @@ describe 'an admin user' do
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
-  
     expect(page).to_not have_content(issue.id)
 
     get "/api/people/#{person.id}/issues/#{Issue.first.id}"
@@ -146,6 +145,91 @@ describe 'an admin user' do
 
     visit "/"
     expect(page).to_not have_content(issue.id)
+  end
+
+  it "Reviews a new user that needs to be checked in worldcheck" do
+     person = create :new_natural_person
+     person.should_not be_enabled
+     issue = person.issues.last
+
+     observation = create(:admin_world_check_observation, issue: issue)
+
+     login_as admin_user
+
+     issue.should be_observed
+     
+     # Admin clicks in the observation to see the issue detail
+     within("#observation_#{observation.id} td.col.col-actions") do
+      click_link('View')
+     end
+     page.current_path.should == "/issues/#{Issue.last.id}/edit"
+
+     # Admin replies that there is not hits on worldcheck
+     fill_in 'issue[observations_attributes][0][reply]',
+      with: 'No hits'
+     click_button 'Update Issue'
+
+     issue.reload.should be_answered
+     observation.reload.should be_answered
+
+     click_link 'Approve'
+
+     Issue.last.should be_approved
+     Observation.last.should be_answered
+     click_link 'Dashboard' 
+     expect(page).to_not have_content(issue.id)
+
+     visit "/issues/#{Issue.last.id}/edit"
+     page.current_path.should == "/issues/#{Issue.last.id}"
+  end
+
+  it 'Reviews a new user with a robot-made worldcheck check' do
+    person = create :new_natural_person
+    person.should_not be_enabled
+    issue = person.issues.last
+
+    observation = create(:robot_observation, issue: issue)
+
+    login_as admin_user
+
+    issue.should be_observed
+
+    expect(page).to_not have_content(issue.id)
+
+    # Simulate that robot perform check and notify to compliance
+    get "/api/people/#{person.id}/issues/#{Issue.first.id}"
+    issue_document = JSON.parse(response.body).deep_symbolize_keys
+
+    issue_document[:included]
+      .find{|x| x[:type] == 'observations' }
+      .tap do |i|
+        i[:attributes] = {reply: "No hits"}
+      end
+
+    patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
+      params: JSON.dump(issue_document),
+      headers: {"CONTENT_TYPE" => 'application/json' }
+    assert_response 200
+
+    Issue.first.should be_answered
+    Observation.first.should be_answered
+
+    visit '/' 
+
+    within("#issue_#{issue.id} td.col.col-actions") do
+      click_link('View')
+    end
+    page.current_path.should == "/issues/#{Issue.last.id}/edit" 
+
+    click_link 'Approve'
+
+    Issue.last.should be_approved
+    Observation.last.should be_answered
+    click_link 'Dashboard' 
+    expect(page).to_not have_content(issue.id)
+
+    visit "/issues/#{Issue.last.id}/edit"
+    page.current_path.should == "/issues/#{Issue.last.id}"
   end
 
   it "Abandons an issue that was inactive" do
