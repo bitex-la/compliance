@@ -4,7 +4,17 @@ require 'helpers/api/issues_helper'
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
 
-  it 'Reviews and approves a user created via api' do
+  it 'creates a new customer and its issue via adimn' do
+    pending
+    # This is actually doing things via API. It should do
+    # everything via admin.
+    fail
+
+    # Stops when the issue has been created, with all seeds and attachments,
+    # and an observation has been placed for the robot to run worldcheck.
+  end
+
+  it 'reviews a newly created customer' do
     person = create :new_natural_person
     issue = person.issues.first
 
@@ -118,6 +128,11 @@ describe 'an admin user' do
     page.current_path.should == "/issues/#{Issue.last.id}"
   end
 
+  it "Edits a customer by creating a new issue" do
+    pending
+    fail
+  end
+
   it "Dismisses an issue that had only bogus data" do
     person = create :new_natural_person
     issue = person.issues.last
@@ -147,42 +162,55 @@ describe 'an admin user' do
     expect(page).to_not have_content(issue.id)
   end
 
-  it "Reviews and approved a new user that needs to be checked in worldcheck" do
-     person = create :new_natural_person
-     person.should_not be_enabled
-     issue = person.issues.last
+  it "Creates a user via API, asking for manual 'admin' worldcheck run" do
+    reason = create :human_world_check_reason
 
-     observation = create(:admin_world_check_observation, issue: issue)
+    post "/api/people/"
+    person = api_response.data
 
-     login_as admin_user
+    issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
+    issue_request[:data][:relationships][:observations] = {
+      data: [{type: 'observations', id: '@1'}]
+    }
+    issue_request[:included] << Api::IssuesHelper.observation_for(
+      '@1', reason, "Please run worldcheck for them")
+    issue_request[:data][:id] = "@1"
 
-     issue.should be_observed
-     
-     # Admin clicks in the observation to see the issue detail
-     within("#observation_#{observation.id} td.col.col-actions") do
+    post "/api/people/#{person.id}/issues", params: issue_request
+    
+    login_as admin_user
+
+    issue = api_response.data
+    issue.attributes.state.should == 'observed'
+    observation = api_response.included.find{|i| i.type == 'observations'}
+
+    within("#observation_#{observation.id} td.col.col-actions") do
       click_link('View')
-     end
-     page.current_path.should == "/issues/#{Issue.last.id}/edit"
+    end
+    page.current_path.should == "/issues/#{issue.id}/edit"
 
-     # Admin replies that there is not hits on worldcheck
-     fill_in 'issue[observations_attributes][0][reply]',
-      with: 'No hits'
-     click_button 'Update Issue'
+    # Admin replies that there is not hits on worldcheck
+    fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
+    click_button 'Update Issue'
 
-     issue.reload.should be_answered
-     observation.reload.should be_answered
+    get "/api/people/#{person.id}/issues/#{issue.id}"
+    api_response.data.attributes.state.should == 'answered'
+    api_response.included.find{|i| i.type == 'observations'}
+      .attributes.state.should == 'answered'
 
-     click_link 'Approve'
+    click_link 'Approve'
 
-     Issue.last.should be_approved
-     Observation.last.should be_answered
-     click_link 'Dashboard' 
-     expect(page).to_not have_content(issue.id)
+    get "/api/people/#{person.id}/issues/#{issue.id}"
+    api_response.data.attributes.state.should == 'approved'
 
-     person.reload.should be_enabled
+    click_link 'Dashboard' 
+    expect(page).to_not have_content(issue.id)
 
-     visit "/issues/#{Issue.last.id}/edit"
-     page.current_path.should == "/issues/#{Issue.last.id}"
+    get "/api/people/#{person.id}"
+    api_response.data.attributes.enabled.should be_truthy
+
+    visit "/issues/#{issue.id}/edit"
+    page.current_path.should == "/issues/#{issue.id}"
   end
 
   it 'Reviews and disable a user with hits on worldcheck' do
@@ -218,59 +246,69 @@ describe 'an admin user' do
 
     issue.reload.should be_answered
     Observation.last.should be_answered
- 
-    debugger
   end
 
-  it 'Reviews and approves a new user with a robot-made worldcheck check' do
-    person = create :new_natural_person
-    person.should_not be_enabled
-    issue = person.issues.last
+  it 'Creates a user via API, asking for robot worldcheck run' do
+    reason = create :world_check_reason
 
-    observation = create(:robot_observation, issue: issue)
+    post "/api/people/"
+    person = api_response.data
+
+    issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
+    issue_request[:data][:relationships][:observations] = {
+      data: [{type: 'observations', id: '@1'}]
+    }
+    issue_request[:included] << Api::IssuesHelper.observation_for(
+      '@1', reason, "robot-worldcheck", 'robot')
+    issue_request[:data][:id] = "@1"
+
+    post "/api/people/#{person.id}/issues",
+      params: issue_request.to_json,
+      headers: {"CONTENT_TYPE" => 'application/json' }
+
+    issue = api_response.data
+    issue.attributes.state.should == 'observed'
+    observation = api_response.included.find{|i| i.type == 'observations'}
+    observation.attributes.scope.should == 'robot'
 
     login_as admin_user
-
-    issue.should be_observed
-
     expect(page).to_not have_content(issue.id)
 
     # Simulate that robot perform check and notify to compliance
-    get "/api/people/#{person.id}/issues/#{Issue.first.id}"
-    issue_document = JSON.parse(response.body).deep_symbolize_keys
+    get "/api/people/#{person.id}/issues/#{issue.id}"
+    issue_request = json_response
+    issue_request[:included]
+      .find{|x| x[:type] == 'observations' }[:attributes] = {reply: "No hits"}
 
-    issue_document[:included]
-      .find{|x| x[:type] == 'observations' }
-      .tap do |i|
-        i[:attributes] = {reply: "No hits"}
-      end
-
-    patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
-      params: JSON.dump(issue_document),
+    patch "/api/people/#{person.id}/issues/#{issue.id}",
+      params: issue_request.to_json,
       headers: {"CONTENT_TYPE" => 'application/json' }
     assert_response 200
 
-    Issue.first.should be_answered
-    Observation.first.should be_answered
+    api_response.data.attributes.state.should == 'answered'
+    api_response.included.find{|i| i.type == 'observations'}
+      .attributes.state.should == 'answered'
 
     visit '/' 
 
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
-    page.current_path.should == "/issues/#{Issue.last.id}/edit" 
+    page.current_path.should == "/issues/#{issue.id}/edit" 
 
     click_link 'Approve'
 
-    Issue.last.should be_approved
-    Observation.last.should be_answered
+    get "/api/people/#{person.id}/issues/#{issue.id}"
+    api_response.data.attributes.state.should == 'approved'
+
     click_link 'Dashboard' 
     expect(page).to_not have_content(issue.id)
 
-    person.reload.should be_enabled
+    get "/api/people/#{person.id}"
+    api_response.data.attributes.enabled.should be_truthy
 
-    visit "/issues/#{Issue.last.id}/edit"
-    page.current_path.should == "/issues/#{Issue.last.id}"
+    visit "/issues/#{issue.id}/edit"
+    page.current_path.should == "/issues/#{issue.id}"
   end
 
   it "Abandons an issue that was inactive" do
@@ -279,12 +317,12 @@ describe 'an admin user' do
   end
 
   describe 'when admin edits an issue' do
-    it 'can edit the domicile' do
+    it 'can edit a particular seed' do
       post api_person_issues_path(create(:full_natural_person).id),
         params: Api::IssuesHelper.issue_with_domicile_seed(:png)
-      login_as admin_user
+      issue = api_response.data
 
-      issue = Issue.last
+      login_as admin_user
       within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
         click_link('View')
       end
@@ -292,7 +330,12 @@ describe 'an admin user' do
       fail
     end
 
-    it 'can edit allowances' do
+    it 'can add new seeds' do
+      pending
+      fail
+    end
+
+    it 'can remove existing seeds' do
       pending
       fail
     end
@@ -301,18 +344,6 @@ describe 'an admin user' do
   it 'manually enables/disables and sets risk for a person' do
     pending
     fail
-  end
-
-  describe 'when running checks' do
-    it 'runs it through a robot' do
-      pending
-      fail
-    end
-
-    it 'runs it manually' do
-      pending
-      fail
-    end
   end
 
   it 'keeps track of usage allowances' do

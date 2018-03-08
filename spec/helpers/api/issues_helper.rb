@@ -310,7 +310,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.observation_for(issue, reason, note)
+  def self.observation_for(issue, reason, note, scope = 'admin')
     {
       id: "@1",
       type: "observations",
@@ -318,10 +318,7 @@ class Api::IssuesHelper
         issue: {data: {id: issue, type: "issues"}},
         observation_reason: {data: {id: reason.id.to_s, type: "observation_reasons"}}
       },
-      attributes: {
-        note: note,
-        scope: 'admin'
-      }
+      attributes: { note: note, scope: scope }
     }
   end
 

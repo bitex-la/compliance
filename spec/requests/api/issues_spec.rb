@@ -25,10 +25,9 @@ describe Issue do
     it 'creates a new issue with an observation' do
       reason = create(:human_world_check_reason)
       issue  = Api::IssuesHelper.issue_with_an_observation(person.id, reason, 'test')
-      #issue  = Api::IssuesHelper.issue_with_domicile_seed(:png)
       post "/api/people/#{person.id}/issues", params: issue
       assert_response 201
-     end
+    end
 
     %i(png gif pdf jpg zip).each do |ext|
       describe "receives a #{ext} attachment and" do
@@ -137,6 +136,35 @@ describe Issue do
       end
 
       Issue.last.should be_answered
+    end
+
+    it 'can answer an observation and add a new one in one step' do
+      person = create :new_natural_person
+      issue = person.issues.last
+      create :robot_observation, issue: issue
+
+      get "/api/people/#{person.id}/issues/#{issue.id}"
+      issue_request = json_response
+
+      observation = Api::IssuesHelper.observation_for(
+        issue.id, create(:human_world_check_reason), "Run manually")
+
+      issue_request[:included]
+        .find{|i| i[:type] == 'observations'}[:attributes] = { reply: "hits" }
+        
+      issue_request[:data][:relationships][:observations][:data] <<
+        observation.slice(:id, :type)
+
+      issue_request[:included] << observation
+
+      patch "/api/people/#{person.id}/issues/#{issue.id}", 
+        params: issue_request.to_json,
+        headers: {"CONTENT_TYPE" => 'application/json'}
+
+      api_response.data.attributes.state.should == "observed"
+      observations = api_response.included.select{|i| i.type == 'observations' }
+      observations.count.should == 2
+      observations.map{|o| o.attributes.state }.should == %w(answered new)
     end
   end
 

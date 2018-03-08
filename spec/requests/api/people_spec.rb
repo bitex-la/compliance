@@ -4,16 +4,11 @@ require 'helpers/api/people_helper'
 describe Person do
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do
-      Person.count.should == 0
-      Issue.count.should == 0
-
-      post '/api/people', params: { data: nil }
-
-      Person.count.should == 1
-      Issue.count.should == 1
+      expect do
+        post '/api/people', params: { data: nil }
+      end.to change{ Person.count }.by(1)
 
       response.status.should == 201
-
       json_response.should == {
         data: {
           type: 'people',
@@ -23,7 +18,7 @@ describe Person do
             risk: nil
           },
           relationships: {
-            issues: {data: [{ type: 'issues', id: Issue.last.id.to_s }] },
+            issues: {data: []},
             domiciles: {data: []},
             identifications: {data: []},
             natural_dockets: {data: []},
@@ -31,23 +26,7 @@ describe Person do
             allowances: {data: []}
           }
         },
-        included: [
-          { type: 'issues',
-            id: Issue.last.id.to_s,
-            attributes: {
-              state: "new",
-            },
-            relationships: {
-              person: {data: {id: Person.last.id.to_s, type: "people"}},
-              domicile_seeds: {data: []},
-              identification_seeds: {data: []},
-              natural_docket_seed: {data: nil},
-              legal_entity_docket_seed: {data: nil},
-              allowance_seeds: {data: []},
-              observations: {data: []}
-            }
-          }
-        ]
+        included: []
       }
     end
 
@@ -91,7 +70,7 @@ describe Person do
         { type: 'issues',
           id: issue.id.to_s,
           attributes: {
-            state: "new",
+            state: 'approved',
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -132,8 +111,9 @@ describe Person do
               type: "domicile_seeds",
               id: issue.domicile_seeds.first.id.to_s
             }},
-            attachments:{
-              data: person.domiciles.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            attachments: {
+              data: person.domiciles.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
         },
@@ -150,8 +130,9 @@ describe Person do
               type: "identification_seeds",
               id: issue.identification_seeds.last.id.to_s,
             }},
-            attachments:{
-              data: person.identifications.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            attachments: {
+              data: person.identifications.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
         },
@@ -171,8 +152,9 @@ describe Person do
 	      type: "natural_docket_seeds",	    
               id: issue.natural_docket_seed.id.to_s
             }},
-            attachments:{
-              data: person.natural_dockets.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+            attachments: {
+              data: person.natural_dockets.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
         },
@@ -190,7 +172,8 @@ describe Person do
               type: "allowance_seeds"
             }},
             attachments:{
-              data: person.allowances.first.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+              data: person.allowances.first.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
         },
@@ -208,7 +191,8 @@ describe Person do
               type: "allowance_seeds"
             }},
             attachments:{
-              data: person.allowances.last.attachments.map{|x| {id: x.id.to_s, type: 'attachments'}}
+              data: person.allowances.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
         }
@@ -219,7 +203,7 @@ describe Person do
       end
     end
 
-    it 'responds with a not found error 404 when the person does not exist' do
+    it 'responds 404 when the person does not exist' do
       get "/api/people/1"
       assert_response 404
     end

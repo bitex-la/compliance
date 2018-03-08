@@ -12,24 +12,6 @@ class Api::PeopleController < Api::ApiController
   end
 
   def create
-    document = {
-      data: {
-        type: 'people',
-        id: '@1',
-        relationships: {
-          issues: { data: [{ type: 'issues', id: '@1' }] }
-        }
-      },
-      included: [{ type: 'issues', id: '@1' }]
-    }
-
-    mapper = JsonapiMapper.doc_unsafe! document,
-      [:people, :issues], people: [:issues], issues: []
-
-    if mapper.save_all
-      jsonapi_response mapper.data, {}, 201
-    else
-      json_response mapper.all_errors, 422
-    end	
+    jsonapi_response Person.create, {}, 201
   end
 end

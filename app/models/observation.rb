@@ -32,12 +32,15 @@ class Observation < ApplicationRecord
     issue.observe!  
   end
 
+  def state
+    aasm_state
+  end
+
   private
 
   def validate_scope_integrity
-    return true if observation_reason.nil?
-    if scope != observation_reason.scope
-      errors.add("Observation and Observation reason scope must match")
+    if scope != observation_reason.try(:scope)
+      errors.add(:scope, "Observation and Observation reason scope must match")
     end
   end
 end
