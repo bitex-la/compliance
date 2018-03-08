@@ -12,7 +12,6 @@ class Api::IssuesController < Api::ApiController
 
   def create
     person = Person.find(params[:person_id])
-
     mapper = get_issue_jsonapi_mapper(person.id)
     return jsonapi_422(nil) unless mapper.data
 
@@ -38,7 +37,17 @@ class Api::IssuesController < Api::ApiController
   private
 
   def get_issue_jsonapi_mapper(person_id, issue_id = nil)
+    hash_params = params.permit!.to_h
     seed_scope = issue_id ? { issue_id: issue_id } : { id: nil }
+    
+    reason_scope = if hash_params[:included].nil?
+      ''
+    else  
+      obvs = params.permit!.to_h[:included]
+        .find{|x| x[:type] == 'observations' }
+      !obvs.nil? && obvs[:relationships].present? ? 
+        obvs[:relationships][:observation_reason][:data][:id] : ''
+    end
 
     JsonapiMapper.doc params.permit!.to_h,
       issues: [
@@ -100,7 +109,7 @@ class Api::IssuesController < Api::ApiController
         :note,
         :reply,
         :scope,
-        seed_scope
+        observation_reason_id: reason_scope 
       ],
       attachments: [
         :document,

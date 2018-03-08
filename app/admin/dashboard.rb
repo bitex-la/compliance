@@ -16,6 +16,9 @@ ActiveAdmin.register_page "Dashboard" do
             o.column(:observation_reason) { |obv| 
               obv.observation_reason.subject
             }
+            o.column('Person') { |obv|
+              span link_to(obv.issue.person.id, people_path(obv.issue.person))
+            }
             o.column('Actions') { |obv|
               span link_to('View', issue_path(obv.issue))
             }

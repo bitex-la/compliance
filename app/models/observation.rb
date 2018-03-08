@@ -35,6 +35,7 @@ class Observation < ApplicationRecord
   private
 
   def validate_scope_integrity
+    return true if observation_reason.nil?
     if scope != observation_reason.scope
       errors.add("Observation and Observation reason scope must match")
     end

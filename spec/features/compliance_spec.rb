@@ -147,7 +147,7 @@ describe 'an admin user' do
     expect(page).to_not have_content(issue.id)
   end
 
-  it "Reviews a new user that needs to be checked in worldcheck" do
+  it "Reviews and approved a new user that needs to be checked in worldcheck" do
      person = create :new_natural_person
      person.should_not be_enabled
      issue = person.issues.last
@@ -179,11 +179,50 @@ describe 'an admin user' do
      click_link 'Dashboard' 
      expect(page).to_not have_content(issue.id)
 
+     person.reload.should be_enabled
+
      visit "/issues/#{Issue.last.id}/edit"
      page.current_path.should == "/issues/#{Issue.last.id}"
   end
 
-  it 'Reviews a new user with a robot-made worldcheck check' do
+  it 'Reviews and disable a user with hits on worldcheck' do
+    person = create :full_natural_person
+    person.should be_enabled
+    reason = create(:human_world_check_reason)
+
+    issue_payload = Api::IssuesHelper.issue_with_an_observation(person.id, 
+      reason, 
+      "Please run worldcheck over this guy")
+
+    post "/api/people/#{person.id}/issues", 
+      params: JSON.dump(issue_payload),
+      headers: {"CONTENT_TYPE" => 'application/json'}
+
+    assert_response 201
+  
+    issue = person.issues.last
+    login_as admin_user
+    issue.should be_observed
+    expect(page).to_not have_content(issue.id)
+    
+    # Admin clicks in the observation to see the issue detail
+    within("#observation_#{Observation.last.id} td.col.col-actions") do
+      click_link('View')
+    end
+    page.current_path.should == "/issues/#{Issue.last.id}/edit"
+
+    # Admin replies that there is not hits on worldcheck
+    fill_in 'issue[observations_attributes][0][reply]',
+      with: '1 hits'
+    click_button 'Update Issue'
+
+    issue.reload.should be_answered
+    Observation.last.should be_answered
+ 
+    debugger
+  end
+
+  it 'Reviews and approves a new user with a robot-made worldcheck check' do
     person = create :new_natural_person
     person.should_not be_enabled
     issue = person.issues.last
@@ -227,6 +266,8 @@ describe 'an admin user' do
     Observation.last.should be_answered
     click_link 'Dashboard' 
     expect(page).to_not have_content(issue.id)
+
+    person.reload.should be_enabled
 
     visit "/issues/#{Issue.last.id}/edit"
     page.current_path.should == "/issues/#{Issue.last.id}"

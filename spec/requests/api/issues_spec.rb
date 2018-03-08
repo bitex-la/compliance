@@ -22,6 +22,14 @@ describe Issue do
       assert_response 422
     end
 
+    it 'creates a new issue with an observation' do
+      reason = create(:human_world_check_reason)
+      issue  = Api::IssuesHelper.issue_with_an_observation(person.id, reason, 'test')
+      #issue  = Api::IssuesHelper.issue_with_domicile_seed(:png)
+      post "/api/people/#{person.id}/issues", params: issue
+      assert_response 201
+     end
+
     %i(png gif pdf jpg zip).each do |ext|
       describe "receives a #{ext} attachment and" do
         it 'creates a new issue with a domicile seed' do
@@ -99,6 +107,16 @@ describe Issue do
         id: Observation.last.id,
         attributes: {
           reply: "Mire, mejor me cambio la dirección"
+        },
+        relationships: {
+          issue: {data: {id: Issue.last.id, type: "issues"}},
+          observation_reason: {
+            data: 
+            {
+              id: Observation.last.observation_reason.id.to_s, 
+             type: "observation_reasons"
+            }
+          }
         }
       }
 

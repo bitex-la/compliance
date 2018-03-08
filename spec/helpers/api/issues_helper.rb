@@ -36,7 +36,31 @@ class Api::IssuesHelper
       ]
     }
   end
-
+  
+  def self.issue_with_an_observation(person_id, reason, note)
+    {
+      data: {
+        id: '@1',
+        type: "issues",
+        attributes: {
+          
+        },
+        relationships: {
+          person: {
+            data: {
+              id: person_id,
+              type: "people"
+            }
+          },
+          observations:{data:[{id: "@1", type:"observations"}]},
+        }
+      },
+      included: [
+         observation_for('@1', reason, note)
+      ]
+    }
+  end
+  
   def self.basic_issue
     {
       data: {
@@ -121,7 +145,7 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1')
+        attachment_for(attachment_type, '@1'),
       ]
     }
   end
@@ -283,6 +307,21 @@ class Api::IssuesHelper
         },
         attachment_for(attachment_type, '@1')
       ]
+    }
+  end
+
+  def self.observation_for(issue, reason, note)
+    {
+      id: "@1",
+      type: "observations",
+      relationships: {
+        issue: {data: {id: issue, type: "issues"}},
+        observation_reason: {data: {id: reason.id.to_s, type: "observation_reasons"}}
+      },
+      attributes: {
+        note: note,
+        scope: 'admin'
+      }
     }
   end
 
