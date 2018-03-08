@@ -1,6 +1,6 @@
 class Observation < ApplicationRecord
   include AASM
-  enum scope: %i(client robot)
+  enum scope: %i(client robot admin)
   
   belongs_to :issue
   belongs_to :observation_reason
@@ -9,6 +9,8 @@ class Observation < ApplicationRecord
   after_create :observe_issue
 
   validate :validate_scope_integrity
+
+  scope :admin_pending, -> { where(scope: 'admin') } 
 
   aasm do
     state :new, initial: true

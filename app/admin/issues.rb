@@ -86,6 +86,7 @@ ActiveAdmin.register Issue do
       sf.input :observation_reason
       sf.input :scope
       sf.input :note
+      sf.input :reply
     end
 
     f.actions

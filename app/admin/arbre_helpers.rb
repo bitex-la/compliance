@@ -1,4 +1,29 @@
 module ArbreHelpers
+
+  def self.issues_panel(context, issues, title)
+    context.instance_eval do
+      panel title do
+        table_for issues do |i|
+          i.column("ID") { |issue|
+            link_to(issue.id, issue_path(issue)) 
+          }
+          i.column("Person") { |issue|
+            link_to(issue.person.id, person_path(issue.person)) 
+          }
+          i.column("Created at") { |issue|
+            issue.created_at 
+          }
+          i.column("Updated at") { |issue|
+            issue.updated_at 
+          }
+          i.column("Actions") { |issue|
+            span link_to("View", issue_path(issue))
+          }
+        end
+      end
+    end
+  end
+
   def self.attachments_panel(context, attachments)
     context.instance_eval do
       next if attachments.empty?
