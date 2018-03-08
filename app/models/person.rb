@@ -16,4 +16,8 @@ class Person < ApplicationRecord
   def natural_docket
     natural_dockets.current.first
   end
+
+  def name
+    "#{id}"
+  end
 end

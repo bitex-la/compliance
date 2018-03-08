@@ -35,6 +35,10 @@ ActiveAdmin.register Issue do
       f.inputs 'Basics' do
         f.input :person_id
       end
+    else
+      f.inputs 'Select a person' do
+        f.input :person_id, as: :select, collection: Person.all
+      end
     end
 
     ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|

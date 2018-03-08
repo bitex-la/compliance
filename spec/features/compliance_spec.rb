@@ -4,14 +4,144 @@ require 'helpers/api/issues_helper'
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
 
-  it 'creates a new customer and its issue via adimn' do
-    pending
-    # This is actually doing things via API. It should do
-    # everything via admin.
-    fail
+  def fill_seed(kind, attributes, has_many = true, index = 0)
+    attributes.each do |key, value|
+      if has_many
+      	fill_in "issue[#{kind}_seeds_attributes][#{index}][#{key}]",
+	  with: value
+      else
+        fill_in "issue[#{kind}_seed_attributes][#{key}]",
+	  with: value
+      end
+    end
+  end
 
-    # Stops when the issue has been created, with all seeds and attachments,
-    # and an observation has been placed for the robot to run worldcheck.
+  def fill_attachment(kind, ext = 'jpg', has_many = true, index = 0, att_index = 0)
+    path = if has_many
+      "issue[#{kind}_attributes][#{index}][attachments_attributes][#{att_index}][document]"
+    else
+      "issue[#{kind}_attributes][attachments_attributes][#{att_index}][document]"
+    end
+    attach_file(path,
+        File.absolute_path("./spec/fixtures/files/simple.#{ext}"))
+  end
+
+  it 'creates a new person and its issue via admin' do
+    observation_reason = create(:human_world_check_reason)
+    login_as admin_user
+
+    click_link 'People'
+    click_link 'New Person'
+    click_button 'Create Person'
+
+    Person.count.should == 1
+    
+    click_link 'Issues'
+    click_link 'New'
+
+    select "#{Person.last.id}",
+      from: "issue[person_id]",
+      visible: false
+
+    click_link "Add New Identification seed"
+    fill_seed("identification",{
+      number: '123456789',
+      kind: 'ID',
+      issuer: 'Argentina'  
+    })
+
+    within(".has_many_container.identification_seeds") do 
+      click_link "Add New Attachment"
+      fill_attachment('identification_seeds', 'jpg')
+    end
+
+    click_link "Add New Domicile seed"
+   
+    select "Argentina",
+      from: "issue[domicile_seeds_attributes][0][country]",
+      visible: false 
+    fill_seed('domicile', {
+       state: 'Buenos Aires',
+       city: 'C.A.B.A',
+       street_address: 'Monroe',
+       street_number: '4567',
+       postal_code: '1657',
+       floor: '1',
+       apartment: 'C' 
+    })
+    within(".has_many_container.domicile_seeds") do 
+      click_link "Add New Attachment"
+      fill_attachment('domicile_seeds', 'zip') 
+    end
+
+    click_link "Add New Allowance seed"
+    fill_seed("allowance", {
+      weight: "100",
+      kind: "ARS",
+      amount: "100" 
+    })
+
+    within(".has_many_container.allowance_seeds") do 
+      click_link "Add New Attachment"
+      fill_attachment('allowance_seeds', 'gif')
+    end
+
+    fill_seed("natural_docket", {
+      first_name: "Lionel",
+      last_name: "Higuain",
+      nationality: "Argentina",
+      gender: "Male",
+      marital_status: "Married"
+    }, false)  
+    select "1985",
+      from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
+      visible: false
+    select "January",
+      from: "issue[natural_docket_seed_attributes][birth_date(2i)]",
+      visible: false
+    select "1",
+      from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
+      visible: false
+
+    within("#natural_docket_seed") do 
+      click_link "Add New Attachment"
+      fill_attachment('natural_docket_seed', 'png', false)
+    end
+
+    click_link "Add New Observation"
+
+    select observation_reason.subject.truncate(140),
+      from: "issue[observations_attributes][0][observation_reason_id]",
+      visible: false
+    select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
+    fill_in 'issue[observations_attributes][0][note]',
+      with: 'Please check this guy on world check'
+ 
+    click_button "Create Issue"
+
+    issue = Issue.last
+    observation = Observation.last
+
+    %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
+      issue.send(seed).count.should == 1 
+      issue.send(seed).first.attachments.count == 1 
+    end
+
+    issue.natural_docket_seed.should == NaturalDocketSeed.last
+    issue.should be_observed 
+    observation.should be_new
+     
+    fill_in 'issue[observations_attributes][0][reply]',
+      with: '0 hits go ahead!!!'
+    click_button "Update Issue"
+    
+    issue.reload.should be_answered
+    observation.reload.should be_answered
+ 
+    click_link "Approve" 
+
+    issue.reload.should be_approved  
+    Person.last.should be_enabled
   end
 
   it 'reviews a newly created customer' do

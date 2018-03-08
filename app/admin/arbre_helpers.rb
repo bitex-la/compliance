@@ -52,7 +52,7 @@ module ArbreHelpers
 
   def self.has_one_form(context, builder, title, relationship, &fields)
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
-    builder.inputs(title, for: [relationship, b_object], &fields)
+    builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
     if b_object.persisted?
       context.span context.link_to("Show", b_object, target: '_blank')
     end
