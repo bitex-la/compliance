@@ -1,26 +1,20 @@
 ActiveAdmin.register Person do
-# See permitted parameters documentation:
-# https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-#
-# permit_params :list, :of, :attributes, :on, :model
-#
-# or
-#
-# permit_params do
-#   permitted = [:permitted, :attributes]
-#   permitted << :other if params[:action] == 'create' && current_user.admin?
-#   permitted
-# end
+  actions :all, except: [:destroy]
+
+  action_item only: %i(show edit) do
+    link_to 'Add Person Information', new_issue_path
+  end
 
   show do
     attributes_table do
       row :id
       row :created_at
       row :updated_at
+      row :enabled
     end
     
     if person.natural_dockets.any?
-      panel 'Natural Docket' do
+      panel 'Natural Docket', class:'natural_docket' do
         table_for person.natural_dockets.current do |n|
           n.column("ID") do |docket|
             link_to(docket.id, natural_docket_path(docket))
@@ -47,7 +41,7 @@ ActiveAdmin.register Person do
     end
   
     if person.legal_entity_dockets.any?
-      panel 'Legal Entity Docket' do
+      panel 'Legal Entity Docket', class: 'legal_entity_docket' do
         table_for person.legal_entity_dockets.current do |l|
           l.column("ID") do |docket|
             link_to(docket.id, legal_entity_docket_path(docket))
@@ -73,7 +67,7 @@ ActiveAdmin.register Person do
     end
   
     if person.identifications.any?
-      panel 'Identification' do
+      panel 'Identification' , class: 'identifications'do
         table_for person.identifications.current do |i|
           i.column("ID") do |identification|
             link_to(identification.id, identification_path(identification))
@@ -97,7 +91,7 @@ ActiveAdmin.register Person do
     end
   
     if person.domiciles.any?
-      panel 'Domiciles' do
+      panel 'Domiciles', class: 'domiciles' do
         table_for person.domiciles.current do |d|
           d.column("ID") do |domicile|
             link_to(domicile.id, domicile_path(domicile))
@@ -126,7 +120,7 @@ ActiveAdmin.register Person do
     end
   
     if person.allowances.any?
-      panel 'Allowances' do
+      panel 'Allowances' , class: 'allowances' do
         table_for person.allowances.current do |q|
           q.column("ID") do |allowance|
             link_to(allowance.id, allowance_path(allowance))

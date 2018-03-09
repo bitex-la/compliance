@@ -310,6 +310,30 @@ class Api::IssuesHelper
     }
   end
 
+  def self.natural_docket_seed(attachment_type)
+    [{
+      type: "natural_docket_seeds",
+      id: "@1",
+      attributes: {
+        first_name: "joe",
+        last_name: "jones",
+        birth_date: "1985-10-08",
+        nationality: "argentina",
+        gender: "male",
+        marital_status: "married"
+      },
+      relationships: {
+        attachments: {
+          data: [{
+            id: "@2",
+            type: "attachments"
+          }]
+        }
+      }
+    },
+    attachment_for(attachment_type, '@2')]
+  end
+
   def self.observation_for(issue, reason, note, scope = 'admin')
     {
       id: "@1",

@@ -259,8 +259,150 @@ describe 'an admin user' do
   end
 
   it "Edits a customer by creating a new issue" do
-    pending
-    fail
+    observation_reason = create(:human_world_check_reason)
+    person = create(:full_natural_person)
+    login_as admin_user
+    
+    click_link 'People'
+    
+    within("tr[id='person_#{person.id}'] td[class='col col-actions']") do
+      click_link('View')
+    end
+   
+    click_link "Add Person Information"
+
+    select "#{person.id}",
+      from: "issue[person_id]",
+      visible: false
+
+    click_link "Add New Identification seed"
+    fill_seed("identification",{
+      number: '123456789',
+      kind: 'ID',
+      issuer: 'Argentina'  
+    })
+
+    select person.identifications.first.id, from: "issue[identification_seeds_attributes][0][replaces_id]"
+
+    within(".has_many_container.identification_seeds") do 
+      click_link "Add New Attachment"
+      fill_attachment('identification_seeds', 'jpg')
+    end
+
+    click_link "Add New Domicile seed"
+   
+    select "Argentina",
+      from: "issue[domicile_seeds_attributes][0][country]",
+      visible: false 
+    fill_seed('domicile', {
+       state: 'Buenos Aires',
+       city: 'C.A.B.A',
+       street_address: 'Monroe',
+       street_number: '4567',
+       postal_code: '1657',
+       floor: '1',
+       apartment: 'C' 
+    })
+
+    select person.domiciles.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]"
+
+    within(".has_many_container.domicile_seeds") do 
+      click_link "Add New Attachment"
+      fill_attachment('domicile_seeds', 'zip') 
+    end
+
+    click_link "Add New Allowance seed"
+    fill_seed("allowance", {
+      weight: "100",
+      kind: "ARS",
+      amount: "100" 
+    })
+
+   select person.allowances.first.id, from: "issue[allowance_seeds_attributes][0][replaces_id]"
+
+    within(".has_many_container.allowance_seeds") do 
+      click_link "Add New Attachment"
+      fill_attachment('allowance_seeds', 'gif')
+    end
+
+    fill_seed("natural_docket", {
+      first_name: "Lionel",
+      last_name: "Higuain",
+      nationality: "Argentina",
+      gender: "Male",
+      marital_status: "Married"
+    }, false)  
+    select "1985",
+      from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
+      visible: false
+    select "January",
+      from: "issue[natural_docket_seed_attributes][birth_date(2i)]",
+      visible: false
+    select "1",
+      from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
+      visible: false
+
+    within("#natural_docket_seed") do 
+      click_link "Add New Attachment"
+      fill_attachment('natural_docket_seed', 'png', false)
+    end
+
+    click_link "Add New Observation"
+
+    select observation_reason.subject.truncate(140),
+      from: "issue[observations_attributes][0][observation_reason_id]",
+      visible: false
+    select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
+    fill_in 'issue[observations_attributes][0][note]',
+      with: 'Please check this guy on world check'
+ 
+    click_button "Create Issue"
+   
+    issue = Issue.last
+    observation = Observation.last
+    issue.should be_observed 
+    observation.should be_new
+     
+    fill_in 'issue[observations_attributes][0][reply]',
+      with: '0 hits go ahead!!!'
+    click_button "Update Issue"
+    
+    issue.reload.should be_answered
+    observation.reload.should be_answered
+ 
+    click_link "Approve" 
+
+    issue.reload.should be_approved  
+   
+    old_domicile = Domicile.first
+    new_domicile = Domicile.last
+    old_identification = Identification.first
+    new_identification = Identification.last
+    old_allowance = Allowance.first
+    new_allowance = Allowance.last
+
+    old_domicile.replaced_by_id.should == new_domicile.id
+    new_domicile.replaced_by_id.should be_nil
+
+    old_identification.replaced_by_id.should == new_identification.id
+    new_identification.replaced_by_id.should be_nil 
+
+    old_allowance.replaced_by_id.should == new_allowance.id
+    new_allowance.replaced_by_id.should be_nil
+
+    within '.row.row-person' do
+      click_link person.id
+    end
+    person.should be_enabled
+    within ".domiciles.panel" do
+      expect(page).to_not have_content old_domicile.id
+    end
+    within ".identifications.panel" do
+      expect(page).to_not have_content old_identification.id
+    end
+    within ".allowances.panel" do
+      expect(page).to_not have_content old_allowance.id
+    end
   end
 
   it "Dismisses an issue that had only bogus data" do
@@ -448,21 +590,117 @@ describe 'an admin user' do
 
   describe 'when admin edits an issue' do
     it 'can edit a particular seed' do
+      issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
+      issue_request[:data][:relationships][:natural_docket_seed] = {
+        data: {id: '@1', type: 'natural_docket_seeds'}}
+      issue_request[:included] += Api::IssuesHelper.natural_docket_seed(:jpg) 
+
       post api_person_issues_path(create(:full_natural_person).id),
-        params: Api::IssuesHelper.issue_with_domicile_seed(:png)
+        params: issue_request.to_json,
+        headers: {"CONTENT-TYPE": 'application/json'}
+      issue = api_response.data
+      
+      login_as admin_user
+      within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
+        click_link('View')
+      end
+
+      within ".has_many_container.domicile_seeds" do
+        select "Argentina",
+        from: "issue[domicile_seeds_attributes][0][country]",
+        visible: false 
+    
+        fill_seed('domicile', {
+          state: 'Buenos Aires',
+          city: 'C.A.B.A',
+          street_address: 'Ayacucho',
+          street_number: '4567',
+          postal_code: '1657',
+          floor: '1',
+          apartment: 'C' 
+        })
+      
+        select Domicile.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]" 
+       
+        find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
+        click_link "Add New Attachment"
+        fill_attachment('domicile_seeds', 'gif', true, 0, 1) 
+      end   
+
+      click_button "Update Issue"
+      issue = Issue.last
+      issue.should be_new
+      
+      click_link "Approve"
+      issue.reload.should be_approved
+
+      old_domicile = Domicile.first
+      new_domicile = Domicile.last
+
+      old_domicile.replaced_by_id.should == new_domicile.id
+      new_domicile.replaced_by_id.should be_nil
+
+      click_link Person.last.id
+      within ".domiciles.panel" do
+        expect(page).to_not have_content old_domicile.id
+      end
+    end
+
+    it 'can add new seeds' do
+      person = create(:full_natural_person)
+      issue_request = Api::IssuesHelper.issue_with_current_person(person.id)
+      post api_person_issues_path(person.id),
+        params: issue_request.to_json,
+        headers: {"CONTENT-TYPE": 'application/json'}
       issue = api_response.data
 
       login_as admin_user
       within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
         click_link('View')
       end
-      pending
-      fail
-    end
 
-    it 'can add new seeds' do
-      pending
-      fail
+      click_link "Add New Identification seed"
+      fill_seed("identification",{
+        number: '123456789',
+        kind: 'ID',
+        issuer: 'Argentina'  
+      })
+
+      within(".has_many_container.identification_seeds") do 
+        click_link "Add New Attachment"
+        fill_attachment('identification_seeds', 'jpg')
+      end
+
+      click_link "Add New Domicile seed"
+
+      select "Argentina",
+       from: "issue[domicile_seeds_attributes][0][country]",
+       visible: false 
+      fill_seed('domicile', {
+        state: 'Buenos Aires',
+        city: 'C.A.B.A',
+        street_address: 'Monroe',
+        street_number: '4567',
+        postal_code: '1657',
+        floor: '1',
+        apartment: 'C' 
+      })
+      within(".has_many_container.domicile_seeds fieldset:nth-of-type(1)") do 
+        click_link "Add New Attachment"
+        fill_attachment('domicile_seeds', 'zip') 
+      end
+
+      click_button "Update Issue"
+      issue = Issue.last
+      issue.should be_new
+      
+      click_link "Approve"
+      issue.reload.should be_approved
+
+      click_link person.id
+
+      person.reload.domiciles.count == 2
+      person.reload.identifications.count == 2
     end
 
     it 'can remove existing seeds' do

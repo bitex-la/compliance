@@ -45,6 +45,7 @@ ActiveAdmin.register Issue do
       sf.input :number
       sf.input :kind
       sf.input :issuer
+      sf.input :replaces
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
@@ -57,6 +58,7 @@ ActiveAdmin.register Issue do
       sf.input :postal_code
       sf.input :floor
       sf.input :apartment
+      sf.input :replaces
       ArbreHelpers.has_many_attachments(context, sf)
     end 
     
@@ -83,6 +85,7 @@ ActiveAdmin.register Issue do
       sf.input :weight 
       sf.input :amount
       sf.input :kind
+      sf.input :replaces
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
@@ -105,7 +108,7 @@ ActiveAdmin.register Issue do
     end 
 
     if issue.legal_entity_docket_seed.present?
-      panel 'legal entity dockets' do
+      panel 'legal entity docket seed' do
         table_for issue.legal_entity_docket_seed do |l|
           l.column("ID") do |seed|
             link_to(seed.id, legal_entity_docket_seed_path(seed))
@@ -131,7 +134,7 @@ ActiveAdmin.register Issue do
     end
 
     if issue.natural_docket_seed.present?
-      panel 'natural dockets' do
+      panel 'natural docket seed' do
         table_for issue.natural_docket_seed do |n|
           n.column("ID") do |seed|
             link_to(seed.id, natural_docket_seed_path(seed))
@@ -158,7 +161,7 @@ ActiveAdmin.register Issue do
     end
 
     if issue.allowance_seeds.any?
-      panel 'Allowances' do
+      panel 'Allowance seeds' do
         table_for issue.allowance_seeds do |q|
           q.column("ID") do |seed|
             link_to(seed.id, allowance_seeds_path(seed))
@@ -182,7 +185,7 @@ ActiveAdmin.register Issue do
     end
 
     if issue.domicile_seeds.any?
-      panel 'domiciles' do
+      panel 'Domicile seed' do
         table_for issue.domicile_seeds do |d|
           d.column("ID") do |seed|
             link_to(seed.id, domicile_seed_path(seed))
@@ -211,7 +214,7 @@ ActiveAdmin.register Issue do
     end
 
     if issue.identification_seeds.any?
-      panel 'Identifications' do
+      panel 'Identification seed' do
         table_for issue.identification_seeds do |i|
           i.column("ID") do |seed|
             link_to(seed.id, identification_seed_path(seed))
