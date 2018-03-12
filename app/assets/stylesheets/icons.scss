@@ -1,0 +1,41 @@
+@mixin sprite {
+  display: block;
+  margin: 0 auto;
+  background-image: image-url("sprite.png");
+  background-repeat: no-repeat;
+  margin: 0 auto;
+  @media (max-width: $screen-sm-max) {
+    background-size: 2366px;
+  }
+}
+
+.icon-image{
+  @include sprite;
+  width: 136px;
+  height: 124px;
+  @media (max-width: $screen-sm-max) {
+    width: 68px;
+    height: 62px;
+  }
+}
+
+$bitex-icons: (
+  (3915, (sameday, wholesale, assets, arbitrage, market, man)),
+  (2095, (collect, pay, royalties, manage-funds,
+    startups, freelancers, entrepreneurs, small-business)),
+  (0, (global-and-secure, no-fraud, low-fees, btc-for-usd,
+    daily-settlement, profits, no-more-theft, innovative,
+    integration, flexible)));
+
+@each $offset, $set in $bitex-icons {
+  @each $current in $set {
+    $i: index($set, $current)-1;
+    .icon-image-#{$current}{
+      background-position: -($offset + (136px * $i)) 0px;
+      @media (max-width: $screen-sm-max) {
+        background-position: -(round($offset/2) + (round(136px/2) * $i)) 0px;
+      }
+    }
+  }
+}
+
