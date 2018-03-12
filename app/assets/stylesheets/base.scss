@@ -1,0 +1,361 @@
+@import "variables";
+@import "icons";
+@import "bootstrap";
+@import "compass";
+@import "compass/css3/transform";
+@import "compass/css3/user-interface";
+@import "bitex_components";
+@import "file_uploader/style";
+@import "file_uploader/jquery.fileupload-ui";
+@import "navbar";
+@import "footer";
+@import "bitex_components";
+@import "landing";
+@import "about_us";
+@import "kyc";
+@import "developers";
+@import "dashboard";
+@import "calculator";
+@import "graph";
+@import "trezor";
+@import "payments";
+@import "pos";
+@import "syntax_highlighting";
+@import "guidelines";
+@import "bootstrap-datepicker";
+
+@font-face {
+  font-family: 'Dosis';
+  src: font-url('dosis_regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Dosis';
+  src: font-url('dosis_bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Dosis';
+  src: font-url('dosis_extralight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: font-url('OpenSans-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: font-url('OpenSans-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: font-url('OpenSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: font-url('OpenSans-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: font-url('OpenSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: font-url('OpenSans-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Ubuntu Mono';
+  src: font-url('UbuntuMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Moderat Bold';
+  src: font-url('Moderat-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body{
+  color: $body-color;
+  background-color: $body-background-color;
+}
+
+.alert{
+  font-size: 1.1em;
+  font-weight: 200;
+  p {
+    margin-bottom: 0px;
+  }
+  a, a:hover, a:visited{
+    font-weight: normal;
+    color: $white-like;
+  }
+}
+
+.valign-wrapper{
+  position: relative;
+  top: 50%;
+  @include transform(translateY(-50%));
+}
+
+#flashes, #alerts{
+  .alert{
+    margin-bottom: 0;
+  }
+}
+
+.qr-container{
+  margin: 15px auto;
+  padding: 10px;
+  background: white;
+  overflow: auto;
+  width: 220px;
+}
+
+.modal{
+  .modal-header, .modal-footer{
+  }
+  .modal-content{
+  }
+  .modal-header{
+    font-weight: 100;
+    font-size: 25px;
+  }
+  .modal-body{
+    font-weight: 200;
+    font-size: 16px;
+  }
+  &.in{
+    .modal-dialog{
+      transform: translate(0, 50%);
+    }
+  }
+}
+
+p{
+  font-family: $body-font-family;
+}
+
+.text-danger{
+  color: $brand-danger;
+}
+
+.text-warning{
+  color: $brand-warning;
+}
+
+.text-primary{
+  color: $brand-primary;
+}
+
+.text-success{
+  color: $brand-success;
+}
+
+.text-secondary{
+  color: $secondary-color;
+}
+
+.text-info{
+  color: $brand-default;
+}
+
+.alert-primary{
+  color: $white-like;
+  background: $brand-default;
+  a, a:hover, a:visited{
+    color: $white-like;
+  }
+}
+
+.alert-info{
+  color: $body-color;
+  background: #fff;
+}
+
+.alert .btn-link{
+  padding: 0;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+.loading-spinner{
+  @include border-radius(50px);
+  @include box-shadow(0px 0px 5px rgba(0,0,0,0.3) inset);
+  margin: 100px auto;
+  background: #ffffff;
+  width: 215px;
+  height: 70px;
+  padding: 10px;
+
+  /*.animation{
+    float: left;
+    width: 50px;
+    height: 50px;
+    background: image-url("loading.gif") no-repeat center left;
+    background-size: contain;
+  }*/
+  .text{
+    text-align: center;
+    color: #999;
+    padding: 10px 0;
+    font-size: 24px;
+    font-weight: 100;
+    text-transform: uppercase;
+  }
+}
+
+.container{
+  padding: 0 15px;
+}
+.container-edgy{
+  padding-left: 0;
+  padding-right: 0;
+}
+
+
+.primary-well{
+  background: $brand-primary;
+}
+
+.btn-link{
+  color: $white-like;
+}
+.btn-link:hover{
+  color: $white-like;
+  font-weight: 200;
+}
+
+hr{
+  border-top: 1px solid $lines-color;
+}
+
+a, a:hover, a:visited {
+  color: $brand-primary;
+  text-decoration: none;
+}
+a:hover{
+  cursor: pointer;
+}
+
+a.btn, a.btn:hover, a.btn:visited {
+  color: $white-like;
+}
+
+iframe[name='google_conversion_frame'] {
+  height: 0 !important;
+  width: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  margin-top: -13px;
+  float: left;
+}
+
+p.lead {
+  @media (min-width: $screen-md-min){
+    &.major{
+      font-weight: 100;
+      margin-bottom: 40px;
+      font-size: 26px;
+    }
+    &.minor{
+      font-weight: 100;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      font-size: 24px;
+      strong{
+        font-weight: 200;
+      }
+    }
+  }
+}
+
+thead{
+  th{
+    font-weight: normal;
+  }
+}
+
+.image-row{
+  img{
+    width: 100%;
+    height: 100%;
+    max-width: 306px;
+    max-height: 306px;
+  }
+  div[class*="col-md"]{
+    margin-bottom: 4px;
+  }
+  p {
+    font-size: 17px;
+    margin: 10px 20px 0 0;
+    font-weight: 200;
+  }
+}
+
+.auth-page{
+  color: $white-like;
+  min-height: 100%;
+  .container{
+    height: 100%;
+    position: relative;
+    padding: 0 30px;
+  }
+  position: relative;
+  background-image: image-url("auth_background.jpg");
+  background-size: cover;
+  background-position: 50%;
+  .services-navbar{
+    position: absolute;
+    @media (min-width: $screen-md-min) {
+      position: absolute;
+    }
+  }
+  .form-control{
+    @include border-radius(3px);
+    border: 0px;
+    font-family: 'Open Sans';
+    padding: 10px 15px;
+    font-weight: 100;
+    font-size: 16px;
+    color: #aaa;
+  }
+  .btn-primary{
+    background-color: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    font-weight: 600;
+    @include border-radius(5px);
+    font-family: 'Open Sans';
+    @include transition(all 0.5s ease-in-out);
+  }
+  .btn-primary:hover{
+    background-color: #fff;
+    color: #1b80c4;
+  }
+}

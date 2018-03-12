@@ -1,0 +1,7 @@
+.about_us{
+  padding-bottom: 60px !important;
+  text-align: center;
+  @media (min-width: $screen-md-min){
+    text-align: justify;
+  }
+}
