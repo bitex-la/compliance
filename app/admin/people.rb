@@ -11,6 +11,7 @@ ActiveAdmin.register Person do
       row :created_at
       row :updated_at
       row :enabled
+      row :risk
     end
     
     if person.natural_dockets.any?

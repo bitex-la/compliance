@@ -6,7 +6,7 @@ ActiveAdmin.register Issue do
     link_to 'New', new_issue_path
   end
 
-  %i(approve reject dismiss).each do |action|
+  %i(approve abandon reject dismiss).each do |action|
     action_item action, only: :edit, if: lambda { resource.send("may_#{action}?") } do
       link_to action.to_s.titleize, [action, :issue], method: :post
     end

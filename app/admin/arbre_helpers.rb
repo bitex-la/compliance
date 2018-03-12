@@ -54,7 +54,17 @@ module ArbreHelpers
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
     builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
     if b_object.persisted?
-      context.span context.link_to("Show", b_object, target: '_blank')
+      context.link_to(
+        "Show", 
+        b_object, 
+        target: '_blank')
+
+      unless b_object.class.name == 'Attachment'
+        context.link_to("Remove Seed", 
+          b_object, 
+          method: :delete, 
+          data: {confirm: "Are you sure?"})
+      end
     end
   end
 
@@ -62,8 +72,20 @@ module ArbreHelpers
     builder.has_many relationship do |f|
       instance_exec(f, context, &fields)
       if f.object.persisted?
-        f.template.concat(context.link_to "Show", f.object, target: '_blank')
-      end 
+        f.template.concat(context.link_to(
+          "Show", 
+          f.object, 
+          target: '_blank'
+        ))
+
+        unless f.object.class.name == 'Attachment'
+          f.template.concat(context.link_to("Remove Seed", 
+            f.object, 
+            method: :delete, 
+            data: {confirm: "Are you sure?"}
+          ))
+        end 
+      end
     end
   end
 

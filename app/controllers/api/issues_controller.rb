@@ -42,7 +42,7 @@ class Api::IssuesController < Api::ApiController
     seed_scope = issue_id ? { issue_id: issue_id } : { id: nil }
 
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [:observation_reasons],
+      [:observation_reasons, :domiciles, :identifications, :allowances],
       issues: [
         :domicile_seeds,
         :identification_seeds,
@@ -63,6 +63,7 @@ class Api::IssuesController < Api::ApiController
         :floor,
         :apartment,
         :attachments,
+        :replaces,
         seed_scope
       ],
       identification_seeds: [
@@ -70,6 +71,7 @@ class Api::IssuesController < Api::ApiController
         :number,
         :issuer,
         :attachments,
+        :replaces,
         seed_scope
       ],
       natural_docket_seeds: [
@@ -96,6 +98,7 @@ class Api::IssuesController < Api::ApiController
         :amount,
         :kind,
         :attachments,
+        :replaces,
         seed_scope
       ],
       observations: [
@@ -106,6 +109,9 @@ class Api::IssuesController < Api::ApiController
         seed_scope
       ],
       observation_reasons: [],
+      domiciles: [],
+      identifications: [],
+      allowances: [],
       attachments: [
         :document,
         :document_file_name,

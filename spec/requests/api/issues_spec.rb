@@ -4,7 +4,7 @@ require 'json'
 
 describe Issue do
   let(:person) { create(:empty_person) }
-  
+
   def assert_issue_integrity(seed_list = [])
     Issue.count.should == 1
     Person.count.should == 1
@@ -16,7 +16,16 @@ describe Issue do
     end
   end
 
-  describe 'Creating an Issue' do
+  def assert_replacement_issue_integrity(seed_list = [])
+    Issue.count == 2
+    seed_list.each do |seed_type|
+      seed_type.constantize.count.should == 2
+      seed_type.constantize.last.issue.should == Issue.last
+      seed_type.constantize.last.attachments.count.should == 1
+    end
+  end
+
+  describe 'Creating a new user Issue' do
     it 'responds with an Unprocessable Entity HTTP code (422) when body is empty' do
       post "/api/people/#{person.id}/issues",  params: {}
       assert_response 422
@@ -63,6 +72,60 @@ describe Issue do
           issue  = Api::IssuesHelper.issue_with_allowance_seed(ext)
           post "/api/people/#{person.id}/issues", params: issue
           assert_issue_integrity(["AllowanceSeed"]) 
+          assert_response 201
+        end
+      end
+    end
+  end
+
+  describe 'Updating people info' do
+     %i(png gif pdf jpg zip).each do |ext|
+      describe "receives a #{ext} attachment and" do
+        it 'creates a new issue with a domicile seed who wants to replace the current domicile' do
+          full_natural_person = create(:full_natural_person)
+          issue  = Api::IssuesHelper.issue_with_domicile_seed(ext)
+          issue[:included][0][:relationships].merge!({
+            replaces: { data: { type: 'domiciles', id: Domicile.last.id.to_s } }
+          })
+
+          post "/api/people/#{full_natural_person.id}/issues", params: issue
+
+          assert_replacement_issue_integrity(["DomicileSeed"])
+          DomicileSeed.last.replaces.should == Domicile.last
+          DomicileSeed.first.replaces.should be_nil
+          assert_response 201
+        end
+
+        it 'creates a new issue with an identification seed who wants to replace the current identification' do
+          full_natural_person = create(:full_natural_person)
+          issue  = Api::IssuesHelper.issue_with_identification_seed(ext)
+          issue[:included][0][:relationships].merge!({
+            replaces: { data: { type: 'identifications', id: Identification.last.id.to_s } }
+          })
+
+          post "/api/people/#{full_natural_person.id}/issues", params: issue
+
+          assert_replacement_issue_integrity(["IdentificationSeed"])
+          IdentificationSeed.last.replaces.should == Identification.last
+          IdentificationSeed.first.replaces.should be_nil
+          assert_response 201
+        end
+
+        it 'creates a new issue with an allowance seed who wants to replace the current allowance' do
+          full_natural_person = create(:full_natural_person)
+          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext)
+          issue[:included][0][:relationships].merge!({
+            replaces: { data: { type: 'allowances', id: Allowance.last.id.to_s } }
+          })
+
+          post "/api/people/#{full_natural_person.id}/issues", params: issue
+
+          Issue.count.should == 2 
+          AllowanceSeed.count.should == 3
+          AllowanceSeed.last.issue.should == Issue.last
+          AllowanceSeed.last.attachments.count.should == 1
+          AllowanceSeed.last.replaces.should == Allowance.last
+          AllowanceSeed.first.replaces.should be_nil
           assert_response 201
         end
       end

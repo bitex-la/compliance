@@ -1,18 +1,13 @@
 ActiveAdmin.register DomicileSeed do
-# See permitted parameters documentation:
-# https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-#
-# permit_params :list, :of, :attributes, :on, :model
-#
-# or
-#
-# permit_params do
-#   permitted = [:permitted, :attributes]
-#   permitted << :other if params[:action] == 'create' && current_user.admin?
-#   permitted
-# end
-  
   menu false
+
+  controller do
+    def destroy
+      issue = resource.issue
+      resource.destroy
+      redirect_to edit_issue_url(issue)
+    end
+  end
 
   begin
     permit_params :country, :state, :city, :street_address, :street_number, :postal_code, :floor, :apartment, :issue_id

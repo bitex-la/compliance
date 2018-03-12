@@ -583,9 +583,18 @@ describe 'an admin user' do
     page.current_path.should == "/issues/#{issue.id}"
   end
 
-  it "Abandons an issue that was inactive" do
-    pending
-    fail
+  it "Abandons a new person issue that was inactive" do
+    person = create :new_natural_person
+    issue = person.issues.last
+    login_as admin_user
+    visit "/issues/#{issue.id}"
+    click_link 'Abandon'
+
+    issue.reload.should be_abandoned
+    person.reload.should_not be_enabled
+
+    visit "/"
+    expect(page).to_not have_content(issue.id)
   end
 
   describe 'when admin edits an issue' do
@@ -704,14 +713,96 @@ describe 'an admin user' do
     end
 
     it 'can remove existing seeds' do
-      pending
-      fail
+      person = create :new_natural_person
+      issue = person.issues.first
+
+      Issue.count.should == 1
+      Person.count.should == 1 
+      DomicileSeed.count.should == 1
+      IdentificationSeed.count.should == 1
+      NaturalDocketSeed.count.should == 1
+      AllowanceSeed.count.should == 2
+
+      # Admin does not see it as pending
+      login_as admin_user
+
+      expect(page).to have_content 'Signed in successfully.'
+
+      # Admin sees issue in dashboard.
+      expect(page).to have_content issue.id
+      
+      within("#issue_#{issue.id} td.col.col-actions") do
+        click_link('View')
+      end
+      page.current_path.should == "/issues/#{Issue.last.id}/edit"
+
+      visit "/issues/#{Issue.last.id}"
+      page.current_path.should == "/issues/#{Issue.last.id}/edit"
+
+      expect(page).to have_content 'Identification'
+      expect(page).to have_content 'Domicile'
+      expect(page).to have_content 'Natural Docket'
+      expect(page).to have_content 'Allowance seed'
+
+      within '.has_many_container.identification_seeds' do
+        click_link 'Remove Seed'
+        page.driver.browser.switch_to.alert.accept
+      end
+
+      within '.has_many_container.allowance_seeds' do
+        first(:link, 'Remove Seed').click
+        page.driver.browser.switch_to.alert.accept
+      end
+
+      DomicileSeed.count.should == 1
+      IdentificationSeed.count.should == 0
+      NaturalDocketSeed.count.should == 1
+     
+      visit "/issues/#{Issue.last.id}"
+
+      click_link "Add New Identification seed"
+      fill_seed("identification",{
+        number: '123456789',
+        kind: 'ID',
+        issuer: 'Argentina'  
+      })
+
+      within(".has_many_container.identification_seeds") do 
+        click_link "Add New Attachment"
+        fill_attachment('identification_seeds', 'jpg')
+      end
+      
+      click_button 'Update Issue' 
+
+      click_link 'Approve'
+      issue.reload.should be_approved
+
+      click_link  person.id
+      person.allowances.first.weight.should == AllowanceSeed.last.weight
+      person.identifications.first.number.should == IdentificationSeed.last.number
     end
   end
 
   it 'manually enables/disables and sets risk for a person' do
-    pending
-    fail
+    person = create(:full_natural_person)
+    
+    login_as admin_user
+
+    click_link 'People'
+
+    within("#person_#{person.id} td.col.col-actions") do
+      click_link('Edit')
+    end
+    page.current_path.should == "/people/#{person.id}/edit"
+
+    find(:css, "#person_enabled").set(false) 
+    select 'Low', from: 'person_risk', visible: false
+    click_button 'Update Person'
+
+    page.current_path.should == "/people/#{person.id}"
+
+    person.reload.should_not be_enabled
+    person.risk.should == 'low'
   end
 
   it 'keeps track of usage allowances' do
