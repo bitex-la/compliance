@@ -89,10 +89,17 @@ describe 'an admin user' do
     fill_seed("natural_docket", {
       first_name: "Lionel",
       last_name: "Higuain",
-      nationality: "Argentina",
-      gender: "Male",
-      marital_status: "Married"
-    }, false)  
+    }, false)
+
+    select "Married",
+      from: "issue[natural_docket_seed_attributes][marital_status]",
+      visible: false
+    select "Male",
+      from: "issue[natural_docket_seed_attributes][gender]",
+      visible: false
+    select "Argentina",
+      from: "issue[natural_docket_seed_attributes][nationality]",
+      visible: false
     select "1985",
       from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
       visible: false
@@ -328,10 +335,18 @@ describe 'an admin user' do
     fill_seed("natural_docket", {
       first_name: "Lionel",
       last_name: "Higuain",
-      nationality: "Argentina",
-      gender: "Male",
-      marital_status: "Married"
-    }, false)  
+    }, false)
+
+    select "Married",
+      from: "issue[natural_docket_seed_attributes][marital_status]",
+      visible: false
+    select "Male",
+      from: "issue[natural_docket_seed_attributes][gender]",
+      visible: false
+    select "Argentina",
+      from: "issue[natural_docket_seed_attributes][nationality]",
+      visible: false
+
     select "1985",
       from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
       visible: false
@@ -796,7 +811,7 @@ describe 'an admin user' do
     page.current_path.should == "/people/#{person.id}/edit"
 
     find(:css, "#person_enabled").set(false) 
-    select 'Low', from: 'person_risk', visible: false
+    select 'low', from: 'person_risk', visible: false
     click_button 'Update Person'
 
     page.current_path.should == "/people/#{person.id}"

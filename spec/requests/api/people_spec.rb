@@ -23,7 +23,8 @@ describe Person do
             identifications: {data: []},
             natural_dockets: {data: []},
             legal_entity_dockets: {data: []},
-            allowances: {data: []}
+            allowances: {data: []},
+            phones: {data: []}
           }
         },
         included: []
@@ -62,6 +63,9 @@ describe Person do
           legal_entity_dockets: {data: []},
           allowances: {data: person.allowances.map{ |x|
             {id: x.id.to_s, type: "allowances" }
+          }},
+          phones: {data: person.phones.map { |x| 
+            {id: x.id.to_s, type: 'phones'}
           }}
         }
       }
@@ -89,6 +93,9 @@ describe Person do
             legal_entity_docket_seed: {data: nil},
             allowance_seeds: {data: issue.allowance_seeds.map{ |x|
               {id: x.id.to_s, type: "allowance_seeds" }
+            }},
+            phone_seeds: {data: issue.phone_seeds.map { |x|
+             {id: x.id.to_s, type: "phone_seeds"}
             }},
             observations: {data: []}
           }

@@ -150,6 +150,48 @@ class Api::IssuesHelper
     }
   end
 
+  def self.issue_with_phone_seed(attachment_type)
+    mime, bytes = 
+    {
+      data: {
+        id: "@1",
+        type: "issues",
+        attributes: { },
+        relationships: {
+          phone_seeds: {
+            data: [{ id: "@1", type: "phone_seeds" }]
+          }
+        }
+      },
+      included: [
+        {
+          type: "phone_seeds",
+          id: "@1",
+          attributes: {
+            number: "+54911282256470",
+            kind: "cellphone",
+            country: "Argentina",
+            has_whatsapp: true,
+            has_telegram: false,
+            note: "only on office hours",
+          },
+          relationships: {
+            issue: {
+              data: {id: "@1", type: 'issues'}
+            },
+            attachments: {
+              data: [{
+                id: "@1",
+                type: "attachments"
+              }]
+            }
+          }
+        },
+        attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end 
+
   def self.issue_with_identification_seed(attachment_type)
     {
       data: {
