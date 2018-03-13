@@ -66,9 +66,9 @@ ActiveAdmin.register Issue do
       sf.input :first_name
       sf.input :last_name
       sf.input :birth_date, start_year: 1900
-      sf.input :nationality
-      sf.input :gender
-      sf.input :marital_status
+      sf.input :nationality, as: :country
+      sf.input :gender, collection: ['Male', 'Female']
+      sf.input :marital_status, collection: ['Single', 'Married', 'Divorced']
       ArbreHelpers.has_many_attachments(self, sf)
     end
 
