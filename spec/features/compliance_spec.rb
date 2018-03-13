@@ -745,12 +745,12 @@ describe 'an admin user' do
       expect(page).to have_content 'Allowance seed'
 
       within '.has_many_container.identification_seeds' do
-        click_link 'Remove Seed'
+        click_link 'Remove Entity'
         page.driver.browser.switch_to.alert.accept
       end
 
       within '.has_many_container.allowance_seeds' do
-        first(:link, 'Remove Seed').click
+        first(:link, 'Remove Entity').click
         page.driver.browser.switch_to.alert.accept
       end
 

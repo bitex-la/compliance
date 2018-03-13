@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180306165316) do
+ActiveRecord::Schema.define(version: 20180313175018) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -271,6 +271,40 @@ ActiveRecord::Schema.define(version: 20180306165316) do
     t.integer "risk"
   end
 
+  create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "number"
+    t.string "kind"
+    t.string "country"
+    t.boolean "has_whatsapp"
+    t.boolean "has_telegram"
+    t.text "note"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_phone_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_phone_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_phone_seeds_on_replaces_id"
+  end
+
+  create_table "phones", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "number"
+    t.string "kind"
+    t.string "country"
+    t.boolean "has_whatsapp"
+    t.boolean "has_telegram"
+    t.text "note"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.bigint "issue_id"
+    t.index ["issue_id"], name: "index_phones_on_issue_id"
+    t.index ["person_id"], name: "index_phones_on_person_id"
+    t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
+  end
+
   create_table "relationship_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
     t.string "kind"
@@ -326,6 +360,12 @@ ActiveRecord::Schema.define(version: 20180306165316) do
   add_foreign_key "natural_dockets", "natural_dockets", column: "replaced_by_id"
   add_foreign_key "natural_dockets", "people"
   add_foreign_key "observations", "issues"
+  add_foreign_key "phone_seeds", "issues"
+  add_foreign_key "phone_seeds", "phones", column: "fruit_id"
+  add_foreign_key "phone_seeds", "phones", column: "replaces_id"
+  add_foreign_key "phones", "issues"
+  add_foreign_key "phones", "people"
+  add_foreign_key "phones", "phones", column: "replaced_by_id"
   add_foreign_key "relationship_seeds", "issues"
   add_foreign_key "relationship_seeds", "people", column: "related_person_id"
   add_foreign_key "relationships", "people"

@@ -5,6 +5,21 @@ ActiveAdmin.register Person do
     link_to 'Add Person Information', new_issue_path
   end
 
+  form do |f|
+    f.inputs 'Basics' do
+      f.input :enabled
+      f.input :risk, as:  :select, collection: %w(low medium high)
+    end
+
+    ArbreHelpers.has_many_form self, f, :comments do |cf, context|
+      cf.input :title
+      cf.input :meta
+      cf.input :body
+    end
+
+    f.actions
+  end
+
   show do
     attributes_table do
       row :id
@@ -143,5 +158,51 @@ ActiveAdmin.register Person do
         end
       end
     end
+
+    if person.phones.any?
+      panel 'Phones' , class: 'phones' do
+        table_for person.phones.current do |q|
+          q.column("ID") do |phone|
+            link_to(phone.id, phone_path(phone))
+          end
+          q.column("Number") { |p| p.number }
+          q.column("Kind") { |p| p.kind }
+          q.column("Country")   { |p| p.country }
+          q.column("Has whatsapp") { |p| p.has_whatsapp }
+          q.column("Has telegram") { |p| p.has_telegram }
+          q.column("Note") { |p| p.note }
+          q.column("Attachments") do |p|
+            p.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          q.column("") { |phone|
+            link_to("View", phone_path(phone))
+          }
+          q.column("") { |phone|
+            link_to("Edit", edit_phone_path(phone))
+          }
+        end
+      end
+    end
+
+    if person.comments.any?
+      panel 'Comments' , class: 'comments' do
+        table_for person.comments do |q|
+          q.column("ID") do |comment|
+            link_to(comment.id, comment_path(comment))
+          end
+          q.column(:title)
+          q.column(:meta)
+          q.column(:body)
+          q.column("") { |comment|
+            link_to("View", comment_path(comment))
+          }
+          q.column("") { |comment|
+            link_to("Edit", edit_comment_path(comment))
+          }
+        end
+      end
+    end  
   end
 end

@@ -6,11 +6,14 @@ class Person < ApplicationRecord
     natural_dockets
     legal_entity_dockets
     allowances
+    phones
   }.each do |relationship|
     has_many relationship
   end
 
   has_many :comments, as: :commentable
+  accepts_nested_attributes_for :comments, allow_destroy: true
+  
   enum risk: %i(low medium high)
 
   def natural_docket

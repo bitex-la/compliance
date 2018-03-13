@@ -89,6 +89,17 @@ ActiveAdmin.register Issue do
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
+    ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
+      pf.input :number
+      pf.input :kind
+      pf.input :country
+      pf.input :replaces
+      pf.input :has_whatsapp
+      pf.input :has_telegram
+      pf.input :note
+      ArbreHelpers.has_many_attachments(context, pf)
+    end  
+
     ArbreHelpers.has_many_form self, f, :observations do |sf|
       sf.input :observation_reason
       sf.input :scope
@@ -232,6 +243,33 @@ ActiveAdmin.register Issue do
           }
           i.column("") { |seed|
             link_to("Edit", edit_identification_seed_path(seed))
+          }
+        end
+      end
+    end
+
+    if issue.phone_seeds.any?
+      panel 'Phone seeds' do
+        table_for issue.phone_seeds do |i|
+          i.column("ID") do |seed|
+            link_to(seed.id, phone_seed_path(seed))
+          end
+          i.column("Kind")    { |seed| seed.kind }
+          i.column("Number")  { |seed| seed.number }
+          i.column("Country")  { |seed| seed.country }
+          i.column("Has whatsapp")  { |seed| seed.has_whatsapp }
+          i.column("Has telegram")  { |seed| seed.has_telegram }
+          i.column("Note")  { |seed| seed.note } 
+          i.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |seed|
+            link_to("View", phone_seed_path(seed))
+          }
+          i.column("") { |seed|
+            link_to("Edit", edit_phone_seed_path(seed))
           }
         end
       end

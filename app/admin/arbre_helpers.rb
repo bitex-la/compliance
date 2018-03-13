@@ -60,7 +60,7 @@ module ArbreHelpers
         target: '_blank')
 
       unless b_object.class.name == 'Attachment'
-        context.link_to("Remove Seed", 
+        context.link_to("Remove Entity", 
           b_object, 
           method: :delete, 
           data: {confirm: "Are you sure?"})
@@ -79,7 +79,7 @@ module ArbreHelpers
         ))
 
         unless f.object.class.name == 'Attachment'
-          f.template.concat(context.link_to("Remove Seed", 
+          f.template.concat(context.link_to("Remove Entity", 
             f.object, 
             method: :delete, 
             data: {confirm: "Are you sure?"}
