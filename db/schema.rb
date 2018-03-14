@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180314160041) do
+ActiveRecord::Schema.define(version: 20180314171315) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -237,6 +237,9 @@ ActiveRecord::Schema.define(version: 20180314160041) do
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
     t.integer "replaces_id"
+    t.string "public_registry_authority"
+    t.string "public_registry_book"
+    t.string "public_registry_extra_data"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
   end
@@ -250,6 +253,9 @@ ActiveRecord::Schema.define(version: 20180314160041) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.string "public_registry_authority"
+    t.string "public_registry_book"
+    t.string "public_registry_extra_data"
     t.index ["issue_id"], name: "index_identifications_on_issue_id"
     t.index ["person_id"], name: "index_identifications_on_person_id"
     t.index ["replaced_by_id"], name: "index_identifications_on_replaced_by_id"
@@ -304,6 +310,10 @@ ActiveRecord::Schema.define(version: 20180314160041) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
+    t.string "job_title"
+    t.string "job_description"
+    t.boolean "politically_exposed"
+    t.text "politically_exposed_reason"
     t.index ["fruit_id"], name: "index_natural_docket_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_natural_docket_seeds_on_issue_id"
   end
@@ -320,6 +330,10 @@ ActiveRecord::Schema.define(version: 20180314160041) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.string "job_title"
+    t.string "job_description"
+    t.boolean "politically_exposed"
+    t.text "politically_exposed_reason"
     t.index ["issue_id"], name: "index_natural_dockets_on_issue_id"
     t.index ["person_id"], name: "index_natural_dockets_on_person_id"
     t.index ["replaced_by_id"], name: "index_natural_dockets_on_replaced_by_id"

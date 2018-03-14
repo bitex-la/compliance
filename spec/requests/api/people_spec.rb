@@ -142,7 +142,10 @@ describe Person do
           attributes: {
             kind: "ID",
             number: "2545566",
-            issuer: "Argentina"
+            issuer: "Argentina",
+            public_registry_authority: nil,
+            public_registry_book: nil,
+            public_registry_extra_data: nil
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -164,7 +167,11 @@ describe Person do
             birth_date: "2018-02-26",
             nationality: "Argentina",
             gender: "Male",
-            marital_status: "Single"
+            marital_status: "Single",
+            job_title: nil,
+            job_description: nil,
+            politically_exposed: nil,
+            politically_exposed_reason: nil
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},

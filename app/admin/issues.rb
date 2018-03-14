@@ -46,6 +46,9 @@ ActiveAdmin.register Issue do
       sf.input :kind
       sf.input :issuer
       sf.input :replaces
+      sf.input :public_registry_authority
+      sf.input :public_registry_book
+      sf.input :public_registry_extra_data
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
@@ -69,6 +72,10 @@ ActiveAdmin.register Issue do
       sf.input :nationality, as: :country
       sf.input :gender, collection: ['Male', 'Female']
       sf.input :marital_status, collection: ['Single', 'Married', 'Divorced']
+      sf.input :job_title
+      sf.input :job_description
+      sf.input :politically_exposed
+      sf.input :politically_exposed_reason
       ArbreHelpers.has_many_attachments(self, sf)
     end
 
@@ -174,6 +181,10 @@ ActiveAdmin.register Issue do
           n.column("Nationality")     { |seed| seed.nationality }
           n.column("Gender")          { |seed| seed.gender }
           n.column("Marital Status")  { |seed| seed.marital_status }
+          n.column("Job Title") { |seed| seed.job_title }
+          n.column("Job Description") { |seed| seed.job_description }
+          n.column("Politically Exposed") { |seed| seed.politically_exposed }
+          n.column("Politically Exposed Reason") { |seed| seed.politically_exposed_reason }
           n.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -299,6 +310,9 @@ ActiveAdmin.register Issue do
           i.column("Kind")    { |seed| seed.kind }
           i.column("Number")  { |seed| seed.number }
           i.column("Issuer")  { |seed| seed.issuer }
+          i.column("Public Registry Authority")  { |seed| seed.public_registry_authority }
+          i.column("Public Registry Book")  { |seed| seed.public_registry_book }
+          i.column("Public Registry Extra Data")  { |seed| seed.public_registry_extra_data }
           i.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}

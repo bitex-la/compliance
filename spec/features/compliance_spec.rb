@@ -712,7 +712,9 @@ describe 'an admin user' do
       click_link "Approve"
       issue.reload.should be_approved
 
-      click_link person.id
+      within ".row.row-person" do
+        click_link person.id
+      end
 
       person.reload.domiciles.count == 2
       person.reload.identifications.count == 2

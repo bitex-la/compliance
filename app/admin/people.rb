@@ -41,6 +41,10 @@ ActiveAdmin.register Person do
           n.column("Nationality")     { |docket| docket.nationality }
           n.column("Gender")          { |docket| docket.gender }
           n.column("Marital Status")  { |docket| docket.marital_status }
+          n.column("Job Title") { |seed| seed.job_title }
+          n.column("Job Description") { |seed| seed.job_description }
+          n.column("Politically Exposed") { |seed| seed.politically_exposed }
+          n.column("Politically Exposed Reason") { |seed| seed.politically_exposed_reason }
           n.column("Attachments") do |docket|
             docket.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -114,6 +118,9 @@ ActiveAdmin.register Person do
           i.column("Kind")    { |identification| identification.kind }
           i.column("Number")  { |identification| identification.number }
           i.column("Issuer")  { |identification| identification.issuer }
+          i.column("Public Registry Authority")  { |identification| identification.public_registry_authority }
+          i.column("Public Registry Book")  { |identification| identification.public_registry_book }
+          i.column("Public Registry Extra Data")  { |identification| identification.public_registry_extra_data }
           i.column("Attachments") do |identification|
             identification.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
