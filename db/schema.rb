@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180313175018) do
+ActiveRecord::Schema.define(version: 20180313202129) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -131,6 +131,32 @@ ActiveRecord::Schema.define(version: 20180313175018) do
     t.index ["issue_id"], name: "index_domiciles_on_issue_id"
     t.index ["person_id"], name: "index_domiciles_on_person_id"
     t.index ["replaced_by_id"], name: "index_domiciles_on_replaced_by_id"
+  end
+
+  create_table "email_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "address"
+    t.string "kind"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_email_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_email_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_email_seeds_on_replaces_id"
+  end
+
+  create_table "emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "address"
+    t.string "kind"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_emails_on_issue_id"
+    t.index ["person_id"], name: "index_emails_on_person_id"
+    t.index ["replaced_by_id"], name: "index_emails_on_replaced_by_id"
   end
 
   create_table "fundings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -340,6 +366,12 @@ ActiveRecord::Schema.define(version: 20180313175018) do
   add_foreign_key "domiciles", "domiciles", column: "replaced_by_id"
   add_foreign_key "domiciles", "issues"
   add_foreign_key "domiciles", "people"
+  add_foreign_key "email_seeds", "emails", column: "fruit_id"
+  add_foreign_key "email_seeds", "emails", column: "replaces_id"
+  add_foreign_key "email_seeds", "issues"
+  add_foreign_key "emails", "emails", column: "replaced_by_id"
+  add_foreign_key "emails", "issues"
+  add_foreign_key "emails", "people"
   add_foreign_key "fundings", "fundings", column: "replaced_by_id"
   add_foreign_key "fundings", "issues"
   add_foreign_key "fundings", "people"

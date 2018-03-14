@@ -159,6 +159,30 @@ ActiveAdmin.register Person do
       end
     end
 
+    if person.emails.any?
+      panel 'Emails' do
+        table_for person.emails do |i|
+          i.column("ID") do |email|
+            link_to(email.id, email_path(email))
+          end
+          i.column("Kind")    { |email| email.kind }
+          i.column("Address")  { |email| email.address }
+          i.column("Attachments") do |email|
+            email.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |email|
+            link_to("View", email_path(email))
+          }
+          i.column("") { |email|
+            link_to("Edit", edit_email_path(email))
+          }
+        end
+      end
+    end
+
+
     if person.phones.any?
       panel 'Phones' , class: 'phones' do
         table_for person.phones.current do |q|

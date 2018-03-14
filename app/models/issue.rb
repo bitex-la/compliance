@@ -17,6 +17,7 @@ class Issue < ApplicationRecord
     domicile_seeds
     identification_seeds
     phone_seeds
+    email_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true

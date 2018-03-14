@@ -50,6 +50,7 @@ class Api::IssuesController < Api::ApiController
         :legal_entity_docket_seed,
         :allowance_seeds,
         :phone_seeds,
+        :email_seeds,
         :observations,
         id: issue_id, 
         person_id: person_id
@@ -74,6 +75,13 @@ class Api::IssuesController < Api::ApiController
         :has_whatsapp,
         :has_telegram,
         :note,
+        :attachments,
+        :replaces,
+        seed_scope
+      ],
+      email_seeds: [
+        :address,
+        :kind,
         :attachments,
         :replaces,
         seed_scope

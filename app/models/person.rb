@@ -7,6 +7,7 @@ class Person < ApplicationRecord
     legal_entity_dockets
     allowances
     phones
+    emails
   }.each do |relationship|
     has_many relationship
   end

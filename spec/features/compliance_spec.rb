@@ -409,15 +409,6 @@ describe 'an admin user' do
       click_link person.id
     end
     person.should be_enabled
-    within ".domiciles.panel" do
-      expect(page).to_not have_content old_domicile.id
-    end
-    within ".identifications.panel" do
-      expect(page).to_not have_content old_identification.id
-    end
-    within ".allowances.panel" do
-      expect(page).to_not have_content old_allowance.id
-    end
   end
 
   it "Dismisses an issue that had only bogus data" do

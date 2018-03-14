@@ -24,7 +24,8 @@ describe Person do
             natural_dockets: {data: []},
             legal_entity_dockets: {data: []},
             allowances: {data: []},
-            phones: {data: []}
+            phones: {data: []},
+            emails: {data: []}
           }
         },
         included: []
@@ -66,6 +67,9 @@ describe Person do
           }},
           phones: {data: person.phones.map { |x| 
             {id: x.id.to_s, type: 'phones'}
+          }},
+          emails: {data: person.emails.map { |x|
+            {id: x.id.to_s, type: 'emails'}
           }}
         }
       }
@@ -96,6 +100,9 @@ describe Person do
             }},
             phone_seeds: {data: issue.phone_seeds.map { |x|
              {id: x.id.to_s, type: "phone_seeds"}
+            }},
+            email_seeds: {data: issue.email_seeds.map { |x|
+             {id: x.id.to_s, type: "email_seeds"}
             }},
             observations: {data: []}
           }

@@ -100,6 +100,12 @@ ActiveAdmin.register Issue do
       ArbreHelpers.has_many_attachments(context, pf)
     end  
 
+    ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
+      ef.input :address
+      ef.input :kind
+      ArbreHelpers.has_many_attachments(context, ef)
+    end 
+
     ArbreHelpers.has_many_form self, f, :observations do |sf|
       sf.input :observation_reason
       sf.input :scope
@@ -247,6 +253,30 @@ ActiveAdmin.register Issue do
         end
       end
     end
+
+    if issue.email_seeds.any?
+      panel 'Email seeds' do
+        table_for issue.email_seeds do |i|
+          i.column("ID") do |seed|
+            link_to(seed.id, email_seed_path(seed))
+          end
+          i.column("Kind")    { |seed| seed.kind }
+          i.column("Address")  { |seed| seed.address }
+          i.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |seed|
+            link_to("View", email_seed_path(seed))
+          }
+          i.column("") { |seed|
+            link_to("Edit", edit_email_seed_path(seed))
+          }
+        end
+      end
+    end
+
 
     if issue.phone_seeds.any?
       panel 'Phone seeds' do
