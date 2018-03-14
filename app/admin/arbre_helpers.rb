@@ -54,16 +54,16 @@ module ArbreHelpers
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
     builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
     if b_object.persisted?
-      context.link_to(
+      context.span(context.link_to(
         "Show", 
         b_object, 
-        target: '_blank')
+        target: '_blank'))
 
       unless b_object.class.name == 'Attachment'
-        context.link_to("Remove Entity", 
+        context.span(context.link_to("Remove Entity", 
           b_object, 
           method: :delete, 
-          data: {confirm: "Are you sure?"})
+          data: {confirm: "Are you sure?"}))
       end
     end
   end

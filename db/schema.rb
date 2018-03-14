@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180313202129) do
+ActiveRecord::Schema.define(version: 20180314132924) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -68,6 +68,32 @@ ActiveRecord::Schema.define(version: 20180313202129) do
     t.index ["issue_id"], name: "index_allowances_on_issue_id"
     t.index ["person_id"], name: "index_allowances_on_person_id"
     t.index ["replaced_by_id"], name: "index_allowances_on_replaced_by_id"
+  end
+
+  create_table "argentina_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "vat_status_id"
+    t.string "tax_id"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_argentina_invoicing_detail_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_argentina_invoicing_detail_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_argentina_invoicing_detail_seeds_on_replaces_id"
+  end
+
+  create_table "argentina_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "vat_status_id"
+    t.string "tax_id"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_argentina_invoicing_details_on_issue_id"
+    t.index ["person_id"], name: "index_argentina_invoicing_details_on_person_id"
+    t.index ["replaced_by_id"], name: "index_argentina_invoicing_details_on_replaced_by_id"
   end
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -360,6 +386,12 @@ ActiveRecord::Schema.define(version: 20180313202129) do
   add_foreign_key "allowances", "allowances", column: "replaced_by_id"
   add_foreign_key "allowances", "issues"
   add_foreign_key "allowances", "people"
+  add_foreign_key "argentina_invoicing_detail_seeds", "argentina_invoicing_details", column: "fruit_id"
+  add_foreign_key "argentina_invoicing_detail_seeds", "argentina_invoicing_details", column: "replaces_id"
+  add_foreign_key "argentina_invoicing_detail_seeds", "issues"
+  add_foreign_key "argentina_invoicing_details", "argentina_invoicing_details", column: "replaced_by_id"
+  add_foreign_key "argentina_invoicing_details", "issues"
+  add_foreign_key "argentina_invoicing_details", "people"
   add_foreign_key "attachments", "people"
   add_foreign_key "domicile_seeds", "domiciles", column: "fruit_id"
   add_foreign_key "domicile_seeds", "issues"

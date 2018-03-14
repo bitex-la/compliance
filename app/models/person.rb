@@ -8,6 +8,7 @@ class Person < ApplicationRecord
     allowances
     phones
     emails
+    argentina_invoicing_details
   }.each do |relationship|
     has_many relationship
   end

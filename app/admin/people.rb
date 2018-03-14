@@ -81,7 +81,30 @@ ActiveAdmin.register Person do
         end
       end
     end
-  
+
+    if person.argentina_invoicing_details.any?
+      panel 'argentina invoicing details' do
+        table_for person.argentina_invoicing_details do |n|
+          n.column("ID") do |detail|
+            link_to(detail.id, argentina_invoicing_detail_path(detail))
+          end
+          n.column("VAT status id")      { |detail| detail.vat_status_id }
+          n.column("Tax ID")       { |detail| detail.tax_id }
+          n.column("Attachments") do |detail|
+            detail.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          n.column("") { |seed|
+            link_to("View", argentina_invoicing_detail_path(seed))
+          }
+          n.column("") { |seed|
+            link_to("Edit", argentina_invoicing_detail_path(seed))
+          }
+        end
+      end
+    end
+
     if person.identifications.any?
       panel 'Identification' , class: 'identifications'do
         table_for person.identifications.current do |i|

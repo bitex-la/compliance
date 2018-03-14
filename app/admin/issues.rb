@@ -81,6 +81,11 @@ ActiveAdmin.register Issue do
       ArbreHelpers.has_many_attachments(self, sf)
     end
 
+    ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
+      af.input :vat_status_id
+      af.input :tax_id
+    end
+
     ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
       sf.input :weight 
       sf.input :amount
@@ -172,6 +177,29 @@ ActiveAdmin.register Issue do
           }
           n.column("") { |seed|
             link_to("Edit", edit_natural_docket_seed_path(seed))
+          }
+        end
+      end
+    end
+
+    if issue.argentina_invoicing_detail_seed.present?
+      panel 'argentina invoicing details seed' do
+        table_for issue.argentina_invoicing_detail_seed do |n|
+          n.column("ID") do |seed|
+            link_to(seed.id, argentina_invoicing_detail_seed_path(seed))
+          end
+          n.column("VAT status id")      { |seed| seed.vat_status_id }
+          n.column("Tax ID")       { |seed| seed.tax_id }
+          n.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          n.column("") { |seed|
+            link_to("View", argentina_invoicing_detail_seed_path(seed))
+          }
+          n.column("") { |seed|
+            link_to("Edit", argentina_invoicing_detail_seed_path(seed))
           }
         end
       end

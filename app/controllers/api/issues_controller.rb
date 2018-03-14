@@ -48,6 +48,7 @@ class Api::IssuesController < Api::ApiController
         :identification_seeds,
         :natural_docket_seed,
         :legal_entity_docket_seed,
+        :argentina_invoicing_detail_seed,
         :allowance_seeds,
         :phone_seeds,
         :email_seeds,
@@ -110,6 +111,12 @@ class Api::IssuesController < Api::ApiController
         :country,
         :commercial_name,
         :legal_name,
+        :attachments,
+        seed_scope
+      ],
+      argentina_invoicing_detail_seeds: [
+        :vat_status_id,
+        :tax_id,
         :attachments,
         seed_scope
       ],
