@@ -61,6 +61,27 @@ describe Issue do
           assert_response 201
         end
 
+        it 'creates a new issue with an email seed' do
+          issue  = Api::IssuesHelper.issue_with_email_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["EmailSeed"]) 
+          assert_response 201
+        end
+
+        it 'creates a new issue with an argentina invoicing seed' do
+          issue  = Api::IssuesHelper.issue_with_argentina_invoicing_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["ArgentinaInvoicingDetailSeed"]) 
+          assert_response 201
+        end
+
+        it 'creates a new issue with a chile invoicing seed' do
+          issue  = Api::IssuesHelper.issue_with_chile_invoicing_seed(ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          assert_issue_integrity(["ChileInvoicingDetailSeed"]) 
+          assert_response 201
+        end
+
         it 'creates a new issue with a natural docket seed' do
           issue  = Api::IssuesHelper.issue_with_natural_docket_seed(ext)
           post "/api/people/#{person.id}/issues", params: issue

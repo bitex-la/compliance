@@ -192,6 +192,122 @@ class Api::IssuesHelper
     }
   end 
 
+  def self.issue_with_email_seed(attachment_type)
+    mime, bytes = 
+    {
+      data: {
+        id: "@1",
+        type: "issues",
+        attributes: { },
+        relationships: {
+          email_seeds: {
+            data: [{ id: "@1", type: "email_seeds" }]
+          }
+        }
+      },
+      included: [
+        {
+          type: "email_seeds",
+          id: "@1",
+          attributes: {
+            address: "joe.doe@test.com",
+            kind: "personal",
+          },
+          relationships: {
+            issue: {
+              data: {id: "@1", type: 'issues'}
+            },
+            attachments: {
+              data: [{
+                id: "@1",
+                type: "attachments"
+              }]
+            }
+          }
+        },
+        attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end 
+
+  def self.issue_with_argentina_invoicing_seed(attachment_type)
+    mime, bytes = 
+    {
+      data: {
+        id: "@1",
+        type: "issues",
+        attributes: { },
+        relationships: {
+          argentina_invoicing_detail_seed: {
+            data: { id: "@1", type: "argentina_invoicing_detail_seeds" }
+          }
+        }
+      },
+      included: [
+        {
+          type: "argentina_invoicing_detail_seeds",
+          id: "@1",
+          attributes: {
+            vat_status_id: "2256470",
+            tax_id: "2022443870"
+          },
+          relationships: {
+            issue: {
+              data: {id: "@1", type: 'issues'}
+            },
+            attachments: {
+              data: [{
+                id: "@1",
+                type: "attachments"
+              }]
+            }
+          }
+        },
+        attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end 
+
+  def self.issue_with_chile_invoicing_seed(attachment_type)
+    mime, bytes = 
+    {
+      data: {
+        id: "@1",
+        type: "issues",
+        attributes: { },
+        relationships: {
+          chile_invoicing_detail_seed: {
+            data: { id: "@1", type: "chile_invoicing_detail_seeds" }
+          }
+        }
+      },
+      included: [
+        {
+          type: "chile_invoicing_detail_seeds",
+          id: "@1",
+          attributes: {
+            tax_id: "2022443870",
+            giro: 'sfsdffd', 
+            ciudad: 'Santiago',
+            comuna: 'Condes'
+          },
+          relationships: {
+            issue: {
+              data: {id: "@1", type: 'issues'}
+            },
+            attachments: {
+              data: [{
+                id: "@1",
+                type: "attachments"
+              }]
+            }
+          }
+        },
+        attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end 
+
   def self.issue_with_identification_seed(attachment_type)
     {
       data: {
