@@ -2,7 +2,7 @@ module ArbreHelpers
 
   def self.issues_panel(context, issues, title)
     context.instance_eval do
-      panel title do
+      panel title, class: title.gsub(' ','').underscore do
         table_for issues do |i|
           i.column("ID") { |issue|
             link_to(issue.id, issue_path(issue)) 

@@ -25,6 +25,8 @@ FactoryBot.define do
         full_domicile
         full_natural_person_identification
         full_natural_docket
+        full_phone
+        full_email
         salary_allowance
         savings_allowance
       ).each do |name|

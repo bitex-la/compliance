@@ -168,9 +168,9 @@ describe Person do
             nationality: "Argentina",
             gender: "Male",
             marital_status: "Single",
-            job_title: nil,
-            job_description: nil,
-            politically_exposed: nil,
+            job_title: 'Sr. Software developer',
+            job_description: 'Build cool open source software',
+            politically_exposed: false,
             politically_exposed_reason: nil
           },
           relationships: {
@@ -219,6 +219,46 @@ describe Person do
             }},
             attachments:{
               data: person.allowances.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
+          }
+        },
+        { type: "phones",
+          id: person.phones.first.id.to_s,
+          attributes: {
+            number:  '+5491125410470',
+            kind:    'cellphone',
+            country: 'Argentina',
+            has_whatsapp: true,
+            has_telegram: false,
+            note: 'please do not call on Sundays'
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type: "people"}},
+            seed: { data: {
+	      type: "phone_seeds",	    
+              id: issue.phone_seeds.last.id.to_s
+            }},
+            attachments: {
+              data: person.phones.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
+          }
+        },
+        { type: "emails",
+          id: person.emails.first.id.to_s,
+          attributes: {
+            address:  'joe.doe@test.com',
+            kind:    'personal'          
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type: "people"}},
+            seed: { data: {
+	      type: "email_seeds",	    
+              id: issue.email_seeds.last.id.to_s
+            }},
+            attachments: {
+              data: person.emails.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }

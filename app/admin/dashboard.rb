@@ -6,7 +6,7 @@ ActiveAdmin.register_page "Dashboard" do
     columns do
       column do
         ArbreHelpers.issues_panel(self, Issue.just_created, 'Recent Issues')
-        ArbreHelpers.issues_panel(self, Issue.answered, 'Pending for review')
+        ArbreHelpers.issues_panel(self, Issue.answered, 'Pending For Review')
       end
       column do
         panel 'Observations to review' do

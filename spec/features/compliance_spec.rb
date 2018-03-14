@@ -26,7 +26,7 @@ describe 'an admin user' do
         File.absolute_path("./spec/fixtures/files/simple.#{ext}"))
   end
 
-  it 'creates a new person and its issue via admin' do
+  it 'creates a new natural person and its issue via admin' do
     observation_reason = create(:human_world_check_reason)
     login_as admin_user
 
@@ -55,8 +55,23 @@ describe 'an admin user' do
       fill_attachment('identification_seeds', 'jpg')
     end
 
-    click_link "Add New Domicile seed"
-   
+    click_link "Add New Email seed"
+    fill_seed("email",{
+      address: 'tester@rspec.org',
+      kind: 'work',
+    })
+
+    click_link "Add New Phone seed"
+    fill_seed("phone",{
+      number: '+541145250470',
+      kind: 'work',
+      note: 'Only in office hours'  
+    })
+    select "Argentina",
+      from: "issue[phone_seeds_attributes][0][country]",
+      visible: false 
+
+    click_link "Add New Domicile seed" 
     select "Argentina",
       from: "issue[domicile_seeds_attributes][0][country]",
       visible: false 
@@ -163,6 +178,7 @@ describe 'an admin user' do
     IdentificationSeed.count.should == 1
     NaturalDocketSeed.count.should == 1
     AllowanceSeed.count.should == 2
+    PhoneSeed.count.should == 1
 
     # Admin does not see it as pending
     login_as admin_user
@@ -482,7 +498,12 @@ describe 'an admin user' do
     api_response.data.attributes.state.should == 'approved'
 
     click_link 'Dashboard' 
-    expect(page).to_not have_content(issue.id)
+    within ".recent_issues" do
+      expect(page).to_not have_content(issue.id)
+    end
+    within ".pending_for_review" do
+      expect(page).to_not have_content(issue.id)
+    end
 
     get "/api/people/#{person.id}"
     api_response.data.attributes.enabled.should be_truthy

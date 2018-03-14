@@ -156,6 +156,42 @@ describe Issue do
           AllowanceSeed.first.replaces.should be_nil
           assert_response 201
         end
+
+        it 'creates a new issue with a phone seed who wants to replace the current phone' do
+          full_natural_person = create(:full_natural_person)
+          issue  = Api::IssuesHelper.issue_with_phone_seed(ext)
+          issue[:included][0][:relationships].merge!({
+            replaces: { data: { type: 'phones', id: Phone.last.id.to_s } }
+          })
+
+          post "/api/people/#{full_natural_person.id}/issues", params: issue
+
+          Issue.count.should == 2 
+          PhoneSeed.count.should == 2
+          PhoneSeed.last.issue.should == Issue.last
+          PhoneSeed.last.attachments.count.should == 1
+          PhoneSeed.last.replaces.should == Phone.last
+          PhoneSeed.first.replaces.should be_nil
+          assert_response 201
+        end
+
+        it 'creates a new issue with an email seed who wants to replace the current email' do
+          full_natural_person = create(:full_natural_person)
+          issue  = Api::IssuesHelper.issue_with_email_seed(ext)
+          issue[:included][0][:relationships].merge!({
+            replaces: { data: { type: 'emails', id: Email.last.id.to_s } }
+          })
+
+          post "/api/people/#{full_natural_person.id}/issues", params: issue
+
+          Issue.count.should == 2 
+          EmailSeed.count.should == 2
+          EmailSeed.last.issue.should == Issue.last
+          EmailSeed.last.attachments.count.should == 1
+          EmailSeed.last.replaces.should == Email.last
+          EmailSeed.first.replaces.should be_nil
+          assert_response 201
+        end
       end
     end
   end
@@ -224,6 +260,59 @@ describe Issue do
         seed.postal_code == "1341"
         seed.floor == "1"
         seed.apartment == "N/A"
+      end
+
+      Issue.last.should be_answered
+    end
+
+    it 'responds to an observation changing the phone' do
+      post "/api/people/#{person.id}/issues",
+        params: Api::IssuesHelper.issue_with_phone_seed(:png)
+      create(:observation, issue: Issue.last)
+ 
+      assert_issue_integrity(["PhoneSeed"])
+
+      issue_document = json_response
+
+      issue_document[:included][1][:attributes] = {
+        number: "+571165342178",
+        kind: "cellphone", 
+        country: "Colombia",
+        has_whatsapp: true,
+        has_telegram: false,
+        note: "Please use whatsapp"
+      } 
+      issue_document[:included][2] = {
+        type: 'observations',
+        id: Observation.last.id,
+        attributes: {
+          reply: "Mire, mi nuevo telefono"
+        },
+        relationships: {
+          issue: {data: {id: Issue.last.id, type: "issues"}},
+          observation_reason: {
+            data: 
+            {
+              id: Observation.last.observation_reason.id.to_s, 
+             type: "observation_reasons"
+            }
+          }
+        }
+      }
+
+      patch "/api/people/#{person.id}/issues/#{person.issues.last.id}",
+        params: JSON.dump(issue_document),
+        headers: {"CONTENT_TYPE" => 'application/json' }
+      assert_response 200
+
+      PhoneSeed.first.tap do |seed|
+        seed.reload
+        seed.number.should == "+571165342178"
+        seed.kind.should == "cellphone"
+        seed.country.should == "Colombia"
+        seed.has_whatsapp.should == true
+        seed.has_telegram.should == false
+        seed.note.should == "Please use whatsapp"
       end
 
       Issue.last.should be_answered
