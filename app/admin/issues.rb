@@ -86,6 +86,13 @@ ActiveAdmin.register Issue do
       af.input :tax_id
     end
 
+    ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
+      cf.input :tax_id
+      cf.input :giro
+      cf.input :ciudad
+      cf.input :comuna
+    end
+
     ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
       sf.input :weight 
       sf.input :amount
@@ -200,6 +207,31 @@ ActiveAdmin.register Issue do
           }
           n.column("") { |seed|
             link_to("Edit", argentina_invoicing_detail_seed_path(seed))
+          }
+        end
+      end
+    end
+
+    if issue.chile_invoicing_detail_seed.present?
+      panel 'chile invoicing details seed' do
+        table_for issue.chile_invoicing_detail_seed do |n|
+          n.column("ID") do |seed|
+            link_to(seed.id, chile_invoicing_detail_seed_path(seed))
+          end
+          n.column("Tax ID")       { |seed| seed.tax_id }
+          n.column("Giro")       { |seed| seed.giro }
+          n.column("Ciudad")       { |seed| seed.ciudad }
+          n.column("Comuna")       { |seed| seed.comuna }
+          n.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          n.column("") { |seed|
+            link_to("View", chile_invoicing_detail_seed_path(seed))
+          }
+          n.column("") { |seed|
+            link_to("Edit", chile_invoicing_detail_seed_path(seed))
           }
         end
       end

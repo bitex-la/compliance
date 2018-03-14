@@ -24,6 +24,7 @@ describe Person do
             natural_dockets: {data: []},
             legal_entity_dockets: {data: []},
             argentina_invoicing_details: {data: []},
+            chile_invoicing_details: {data: []},
             allowances: {data: []},
             phones: {data: []},
             emails: {data: []}
@@ -67,6 +68,7 @@ describe Person do
             {id: x.id.to_s, type: "allowances" }
           }},
           argentina_invoicing_details: {data: []},
+          chile_invoicing_details: {data: []},
           phones: {data: person.phones.map { |x| 
             {id: x.id.to_s, type: 'phones'}
           }},
@@ -107,6 +109,7 @@ describe Person do
              {id: x.id.to_s, type: "email_seeds"}
             }},
             argentina_invoicing_detail_seed: {data: nil},
+            chile_invoicing_detail_seed: {data: nil},
             observations: {data: []}
           }
         },

@@ -7,6 +7,7 @@ class Issue < ApplicationRecord
     natural_docket_seed
     legal_entity_docket_seed
     argentina_invoicing_detail_seed
+    chile_invoicing_detail_seed
   }.each do |relationship|  
     has_one relationship, required: false
     accepts_nested_attributes_for relationship, allow_destroy: true
