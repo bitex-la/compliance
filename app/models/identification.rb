@@ -1,6 +1,7 @@
 class Identification < ApplicationRecord
-  belongs_to :issue, optional: true
-  belongs_to :person
+  include Garden::Fruit
 
-  has_many :identification_seeds
+  def name
+    [id, number, kind, issuer].join(',')    
+  end
 end

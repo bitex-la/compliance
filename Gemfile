@@ -12,6 +12,9 @@ gem 'puma', '~> 3.7'
 gem 'mysql2'
 
 gem 'sass-rails', '~> 5.0'
+gem 'bootstrap-sass'
+gem 'compass-rails'
+gem 'font-awesome-rails'
 gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.2'
 gem 'turbolinks', '~> 5'
@@ -25,9 +28,9 @@ gem "paperclip", "4.3.6"
 gem 'country_select'
 gem 'aasm'
 
-gem 'fast_jsonapi'
+gem 'fast_jsonapi', github: 'netflix/fast_jsonapi', branch: 'dev'
 gem 'active_model_serializers', '~> 0.10.0'
-gem 'jsonapi_mapper', :git => 'https://github.com/bitex-la/jsonapi-mapper.git'
+gem 'jsonapi_mapper', github: 'bitex-la/jsonapi-mapper'
 
 gem 'kaminari'
 
@@ -35,8 +38,9 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails'
   gem 'capybara'
+  gem 'selenium-webdriver'
   gem 'geckodriver-helper'
-  gem 'factory_bot_rails'
+  gem 'factory_bot'
   gem 'dotenv-rails'
 end
 
@@ -49,3 +53,5 @@ group :development do
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'yajl-ruby', require: 'yajl'
+

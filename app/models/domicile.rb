@@ -1,6 +1,7 @@
 class Domicile < ApplicationRecord
-  belongs_to :issue, optional: true
-  belongs_to :person
-
-  has_many :domicile_seeds
+  include Garden::Fruit
+  
+  def name
+    [id, country, city, street_address, street_number].join(',')    
+  end 
 end

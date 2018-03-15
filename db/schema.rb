@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180215172048) do
+ActiveRecord::Schema.define(version: 20180314171315) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -43,17 +43,102 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "allowance_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "weight", precision: 10
+    t.decimal "amount", precision: 10
+    t.string "kind"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "fruit_id"
+    t.integer "replaces_id"
+    t.index ["fruit_id"], name: "index_allowance_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
+  end
+
+  create_table "allowances", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "weight", precision: 10
+    t.decimal "amount", precision: 10
+    t.string "kind"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_allowances_on_issue_id"
+    t.index ["person_id"], name: "index_allowances_on_person_id"
+    t.index ["replaced_by_id"], name: "index_allowances_on_replaced_by_id"
+  end
+
+  create_table "argentina_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "vat_status_id"
+    t.string "tax_id"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_argentina_invoicing_detail_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_argentina_invoicing_detail_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_argentina_invoicing_detail_seeds_on_replaces_id"
+  end
+
+  create_table "argentina_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "vat_status_id"
+    t.string "tax_id"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_argentina_invoicing_details_on_issue_id"
+    t.index ["person_id"], name: "index_argentina_invoicing_details_on_person_id"
+    t.index ["replaced_by_id"], name: "index_argentina_invoicing_details_on_replaced_by_id"
+  end
+
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "person_id"
-    t.integer "seed_to_id"
-    t.string "seed_to_type"
+    t.integer "attached_to_seed_id"
+    t.string "attached_to_seed_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "document_file_name"
     t.string "document_content_type"
     t.integer "document_file_size"
     t.datetime "document_updated_at"
+    t.integer "attached_to_fruit_id"
+    t.string "attached_to_fruit_type"
     t.index ["person_id"], name: "index_attachments_on_person_id"
+  end
+
+  create_table "chile_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "tax_id"
+    t.string "giro"
+    t.string "ciudad"
+    t.string "comuna"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_chile_invoicing_detail_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_chile_invoicing_detail_seeds_on_replaces_id"
+  end
+
+  create_table "chile_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "tax_id"
+    t.string "giro"
+    t.string "ciudad"
+    t.string "comuna"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_chile_invoicing_details_on_issue_id"
+    t.index ["person_id"], name: "index_chile_invoicing_details_on_person_id"
+    t.index ["replaced_by_id"], name: "index_chile_invoicing_details_on_replaced_by_id"
   end
 
   create_table "comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -79,8 +164,9 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "domicile_id"
-    t.index ["domicile_id"], name: "index_domicile_seeds_on_domicile_id"
+    t.bigint "fruit_id"
+    t.integer "replaces_id"
+    t.index ["fruit_id"], name: "index_domicile_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_domicile_seeds_on_issue_id"
   end
 
@@ -103,15 +189,30 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.index ["replaced_by_id"], name: "index_domiciles_on_replaced_by_id"
   end
 
-  create_table "funding_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "issue_id"
-    t.decimal "amount", precision: 10
+  create_table "email_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "address"
     t.string "kind"
+    t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "funding_id"
-    t.index ["funding_id"], name: "index_funding_seeds_on_funding_id"
-    t.index ["issue_id"], name: "index_funding_seeds_on_issue_id"
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_email_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_email_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_email_seeds_on_replaces_id"
+  end
+
+  create_table "emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "address"
+    t.string "kind"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_emails_on_issue_id"
+    t.index ["person_id"], name: "index_emails_on_person_id"
+    t.index ["replaced_by_id"], name: "index_emails_on_replaced_by_id"
   end
 
   create_table "fundings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -134,8 +235,12 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.string "issuer"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "identification_id"
-    t.index ["identification_id"], name: "index_identification_seeds_on_identification_id"
+    t.bigint "fruit_id"
+    t.integer "replaces_id"
+    t.string "public_registry_authority"
+    t.string "public_registry_book"
+    t.string "public_registry_extra_data"
+    t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
   end
 
@@ -148,6 +253,9 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.string "public_registry_authority"
+    t.string "public_registry_book"
+    t.string "public_registry_extra_data"
     t.index ["issue_id"], name: "index_identifications_on_issue_id"
     t.index ["person_id"], name: "index_identifications_on_person_id"
     t.index ["replaced_by_id"], name: "index_identifications_on_replaced_by_id"
@@ -170,9 +278,9 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.string "legal_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "legal_entity_docket_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_legal_entity_docket_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_legal_entity_docket_seeds_on_issue_id"
-    t.index ["legal_entity_docket_id"], name: "index_legal_entity_docket_seeds_on_legal_entity_docket_id"
   end
 
   create_table "legal_entity_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -201,9 +309,13 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.string "marital_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "natural_docket_id"
+    t.bigint "fruit_id"
+    t.string "job_title"
+    t.string "job_description"
+    t.boolean "politically_exposed"
+    t.text "politically_exposed_reason"
+    t.index ["fruit_id"], name: "index_natural_docket_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_natural_docket_seeds_on_issue_id"
-    t.index ["natural_docket_id"], name: "index_natural_docket_seeds_on_natural_docket_id"
   end
 
   create_table "natural_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -218,83 +330,159 @@ ActiveRecord::Schema.define(version: 20180215172048) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.string "job_title"
+    t.string "job_description"
+    t.boolean "politically_exposed"
+    t.text "politically_exposed_reason"
     t.index ["issue_id"], name: "index_natural_dockets_on_issue_id"
     t.index ["person_id"], name: "index_natural_dockets_on_person_id"
     t.index ["replaced_by_id"], name: "index_natural_dockets_on_replaced_by_id"
   end
 
+  create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "subject"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "scope"
+  end
+
+  create_table "observations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "note"
+    t.text "reply"
+    t.bigint "observation_reason_id"
+    t.integer "scope"
+    t.string "aasm_state"
+    t.index ["issue_id"], name: "index_observations_on_issue_id"
+    t.index ["observation_reason_id"], name: "index_observations_on_observation_reason_id"
+  end
+
   create_table "people", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.integer "risk"
   end
 
-  create_table "quota", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.decimal "weight", precision: 10
-    t.decimal "amount", precision: 10
+  create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "number"
     t.string "kind"
+    t.string "country"
+    t.boolean "has_whatsapp"
+    t.boolean "has_telegram"
+    t.text "note"
     t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.index ["fruit_id"], name: "index_phone_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_phone_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_phone_seeds_on_replaces_id"
+  end
+
+  create_table "phones", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "number"
+    t.string "kind"
+    t.string "country"
+    t.boolean "has_whatsapp"
+    t.boolean "has_telegram"
+    t.text "note"
     t.bigint "person_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
-    t.index ["issue_id"], name: "index_quota_on_issue_id"
-    t.index ["person_id"], name: "index_quota_on_person_id"
-    t.index ["replaced_by_id"], name: "index_quota_on_replaced_by_id"
-  end
-
-  create_table "quota_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.decimal "weight", precision: 10
-    t.decimal "amount", precision: 10
-    t.string "kind"
     t.bigint "issue_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "quota_id"
-    t.index ["issue_id"], name: "index_quota_seeds_on_issue_id"
-    t.index ["quota_id"], name: "index_quota_seeds_on_quota_id"
+    t.index ["issue_id"], name: "index_phones_on_issue_id"
+    t.index ["person_id"], name: "index_phones_on_person_id"
+    t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
   end
 
   create_table "relationship_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
-    t.string "to"
-    t.string "from"
     t.string "kind"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "related_person_id"
+    t.integer "replaces_id"
+    t.integer "fruit_id"
     t.index ["issue_id"], name: "index_relationship_seeds_on_issue_id"
+    t.index ["related_person_id"], name: "index_relationship_seeds_on_related_person_id"
   end
 
+  create_table "relationships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "relationship_seed_id"
+    t.bigint "person_id"
+    t.bigint "related_person_id"
+    t.string "kind"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id"], name: "index_relationships_on_person_id"
+    t.index ["related_person_id"], name: "index_relationships_on_related_person_id"
+    t.index ["relationship_seed_id"], name: "index_relationships_on_relationship_seed_id"
+  end
+
+  add_foreign_key "allowance_seeds", "allowances", column: "fruit_id"
+  add_foreign_key "allowance_seeds", "issues"
+  add_foreign_key "allowances", "allowances", column: "replaced_by_id"
+  add_foreign_key "allowances", "issues"
+  add_foreign_key "allowances", "people"
+  add_foreign_key "argentina_invoicing_detail_seeds", "argentina_invoicing_details", column: "fruit_id"
+  add_foreign_key "argentina_invoicing_detail_seeds", "argentina_invoicing_details", column: "replaces_id"
+  add_foreign_key "argentina_invoicing_detail_seeds", "issues"
+  add_foreign_key "argentina_invoicing_details", "argentina_invoicing_details", column: "replaced_by_id"
+  add_foreign_key "argentina_invoicing_details", "issues"
+  add_foreign_key "argentina_invoicing_details", "people"
   add_foreign_key "attachments", "people"
-  add_foreign_key "domicile_seeds", "domiciles"
+  add_foreign_key "chile_invoicing_detail_seeds", "chile_invoicing_details", column: "fruit_id"
+  add_foreign_key "chile_invoicing_detail_seeds", "chile_invoicing_details", column: "replaces_id"
+  add_foreign_key "chile_invoicing_detail_seeds", "issues"
+  add_foreign_key "chile_invoicing_details", "chile_invoicing_details", column: "replaced_by_id"
+  add_foreign_key "chile_invoicing_details", "issues"
+  add_foreign_key "chile_invoicing_details", "people"
+  add_foreign_key "domicile_seeds", "domiciles", column: "fruit_id"
   add_foreign_key "domicile_seeds", "issues"
   add_foreign_key "domiciles", "domiciles", column: "replaced_by_id"
   add_foreign_key "domiciles", "issues"
   add_foreign_key "domiciles", "people"
-  add_foreign_key "funding_seeds", "fundings"
-  add_foreign_key "funding_seeds", "issues"
+  add_foreign_key "email_seeds", "emails", column: "fruit_id"
+  add_foreign_key "email_seeds", "emails", column: "replaces_id"
+  add_foreign_key "email_seeds", "issues"
+  add_foreign_key "emails", "emails", column: "replaced_by_id"
+  add_foreign_key "emails", "issues"
+  add_foreign_key "emails", "people"
   add_foreign_key "fundings", "fundings", column: "replaced_by_id"
   add_foreign_key "fundings", "issues"
   add_foreign_key "fundings", "people"
-  add_foreign_key "identification_seeds", "identifications"
+  add_foreign_key "identification_seeds", "identifications", column: "fruit_id"
   add_foreign_key "identification_seeds", "issues"
   add_foreign_key "identifications", "identifications", column: "replaced_by_id"
   add_foreign_key "identifications", "issues"
   add_foreign_key "identifications", "people"
   add_foreign_key "issues", "people"
   add_foreign_key "legal_entity_docket_seeds", "issues"
-  add_foreign_key "legal_entity_docket_seeds", "legal_entity_dockets"
+  add_foreign_key "legal_entity_docket_seeds", "legal_entity_dockets", column: "fruit_id"
   add_foreign_key "legal_entity_dockets", "issues"
   add_foreign_key "legal_entity_dockets", "legal_entity_dockets", column: "replaced_by_id"
   add_foreign_key "legal_entity_dockets", "people"
   add_foreign_key "natural_docket_seeds", "issues"
-  add_foreign_key "natural_docket_seeds", "natural_dockets"
+  add_foreign_key "natural_docket_seeds", "natural_dockets", column: "fruit_id"
   add_foreign_key "natural_dockets", "issues"
   add_foreign_key "natural_dockets", "natural_dockets", column: "replaced_by_id"
   add_foreign_key "natural_dockets", "people"
-  add_foreign_key "quota", "issues"
-  add_foreign_key "quota", "people"
-  add_foreign_key "quota", "quota", column: "replaced_by_id"
-  add_foreign_key "quota_seeds", "issues"
-  add_foreign_key "quota_seeds", "quota", column: "quota_id"
+  add_foreign_key "observations", "issues"
+  add_foreign_key "phone_seeds", "issues"
+  add_foreign_key "phone_seeds", "phones", column: "fruit_id"
+  add_foreign_key "phone_seeds", "phones", column: "replaces_id"
+  add_foreign_key "phones", "issues"
+  add_foreign_key "phones", "people"
+  add_foreign_key "phones", "phones", column: "replaced_by_id"
   add_foreign_key "relationship_seeds", "issues"
+  add_foreign_key "relationship_seeds", "people", column: "related_person_id"
+  add_foreign_key "relationships", "people"
+  add_foreign_key "relationships", "people", column: "related_person_id"
+  add_foreign_key "relationships", "relationship_seeds"
 end

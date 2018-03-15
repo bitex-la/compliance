@@ -292,3 +292,9 @@ ActiveAdmin.setup do |config|
   #
   # config.order_clause = MyOrderClause
 end
+
+module ActiveAdmin 
+  class BaseController
+    before_action { params.permit! }
+  end
+end

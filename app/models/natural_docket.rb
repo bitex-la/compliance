@@ -1,6 +1,7 @@
 class NaturalDocket < ApplicationRecord
-  belongs_to :issue, optional: true
-  belongs_to :person
-
-  has_many :natural_docket_seeds
+  include Garden::Fruit
+  
+  def name
+    [id, first_name, last_name, gender].join(',')    
+  end
 end

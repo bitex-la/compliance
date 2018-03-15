@@ -1,6 +1,7 @@
 class LegalEntityDocket < ApplicationRecord
-  belongs_to :issue, optional: true
-  belongs_to :person
+  include Garden::Fruit
 
-  has_many :legal_entity_docket_seeds
+  def name
+    [id, commercial_name, legal_name].join(',')    
+  end
 end

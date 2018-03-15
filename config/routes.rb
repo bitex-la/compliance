@@ -1,18 +1,11 @@
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
+  ActiveAdmin.routes(self) rescue ActiveAdmin::DatabaseHitDuringLoad
 
   # Concern must go first!
-  concern :api_base do
-    resources :issues do
-    end
-    resources :domicile_seeds do
+  namespace :api do
+    resources :people, only: [:create, :show, :index, :update] do
+      resources :issues, only: [:create, :show, :index, :update]
     end
   end
-
-  namespace :api do  
-    namespace :v1 do
-      concerns :api_base
-    end
-  end  
 end

@@ -1,4 +1,4 @@
 class RelationshipSeed < ApplicationRecord
-  belongs_to :issue
-  has_many :attachments, as: :seed_to
+  include Garden::Seed
+  belongs_to :related_person
 end
