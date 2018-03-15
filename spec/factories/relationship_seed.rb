@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :relationship_seed do
-    to   { create(:empty_person).id }
-    from { create(:another_person).id }
+    association :related_person, factory: :another_person
     kind 'spouse' 
     association :issue, factory: :basic_issue
   end  

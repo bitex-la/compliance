@@ -10,8 +10,19 @@ class Issue < ApplicationRecord
     chile_invoicing_detail_seed
   }.each do |relationship|  
     has_one relationship, required: false
-    accepts_nested_attributes_for relationship, allow_destroy: true
   end
+
+  accepts_nested_attributes_for :legal_entity_docket_seed, allow_destroy: true,
+    reject_if: proc { |attr| attr['commercial_name'].blank? || attr['legal_name'].blank? }
+
+  accepts_nested_attributes_for :argentina_invoicing_detail_seed, allow_destroy: true,
+    reject_if: proc { |attr| attr['tax_id'].blank? }
+
+  accepts_nested_attributes_for :chile_invoicing_detail_seed, allow_destroy: true,
+    reject_if: proc { |attr| attr['tax_id'].blank? }
+
+  accepts_nested_attributes_for :natural_docket_seed, allow_destroy: true, 
+    reject_if: proc { |attr| attr['first_name'].blank? || attr['last_name'].blank? } 
 
   HAS_MANY = %i{
     relationship_seeds
@@ -60,7 +71,7 @@ class Issue < ApplicationRecord
 
     event :reject do
       after do
-        person.update(enabled: false)
+        person.update(enabled: false) unless person.nil?
       end
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected

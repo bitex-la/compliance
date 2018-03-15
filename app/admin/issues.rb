@@ -75,13 +75,13 @@ ActiveAdmin.register Issue do
       sf.input :job_title
       sf.input :job_description
       sf.input :politically_exposed
-      sf.input :politically_exposed_reason
-      ArbreHelpers.has_many_attachments(self, sf)
-    end
+      sf.input :politically_exposed_reason, input_html: {rows: 3}
+      ArbreHelpers.has_many_attachments(self, sf) 
+   end
 
     ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
       sf.input :industry
-      sf.input :business_description
+      sf.input :business_description, input_html: {rows: 3}
       sf.input :country
       sf.input :commercial_name
       sf.input :legal_name
@@ -115,7 +115,7 @@ ActiveAdmin.register Issue do
       pf.input :replaces
       pf.input :has_whatsapp
       pf.input :has_telegram
-      pf.input :note
+      pf.input :note, input_html: {rows: 3}
       ArbreHelpers.has_many_attachments(context, pf)
     end  
 
@@ -128,8 +128,8 @@ ActiveAdmin.register Issue do
     ArbreHelpers.has_many_form self, f, :observations do |sf|
       sf.input :observation_reason
       sf.input :scope
-      sf.input :note
-      sf.input :reply
+      sf.input :note, input_html: {rows: 3}
+      sf.input :reply, input_html: {rows: 3}
     end
 
     f.actions

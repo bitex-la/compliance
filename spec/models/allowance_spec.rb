@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Allowance, type: :model do
+  let(:person) {create(:empty_person)}
   let(:invalid_allowance) { described_class.new }
-  let(:valid_allowance)   { create(:allowance) }
+  let(:valid_allowance)   { create(:allowance, person: person) }
 
   it 'is not valid without a person' do
     expect(invalid_allowance).to_not be_valid

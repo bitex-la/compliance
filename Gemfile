@@ -31,6 +31,7 @@ gem 'aasm'
 gem 'fast_jsonapi', github: 'netflix/fast_jsonapi', branch: 'dev'
 gem 'active_model_serializers', '~> 0.10.0'
 gem 'jsonapi_mapper', github: 'bitex-la/jsonapi-mapper'
+gem 'static_models', github: 'dev-yohan/static_models', branch: 'rails-5-support'
 
 gem 'kaminari'
 

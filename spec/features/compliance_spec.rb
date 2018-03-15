@@ -17,13 +17,14 @@ describe 'an admin user' do
   end
 
   def fill_attachment(kind, ext = 'jpg', has_many = true, index = 0, att_index = 0)
+    wait_for_ajax
     path = if has_many
       "issue[#{kind}_attributes][#{index}][attachments_attributes][#{att_index}][document]"
     else
       "issue[#{kind}_attributes][attachments_attributes][#{att_index}][document]"
     end
     attach_file(path,
-        File.absolute_path("./spec/fixtures/files/simple.#{ext}"))
+        File.absolute_path("./spec/fixtures/files/simple.#{ext}"), wait: 10.seconds)
   end
 
   it 'creates a new natural person and its issue via admin' do
@@ -125,9 +126,17 @@ describe 'an admin user' do
       from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
       visible: false
 
+    fill_seed("natural_docket", {
+     job_title: "Programmer",
+     job_description: "Develop cool software for the real people",
+     politically_exposed_reason: "Nothing I am a legit guy!"
+    }, false)
+
+    
+    #find("#natural_docket_seed", visible: false).click_link("Add New Attachment")
     within("#natural_docket_seed") do 
-      click_link "Add New Attachment"
-      fill_attachment('natural_docket_seed', 'png', false)
+       find('.has_many_container.attachments').click_link("Add New Attachment")
+       fill_attachment('natural_docket_seed', 'png', false)
     end
 
     click_link "Add New Observation"
