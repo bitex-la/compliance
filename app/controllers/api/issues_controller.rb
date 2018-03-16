@@ -81,6 +81,7 @@ class Api::IssuesController < Api::ApiController
         :floor,
         :apartment,
         :attachments,
+        :copy_attachments,
         :replaces,
         seed_scope
       ],
@@ -92,6 +93,7 @@ class Api::IssuesController < Api::ApiController
         :has_telegram,
         :note,
         :attachments,
+        :copy_attachments,
         :replaces,
         seed_scope
       ],
@@ -99,6 +101,7 @@ class Api::IssuesController < Api::ApiController
         :address,
         :kind,
         :attachments,
+        :copy_attachments,
         :replaces,
         seed_scope
       ],
@@ -107,6 +110,7 @@ class Api::IssuesController < Api::ApiController
         :related_person,
         :replaces,
         :attachments,
+        :copy_attachments,
         seed_scope
       ],
       identification_seeds: [
@@ -114,6 +118,7 @@ class Api::IssuesController < Api::ApiController
         :number,
         :issuer,
         :attachments,
+        :copy_attachments,
         :replaces,
         seed_scope
       ],
@@ -125,6 +130,7 @@ class Api::IssuesController < Api::ApiController
         :gender,
         :marital_status,
         :attachments,
+        :copy_attachments,
         seed_scope
       ],
       legal_entity_docket_seeds: [
@@ -134,12 +140,14 @@ class Api::IssuesController < Api::ApiController
         :commercial_name,
         :legal_name,
         :attachments,
+        :copy_attachments,
         seed_scope
       ],
       argentina_invoicing_detail_seeds: [
         :vat_status_id,
         :tax_id,
         :attachments,
+        :copy_attachments,
         seed_scope
       ],
       chile_invoicing_detail_seeds: [
@@ -148,6 +156,7 @@ class Api::IssuesController < Api::ApiController
         :ciudad,
         :comuna,
         :attachments,
+        :copy_attachments,
         seed_scope
       ],
       allowance_seeds: [
@@ -155,6 +164,7 @@ class Api::IssuesController < Api::ApiController
         :amount,
         :kind,
         :attachments,
+        :copy_attachments,
         :replaces,
         seed_scope
       ],
