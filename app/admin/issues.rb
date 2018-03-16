@@ -41,30 +41,6 @@ ActiveAdmin.register Issue do
       end
     end
 
-    ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
-      sf.input :number
-      sf.input :kind
-      sf.input :issuer
-      sf.input :replaces
-      sf.input :public_registry_authority
-      sf.input :public_registry_book
-      sf.input :public_registry_extra_data
-      ArbreHelpers.has_many_attachments(context, sf)
-    end
-
-    ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
-      sf.input :country
-      sf.input :state
-      sf.input :city
-      sf.input :street_address
-      sf.input :street_number
-      sf.input :postal_code
-      sf.input :floor
-      sf.input :apartment
-      sf.input :replaces
-      ArbreHelpers.has_many_attachments(context, sf)
-    end 
-    
     ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
       sf.input :first_name
       sf.input :last_name
@@ -98,6 +74,37 @@ ActiveAdmin.register Issue do
       cf.input :giro
       cf.input :ciudad
       cf.input :comuna
+    end
+
+    ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
+      sf.input :number
+      sf.input :kind
+      sf.input :issuer
+      sf.input :replaces
+      sf.input :public_registry_authority
+      sf.input :public_registry_book
+      sf.input :public_registry_extra_data
+      ArbreHelpers.has_many_attachments(context, sf)
+    end
+
+    ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
+      sf.input :country
+      sf.input :state
+      sf.input :city
+      sf.input :street_address
+      sf.input :street_number
+      sf.input :postal_code
+      sf.input :floor
+      sf.input :apartment
+      sf.input :replaces
+      ArbreHelpers.has_many_attachments(context, sf)
+    end
+
+    ArbreHelpers.has_many_form self, f, :relationship_seeds do |rf, context|
+      rf.input :kind, collection: RelationshipKind.all
+      rf.input :related_person
+      rf.input :replaces
+      ArbreHelpers.has_many_attachments(context, rf)
     end
 
     ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
@@ -374,6 +381,29 @@ ActiveAdmin.register Issue do
           }
           i.column("") { |seed|
             link_to("Edit", edit_phone_seed_path(seed))
+          }
+        end
+      end
+    end
+
+    if issue.relationship_seeds.any?
+      panel 'Relationship seeds' do
+        table_for issue.relationship_seeds do |i|
+          i.column("ID") do |seed|
+            link_to(seed.id, relationship_seed_path(seed))
+          end
+          i.column("Kind")    { |seed| RelationshipKind.find(seed.kind).code }
+          i.column("Related Person")  { |seed| seed.related_person }
+          i.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |seed|
+            link_to("View", relationship_seed_path(seed))
+          }
+          i.column("") { |seed|
+            link_to("Edit", edit_relationship_seed_path(seed))
           }
         end
       end

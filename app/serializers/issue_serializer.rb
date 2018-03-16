@@ -1,10 +1,13 @@
 class IssueSerializer
   include FastJsonapiCandy::Serializer
   set_type 'issues'
+  
   build_belongs_to :person
+  
   build_has_one :natural_docket_seed, :legal_entity_docket_seed, 
     :argentina_invoicing_detail_seed, :chile_invoicing_detail_seed
+
   build_has_many :allowance_seeds, :observations, :domicile_seeds,
-    :identification_seeds, :phone_seeds, :email_seeds
+    :identification_seeds, :phone_seeds, :email_seeds, :relationship_seeds
   attributes :state
 end

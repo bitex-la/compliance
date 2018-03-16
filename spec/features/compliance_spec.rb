@@ -182,7 +182,7 @@ describe 'an admin user' do
     observation_reason = create(:observation_reason)
 
     Issue.count.should == 1
-    Person.count.should == 1 
+    Person.count.should == 2 
     DomicileSeed.count.should == 1
     IdentificationSeed.count.should == 1
     NaturalDocketSeed.count.should == 1
@@ -237,7 +237,12 @@ describe 'an admin user' do
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
-    expect(page).to_not have_content(issue.id)
+    within ".recent_issues.panel" do
+      expect(page).to_not have_content(issue.id)
+    end
+    within ".pending_for_review.panel" do
+      expect(page).to_not have_content(issue.id)
+    end
 
     get "/api/people/#{person.id}/issues/#{Issue.first.id}"
 
@@ -685,7 +690,9 @@ describe 'an admin user' do
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
 
-      click_link Person.last.id
+      within '.row.row-person' do
+      	click_link Person.first.id
+      end
       within ".domiciles.panel" do
         expect(page).to_not have_content old_domicile.id
       end
@@ -755,7 +762,7 @@ describe 'an admin user' do
       issue = person.issues.first
 
       Issue.count.should == 1
-      Person.count.should == 1 
+      Person.count.should == 2 
       DomicileSeed.count.should == 1
       IdentificationSeed.count.should == 1
       NaturalDocketSeed.count.should == 1
@@ -815,7 +822,9 @@ describe 'an admin user' do
       click_link 'Approve'
       issue.reload.should be_approved
 
-      click_link  person.id
+      within '.row.row-person' do
+      	click_link  person.id
+      end
       person.allowances.first.weight.should == AllowanceSeed.last.weight
       person.identifications.first.number.should == IdentificationSeed.last.number
     end

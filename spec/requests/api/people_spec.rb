@@ -27,7 +27,8 @@ describe Person do
             chile_invoicing_details: {data: []},
             allowances: {data: []},
             phones: {data: []},
-            emails: {data: []}
+            emails: {data: []},
+            relationships: {data: []}
           }
         },
         included: []
@@ -42,6 +43,7 @@ describe Person do
       assert_response 200
       json_response = JSON.parse(response.body).deep_symbolize_keys
 
+      
       json_response[:data].should == {
         type: 'people',
         id: person.id.to_s,
@@ -74,9 +76,14 @@ describe Person do
           }},
           emails: {data: person.emails.map { |x|
             {id: x.id.to_s, type: 'emails'}
+          }},
+          relationships: {data: person.relationships.map { |x|
+            {id: x.id.to_s, type: 'relationships'}
           }}
         }
       }
+
+      related_person = person.relationships.first.related_person
 
       expected_included = [
         { type: 'issues',
@@ -107,6 +114,9 @@ describe Person do
             }},
             email_seeds: {data: issue.email_seeds.map { |x|
              {id: x.id.to_s, type: "email_seeds"}
+            }},
+            relationship_seeds: {data: issue.relationship_seeds.map { |x|
+             {id: x.id.to_s, type: "relationship_seeds"}
             }},
             argentina_invoicing_detail_seed: {data: nil},
             chile_invoicing_detail_seed: {data: nil},
@@ -259,6 +269,23 @@ describe Person do
             }},
             attachments: {
               data: person.emails.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
+          }
+        },
+        { type: "relationships",
+          id: person.relationships.first.id.to_s,
+          attributes: {
+            kind: person.relationships.first.kind.to_s          
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type: "people"}},
+            seed: { data: {
+	      type: "relationship_seeds",	    
+              id: issue.relationship_seeds.last.id.to_s
+            }},
+            attachments: {
+              data: person.relationships.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
