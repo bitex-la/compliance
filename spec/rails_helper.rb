@@ -8,6 +8,7 @@ require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
+require 'support/wait_for_ajax'
 Dir[Rails.root.join("spec/helpers/**/*.rb")].each {|f| require f} 
 
 FactoryBot.definition_file_paths = [ Rails.root.join('spec', 'factories') ]
@@ -72,4 +73,5 @@ RSpec.configure do |config|
     #config.run_server = false
     config.default_driver = :firefox
   end
+  Capybara.default_max_wait_time = 5 
 end

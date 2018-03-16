@@ -41,6 +41,41 @@ ActiveAdmin.register Issue do
       end
     end
 
+    ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
+      sf.input :first_name
+      sf.input :last_name
+      sf.input :birth_date, start_year: 1900
+      sf.input :nationality, as: :country
+      sf.input :gender, collection: ['Male', 'Female']
+      sf.input :marital_status, collection: ['Single', 'Married', 'Divorced']
+      sf.input :job_title
+      sf.input :job_description
+      sf.input :politically_exposed
+      sf.input :politically_exposed_reason, input_html: {rows: 3}
+      ArbreHelpers.has_many_attachments(self, sf) 
+   end
+
+    ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+      sf.input :industry
+      sf.input :business_description, input_html: {rows: 3}
+      sf.input :country
+      sf.input :commercial_name
+      sf.input :legal_name
+      ArbreHelpers.has_many_attachments(self, sf)
+    end
+
+    ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
+      af.input :vat_status_id
+      af.input :tax_id
+    end
+
+    ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
+      cf.input :tax_id
+      cf.input :giro
+      cf.input :ciudad
+      cf.input :comuna
+    end
+
     ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
       sf.input :number
       sf.input :kind
@@ -63,41 +98,13 @@ ActiveAdmin.register Issue do
       sf.input :apartment
       sf.input :replaces
       ArbreHelpers.has_many_attachments(context, sf)
-    end 
-    
-    ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-      sf.input :first_name
-      sf.input :last_name
-      sf.input :birth_date, start_year: 1900
-      sf.input :nationality, as: :country
-      sf.input :gender, collection: ['Male', 'Female']
-      sf.input :marital_status, collection: ['Single', 'Married', 'Divorced']
-      sf.input :job_title
-      sf.input :job_description
-      sf.input :politically_exposed
-      sf.input :politically_exposed_reason
-      ArbreHelpers.has_many_attachments(self, sf)
     end
 
-    ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
-      sf.input :industry
-      sf.input :business_description
-      sf.input :country
-      sf.input :commercial_name
-      sf.input :legal_name
-      ArbreHelpers.has_many_attachments(self, sf)
-    end
-
-    ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
-      af.input :vat_status_id
-      af.input :tax_id
-    end
-
-    ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
-      cf.input :tax_id
-      cf.input :giro
-      cf.input :ciudad
-      cf.input :comuna
+    ArbreHelpers.has_many_form self, f, :relationship_seeds do |rf, context|
+      rf.input :kind, collection: RelationshipKind.all
+      rf.input :related_person
+      rf.input :replaces
+      ArbreHelpers.has_many_attachments(context, rf)
     end
 
     ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
@@ -115,7 +122,7 @@ ActiveAdmin.register Issue do
       pf.input :replaces
       pf.input :has_whatsapp
       pf.input :has_telegram
-      pf.input :note
+      pf.input :note, input_html: {rows: 3}
       ArbreHelpers.has_many_attachments(context, pf)
     end  
 
@@ -128,8 +135,8 @@ ActiveAdmin.register Issue do
     ArbreHelpers.has_many_form self, f, :observations do |sf|
       sf.input :observation_reason
       sf.input :scope
-      sf.input :note
-      sf.input :reply
+      sf.input :note, input_html: {rows: 3}
+      sf.input :reply, input_html: {rows: 3}
     end
 
     f.actions
@@ -374,6 +381,29 @@ ActiveAdmin.register Issue do
           }
           i.column("") { |seed|
             link_to("Edit", edit_phone_seed_path(seed))
+          }
+        end
+      end
+    end
+
+    if issue.relationship_seeds.any?
+      panel 'Relationship seeds' do
+        table_for issue.relationship_seeds do |i|
+          i.column("ID") do |seed|
+            link_to(seed.id, relationship_seed_path(seed))
+          end
+          i.column("Kind")    { |seed| RelationshipKind.find(seed.kind).code }
+          i.column("Related Person")  { |seed| seed.related_person }
+          i.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |seed|
+            link_to("View", relationship_seed_path(seed))
+          }
+          i.column("") { |seed|
+            link_to("Edit", edit_relationship_seed_path(seed))
           }
         end
       end

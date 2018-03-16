@@ -6,6 +6,7 @@ class Person < ApplicationRecord
     natural_dockets
     legal_entity_dockets
     allowances
+    relationships
     phones
     emails
     argentina_invoicing_details

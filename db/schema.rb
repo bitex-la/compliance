@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180314171315) do
+ActiveRecord::Schema.define(version: 20180316143209) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -420,9 +420,11 @@ ActiveRecord::Schema.define(version: 20180314171315) do
     t.string "kind"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
     t.index ["person_id"], name: "index_relationships_on_person_id"
     t.index ["related_person_id"], name: "index_relationships_on_related_person_id"
     t.index ["relationship_seed_id"], name: "index_relationships_on_relationship_seed_id"
+    t.index ["replaced_by_id"], name: "index_relationships_on_replaced_by_id"
   end
 
   add_foreign_key "allowance_seeds", "allowances", column: "fruit_id"
@@ -485,4 +487,5 @@ ActiveRecord::Schema.define(version: 20180314171315) do
   add_foreign_key "relationships", "people"
   add_foreign_key "relationships", "people", column: "related_person_id"
   add_foreign_key "relationships", "relationship_seeds"
+  add_foreign_key "relationships", "relationships", column: "replaced_by_id"
 end

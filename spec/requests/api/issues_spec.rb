@@ -68,6 +68,19 @@ describe Issue do
           assert_response 201
         end
 
+        it 'creates a new issue with a relationship seed' do
+          related_person = create(:empty_person)
+          issue  = Api::IssuesHelper.issue_with_relationship_seed(related_person, ext)
+          post "/api/people/#{person.id}/issues", params: issue
+          Issue.count.should == 1
+          Person.count.should == 2
+          Issue.first.person.should == person
+          RelationshipSeed.count.should == 1
+          RelationshipSeed.last.issue.should == Issue.first
+          RelationshipSeed.last.attachments.count.should == 1
+          assert_response 201
+        end
+
         it 'creates a new issue with an argentina invoicing seed' do
           issue  = Api::IssuesHelper.issue_with_argentina_invoicing_seed(ext)
           post "/api/people/#{person.id}/issues", params: issue
@@ -190,6 +203,24 @@ describe Issue do
           EmailSeed.last.attachments.count.should == 1
           EmailSeed.last.replaces.should == Email.last
           EmailSeed.first.replaces.should be_nil
+          assert_response 201
+        end
+
+        it 'creates a new issue with a relationship seed who wants to replace the current relationship' do
+          new_partner = create(:empty_person)
+          full_natural_person = create(:full_natural_person)
+          issue  = Api::IssuesHelper.issue_with_relationship_seed(new_partner, ext)
+          issue[:included][0][:relationships].merge!({
+            replaces: { data: { type: 'relationships', id: full_natural_person.relationships.first.id.to_s } }
+          })
+
+          post "/api/people/#{full_natural_person.id}/issues", params: issue
+
+          Issue.count.should == 2 
+          RelationshipSeed.count.should == 2
+          RelationshipSeed.last.issue.should == Issue.last
+          RelationshipSeed.last.replaces.should == Person.second.relationships.first
+          RelationshipSeed.first.replaces.should be_nil
           assert_response 201
         end
       end

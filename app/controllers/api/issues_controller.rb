@@ -43,16 +43,18 @@ class Api::IssuesController < Api::ApiController
 
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [
+        :people,
         :observation_reasons, 
         :domiciles, 
         :identifications, 
         :allowances, 
         :phones, 
         :emails,
+        :relationships,
         :argentina_invoicing_details,
         :chile_invoicing_details,
         :natural_dockets,
-        :legal_entity_dockets 
+        :legal_entity_dockets,
       ],
       issues: [
         :domicile_seeds,
@@ -64,6 +66,7 @@ class Api::IssuesController < Api::ApiController
         :allowance_seeds,
         :phone_seeds,
         :email_seeds,
+        :relationship_seeds,
         :observations,
         id: issue_id, 
         person_id: person_id
@@ -97,6 +100,13 @@ class Api::IssuesController < Api::ApiController
         :kind,
         :attachments,
         :replaces,
+        seed_scope
+      ],
+      relationship_seeds: [
+        :kind,
+        :related_person,
+        :replaces,
+        :attachments,
         seed_scope
       ],
       identification_seeds: [
@@ -155,6 +165,7 @@ class Api::IssuesController < Api::ApiController
         :observation_reason,
         seed_scope
       ],
+      people: [],
       observation_reasons: [],
       domiciles: [],
       identifications: [],
@@ -162,6 +173,7 @@ class Api::IssuesController < Api::ApiController
       legal_entity_dockets: [],
       phones: [],
       emails: [],
+      relationships: [], 
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
       allowances: [],

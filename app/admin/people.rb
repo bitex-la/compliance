@@ -212,7 +212,6 @@ ActiveAdmin.register Person do
       end
     end
 
-
     if person.phones.any?
       panel 'Phones' , class: 'phones' do
         table_for person.phones.current do |q|
@@ -235,6 +234,36 @@ ActiveAdmin.register Person do
           }
           q.column("") { |phone|
             link_to("Edit", edit_phone_path(phone))
+          }
+        end
+      end
+    end
+
+    if person.relationships.any?
+      panel 'Relationships' do
+        table_for person.relationships do |i|
+          i.column("ID") do |fruit|
+            link_to(fruit.id, relationships_path(fruit))
+          end
+          i.column("Kind") do |fruit| 
+             rk = RelationshipKind.find(fruit.kind)
+             if rk.nil?
+	       fruit.kind 	
+             else
+               rk.code
+             end 
+          end
+          i.column("Related Person")  { |fruit| fruit.related_person }
+          i.column("Attachments") do |fruit|
+            fruit.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |fruit|
+            link_to("View", relationship_path(fruit))
+          }
+          i.column("") { |fruit|
+            link_to("Edit", edit_relationship_path(fruit))
           }
         end
       end

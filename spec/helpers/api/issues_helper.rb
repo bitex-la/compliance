@@ -106,6 +106,47 @@ class Api::IssuesHelper
     }
   end
 
+  def self.issue_with_relationship_seed(related_person, attachment_type)
+    mime, bytes = 
+    {
+      data: {
+        id: "@1",
+        type: "issues",
+        attributes: { },
+        relationships: {
+          relationship_seeds: {
+            data: [{ id: "@1", type: "relationship_seeds" }]
+          }
+        }
+      },
+      included: [
+        {
+          type: "relationship_seeds",
+          id: "@1",
+          attributes: {
+            kind: 15
+          },
+          relationships: {
+            issue: {
+              data: {id: "@1", type: 'issues'}
+            },
+            attachments: {
+              data: [{
+                id: "@1",
+                type: "attachments"
+              }]
+            },
+            related_person: {
+              data: {id: related_person.id, type: "people"}
+            } 
+          }
+        },
+        attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end
+
+
   def self.issue_with_domicile_seed(attachment_type)
     mime, bytes = 
     {

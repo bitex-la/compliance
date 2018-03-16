@@ -1,11 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe Issue, type: :model do
-  let(:empty_issue) { described_class.new }
+  let(:invalid_issue) { described_class.new } 
+  let(:empty_issue) { create(:basic_issue) }
   let(:basic_issue) { create(:basic_issue) }
 
   it 'is not valid without a person' do
-    expect(empty_issue).to_not be_valid
+    expect(invalid_issue).to_not be_valid
   end
 
   it 'is valid with a person' do
