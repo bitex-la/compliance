@@ -22,7 +22,7 @@ module Garden
 
     def harvest!
       fruit = self.class.naming.fruit.constantize.new(attributes.except(
-        *%w(id created_at updated_at issue_id fruit_id replaces_id)
+        *%w(id created_at updated_at issue_id fruit_id replaces_id copy_attachments)
       ))
       fruit.person = issue.person
       fruit.save!
@@ -30,13 +30,22 @@ module Garden
       attachments.each{|a| a.update!(attached_to_fruit: fruit) }
 
       if respond_to?(:replaces)
-        replaces.update!(replaced_by: fruit) if replaces
+        if replaces
+          replaces.update!(replaced_by: fruit)
+          replaces.attachments.each{ |a| a.update!(attached_to_fruit: fruit) } if copy_attachments
+        end
       else
-        fruit.person.send(self.class.naming.plural)
+         old_fruits =  fruit.person.send(self.class.naming.plural)
           .current.where('id != ?', fruit.id)
-          .update_all(replaced_by_id: fruit.id)
+         
+         if copy_attachments 
+           old_fruits.each do |old_fruit|
+             old_fruit.attachments.each{ |a| a.update!(attached_to_fruit: fruit) } 
+           end
+         end
+         old_fruits.update_all(replaced_by_id: fruit.id)
       end
-
+ 
       fruit
     end
   end

@@ -52,6 +52,7 @@ ActiveAdmin.register Issue do
       sf.input :job_description
       sf.input :politically_exposed
       sf.input :politically_exposed_reason, input_html: {rows: 3}
+      sf.input :copy_attachments
       ArbreHelpers.has_many_attachments(self, sf) 
    end
 
@@ -61,12 +62,15 @@ ActiveAdmin.register Issue do
       sf.input :country
       sf.input :commercial_name
       sf.input :legal_name
+      sf.input :copy_attachments
       ArbreHelpers.has_many_attachments(self, sf)
     end
 
     ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
       af.input :vat_status_id
-      af.input :tax_id
+      af.input :tax_id 
+      af.input :copy_attachments
+      ArbreHelpers.has_many_attachments(self, af)      
     end
 
     ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
@@ -74,6 +78,8 @@ ActiveAdmin.register Issue do
       cf.input :giro
       cf.input :ciudad
       cf.input :comuna
+      cf.input :copy_attachments
+      ArbreHelpers.has_many_attachments(self, cf)
     end
 
     ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
@@ -84,6 +90,7 @@ ActiveAdmin.register Issue do
       sf.input :public_registry_authority
       sf.input :public_registry_book
       sf.input :public_registry_extra_data
+      sf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
@@ -97,6 +104,7 @@ ActiveAdmin.register Issue do
       sf.input :floor
       sf.input :apartment
       sf.input :replaces
+      sf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
@@ -104,6 +112,7 @@ ActiveAdmin.register Issue do
       rf.input :kind, collection: RelationshipKind.all
       rf.input :related_person
       rf.input :replaces
+      rf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, rf)
     end
 
@@ -112,6 +121,7 @@ ActiveAdmin.register Issue do
       sf.input :amount
       sf.input :kind
       sf.input :replaces
+      sf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
@@ -122,13 +132,15 @@ ActiveAdmin.register Issue do
       pf.input :replaces
       pf.input :has_whatsapp
       pf.input :has_telegram
-      pf.input :note, input_html: {rows: 3}
+      pf.input :note, input_html: {rows: 3} 
+      pf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, pf)
     end  
 
     ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
       ef.input :address
       ef.input :kind
+      ef.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, ef)
     end 
 

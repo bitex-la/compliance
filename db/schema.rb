@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180316143209) do
+ActiveRecord::Schema.define(version: 20180316183111) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
     t.integer "replaces_id"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_allowance_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
   end
@@ -78,6 +79,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.datetime "updated_at", null: false
     t.bigint "replaces_id"
     t.bigint "fruit_id"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_argentina_invoicing_detail_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_argentina_invoicing_detail_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_argentina_invoicing_detail_seeds_on_replaces_id"
@@ -121,6 +123,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.datetime "updated_at", null: false
     t.bigint "replaces_id"
     t.bigint "fruit_id"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_chile_invoicing_detail_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_chile_invoicing_detail_seeds_on_replaces_id"
@@ -166,6 +169,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
     t.integer "replaces_id"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_domicile_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_domicile_seeds_on_issue_id"
   end
@@ -197,6 +201,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.datetime "updated_at", null: false
     t.bigint "replaces_id"
     t.bigint "fruit_id"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_email_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_email_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_email_seeds_on_replaces_id"
@@ -240,6 +245,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.string "public_registry_authority"
     t.string "public_registry_book"
     t.string "public_registry_extra_data"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
   end
@@ -279,6 +285,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_legal_entity_docket_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_legal_entity_docket_seeds_on_issue_id"
   end
@@ -314,6 +321,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.string "job_description"
     t.boolean "politically_exposed"
     t.text "politically_exposed_reason"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_natural_docket_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_natural_docket_seeds_on_issue_id"
   end
@@ -379,6 +387,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.datetime "updated_at", null: false
     t.bigint "replaces_id"
     t.bigint "fruit_id"
+    t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_phone_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_phone_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_phone_seeds_on_replaces_id"
@@ -409,6 +418,7 @@ ActiveRecord::Schema.define(version: 20180316143209) do
     t.bigint "related_person_id"
     t.integer "replaces_id"
     t.integer "fruit_id"
+    t.boolean "copy_attachments"
     t.index ["issue_id"], name: "index_relationship_seeds_on_issue_id"
     t.index ["related_person_id"], name: "index_relationship_seeds_on_related_person_id"
   end

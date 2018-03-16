@@ -326,6 +326,8 @@ describe 'an admin user' do
       fill_attachment('identification_seeds', 'jpg')
     end
 
+    find(:css, '#issue_identification_seeds_attributes_0_copy_attachments').set true
+
     click_link "Add New Domicile seed"
    
     select "Argentina",
@@ -425,15 +427,24 @@ describe 'an admin user' do
     new_identification = Identification.last
     old_allowance = Allowance.first
     new_allowance = Allowance.last
+    old_natural_docket = NaturalDocket.first
+    new_natural_docket = NaturalDocket.last
 
     old_domicile.replaced_by_id.should == new_domicile.id
     new_domicile.replaced_by_id.should be_nil
 
     old_identification.replaced_by_id.should == new_identification.id
     new_identification.replaced_by_id.should be_nil 
-
+    
+    old_natural_docket.replaced_by_id.should == new_natural_docket.id
+    new_natural_docket.replaced_by_id.should be_nil
+    
     old_allowance.replaced_by_id.should == new_allowance.id
     new_allowance.replaced_by_id.should be_nil
+
+    # Here we validate that attachments are copy to the new fruit (when applies)
+    new_identification.attachments.count.should == 6
+    new_natural_docket.attachments.count.should == 1
 
     within '.row.row-person' do
       click_link person.id
@@ -643,7 +654,8 @@ describe 'an admin user' do
       issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
       issue_request[:data][:relationships][:natural_docket_seed] = {
         data: {id: '@1', type: 'natural_docket_seeds'}}
-      issue_request[:included] += Api::IssuesHelper.natural_docket_seed(:jpg) 
+      issue_request[:included] += Api::IssuesHelper.natural_docket_seed(:jpg)
+      issue_request[:included][0][:attributes][:copy_attachments] = true
 
       post api_person_issues_path(create(:full_natural_person).id),
         params: issue_request.to_json,
@@ -689,6 +701,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
+      new_domicile.attachments.count.should == 6
 
       within '.row.row-person' do
       	click_link Person.first.id
