@@ -9,6 +9,7 @@ class Person < ApplicationRecord
     relationships
     phones
     emails
+    notes 
     argentina_invoicing_details
     chile_invoicing_details
   }.each do |relationship|

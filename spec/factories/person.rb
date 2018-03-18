@@ -27,6 +27,7 @@ FactoryBot.define do
         full_natural_docket
         full_phone
         full_email
+        full_note
         full_relationship
         salary_allowance
         savings_allowance

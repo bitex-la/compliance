@@ -50,6 +50,7 @@ class Api::IssuesController < Api::ApiController
         :allowances, 
         :phones, 
         :emails,
+        :notes,
         :relationships,
         :argentina_invoicing_details,
         :chile_invoicing_details,
@@ -66,6 +67,7 @@ class Api::IssuesController < Api::ApiController
         :allowance_seeds,
         :phone_seeds,
         :email_seeds,
+        :note_seeds,
         :relationship_seeds,
         :observations,
         id: issue_id, 
@@ -100,6 +102,14 @@ class Api::IssuesController < Api::ApiController
       email_seeds: [
         :address,
         :kind,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        seed_scope
+      ],
+      note_seeds: [
+        :title,
+        :body,
         :attachments,
         :copy_attachments,
         :replaces,
@@ -183,6 +193,7 @@ class Api::IssuesController < Api::ApiController
       legal_entity_dockets: [],
       phones: [],
       emails: [],
+      notes: [],
       relationships: [], 
       argentina_invoicing_details: [],
       chile_invoicing_details: [],

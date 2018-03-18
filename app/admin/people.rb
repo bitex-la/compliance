@@ -191,7 +191,7 @@ ActiveAdmin.register Person do
 
     if person.emails.any?
       panel 'Emails' do
-        table_for person.emails do |i|
+        table_for person.emails.current do |i|
           i.column("ID") do |email|
             link_to(email.id, email_path(email))
           end
@@ -234,6 +234,29 @@ ActiveAdmin.register Person do
           }
           q.column("") { |phone|
             link_to("Edit", edit_phone_path(phone))
+          }
+        end
+      end
+    end
+ 
+    if person.notes.any?
+      panel 'Notes' do
+        table_for person.notes.current do |i|
+          i.column("ID") do |note|
+            link_to(note.id, note_path(note))
+          end
+          i.column("Title") { |note| note.title }
+          i.column("Body")  { |note| note.body }
+          i.column("Attachments") do |note|
+            note.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |note|
+            link_to("View", note_path(note))
+          }
+          i.column("") { |note|
+            link_to("Edit", edit_note_path(note))
           }
         end
       end

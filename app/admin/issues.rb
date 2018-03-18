@@ -139,10 +139,19 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
       ef.input :address
+      ef.input :replaces 
       ef.input :kind
       ef.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, ef)
     end 
+
+    ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
+      nf.input :title
+      nf.input :replaces 
+      nf.input :body, input_html: {rows: 3}
+      nf.input :copy_attachments
+      ArbreHelpers.has_many_attachments(context, nf)
+    end  
 
     ArbreHelpers.has_many_form self, f, :observations do |sf|
       sf.input :observation_reason
@@ -276,6 +285,7 @@ ActiveAdmin.register Issue do
           q.column("Weight") { |seed| seed.weight }
           q.column("Amount") { |seed| seed.amount }
           q.column("Kind")   { |seed| seed.kind }
+          q.column("Replaces")  { |seed| seed.replaces }
           q.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -305,6 +315,7 @@ ActiveAdmin.register Issue do
           d.column("Postal Code")     { |seed| seed.postal_code }
           d.column("Floor")           { |seed| seed.floor}
           d.column("Apartment")       { |seed| seed.apartment }
+          d.column("Replaces")  { |seed| seed.replaces }
           d.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -332,6 +343,7 @@ ActiveAdmin.register Issue do
           i.column("Public Registry Authority")  { |seed| seed.public_registry_authority }
           i.column("Public Registry Book")  { |seed| seed.public_registry_book }
           i.column("Public Registry Extra Data")  { |seed| seed.public_registry_extra_data }
+          i.column("Replaces")  { |seed| seed.replaces }
           i.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -355,6 +367,7 @@ ActiveAdmin.register Issue do
           end
           i.column("Kind")    { |seed| seed.kind }
           i.column("Address")  { |seed| seed.address }
+          i.column("Replaces")  { |seed| seed.replaces }
           i.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -383,6 +396,7 @@ ActiveAdmin.register Issue do
           i.column("Has whatsapp")  { |seed| seed.has_whatsapp }
           i.column("Has telegram")  { |seed| seed.has_telegram }
           i.column("Note")  { |seed| seed.note } 
+          i.column("Replaces")  { |seed| seed.replaces }
           i.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -393,6 +407,30 @@ ActiveAdmin.register Issue do
           }
           i.column("") { |seed|
             link_to("Edit", edit_phone_seed_path(seed))
+          }
+        end
+      end
+    end
+
+    if issue.note_seeds.any?
+      panel 'Note seeds' do
+        table_for issue.note_seeds do |i|
+          i.column("ID") do |seed|
+            link_to(seed.id, note_seed_path(seed))
+          end
+          i.column("Title") { |seed| seed.title }
+          i.column("Body")  { |seed| seed.body }
+          i.column("Replaces")  { |seed| seed.replaces }
+          i.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          i.column("") { |seed|
+            link_to("View", note_seed_path(seed))
+          }
+          i.column("") { |seed|
+            link_to("Edit", edit_note_seed_path(seed))
           }
         end
       end

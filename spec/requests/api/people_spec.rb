@@ -28,6 +28,7 @@ describe Person do
             allowances: {data: []},
             phones: {data: []},
             emails: {data: []},
+            notes: {data: []},
             relationships: {data: []}
           }
         },
@@ -77,6 +78,9 @@ describe Person do
           emails: {data: person.emails.map { |x|
             {id: x.id.to_s, type: 'emails'}
           }},
+          notes: {data: person.notes.map { |x|
+            {id: x.id.to_s, type: 'notes'}
+          }},
           relationships: {data: person.relationships.map { |x|
             {id: x.id.to_s, type: 'relationships'}
           }}
@@ -114,6 +118,9 @@ describe Person do
             }},
             email_seeds: {data: issue.email_seeds.map { |x|
              {id: x.id.to_s, type: "email_seeds"}
+            }},
+            note_seeds: {data: issue.note_seeds.map { |x|
+             {id: x.id.to_s, type: "note_seeds"}
             }},
             relationship_seeds: {data: issue.relationship_seeds.map { |x|
              {id: x.id.to_s, type: "relationship_seeds"}
@@ -286,6 +293,24 @@ describe Person do
             }},
             attachments: {
               data: person.relationships.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
+          }
+        },
+        { type: "notes",
+          id: person.notes.first.id.to_s,
+          attributes: {
+            title:  'my nickname',
+            body:   'Please call me by my nickname: Mr. Bond'          
+          },
+          relationships: {
+            person: {data: {id: person.id.to_s, type: "people"}},
+            seed: { data: {
+	      type: "note_seeds",	    
+              id: issue.note_seeds.last.id.to_s
+            }},
+            attachments: {
+              data: person.notes.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
