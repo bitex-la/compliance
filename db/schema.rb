@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180316183111) do
+ActiveRecord::Schema.define(version: 20180318180027) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -347,6 +347,33 @@ ActiveRecord::Schema.define(version: 20180316183111) do
     t.index ["replaced_by_id"], name: "index_natural_dockets_on_replaced_by_id"
   end
 
+  create_table "note_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "title"
+    t.text "body"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaces_id"
+    t.bigint "fruit_id"
+    t.boolean "copy_attachments"
+    t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
+  end
+
+  create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "title"
+    t.text "body"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_notes_on_issue_id"
+    t.index ["person_id"], name: "index_notes_on_person_id"
+    t.index ["replaced_by_id"], name: "index_notes_on_replaced_by_id"
+  end
+
   create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "subject"
     t.text "body"
@@ -485,6 +512,12 @@ ActiveRecord::Schema.define(version: 20180316183111) do
   add_foreign_key "natural_dockets", "issues"
   add_foreign_key "natural_dockets", "natural_dockets", column: "replaced_by_id"
   add_foreign_key "natural_dockets", "people"
+  add_foreign_key "note_seeds", "issues"
+  add_foreign_key "note_seeds", "notes", column: "fruit_id"
+  add_foreign_key "note_seeds", "notes", column: "replaces_id"
+  add_foreign_key "notes", "issues"
+  add_foreign_key "notes", "notes", column: "replaced_by_id"
+  add_foreign_key "notes", "people"
   add_foreign_key "observations", "issues"
   add_foreign_key "phone_seeds", "issues"
   add_foreign_key "phone_seeds", "phones", column: "fruit_id"

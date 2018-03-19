@@ -31,6 +31,7 @@ class Issue < ApplicationRecord
     identification_seeds
     phone_seeds
     email_seeds
+    note_seeds 
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
