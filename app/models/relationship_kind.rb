@@ -5,5 +5,9 @@ class RelationshipKind
    [10, :spouse],
    [15, :business_partner],
    [20, :couple] 
- ] 
+ ]
+
+ def name
+   code
+ end
 end

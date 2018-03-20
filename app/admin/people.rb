@@ -39,8 +39,8 @@ ActiveAdmin.register Person do
           n.column("Last Name")       { |docket| docket.last_name }
           n.column("Birthdate")       { |docket| docket.birth_date }
           n.column("Nationality")     { |docket| docket.nationality }
-          n.column("Gender")          { |docket| docket.gender }
-          n.column("Marital Status")  { |docket| docket.marital_status }
+          n.column("Gender")          { |docket| GenderKind.find(docket.gender) }
+          n.column("Marital Status")  { |docket| MaritalStatusKind.find(docket.marital_status) }
           n.column("Job Title") { |seed| seed.job_title }
           n.column("Job Description") { |seed| seed.job_description }
           n.column("Politically Exposed") { |seed| seed.politically_exposed }
@@ -52,9 +52,6 @@ ActiveAdmin.register Person do
           end
           n.column("") { |docket|
             link_to("View", natural_docket_path(docket))
-          }
-          n.column("") { |docket|
-            link_to("Edit", edit_natural_docket_path(docket))
           }
         end
       end
@@ -79,9 +76,6 @@ ActiveAdmin.register Person do
           l.column("") { |docket|
             link_to("View", legal_entity_docket_path(docket))
           }
-          l.column("") { |docket|
-            link_to("Edit", edit_legal_entity_docket_path(docket))
-          }
         end
       end
     end
@@ -102,9 +96,6 @@ ActiveAdmin.register Person do
           n.column("") { |seed|
             link_to("View", argentina_invoicing_detail_path(seed))
           }
-          n.column("") { |seed|
-            link_to("Edit", argentina_invoicing_detail_path(seed))
-          }
         end
       end
     end
@@ -115,7 +106,7 @@ ActiveAdmin.register Person do
           i.column("ID") do |identification|
             link_to(identification.id, identification_path(identification))
           end
-          i.column("Kind")    { |identification| identification.kind }
+          i.column("Kind")    { |identification| IdentificationKind.find(identification.kind) }
           i.column("Number")  { |identification| identification.number }
           i.column("Issuer")  { |identification| identification.issuer }
           i.column("Public Registry Authority")  { |identification| identification.public_registry_authority }
@@ -128,9 +119,6 @@ ActiveAdmin.register Person do
           end
           i.column("") { |identification|
             link_to("View", identification_path(identification))
-          }
-          i.column("") { |identification|
-            link_to("Edit", edit_identification_path(identification))
           }
         end
       end
@@ -158,9 +146,6 @@ ActiveAdmin.register Person do
           d.column("") { |domicile|
             link_to("View", domicile_path(domicile))
           }
-          d.column("") { |domicile|
-            link_to("Edit", edit_domicile_path(domicile))
-          }
         end
       end
     end
@@ -182,9 +167,6 @@ ActiveAdmin.register Person do
           q.column("") { |allowance|
             link_to("View", allowance_path(allowance))
           }
-          q.column("") { |allowance|
-            link_to("Edit", edit_allowance_path(allowance))
-          }
         end
       end
     end
@@ -195,7 +177,7 @@ ActiveAdmin.register Person do
           i.column("ID") do |email|
             link_to(email.id, email_path(email))
           end
-          i.column("Kind")    { |email| email.kind }
+          i.column("Kind")    { |email| EmailKind.find(email.kind) }
           i.column("Address")  { |email| email.address }
           i.column("Attachments") do |email|
             email.attachments
@@ -204,9 +186,6 @@ ActiveAdmin.register Person do
           end
           i.column("") { |email|
             link_to("View", email_path(email))
-          }
-          i.column("") { |email|
-            link_to("Edit", edit_email_path(email))
           }
         end
       end
@@ -219,7 +198,7 @@ ActiveAdmin.register Person do
             link_to(phone.id, phone_path(phone))
           end
           q.column("Number") { |p| p.number }
-          q.column("Kind") { |p| p.kind }
+          q.column("Kind") { |p| PhoneKind.find(p.kind) }
           q.column("Country")   { |p| p.country }
           q.column("Has whatsapp") { |p| p.has_whatsapp }
           q.column("Has telegram") { |p| p.has_telegram }
@@ -231,9 +210,6 @@ ActiveAdmin.register Person do
           end
           q.column("") { |phone|
             link_to("View", phone_path(phone))
-          }
-          q.column("") { |phone|
-            link_to("Edit", edit_phone_path(phone))
           }
         end
       end
@@ -254,9 +230,6 @@ ActiveAdmin.register Person do
           end
           i.column("") { |note|
             link_to("View", note_path(note))
-          }
-          i.column("") { |note|
-            link_to("Edit", edit_note_path(note))
           }
         end
       end
@@ -284,9 +257,6 @@ ActiveAdmin.register Person do
           end
           i.column("") { |fruit|
             link_to("View", relationship_path(fruit))
-          }
-          i.column("") { |fruit|
-            link_to("Edit", edit_relationship_path(fruit))
           }
         end
       end
