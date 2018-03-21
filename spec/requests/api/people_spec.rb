@@ -133,7 +133,7 @@ describe Person do
         { type: "domiciles",
           id: person.domiciles.last.id.to_s,
           attributes: {
-            country: "Argentina",
+            country: "AR",
             state: "Buenos Aires",
             city: "C.A.B.A",
             street_address: "Cullen",
@@ -157,9 +157,9 @@ describe Person do
         { type: "identifications",
           id: person.identifications.last.id.to_s,
           attributes: {
-            kind: "ID",
+            kind: "7",
             number: "2545566",
-            issuer: "Argentina",
+            issuer: "AR",
             public_registry_authority: nil,
             public_registry_book: nil,
             public_registry_extra_data: nil
@@ -182,9 +182,9 @@ describe Person do
             first_name: "Joe",
             last_name: "Doe",
             birth_date: "2018-02-26",
-            nationality: "Argentina",
-            gender: "Male",
-            marital_status: "Single",
+            nationality: "AR",
+            gender: "1",
+            marital_status: "1",
             job_title: 'Sr. Software developer',
             job_description: 'Build cool open source software',
             politically_exposed: false,
@@ -244,8 +244,8 @@ describe Person do
           id: person.phones.first.id.to_s,
           attributes: {
             number:  '+5491125410470',
-            kind:    'cellphone',
-            country: 'Argentina',
+            kind:    '1',
+            country: 'AR',
             has_whatsapp: true,
             has_telegram: false,
             note: 'please do not call on Sundays'
@@ -266,7 +266,7 @@ describe Person do
           id: person.emails.first.id.to_s,
           attributes: {
             address:  'joe.doe@test.com',
-            kind:    'personal'          
+            kind:    '1'          
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},

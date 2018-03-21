@@ -251,7 +251,7 @@ describe Issue do
       issue_document = json_response
 
       issue_document[:included][1][:attributes] = {
-        country: "Argentina",
+        country: "AR",
         state: "Baires", 
         street_address: "Mitre",
         street_number: "6782",
@@ -284,7 +284,7 @@ describe Issue do
 
       DomicileSeed.first.tap do |seed|
         seed.reload
-        seed.country.should == "Argentina"
+        seed.country.should == "AR"
         seed.state.should == "Baires"
         seed.city == "CABA"
         seed.street_address == 'Mitre'
@@ -307,8 +307,8 @@ describe Issue do
 
       issue_document[:included][1][:attributes] = {
         number: "+571165342178",
-        kind: "cellphone", 
-        country: "Colombia",
+        kind: "2", 
+        country: "CO",
         has_whatsapp: true,
         has_telegram: false,
         note: "Please use whatsapp"
@@ -339,8 +339,8 @@ describe Issue do
       PhoneSeed.first.tap do |seed|
         seed.reload
         seed.number.should == "+571165342178"
-        seed.kind.should == "cellphone"
-        seed.country.should == "Colombia"
+        seed.kind.should == "2"
+        seed.country.should == "CO"
         seed.has_whatsapp.should == true
         seed.has_telegram.should == false
         seed.note.should == "Please use whatsapp"

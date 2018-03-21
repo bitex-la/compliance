@@ -3,9 +3,9 @@ FactoryBot.define_persons_item_and_seed(:natural_docket,
     first_name      'Joe'
     last_name       'Doe'
     birth_date      '2018-02-26'
-    nationality     'Argentina'
-    gender          'Male'
-    marital_status  'Single'
+    nationality     'AR'
+    gender          GenderKind.find(1).id
+    marital_status  MaritalStatusKind.find(1).id
     job_title       'Sr. Software developer'
     job_description 'Build cool open source software'
     politically_exposed false

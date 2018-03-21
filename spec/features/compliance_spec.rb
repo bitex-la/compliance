@@ -47,9 +47,15 @@ describe 'an admin user' do
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
-      kind: 'ID',
-      issuer: 'Argentina'  
     })
+
+    select "national_id",
+      from: "issue_identification_seeds_attributes_0_kind",
+      visible: false
+
+    select "Argentina",
+      from: "issue_identification_seeds_attributes_0_issuer",
+      visible: false
 
     within(".has_many_container.identification_seeds") do 
       click_link "Add New Attachment"
@@ -59,15 +65,22 @@ describe 'an admin user' do
     click_link "Add New Email seed"
     fill_seed("email",{
       address: 'tester@rspec.org',
-      kind: 'work',
     })
+
+    select "work",
+      from: "issue_email_seeds_attributes_0_kind",
+      visible: false
 
     click_link "Add New Phone seed"
     fill_seed("phone",{
       number: '+541145250470',
-      kind: 'work',
       note: 'Only in office hours'  
     })
+
+    select "main",
+      from: "issue_phone_seeds_attributes_0_kind",
+      visible: false
+
     select "Argentina",
       from: "issue[phone_seeds_attributes][0][country]",
       visible: false 
@@ -107,10 +120,10 @@ describe 'an admin user' do
       last_name: "Higuain",
     }, false)
 
-    select "Married",
+    select "married",
       from: "issue[natural_docket_seed_attributes][marital_status]",
       visible: false
-    select "Male",
+    select "male",
       from: "issue[natural_docket_seed_attributes][gender]",
       visible: false
     select "Argentina",
@@ -253,7 +266,7 @@ describe 'an admin user' do
       .find{|x| x[:type] == 'identification_seeds' }
       .tap do |i|
         i[:attributes][:number] = '1234567890'
-        i[:attributes][:issuer] = 'Colombia'
+        i[:attributes][:issuer] = 'CO'
       end
     issue_document[:included]
       .find{|x| x[:type] == 'observations' }
@@ -271,7 +284,7 @@ describe 'an admin user' do
 
     IdentificationSeed.first.tap do |seed|
       seed.reload
-      seed.issuer.should == "Colombia"
+      seed.issuer.should == "CO"
       seed.number.should == "1234567890"
     end
 
@@ -315,11 +328,18 @@ describe 'an admin user' do
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
-      kind: 'ID',
-      issuer: 'Argentina'  
     })
 
-    select person.identifications.first.id, from: "issue[identification_seeds_attributes][0][replaces_id]"
+    select 'national_id',
+      from: 'issue_identification_seeds_attributes_0_kind',
+      visible: false
+
+    select 'Argentina',
+      from: 'issue_identification_seeds_attributes_0_issuer',
+      visible: false
+
+    select person.identifications.first.id, 
+      from: "issue[identification_seeds_attributes][0][replaces_id]"
 
     within(".has_many_container.identification_seeds") do 
       click_link "Add New Attachment"
@@ -369,10 +389,10 @@ describe 'an admin user' do
       last_name: "Higuain",
     }, false)
 
-    select "Married",
+    select "married",
       from: "issue[natural_docket_seed_attributes][marital_status]",
       visible: false
-    select "Male",
+    select "male",
       from: "issue[natural_docket_seed_attributes][gender]",
       visible: false
     select "Argentina",
@@ -726,10 +746,16 @@ describe 'an admin user' do
 
       click_link "Add New Identification seed"
       fill_seed("identification",{
-        number: '123456789',
-        kind: 'ID',
-        issuer: 'Argentina'  
+        number: '123456789'
       })
+
+      select 'national_id',
+        from: 'issue_identification_seeds_attributes_0_kind',
+        visible: false
+
+      select 'Argentina',
+        from: 'issue_identification_seeds_attributes_0_issuer',
+        visible: false
 
       within(".has_many_container.identification_seeds") do 
         click_link "Add New Attachment"
@@ -820,10 +846,16 @@ describe 'an admin user' do
 
       click_link "Add New Identification seed"
       fill_seed("identification",{
-        number: '123456789',
-        kind: 'ID',
-        issuer: 'Argentina'  
+        number: '123456789'
       })
+
+      select 'national_id',
+        from: 'issue_identification_seeds_attributes_0_kind',
+        visible: false
+
+      select 'Argentina',
+        from: 'issue_identification_seeds_attributes_0_issuer',
+        visible: false
 
       within(".has_many_container.identification_seeds") do 
         click_link "Add New Attachment"

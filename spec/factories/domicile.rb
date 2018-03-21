@@ -1,6 +1,6 @@
 FactoryBot.define_persons_item_and_seed(:domicile,
   full_domicile: proc {
-    country         'Argentina'
+    country         'AR'
     state           'Buenos Aires'
     city            'C.A.B.A'
     street_address  'Cullen'

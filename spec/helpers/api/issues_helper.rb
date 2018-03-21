@@ -165,7 +165,7 @@ class Api::IssuesHelper
           type: "domicile_seeds",
           id: "@1",
           attributes: {
-            country: "argentina",
+            country: "AR",
             state: "buenos aires",
             city: "CABA",
             street_address: "cullen",
@@ -210,8 +210,8 @@ class Api::IssuesHelper
           id: "@1",
           attributes: {
             number: "+54911282256470",
-            kind: "cellphone",
-            country: "Argentina",
+            kind: "1",
+            country: "AR",
             has_whatsapp: true,
             has_telegram: false,
             note: "only on office hours",
@@ -252,7 +252,7 @@ class Api::IssuesHelper
           id: "@1",
           attributes: {
             address: "joe.doe@test.com",
-            kind: "personal",
+            kind: "1",
           },
           relationships: {
             issue: {
@@ -367,9 +367,9 @@ class Api::IssuesHelper
           type: "identification_seeds",
           id: "@1",
           attributes: {
-            kind: "passport",
+            kind: "1",
             number: "AQ322812",
-            issuer: "Colombia"
+            issuer: "CO"
           },
           relationships: {
             attachments: {
@@ -410,9 +410,9 @@ class Api::IssuesHelper
             first_name: "joe",
             last_name: "doe",
             birth_date: "1985-10-08",
-            nationality: "argentina",
-            gender: "male",
-            marital_status: "single"
+            nationality: "AR",
+            gender: "1",
+            marital_status: "1"
           },
           relationships: {
             attachments: {
@@ -452,7 +452,7 @@ class Api::IssuesHelper
           attributes: {
             industry: "software",
             business_description: "software factory",
-            country: "argentina",
+            country: "AR",
             commercial_name: "my soft",
             legal_name: "mySoft SRL"
           },
@@ -517,9 +517,9 @@ class Api::IssuesHelper
         first_name: "joe",
         last_name: "jones",
         birth_date: "1985-10-08",
-        nationality: "argentina",
-        gender: "male",
-        marital_status: "married"
+        nationality: "AR",
+        gender: "1",
+        marital_status: "1"
       },
       relationships: {
         attachments: {
