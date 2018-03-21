@@ -46,8 +46,8 @@ ActiveAdmin.register Issue do
       sf.input :last_name
       sf.input :birth_date, start_year: 1900
       sf.input :nationality, as: :country
-      sf.input :gender, collection: ['Male', 'Female']
-      sf.input :marital_status, collection: ['Single', 'Married', 'Divorced']
+      sf.input :gender, collection: GenderKind.all
+      sf.input :marital_status, collection: MaritalStatusKind.all
       sf.input :job_title
       sf.input :job_description
       sf.input :politically_exposed
@@ -84,8 +84,8 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
       sf.input :number
-      sf.input :kind
-      sf.input :issuer
+      sf.input :kind, collection: IdentificationKind.all
+      sf.input :issuer, as: :country
       sf.input :replaces
       sf.input :public_registry_authority
       sf.input :public_registry_book
@@ -127,7 +127,7 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
       pf.input :number
-      pf.input :kind
+      pf.input :kind, collection: PhoneKind.all
       pf.input :country
       pf.input :replaces
       pf.input :has_whatsapp
@@ -140,7 +140,7 @@ ActiveAdmin.register Issue do
     ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
       ef.input :address
       ef.input :replaces 
-      ef.input :kind
+      ef.input :kind, collection: EmailKind.all
       ef.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, ef)
     end 
@@ -207,8 +207,8 @@ ActiveAdmin.register Issue do
           n.column("Last Name")       { |seed| seed.last_name }
           n.column("Birthdate")       { |seed| seed.birth_date }
           n.column("Nationality")     { |seed| seed.nationality }
-          n.column("Gender")          { |seed| seed.gender }
-          n.column("Marital Status")  { |seed| seed.marital_status }
+          n.column("Gender")          { |seed| GenderKind.find(seed.gender) }
+          n.column("Marital Status")  { |seed| MaritalStatusKind.find(seed.marital_status) }
           n.column("Job Title") { |seed| seed.job_title }
           n.column("Job Description") { |seed| seed.job_description }
           n.column("Politically Exposed") { |seed| seed.politically_exposed }
@@ -337,7 +337,7 @@ ActiveAdmin.register Issue do
           i.column("ID") do |seed|
             link_to(seed.id, identification_seed_path(seed))
           end
-          i.column("Kind")    { |seed| seed.kind }
+          i.column("Kind")    { |seed| IdentificationKind.find(seed.kind) }
           i.column("Number")  { |seed| seed.number }
           i.column("Issuer")  { |seed| seed.issuer }
           i.column("Public Registry Authority")  { |seed| seed.public_registry_authority }
@@ -365,7 +365,7 @@ ActiveAdmin.register Issue do
           i.column("ID") do |seed|
             link_to(seed.id, email_seed_path(seed))
           end
-          i.column("Kind")    { |seed| seed.kind }
+          i.column("Kind")    { |seed| EmailKind.find(seed.kind) }
           i.column("Address")  { |seed| seed.address }
           i.column("Replaces")  { |seed| seed.replaces }
           i.column("Attachments") do |seed|
@@ -390,7 +390,7 @@ ActiveAdmin.register Issue do
           i.column("ID") do |seed|
             link_to(seed.id, phone_seed_path(seed))
           end
-          i.column("Kind")    { |seed| seed.kind }
+          i.column("Kind")    { |seed| PhoneKind.find(seed.kind) }
           i.column("Number")  { |seed| seed.number }
           i.column("Country")  { |seed| seed.country }
           i.column("Has whatsapp")  { |seed| seed.has_whatsapp }

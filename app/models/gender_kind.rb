@@ -1,10 +1,10 @@
-class RelationshipKind
+class GenderKind
   include StaticModels::Model
  
   static_models_sparse [
-    [10, :spouse],
-    [15, :business_partner],
-    [20, :couple] 
+    [1, :female],
+    [2, :male],
+    [3, :none] 
   ]
 
   def name
