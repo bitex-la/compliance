@@ -2,7 +2,11 @@ require 'rails_helper'
 
 RSpec.describe IdentificationSeed, type: :model do
   let(:invalid_seed) { described_class.new }
-  let(:valid_seed)   { create(:identification_seed) }
+  let(:valid_seed)   { 
+    create(:identification_seed, 
+      kind: IdentificationKind.find(1).id,
+      issuer: 'CO'
+  )}
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid

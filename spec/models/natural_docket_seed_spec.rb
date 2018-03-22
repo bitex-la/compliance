@@ -2,7 +2,13 @@ require 'rails_helper'
 
 RSpec.describe NaturalDocketSeed, type: :model do
   let(:invalid_seed) { described_class.new }
-  let(:valid_seed)   { create(:natural_docket_seed, issue: create(:basic_issue)) }
+  let(:valid_seed)   { 
+    create(:natural_docket_seed, 
+      issue: create(:basic_issue),
+      nationality: 'CO',
+      gender: GenderKind.find(1).id,
+      marital_status: MaritalStatusKind.find(1).id
+  )}
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
