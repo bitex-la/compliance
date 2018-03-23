@@ -3,7 +3,7 @@ class Observation < ApplicationRecord
   enum scope: %i(client robot admin)
   
   belongs_to :issue
-  belongs_to :observation_reason
+  belongs_to :observation_reason, optional: true
 
   before_save  :check_for_answer
   after_create :observe_issue

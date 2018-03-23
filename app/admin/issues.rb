@@ -469,7 +469,11 @@ ActiveAdmin.register Issue do
           o.column("Updated at") { |obv| obv.updated_at } 
           o.column("Note")    { |obv| obv.note }
           o.column("Reply")   { |obv| obv.reply }
-          o.column("Reason")  { |obv| obv.observation_reason.subject }
+          o.column("Reason")  { |obv|
+            unless obv.observation_reason.nil? 
+              obv.observation_reason.subject 
+            end
+          }
           o.column("Scope")   { |obv| obv.scope }  
         end
       end

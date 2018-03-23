@@ -13,11 +13,13 @@ ActiveAdmin.register_page "Dashboard" do
           table_for Observation.admin_pending do |o|
             o.column(:id) { |obv| obv.id }
             o.column(:note) { |obv| obv.note }
-            o.column(:observation_reason) { |obv| 
-              obv.observation_reason.subject
-            }
+            o.column("observation reason") { |obv|
+              unless obv.observation_reason.nil? 
+                obv.observation_reason.subject 
+              end
+           }
             o.column('Person') { |obv|
-              span link_to(obv.issue.person.id, people_path(obv.issue.person))
+              span link_to(obv.issue.person.id, person_path(obv.issue.person))
             }
             o.column('Actions') { |obv|
               span link_to('View', issue_path(obv.issue))
