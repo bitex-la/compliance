@@ -95,6 +95,19 @@ class Issue < ApplicationRecord
     end
   end
 
+  def modifications_count
+    count = 0
+    
+    HAS_ONE.each do |relation|
+      count += 1 unless send(relation).nil?
+    end
+    
+    HAS_MANY.each do |relation|
+      count += send(relation).count unless send(relation).blank?
+    end
+    count
+  end
+
   def state
     aasm_state
   end

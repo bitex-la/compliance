@@ -10,6 +10,12 @@ module ArbreHelpers
           i.column("Person") { |issue|
             link_to(issue.person.id, person_path(issue.person)) 
           }
+          i.column("Seeds") { |issue|
+            issue.modifications_count
+          }
+          i.column("Observations") { |issue|
+            issue.observations.count
+          }
           i.column("Created at") { |issue|
             issue.created_at 
           }
