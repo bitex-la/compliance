@@ -10,7 +10,7 @@ class Observation < ApplicationRecord
 
   validate :validate_scope_integrity
 
-  scope :admin_pending, -> { where(scope: 'admin') } 
+  scope :admin_pending, -> { where(scope: 'admin', aasm_state: 'new') } 
 
   aasm do
     state :new, initial: true
