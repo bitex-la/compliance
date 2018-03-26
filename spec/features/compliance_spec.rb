@@ -575,8 +575,14 @@ describe 'an admin user' do
     issue = person.issues.last
     login_as admin_user
     issue.should be_observed
-    expect(page).to_not have_content(issue.id)
     
+    within '.recent_issues.panel' do 
+      expect(page).to_not have_content(issue.id)
+    end
+
+    within '.pending_for_review.panel' do 
+      expect(page).to_not have_content(issue.id)
+    end
     # Admin clicks in the observation to see the issue detail
     within("#observation_#{Observation.last.id} td.col.col-actions") do
       click_link('View')
