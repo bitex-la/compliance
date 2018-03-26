@@ -290,7 +290,12 @@ class Api::IssuesHelper
           id: "@1",
           attributes: {
             vat_status_id: "2256470",
-            tax_id: "2022443870"
+            tax_id: "2022443870",
+            tax_id_type: "86",
+            receipt_type: "1",
+            name: "Jorge Galvan",
+            country: "AR",
+            address: "Bucarelli 2675"
           },
           relationships: {
             issue: {

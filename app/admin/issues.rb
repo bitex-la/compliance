@@ -68,7 +68,12 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
       af.input :vat_status_id
-      af.input :tax_id 
+      af.input :tax_id
+      af.input :tax_id_type, collection: TaxIdKind.all
+      af.input :receipt_type, collection: ReceiptType.all
+      af.input :name
+      af.input :country
+      af.input :address
       af.input :copy_attachments
       ArbreHelpers.has_many_attachments(self, af)      
     end
@@ -236,6 +241,11 @@ ActiveAdmin.register Issue do
           end
           n.column("VAT status id")      { |seed| seed.vat_status_id }
           n.column("Tax ID")       { |seed| seed.tax_id }
+          n.column("Tax ID Type")       { |seed| seed.tax_id_type }
+          n.column("Receipt Type")       { |seed| seed.receipt_type }
+          n.column("Name")       { |seed| seed.name }
+          n.column("Country")       { |seed| seed.country }
+          n.column("Address")       { |seed| seed.address }
           n.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}

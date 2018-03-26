@@ -156,6 +156,11 @@ class Api::IssuesController < Api::ApiController
       argentina_invoicing_detail_seeds: [
         :vat_status_id,
         :tax_id,
+        :tax_id_type,
+        :receipt_type,
+        :name,
+        :country,
+        :address,
         :attachments,
         :copy_attachments,
         seed_scope

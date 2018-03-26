@@ -88,6 +88,11 @@ ActiveAdmin.register Person do
           end
           n.column("VAT status id")      { |detail| detail.vat_status_id }
           n.column("Tax ID")       { |detail| detail.tax_id }
+          n.column("Tax ID Type")       { |detail| seed.tax_id_type }
+          n.column("Receipt Type")       { |detail| seed.receipt_type }
+          n.column("Name")         { |detail| detail.name }
+          n.column("Country")       { |detail| seed.country }
+          n.column("Address")       { |detail| seed.address }
           n.column("Attachments") do |detail|
             detail.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
