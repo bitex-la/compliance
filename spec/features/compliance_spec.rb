@@ -575,7 +575,7 @@ describe 'an admin user' do
     issue = person.issues.last
     login_as admin_user
     issue.should be_observed
-    
+
     within '.recent_issues.panel' do 
       expect(page).to_not have_content(issue.id)
     end
