@@ -29,7 +29,7 @@ FactoryBot.define do
         full_phone
         full_email
         full_note
-        full_relationship
+        full_affinity
         salary_allowance
         savings_allowance
       ).each do |name|

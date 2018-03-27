@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180326191155) do
+ActiveRecord::Schema.define(version: 20180327170751) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -41,6 +41,33 @@ ActiveRecord::Schema.define(version: 20180326191155) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "affinities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "affinity_seed_id"
+    t.bigint "person_id"
+    t.bigint "related_person_id"
+    t.string "kind"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["affinity_seed_id"], name: "index_affinities_on_affinity_seed_id"
+    t.index ["person_id"], name: "index_affinities_on_person_id"
+    t.index ["related_person_id"], name: "index_affinities_on_related_person_id"
+    t.index ["replaced_by_id"], name: "index_affinities_on_replaced_by_id"
+  end
+
+  create_table "affinity_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "issue_id"
+    t.string "kind"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "related_person_id"
+    t.integer "replaces_id"
+    t.integer "fruit_id"
+    t.boolean "copy_attachments"
+    t.index ["issue_id"], name: "index_affinity_seeds_on_issue_id"
+    t.index ["related_person_id"], name: "index_affinity_seeds_on_related_person_id"
   end
 
   create_table "allowance_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -447,33 +474,12 @@ ActiveRecord::Schema.define(version: 20180326191155) do
     t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
   end
 
-  create_table "relationship_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "issue_id"
-    t.string "kind"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "related_person_id"
-    t.integer "replaces_id"
-    t.integer "fruit_id"
-    t.boolean "copy_attachments"
-    t.index ["issue_id"], name: "index_relationship_seeds_on_issue_id"
-    t.index ["related_person_id"], name: "index_relationship_seeds_on_related_person_id"
-  end
-
-  create_table "relationships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "relationship_seed_id"
-    t.bigint "person_id"
-    t.bigint "related_person_id"
-    t.string "kind"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "replaced_by_id"
-    t.index ["person_id"], name: "index_relationships_on_person_id"
-    t.index ["related_person_id"], name: "index_relationships_on_related_person_id"
-    t.index ["relationship_seed_id"], name: "index_relationships_on_relationship_seed_id"
-    t.index ["replaced_by_id"], name: "index_relationships_on_replaced_by_id"
-  end
-
+  add_foreign_key "affinities", "affinities", column: "replaced_by_id"
+  add_foreign_key "affinities", "affinity_seeds"
+  add_foreign_key "affinities", "people"
+  add_foreign_key "affinities", "people", column: "related_person_id"
+  add_foreign_key "affinity_seeds", "issues"
+  add_foreign_key "affinity_seeds", "people", column: "related_person_id"
   add_foreign_key "allowance_seeds", "allowances", column: "fruit_id"
   add_foreign_key "allowance_seeds", "issues"
   add_foreign_key "allowances", "allowances", column: "replaced_by_id"
@@ -535,10 +541,4 @@ ActiveRecord::Schema.define(version: 20180326191155) do
   add_foreign_key "phones", "issues"
   add_foreign_key "phones", "people"
   add_foreign_key "phones", "phones", column: "replaced_by_id"
-  add_foreign_key "relationship_seeds", "issues"
-  add_foreign_key "relationship_seeds", "people", column: "related_person_id"
-  add_foreign_key "relationships", "people"
-  add_foreign_key "relationships", "people", column: "related_person_id"
-  add_foreign_key "relationships", "relationship_seeds"
-  add_foreign_key "relationships", "relationships", column: "replaced_by_id"
 end

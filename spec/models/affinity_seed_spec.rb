@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe RelationshipSeed, type: :model do
+RSpec.describe AffinitySeed, type: :model do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { 
-    create(:relationship_seed, 
+    create(:affinity_seed, 
       related_person: create(:empty_person),
       kind: RelationshipKind.find(10).id
   )}

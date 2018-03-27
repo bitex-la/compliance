@@ -88,11 +88,11 @@ ActiveAdmin.register Person do
           end
           n.column("VAT status id")      { |detail| detail.vat_status_id }
           n.column("Tax ID")       { |detail| detail.tax_id }
-          n.column("Tax ID Type")       { |detail| seed.tax_id_type }
-          n.column("Receipt Type")       { |detail| seed.receipt_type }
+          n.column("Tax ID Type")       { |detail| detail.tax_id_type }
+          n.column("Receipt Type")       { |detail| detail.receipt_type }
           n.column("Name")         { |detail| detail.name }
-          n.column("Country")       { |detail| seed.country }
-          n.column("Address")       { |detail| seed.address }
+          n.column("Country")       { |detail| detail.country }
+          n.column("Address")       { |detail| detail.address }
           n.column("Attachments") do |detail|
             detail.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -240,11 +240,11 @@ ActiveAdmin.register Person do
       end
     end
 
-    if person.relationships.any?
-      panel 'Relationships' do
-        table_for person.relationships do |i|
+    if person.affinities.any?
+      panel 'Affinities' do
+        table_for person.affinities do |i|
           i.column("ID") do |fruit|
-            link_to(fruit.id, relationships_path(fruit))
+            link_to(fruit.id, affinity_path(fruit))
           end
           i.column("Kind") do |fruit| 
              rk = RelationshipKind.find(fruit.kind)
@@ -261,7 +261,7 @@ ActiveAdmin.register Person do
               .join("<br />").html_safe
           end
           i.column("") { |fruit|
-            link_to("View", relationship_path(fruit))
+            link_to("View", affinity_path(fruit))
           }
         end
       end

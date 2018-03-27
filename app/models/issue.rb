@@ -25,13 +25,13 @@ class Issue < ApplicationRecord
     reject_if: proc { |attr| attr['first_name'].blank? || attr['last_name'].blank? } 
 
   HAS_MANY = %i{
-    relationship_seeds
     allowance_seeds
     domicile_seeds
     identification_seeds
     phone_seeds
     email_seeds
     note_seeds 
+    affinity_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true

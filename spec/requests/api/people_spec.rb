@@ -29,7 +29,7 @@ describe Person do
             phones: {data: []},
             emails: {data: []},
             notes: {data: []},
-            relationships: {data: []}
+            affinities: {data: []}
           }
         },
         included: []
@@ -85,13 +85,13 @@ describe Person do
           notes: {data: person.notes.map { |x|
             {id: x.id.to_s, type: 'notes'}
           }},
-          relationships: {data: person.relationships.map { |x|
-            {id: x.id.to_s, type: 'relationships'}
+          affinities: {data: person.affinities.map { |x|
+            {id: x.id.to_s, type: 'affinities'}
           }}
         }
       }
 
-      related_person = person.relationships.first.related_person
+      related_person = person.affinities.first.related_person
 
       expected_included = [
         { type: 'issues',
@@ -126,8 +126,8 @@ describe Person do
             note_seeds: {data: issue.note_seeds.map { |x|
              {id: x.id.to_s, type: "note_seeds"}
             }},
-            relationship_seeds: {data: issue.relationship_seeds.map { |x|
-             {id: x.id.to_s, type: "relationship_seeds"}
+            affinity_seeds: {data: issue.affinity_seeds.map { |x|
+             {id: x.id.to_s, type: "affinity_seeds"}
             }},
             argentina_invoicing_detail_seed: {data: {
               id: issue.argentina_invoicing_detail_seed.id.to_s,
@@ -287,26 +287,27 @@ describe Person do
             }
           }
         },
-        { type: "relationships",
-          id: person.relationships.first.id.to_s,
+        { 
+          type: "affinities",
+          id: person.affinities.first.id.to_s,
           attributes: {
-            kind: person.relationships.first.kind.to_s          
+            kind: person.affinities.first.kind.to_s          
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "relationship_seeds",	    
-              id: issue.relationship_seeds.last.id.to_s
+	            type: "affinity_seeds",	    
+              id: issue.affinity_seeds.last.id.to_s
             }},
             attachments: {
-              data: person.relationships.last.attachments
+              data: person.affinities.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
         },
         {
-	  id: person.argentina_invoicing_details.first.id.to_s,
-  	  type: "argentina_invoicing_details",
+	        id: person.argentina_invoicing_details.first.id.to_s,
+  	      type: "argentina_invoicing_details",
           attributes: 
           {
             vat_status_id: "2",

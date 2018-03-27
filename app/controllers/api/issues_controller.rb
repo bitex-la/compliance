@@ -51,7 +51,7 @@ class Api::IssuesController < Api::ApiController
         :phones, 
         :emails,
         :notes,
-        :relationships,
+        :affinities,
         :argentina_invoicing_details,
         :chile_invoicing_details,
         :natural_dockets,
@@ -68,7 +68,7 @@ class Api::IssuesController < Api::ApiController
         :phone_seeds,
         :email_seeds,
         :note_seeds,
-        :relationship_seeds,
+        :affinity_seeds,
         :observations,
         id: issue_id, 
         person_id: person_id
@@ -115,7 +115,7 @@ class Api::IssuesController < Api::ApiController
         :replaces,
         seed_scope
       ],
-      relationship_seeds: [
+      affinity_seeds: [
         :kind,
         :related_person,
         :replaces,
@@ -199,7 +199,7 @@ class Api::IssuesController < Api::ApiController
       phones: [],
       emails: [],
       notes: [],
-      relationships: [], 
+      affinities: [], 
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
       allowances: [],

@@ -6,12 +6,12 @@ class Person < ApplicationRecord
     natural_dockets
     legal_entity_dockets
     allowances
-    relationships
     phones
     emails
     notes 
     argentina_invoicing_details
     chile_invoicing_details
+    affinities
   }.each do |relationship|
     has_many relationship
   end
