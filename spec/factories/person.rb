@@ -25,6 +25,7 @@ FactoryBot.define do
         full_domicile
         full_natural_person_identification
         full_natural_docket
+        full_argentina_invoicing_detail
         full_phone
         full_email
         full_note

@@ -70,8 +70,12 @@ describe Person do
           allowances: {data: person.allowances.map{ |x|
             {id: x.id.to_s, type: "allowances" }
           }},
-          argentina_invoicing_details: {data: []},
-          chile_invoicing_details: {data: []},
+          argentina_invoicing_details: {data: person.argentina_invoicing_details.map { |x| 
+            {id: x.id.to_s, type: 'argentina_invoicing_details'}
+          }},
+          chile_invoicing_details: {data: person.chile_invoicing_details.map { |x| 
+            {id: x.id.to_s, type: 'chile_invoicing_details'}
+          }},
           phones: {data: person.phones.map { |x| 
             {id: x.id.to_s, type: 'phones'}
           }},
@@ -125,7 +129,10 @@ describe Person do
             relationship_seeds: {data: issue.relationship_seeds.map { |x|
              {id: x.id.to_s, type: "relationship_seeds"}
             }},
-            argentina_invoicing_detail_seed: {data: nil},
+            argentina_invoicing_detail_seed: {data: {
+              id: issue.argentina_invoicing_detail_seed.id.to_s,
+              type: "argentina_invoicing_detail_seeds"
+            }},
             chile_invoicing_detail_seed: {data: nil},
             observations: {data: []}
           }
@@ -293,6 +300,29 @@ describe Person do
             }},
             attachments: {
               data: person.relationships.last.attachments
+                .map{|x| {id: x.id.to_s, type: 'attachments'}}
+            }
+          }
+        },
+        {
+	  id: person.argentina_invoicing_details.first.id.to_s,
+  	  type: "argentina_invoicing_details",
+          attributes: 
+          {
+            vat_status_id: "2",
+            tax_id: "20955754290",
+            tax_id_type: "80",
+            receipt_type: "1",
+            country: "AR",
+            address: "Jujuy 3421"
+          },
+          relationships: 
+          {
+            person: {data: { id: person.id.to_s, type:"people"}},
+            seed:   {data: { id: issue.argentina_invoicing_detail_seed.id.to_s,  type: "argentina_invoicing_detail_seeds"}},
+            attachments: 
+            {
+              data: person.argentina_invoicing_details.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
           }
