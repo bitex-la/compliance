@@ -113,7 +113,7 @@ ActiveAdmin.register Issue do
       ArbreHelpers.has_many_attachments(context, sf)
     end
 
-    ArbreHelpers.has_many_form self, f, :relationship_seeds do |rf, context|
+    ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
       rf.input :kind, collection: RelationshipKind.all
       rf.input :related_person
       rf.input :replaces
@@ -446,11 +446,11 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.relationship_seeds.any?
-      panel 'Relationship seeds' do
-        table_for issue.relationship_seeds do |i|
+    if issue.affinity_seeds.any?
+      panel 'Affinity seeds' do
+        table_for issue.affinity_seeds do |i|
           i.column("ID") do |seed|
-            link_to(seed.id, relationship_seed_path(seed))
+            link_to(seed.id, affinity_seed_path(seed))
           end
           i.column("Kind")    { |seed| RelationshipKind.find(seed.kind).code }
           i.column("Related Person")  { |seed| seed.related_person }
@@ -460,10 +460,10 @@ ActiveAdmin.register Issue do
               .join("<br />").html_safe
           end
           i.column("") { |seed|
-            link_to("View", relationship_seed_path(seed))
+            link_to("View", affinity_seed_path(seed))
           }
           i.column("") { |seed|
-            link_to("Edit", edit_relationship_seed_path(seed))
+            link_to("Edit", edit_affinity_seed_path(seed))
           }
         end
       end

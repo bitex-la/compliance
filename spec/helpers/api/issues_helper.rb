@@ -106,7 +106,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_relationship_seed(related_person, attachment_type)
+  def self.issue_with_affinity_seed(related_person, attachment_type)
     mime, bytes = 
     {
       data: {
@@ -114,14 +114,14 @@ class Api::IssuesHelper
         type: "issues",
         attributes: { },
         relationships: {
-          relationship_seeds: {
-            data: [{ id: "@1", type: "relationship_seeds" }]
+          affinity_seeds: {
+            data: [{ id: "@1", type: "affinity_seeds" }]
           }
         }
       },
       included: [
         {
-          type: "relationship_seeds",
+          type: "affinity_seeds",
           id: "@1",
           attributes: {
             kind: 15

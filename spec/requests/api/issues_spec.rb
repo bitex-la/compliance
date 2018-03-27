@@ -68,16 +68,16 @@ describe Issue do
           assert_response 201
         end
 
-        it 'creates a new issue with a relationship seed' do
+        it 'creates a new issue with an affinity seed' do
           related_person = create(:empty_person)
-          issue  = Api::IssuesHelper.issue_with_relationship_seed(related_person, ext)
+          issue  = Api::IssuesHelper.issue_with_affinity_seed(related_person, ext)
           post "/api/people/#{person.id}/issues", params: issue
           Issue.count.should == 1
           Person.count.should == 2
           Issue.first.person.should == person
-          RelationshipSeed.count.should == 1
-          RelationshipSeed.last.issue.should == Issue.first
-          RelationshipSeed.last.attachments.count.should == 1
+          AffinitySeed.count.should == 1
+          AffinitySeed.last.issue.should == Issue.first
+          AffinitySeed.last.attachments.count.should == 1
           assert_response 201
         end
 
@@ -206,21 +206,21 @@ describe Issue do
           assert_response 201
         end
 
-        it 'creates a new issue with a relationship seed who wants to replace the current relationship' do
+        it 'creates a new issue with an affinity seed who wants to replace the current affinity' do
           new_partner = create(:empty_person)
           full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_relationship_seed(new_partner, ext)
+          issue  = Api::IssuesHelper.issue_with_affinity_seed(new_partner, ext)
           issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'relationships', id: full_natural_person.relationships.first.id.to_s } }
+            replaces: { data: { type: 'affinities', id: full_natural_person.affinities.first.id.to_s } }
           })
 
           post "/api/people/#{full_natural_person.id}/issues", params: issue
 
           Issue.count.should == 2 
-          RelationshipSeed.count.should == 2
-          RelationshipSeed.last.issue.should == Issue.last
-          RelationshipSeed.last.replaces.should == Person.second.relationships.first
-          RelationshipSeed.first.replaces.should be_nil
+          AffinitySeed.count.should == 2
+          AffinitySeed.last.issue.should == Issue.last
+          AffinitySeed.last.replaces.should == Person.second.affinities.first
+          AffinitySeed.first.replaces.should be_nil
           assert_response 201
         end
       end

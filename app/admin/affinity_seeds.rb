@@ -1,4 +1,4 @@
-ActiveAdmin.register RelationshipSeed do
+ActiveAdmin.register AffinitySeed do
   menu false
 
   controller do
