@@ -44,7 +44,7 @@ describe Issue do
           issue  = Api::IssuesHelper.issue_with_domicile_seed(ext)
           post "/api/people/#{person.id}/issues", params: issue
           assert_issue_integrity(["DomicileSeed"]) 
-          assert_response 201
+          assert_response 201 
         end
 
         it 'creates a new issue with an identification seed' do

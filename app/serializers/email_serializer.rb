@@ -1,5 +1,5 @@
 class EmailSerializer
   include FastJsonapiCandy::Fruit
-  attributes :address, :kind  
+  attributes :address, :kind
   derive_seed_serializer!
 end

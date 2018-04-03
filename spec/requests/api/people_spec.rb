@@ -155,6 +155,7 @@ describe Person do
               type: "domicile_seeds",
               id: issue.domicile_seeds.first.id.to_s
             }},
+            replaced_by: {data: nil},
             attachments: {
               data: person.domiciles.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -177,6 +178,7 @@ describe Person do
               type: "identification_seeds",
               id: issue.identification_seeds.last.id.to_s,
             }},
+            replaced_by: {data: nil},
             attachments: {
               data: person.identifications.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -203,6 +205,7 @@ describe Person do
 	      type: "natural_docket_seeds",	    
               id: issue.natural_docket_seed.id.to_s
             }},
+            replaced_by: {data: nil},
             attachments: {
               data: person.natural_dockets.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -222,7 +225,8 @@ describe Person do
               id: issue.allowance_seeds.first.id.to_s,
               type: "allowance_seeds"
             }},
-            attachments:{
+            replaced_by: {data: nil},
+            attachments: {
               data: person.allowances.first.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
@@ -241,7 +245,8 @@ describe Person do
               id: issue.allowance_seeds.last.id.to_s,
               type: "allowance_seeds"
             }},
-            attachments:{
+            replaced_by: {data: nil},
+            attachments: {
               data: person.allowances.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
             }
@@ -263,6 +268,7 @@ describe Person do
 	      type: "phone_seeds",	    
               id: issue.phone_seeds.last.id.to_s
             }},
+            replaced_by: {data: nil},
             attachments: {
               data: person.phones.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -281,6 +287,7 @@ describe Person do
 	      type: "email_seeds",	    
               id: issue.email_seeds.last.id.to_s
             }},
+            replaced_by: {data: nil},
             attachments: {
               data: person.emails.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -299,6 +306,7 @@ describe Person do
 	            type: "affinity_seeds",	    
               id: issue.affinity_seeds.last.id.to_s
             }},
+            replaced_by: {data: nil},
             attachments: {
               data: person.affinities.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -321,6 +329,7 @@ describe Person do
           {
             person: {data: { id: person.id.to_s, type:"people"}},
             seed:   {data: { id: issue.argentina_invoicing_detail_seed.id.to_s,  type: "argentina_invoicing_detail_seeds"}},
+            replaced_by: {data: nil},
             attachments: 
             {
               data: person.argentina_invoicing_details.last.attachments
@@ -340,6 +349,7 @@ describe Person do
 	      type: "note_seeds",	    
               id: issue.note_seeds.last.id.to_s
             }},
+            replaced_by: {data: nil},
             attachments: {
               data: person.notes.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
