@@ -79,6 +79,7 @@ ActiveAdmin.register Issue do
     end
 
     ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
+      cf.input :vat_status_id
       cf.input :tax_id
       cf.input :giro
       cf.input :ciudad
@@ -267,10 +268,11 @@ ActiveAdmin.register Issue do
           n.column("ID") do |seed|
             link_to(seed.id, chile_invoicing_detail_seed_path(seed))
           end
-          n.column("Tax ID")       { |seed| seed.tax_id }
-          n.column("Giro")       { |seed| seed.giro }
-          n.column("Ciudad")       { |seed| seed.ciudad }
-          n.column("Comuna")       { |seed| seed.comuna }
+          n.column("VAT status id") { |seed| seed.vat_status_id }
+          n.column("Tax ID")        { |seed| seed.tax_id }
+          n.column("Giro")          { |seed| seed.giro }
+          n.column("Ciudad")        { |seed| seed.ciudad }
+          n.column("Comuna")        { |seed| seed.comuna }
           n.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
