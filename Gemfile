@@ -35,6 +35,8 @@ gem 'static_models', github: 'dev-yohan/static_models', branch: 'rails-5-support
 
 gem 'kaminari'
 
+gem 'timecop'
+
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails'

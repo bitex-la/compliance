@@ -2,6 +2,7 @@ require 'rails_helper'
 require 'helpers/api/people_helper'
 
 describe Person do
+  Timecop.freeze Date.new(2018,01,01)
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do
       expect do
@@ -147,7 +148,9 @@ describe Person do
             street_number: "5229",
             postal_code: "1432",
             floor: "5",
-            apartment: "A"
+            apartment: "A",
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -170,7 +173,9 @@ describe Person do
             issuer: "AR",
             public_registry_authority: nil,
             public_registry_book: nil,
-            public_registry_extra_data: nil
+            public_registry_extra_data: nil,
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -197,7 +202,9 @@ describe Person do
             job_title: 'Sr. Software developer',
             job_description: 'Build cool open source software',
             politically_exposed: false,
-            politically_exposed_reason: nil
+            politically_exposed_reason: nil,
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -217,7 +224,9 @@ describe Person do
           attributes: {
             weight: 1000,
             amount: 1000,
-            kind:"USD"
+            kind: "USD",
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"
           },
           relationships: {
             person: { data: {id: person.id.to_s, type:"people"}},
@@ -237,7 +246,9 @@ describe Person do
           attributes: {
             weight: 1000,
             amount: 1000,
-            kind: "USD"
+            kind: "USD",
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"
           },
           relationships: {
             person: {data: {id: person.id.to_s, type:"people"}},
@@ -260,7 +271,9 @@ describe Person do
             country: 'AR',
             has_whatsapp: true,
             has_telegram: false,
-            note: 'please do not call on Sundays'
+            note: 'please do not call on Sundays',
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -279,7 +292,9 @@ describe Person do
           id: person.emails.first.id.to_s,
           attributes: {
             address:  'joe.doe@test.com',
-            kind:    '1'          
+            kind:    '1',
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"         
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -298,7 +313,9 @@ describe Person do
           type: "affinities",
           id: person.affinities.first.id.to_s,
           attributes: {
-            kind: person.affinities.first.kind.to_s          
+            kind: person.affinities.first.kind.to_s,
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"         
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -310,12 +327,18 @@ describe Person do
             attachments: {
               data: person.affinities.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
+            },
+            related_person: {
+              data: {
+                id: person.affinities.first.related_person.id.to_s, 
+                type: "people"
+              }
             }
           }
         },
         {
-	        id: person.argentina_invoicing_details.first.id.to_s,
-  	      type: "argentina_invoicing_details",
+	  id: person.argentina_invoicing_details.first.id.to_s,    
+          type: "argentina_invoicing_details",
           attributes: 
           {
             vat_status_id: "2",
@@ -323,7 +346,9 @@ describe Person do
             tax_id_type: "80",
             receipt_type: "1",
             country: "AR",
-            address: "Jujuy 3421"
+            address: "Jujuy 3421",
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"
           },
           relationships: 
           {
@@ -341,7 +366,9 @@ describe Person do
           id: person.notes.first.id.to_s,
           attributes: {
             title:  'my nickname',
-            body:   'Please call me by my nickname: Mr. Bond'          
+            body:   'Please call me by my nickname: Mr. Bond',
+            created_at: "2018-01-01T00:00:00.000Z", 
+            updated_at: "2018-01-01T00:00:00.000Z"         
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},

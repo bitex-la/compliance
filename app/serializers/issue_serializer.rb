@@ -1,7 +1,9 @@
 class IssueSerializer
   include FastJsonapiCandy::Serializer
   set_type 'issues'
-  
+ 
+  build_timestamps
+
   build_belongs_to :person
   
   build_has_one :natural_docket_seed, :legal_entity_docket_seed, 

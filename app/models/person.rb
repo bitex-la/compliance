@@ -12,6 +12,7 @@ class Person < ApplicationRecord
     argentina_invoicing_details
     chile_invoicing_details
     affinities
+    attachments
   }.each do |relationship|
     has_many relationship
   end

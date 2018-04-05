@@ -65,6 +65,17 @@ module FastJsonapiCandy
           has_one it, record_type: it.to_s.pluralize
         end
       end
+
+      def build_timestamps
+        %i(
+          created_at
+          updated_at
+        ).each do |attr|
+          attribute attr do |obj|
+            obj.send(attr).to_i
+          end
+        end
+      end
     end
   end
 end
