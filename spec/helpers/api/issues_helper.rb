@@ -332,6 +332,7 @@ class Api::IssuesHelper
           type: "chile_invoicing_detail_seeds",
           id: "@1",
           attributes: {
+            vat_status_id: "2",
             tax_id: "2022443870",
             giro: 'sfsdffd', 
             ciudad: 'Santiago',

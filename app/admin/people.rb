@@ -105,6 +105,32 @@ ActiveAdmin.register Person do
       end
     end
 
+    if person.chile_invoicing_details.any?
+      panel 'chile invoicing details' do
+        table_for person.chile_invoicing_details do |n|
+          n.column("ID") do |d|
+            link_to(d.id, chile_invoicing_detail_path(d))
+          end
+          n.column("VAT status id") { |d| d.vat_status_id }
+          n.column("Tax ID")        { |d| d.tax_id }
+          n.column("Giro")          { |d| d.giro }
+          n.column("Ciudad")        { |d| d.ciudad }
+          n.column("Comuna")        { |d| d.comuna }
+          n.column("Attachments") do |d|
+            d.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          n.column("") { |d|
+            link_to("View", chile_invoicing_detail_path(d))
+          }
+          n.column("") { |d|
+            link_to("Edit", chile_invoicing_detail_path(d))
+          }
+        end
+      end
+    end
+
     if person.identifications.any?
       panel 'Identification' , class: 'identifications'do
         table_for person.identifications.current do |i|

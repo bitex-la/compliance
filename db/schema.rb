@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180327170751) do
+ActiveRecord::Schema.define(version: 20180404155058) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -161,6 +161,7 @@ ActiveRecord::Schema.define(version: 20180327170751) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.string "vat_status_id"
     t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_chile_invoicing_detail_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_chile_invoicing_detail_seeds_on_replaces_id"
@@ -176,6 +177,7 @@ ActiveRecord::Schema.define(version: 20180327170751) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.string "vat_status_id"
     t.index ["issue_id"], name: "index_chile_invoicing_details_on_issue_id"
     t.index ["person_id"], name: "index_chile_invoicing_details_on_person_id"
     t.index ["replaced_by_id"], name: "index_chile_invoicing_details_on_replaced_by_id"

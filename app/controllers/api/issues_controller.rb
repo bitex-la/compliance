@@ -166,6 +166,7 @@ class Api::IssuesController < Api::ApiController
         seed_scope
       ],
       chile_invoicing_detail_seeds: [
+        :vat_status_id,
         :tax_id,
         :giro,
         :ciudad,
