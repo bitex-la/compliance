@@ -2,7 +2,7 @@ class Api::IssuesController < Api::ApiController
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     issues = Person.find(params[:person_id]).issues.page(page).per(per_page)
-    options = { meta: { total_pages: (Issue.count.to_f / per_page).ceil } }
+    options = { meta: { total_pages: (issues.count.to_f / per_page).ceil } }
     jsonapi_response issues, options, 200
   end
 

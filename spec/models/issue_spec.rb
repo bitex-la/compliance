@@ -108,7 +108,8 @@ RSpec.describe Issue, type: :model do
 
       # Allowance
       fruit = person.allowances.first
-      %i(weight amount kind attachments).each do |attr|
+  
+      %i(weight amount kind).each do |attr|
         fruit.send(attr).should == fruit.seed.send(attr)
       end
     end

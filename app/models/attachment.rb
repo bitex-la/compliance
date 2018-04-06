@@ -4,6 +4,8 @@ class Attachment < ApplicationRecord
   belongs_to :attached_to_seed, polymorphic: true, optional: true
   has_attached_file :document, optional: true
 
+  after_commit :relate_to_person
+
   validates_attachment :document,
     content_type: { 
       content_type: [
@@ -25,4 +27,11 @@ class Attachment < ApplicationRecord
     /zip\z/,
     /rar\z/,
   ]
+
+  private
+  def relate_to_person
+    unless destroyed?
+      self.update_column(:person_id, attached_to_seed.issue.person.id) if attached_to_seed
+    end
+  end
 end

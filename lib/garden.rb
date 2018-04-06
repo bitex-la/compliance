@@ -27,12 +27,20 @@ module Garden
       fruit.person = issue.person
       fruit.save!
       update!(fruit: fruit)
-      attachments.each{|a| a.update!(attached_to_fruit: fruit) }
+      attachments.each{|a| a.update!(
+        attached_to_fruit: fruit,
+        attached_to_seed: nil,
+        person: issue.person
+      )}
 
       if respond_to?(:replaces)
         if replaces
           replaces.update!(replaced_by: fruit)
-          replaces.attachments.each{ |a| a.update!(attached_to_fruit: fruit) } if copy_attachments
+          replaces.attachments.each{ |a| a.update!(
+            attached_to_fruit: fruit,
+            attached_to_seed: nil,
+            person: issue.person
+          )} if copy_attachments
         end
       else
          old_fruits =  fruit.person.send(self.class.naming.plural)
@@ -40,7 +48,11 @@ module Garden
          
          if copy_attachments 
            old_fruits.each do |old_fruit|
-             old_fruit.attachments.each{ |a| a.update!(attached_to_fruit: fruit) } 
+             old_fruit.attachments.each{ |a| a.update!(
+               attached_to_fruit: fruit,
+               attached_to_seed: nil,
+               person: issue.person
+             )} 
            end
          end
          old_fruits.update_all(replaced_by_id: fruit.id)
