@@ -2,7 +2,7 @@ FactoryBot.define_persons_item_and_seed(:natural_docket,
   full_natural_docket: proc {
     first_name      'Joe'
     last_name       'Doe'
-    birth_date      '2018-02-26'
+    birth_date      '2018-01-01'
     nationality     'AR'
     gender          GenderKind.find(1).id
     marital_status  MaritalStatusKind.find(1).id
