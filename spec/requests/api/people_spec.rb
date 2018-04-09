@@ -17,8 +17,8 @@ describe Person do
           attributes: {
             enabled: false,
             risk: nil,
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             issues: {data: []},
@@ -54,8 +54,8 @@ describe Person do
         attributes: {
           enabled: true,
           risk: 'medium',
-          created_at: "1514764800", 
-          updated_at: "1514764800"
+          created_at: 1514764800, 
+          updated_at: 1514764800
         },
         relationships: {
           issues: {data: [{ type: 'issues', id: issue.id.to_s }] },
@@ -106,8 +106,8 @@ describe Person do
           id: issue.id.to_s,
           attributes: {
             state: 'approved',
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -158,8 +158,8 @@ describe Person do
             postal_code: "1432",
             floor: "5",
             apartment: "A",
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -183,8 +183,8 @@ describe Person do
             public_registry_authority: nil,
             public_registry_book: nil,
             public_registry_extra_data: nil,
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -204,7 +204,6 @@ describe Person do
           attributes: {
             first_name: "Joe",
             last_name: "Doe",
-            birth_date: "2018-02-26",
             nationality: "AR",
             gender: "1",
             marital_status: "1",
@@ -212,8 +211,9 @@ describe Person do
             job_description: 'Build cool open source software',
             politically_exposed: false,
             politically_exposed_reason: nil,
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            birth_date: 1514775600,
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -234,8 +234,8 @@ describe Person do
             weight: 1000,
             amount: 1000,
             kind: "USD",
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             person: { data: {id: person.id.to_s, type:"people"}},
@@ -256,8 +256,8 @@ describe Person do
             weight: 1000,
             amount: 1000,
             kind: "USD",
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type:"people"}},
@@ -281,8 +281,8 @@ describe Person do
             has_whatsapp: true,
             has_telegram: false,
             note: 'please do not call on Sundays',
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -302,8 +302,8 @@ describe Person do
           attributes: {
             address:  'joe.doe@test.com',
             kind:    '1',
-            created_at: "1514764800", 
-            updated_at: "1514764800"         
+            created_at: 1514764800, 
+            updated_at: 1514764800         
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -323,8 +323,8 @@ describe Person do
           id: person.affinities.first.id.to_s,
           attributes: {
             kind: person.affinities.first.kind.to_s,
-            created_at: "1514764800", 
-            updated_at: "1514764800"         
+            created_at: 1514764800, 
+            updated_at: 1514764800         
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -356,8 +356,8 @@ describe Person do
             receipt_type: "1",
             country: "AR",
             address: "Jujuy 3421",
-            created_at: "1514764800", 
-            updated_at: "1514764800"
+            created_at: 1514764800, 
+            updated_at: 1514764800
           },
           relationships: 
           {
@@ -376,8 +376,8 @@ describe Person do
           attributes: {
             title:  'my nickname',
             body:   'Please call me by my nickname: Mr. Bond',
-            created_at: "1514764800", 
-            updated_at: "1514764800"         
+            created_at: 1514764800, 
+            updated_at: 1514764800         
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},

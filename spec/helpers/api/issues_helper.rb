@@ -415,7 +415,7 @@ class Api::IssuesHelper
           attributes: {
             first_name: "joe",
             last_name: "doe",
-            birth_date: "1985-10-08",
+            birth_date: "2018-01-01",
             nationality: "AR",
             gender: "1",
             marital_status: "1"
@@ -522,7 +522,7 @@ class Api::IssuesHelper
       attributes: {
         first_name: "joe",
         last_name: "jones",
-        birth_date: "1985-10-08",
+        birth_date: "2018-01-01",
         nationality: "AR",
         gender: "1",
         marital_status: "1"
