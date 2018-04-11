@@ -41,13 +41,15 @@ class Issue < ApplicationRecord
   accepts_nested_attributes_for :observations, allow_destroy: true
 
   scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
-  
+ 
+  scope :incomplete, -> { where('aasm_state=?', 'draft') }
   scope :just_created, -> { where('aasm_state=?', 'new') } 
   scope :answered, -> { where('aasm_state=?', 'answered') }
   scope :reviewable, -> { just_created.or(answered) }
 
   aasm do
-    state :new, initial: true
+    state :draft, initial: true
+    state :new
     state :observed
     state :answered
     state :dismissed
@@ -55,7 +57,12 @@ class Issue < ApplicationRecord
     state :approved
     state :abandoned
 
+    event :complete do
+      transitions from: :draft, to: :new
+    end
+
     event :observe do
+      transitions  from: :draft, to: :observed
       transitions from: :new, to: :observed
       transitions from: :answered, to: :observed
     end
@@ -65,6 +72,7 @@ class Issue < ApplicationRecord
     end
 
     event :dismiss do
+      transitions  from: :draft, to: :dismissed 
       transitions from: :new, to: :dismissed
       transitions from: :answered, to: :dismissed
       transitions from: :observed, to: :dismissed
@@ -74,6 +82,7 @@ class Issue < ApplicationRecord
       after do
         person.update(enabled: false) unless person.nil?
       end
+      transitions from:  :draft, to: :rejected
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
       transitions from: :answered, to: :rejected
@@ -84,11 +93,13 @@ class Issue < ApplicationRecord
         person.update(enabled: true)
         harvest_all!
       end
+      transitions from: :draft, to: :approved
       transitions from: :new, to: :approved
       transitions from: :answered, to: :approved 
     end 
 
     event :abandon do
+      transitions from: :draft, to: :abandoned
       transitions from: :new, to: :abandoned
       transitions from: :observed, to: :abandoned
       transitions from: :answered, to: :abandoned
@@ -113,7 +124,7 @@ class Issue < ApplicationRecord
   end
 
   def editable?
-    new? || observed? || answered?
+    draft? || new? || observed? || answered?
   end
 
   def name

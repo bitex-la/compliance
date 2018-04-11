@@ -202,6 +202,9 @@ describe 'an admin user' do
     AllowanceSeed.count.should == 2
     PhoneSeed.count.should == 1
 
+    # assume that issue info is complete
+    issue.complete!
+
     # Admin does not see it as pending
     login_as admin_user
 
@@ -250,10 +253,12 @@ describe 'an admin user' do
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
-    within ".recent_issues.panel" do
+    click_on 'Recent Issues'
+    within "#recent-issues" do
       expect(page).to_not have_content(issue.id)
     end
-    within ".pending_for_review.panel" do
+    click_on 'Pending For Review'
+    within "#pending-for-review" do
       expect(page).to_not have_content(issue.id)
     end
 
@@ -290,6 +295,7 @@ describe 'an admin user' do
 
     visit '/'
 
+    click_on 'Pending For Review' 
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
@@ -475,7 +481,9 @@ describe 'an admin user' do
   it "Dismisses an issue that had only bogus data" do
     person = create :new_natural_person
     issue = person.issues.last
+    issue.complete!
     login_as admin_user
+    click_on "Recent Issues"
     visit "/issues/#{issue.id}"
     click_link 'Dismiss'
 
@@ -490,7 +498,9 @@ describe 'an admin user' do
     person = create :new_natural_person, enabled: true
     person.should be_enabled
     issue = person.issues.last
+    issue.complete!
     login_as admin_user
+    click_on 'Pending For Review'
     visit "/issues/#{issue.id}"
     click_link 'Reject'
 
@@ -523,6 +533,7 @@ describe 'an admin user' do
     issue.attributes.state.should == 'observed'
     observation = api_response.included.find{|i| i.type == 'observations'}
 
+    click_on 'Observations To Review'
     within("#observation_#{observation.id} td.col.col-actions") do
       click_link('View')
     end
@@ -542,10 +553,14 @@ describe 'an admin user' do
     get "/api/people/#{person.id}/issues/#{issue.id}"
     api_response.data.attributes.state.should == 'approved'
 
-    click_link 'Dashboard' 
+    click_link 'Dashboard'
+    
+    click_on 'Recent Issues'
     within ".recent_issues" do
       expect(page).to_not have_content(issue.id)
     end
+
+    click_on 'Pending For Review'
     within ".pending_for_review" do
       expect(page).to_not have_content(issue.id)
     end
@@ -576,14 +591,17 @@ describe 'an admin user' do
     login_as admin_user
     issue.should be_observed
 
+    click_on 'Recent Issues'
     within '.recent_issues.panel' do 
       expect(page).to_not have_content(issue.id)
     end
 
+    click_on 'Pending For Review'
     within '.pending_for_review.panel' do 
       expect(page).to_not have_content(issue.id)
     end
     # Admin clicks in the observation to see the issue detail
+    click_on 'Observations To Review'
     within("#observation_#{Observation.last.id} td.col.col-actions") do
       click_link('View')
     end
@@ -640,7 +658,7 @@ describe 'an admin user' do
       .attributes.state.should == 'answered'
 
     visit '/' 
-
+    click_on 'Pending For Review'
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
@@ -664,7 +682,9 @@ describe 'an admin user' do
   it "Abandons a new person issue that was inactive" do
     person = create :new_natural_person
     issue = person.issues.last
+    issue.complete!
     login_as admin_user
+    click_on 'Pending For Review'
     visit "/issues/#{issue.id}"
     click_link 'Abandon'
 
@@ -689,6 +709,7 @@ describe 'an admin user' do
       issue = api_response.data
       
       login_as admin_user
+      click_on 'Drafts'
       within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
         click_link('View')
       end
@@ -717,7 +738,7 @@ describe 'an admin user' do
 
       click_button "Update Issue"
       issue = Issue.last
-      issue.should be_new
+      issue.should be_draft
       
       click_link "Approve"
       issue.reload.should be_approved
@@ -746,6 +767,7 @@ describe 'an admin user' do
       issue = api_response.data
 
       login_as admin_user
+      click_on 'Drafts'
       within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
         click_link('View')
       end
@@ -789,7 +811,7 @@ describe 'an admin user' do
 
       click_button "Update Issue"
       issue = Issue.last
-      issue.should be_new
+      issue.should be_draft
       
       click_link "Approve"
       issue.reload.should be_approved
@@ -819,6 +841,7 @@ describe 'an admin user' do
       expect(page).to have_content 'Signed in successfully.'
 
       # Admin sees issue in dashboard.
+      click_on 'Drafts'
       expect(page).to have_content issue.id
       
       within("#issue_#{issue.id} td.col.col-actions") do
