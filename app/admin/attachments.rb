@@ -34,7 +34,7 @@ ActiveAdmin.register Attachment do
       row :updated_at
       row :issue do
         if issue = attachment.attached_to_seed.try(:issue)
-          link_to "Issue #{issue.id}", edit_issue_path(issue)
+          link_to "Issue #{issue.id}", edit_person_issue_path(issue.person, issue)
         end
       end
       row :person do

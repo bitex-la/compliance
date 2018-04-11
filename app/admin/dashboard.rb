@@ -3,12 +3,21 @@ ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc{ I18n.t("active_admin.dashboard") }
 
   content title: proc{ I18n.t("active_admin.dashboard") } do
-    columns do
-      column do
+    
+    tabs do
+      tab :recent_issues do
         ArbreHelpers.issues_panel(self, Issue.just_created, 'Recent Issues')
+      end
+
+      tab :pending_for_review do
         ArbreHelpers.issues_panel(self, Issue.answered, 'Pending For Review')
       end
-      column do
+
+      tab :drafts do
+        ArbreHelpers.issues_panel(self, Issue.incomplete, 'Drafts')
+      end
+
+      tab :observations_to_review do
         panel 'Observations to review' do
           table_for Observation.admin_pending do |o|
             o.column(:id) { |obv| obv.id }
@@ -19,13 +28,13 @@ ActiveAdmin.register_page "Dashboard" do
               end
            }
             o.column('Issue') { |obv|
-              span link_to(obv.issue.id, issue_path(obv.issue))
+              span link_to(obv.issue.id, person_issue_path(obv.issue.person, obv.issue))
             }
             o.column('Person') { |obv|
               span link_to(obv.issue.person.id, person_path(obv.issue.person))
             }
             o.column('Actions') { |obv|
-              span link_to('View', issue_path(obv.issue))
+              span link_to('View', person_issue_path(obv.issue.person, obv.issue))
             }
           end
         end

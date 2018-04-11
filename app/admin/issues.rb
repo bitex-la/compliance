@@ -1,14 +1,15 @@
 ActiveAdmin.register Issue do
+  belongs_to :person
   actions :all, :except => :destroy
 
   config.clear_action_items!
   action_item only: [:index] do
-    link_to 'New', new_issue_path
+    link_to 'New', new_person_issue_path(person)
   end
 
   %i(approve abandon reject dismiss).each do |action|
     action_item action, only: :edit, if: lambda { resource.send("may_#{action}?") } do
-      link_to action.to_s.titleize, [action, :issue], method: :post
+      link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end
 
     member_action action, method: :post do
@@ -20,12 +21,12 @@ ActiveAdmin.register Issue do
   controller do
     def edit
       @page_title = resource.name
-      return redirect_to issue_url unless resource.editable?
+      return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
       super
     end
 
     def show
-      return redirect_to edit_issue_url if resource.editable?
+      return redirect_to edit_person_issue_url(resource.person, resource) if resource.editable?
       super
     end
   end
@@ -92,7 +93,7 @@ ActiveAdmin.register Issue do
       sf.input :number
       sf.input :kind, collection: IdentificationKind.all
       sf.input :issuer, as: :country
-      sf.input :replaces
+      sf.input :replaces, collection: f.object.person.identifications 
       sf.input :public_registry_authority
       sf.input :public_registry_book
       sf.input :public_registry_extra_data
@@ -109,7 +110,7 @@ ActiveAdmin.register Issue do
       sf.input :postal_code
       sf.input :floor
       sf.input :apartment
-      sf.input :replaces
+      sf.input :replaces, collection: f.object.person.domiciles
       sf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, sf)
     end
@@ -117,7 +118,7 @@ ActiveAdmin.register Issue do
     ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
       rf.input :kind, collection: RelationshipKind.all
       rf.input :related_person
-      rf.input :replaces
+      rf.input :replaces, collection: f.object.person.affinities
       rf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, rf)
     end
@@ -126,7 +127,7 @@ ActiveAdmin.register Issue do
       sf.input :weight 
       sf.input :amount
       sf.input :kind
-      sf.input :replaces
+      sf.input :replaces, collection: f.object.person.allowances
       sf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, sf)
     end
@@ -135,7 +136,7 @@ ActiveAdmin.register Issue do
       pf.input :number
       pf.input :kind, collection: PhoneKind.all
       pf.input :country
-      pf.input :replaces
+      pf.input :replaces, collection: f.object.person.phones
       pf.input :has_whatsapp
       pf.input :has_telegram
       pf.input :note, input_html: {rows: 3} 
@@ -145,7 +146,7 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
       ef.input :address
-      ef.input :replaces 
+      ef.input :replaces, collection: f.object.person.emails 
       ef.input :kind, collection: EmailKind.all
       ef.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, ef)
@@ -153,7 +154,7 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
       nf.input :title
-      nf.input :replaces 
+      nf.input :replaces, collection: f.object.person.notes
       nf.input :body, input_html: {rows: 3}
       nf.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, nf)

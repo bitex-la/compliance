@@ -14,11 +14,15 @@ RSpec.describe Issue, type: :model do
   end
 
   describe 'when transitioning' do
-    it 'defaults to new' do
-      expect(empty_issue).to have_state(:new)
+    it 'defaults to draft' do
+      expect(empty_issue).to have_state(:draft)
     end
 
-    %i(new answered).each do |state|
+    it "goes from draft to new on complete" do
+      expect(empty_issue).to transition_from(:draft).to(:new).on_event(:complete)
+    end
+
+    %i(draft new answered).each do |state|
       it "goes from #{state} to observed on observe" do
         expect(empty_issue).to transition_from(state).to(:observed).on_event(:observe)
       end
@@ -122,6 +126,7 @@ RSpec.describe Issue, type: :model do
       create :salary_allowance_seed, issue: issue
       create :full_natural_docket_seed, issue: issue
 
+      issue.complete!
       issue.should be_new
       issue.approve!
       issue.should be_approved

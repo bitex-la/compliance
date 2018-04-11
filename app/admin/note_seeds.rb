@@ -5,7 +5,7 @@ ActiveAdmin.register NoteSeed do
     def destroy
       issue = resource.issue
       resource.destroy
-      redirect_to edit_issue_url(issue)
+      redirect_to edit_person_issue_url(issue.person, issue)
     end
   end
 end
