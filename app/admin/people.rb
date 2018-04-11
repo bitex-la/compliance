@@ -2,7 +2,7 @@ ActiveAdmin.register Person do
   actions :all, except: [:destroy]
 
   action_item only: %i(show edit) do
-    link_to 'Add Person Information', new_issue_path
+    link_to 'Add Person Information', new_person_issue_path(person)
   end
 
   form do |f|

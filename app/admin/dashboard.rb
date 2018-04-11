@@ -28,13 +28,13 @@ ActiveAdmin.register_page "Dashboard" do
               end
            }
             o.column('Issue') { |obv|
-              span link_to(obv.issue.id, issue_path(obv.issue))
+              span link_to(obv.issue.id, person_issue_path(obv.issue.person, obv.issue))
             }
             o.column('Person') { |obv|
               span link_to(obv.issue.person.id, person_path(obv.issue.person))
             }
             o.column('Actions') { |obv|
-              span link_to('View', issue_path(obv.issue))
+              span link_to('View', person_issue_path(obv.issue.person, obv.issue))
             }
           end
         end

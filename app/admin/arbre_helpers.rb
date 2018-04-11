@@ -5,7 +5,7 @@ module ArbreHelpers
       panel title, class: title.gsub(' ','').underscore do
         table_for issues do |i|
           i.column("ID") { |issue|
-            link_to(issue.id, issue_path(issue)) 
+            link_to(issue.id, person_issue_path(issue.person, issue)) 
           }
           i.column("Person") { |issue|
             link_to(issue.person.id, person_path(issue.person)) 
@@ -23,7 +23,7 @@ module ArbreHelpers
             issue.updated_at 
           }
           i.column("Actions") { |issue|
-            span link_to("View", issue_path(issue))
+            span link_to("View", person_issue_path(issue.person, issue))
           }
         end
       end

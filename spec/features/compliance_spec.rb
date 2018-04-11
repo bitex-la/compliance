@@ -37,9 +37,13 @@ describe 'an admin user' do
 
     Person.count.should == 1
     
-    click_link 'Issues'
-    click_link 'New'
+    visit '/'
+    click_link 'People'
+    within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
+      click_link 'View'
+    end
 
+    click_link 'Add Person Information'
     select "#{Person.last.id}",
       from: "issue[person_id]",
       visible: false
@@ -217,10 +221,10 @@ describe 'an admin user' do
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
-    page.current_path.should == "/issues/#{Issue.last.id}/edit"
+    page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 
-    visit "/issues/#{Issue.last.id}"
-    page.current_path.should == "/issues/#{Issue.last.id}/edit"
+    visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
+    page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 
     expect(page).to have_content 'Identification'
     expect(page).to have_content 'Domicile'
@@ -310,8 +314,8 @@ describe 'an admin user' do
     click_link 'Dashboard' 
     expect(page).to_not have_content(issue.id)
 
-    visit "/issues/#{Issue.last.id}/edit"
-    page.current_path.should == "/issues/#{Issue.last.id}"
+    visit "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
+    page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}"
   end
 
   it "Edits a customer by creating a new issue" do
@@ -484,7 +488,7 @@ describe 'an admin user' do
     issue.complete!
     login_as admin_user
     click_on "Recent Issues"
-    visit "/issues/#{issue.id}"
+    visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Dismiss'
 
     issue.reload.should be_dismissed
@@ -501,7 +505,7 @@ describe 'an admin user' do
     issue.complete!
     login_as admin_user
     click_on 'Pending For Review'
-    visit "/issues/#{issue.id}"
+    visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Reject'
 
     issue.reload.should be_rejected
@@ -537,7 +541,7 @@ describe 'an admin user' do
     within("#observation_#{observation.id} td.col.col-actions") do
       click_link('View')
     end
-    page.current_path.should == "/issues/#{issue.id}/edit"
+    page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit"
 
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
@@ -568,8 +572,8 @@ describe 'an admin user' do
     get "/api/people/#{person.id}"
     api_response.data.attributes.enabled.should be_truthy
 
-    visit "/issues/#{issue.id}/edit"
-    page.current_path.should == "/issues/#{issue.id}"
+    visit "/people/#{person.id}/issues/#{issue.id}/edit"
+    page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
   end
 
   it 'Reviews and disable a user with hits on worldcheck' do
@@ -605,7 +609,7 @@ describe 'an admin user' do
     within("#observation_#{Observation.last.id} td.col.col-actions") do
       click_link('View')
     end
-    page.current_path.should == "/issues/#{Issue.last.id}/edit"
+    page.current_path.should == "/people/#{person.id}/issues/#{Issue.last.id}/edit"
 
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]',
@@ -662,7 +666,7 @@ describe 'an admin user' do
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
-    page.current_path.should == "/issues/#{issue.id}/edit" 
+    page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit" 
 
     click_link 'Approve'
 
@@ -675,8 +679,8 @@ describe 'an admin user' do
     get "/api/people/#{person.id}"
     api_response.data.attributes.enabled.should be_truthy
 
-    visit "/issues/#{issue.id}/edit"
-    page.current_path.should == "/issues/#{issue.id}"
+    visit "/people/#{person.id}/issues/#{issue.id}/edit"
+    page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
   end
 
   it "Abandons a new person issue that was inactive" do
@@ -685,7 +689,7 @@ describe 'an admin user' do
     issue.complete!
     login_as admin_user
     click_on 'Pending For Review'
-    visit "/issues/#{issue.id}"
+    visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Abandon'
 
     issue.reload.should be_abandoned
@@ -847,10 +851,10 @@ describe 'an admin user' do
       within("#issue_#{issue.id} td.col.col-actions") do
         click_link('View')
       end
-      page.current_path.should == "/issues/#{Issue.last.id}/edit"
+      page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 
-      visit "/issues/#{Issue.last.id}"
-      page.current_path.should == "/issues/#{Issue.last.id}/edit"
+      visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
+      page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 
       expect(page).to have_content 'Identification'
       expect(page).to have_content 'Domicile'
@@ -871,7 +875,7 @@ describe 'an admin user' do
       IdentificationSeed.count.should == 0
       NaturalDocketSeed.count.should == 1
      
-      visit "/issues/#{Issue.last.id}"
+      visit "/people/#{person.id}/issues/#{Issue.last.id}"
 
       click_link "Add New Identification seed"
       fill_seed("identification",{
