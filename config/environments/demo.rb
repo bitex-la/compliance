@@ -96,7 +96,7 @@ Rails.application.configure do
       access_key_id: Secrets.s3.aws_access_key_id,
       secret_access_key: Secrets.s3.aws_secret_access_key
     }, 
-    bucket: 'compliance_demo'
+    bucket: Secrets.s3.attachments_bucket
   }
 
   # Do not dump schema after migrations.
