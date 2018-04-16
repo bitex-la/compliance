@@ -3,6 +3,9 @@ ActiveAdmin.register Person do
 
   action_item only: %i(show edit) do
     link_to 'Add Person Information', new_person_issue_path(person)
+  end
+
+  action_item only: %i(show edit) do
     link_to 'View Person Issues', person_issues_path(person)
   end
 
