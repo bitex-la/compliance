@@ -95,7 +95,7 @@ Rails.application.configure do
     s3_credentials: {
       access_key_id: Secrets.s3.aws_access_key_id,
       secret_access_key: Secrets.s3.aws_secret_access_key
-    } 
+    }, 
     bucket: 'compliance_demo'
   }
 
