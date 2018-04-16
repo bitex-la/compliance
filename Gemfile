@@ -25,7 +25,7 @@ gem 'activeadmin'
 gem 'devise'
 gem 'cancancan'
 gem 'draper'
-gem 'aws-sdk'
+gem 'aws-sdk', '< 2.0'
 gem "paperclip", "4.3.6"
 gem 'country_select'
 gem 'aasm'
