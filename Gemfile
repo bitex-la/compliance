@@ -43,6 +43,7 @@ group :development, :test do
   gem 'capistrano-bundler', '~> 1.1.2', require: false
   gem 'capistrano-rbenv', '~> 2.0.2', require: false
   gem 'capistrano-rbenv-install', require: false
+  gem 'capistrano3-puma',   require: false
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails'
   gem 'capybara'
