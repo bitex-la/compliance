@@ -16,6 +16,9 @@
 # Used by dotenv library to load environment variables.
 .env
 
+# pem files
+*.pem
+
 ## Specific to RubyMotion:
 .dat*
 .repl_history
