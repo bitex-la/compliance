@@ -1,6 +1,6 @@
 class CreateRelationships < ActiveRecord::Migration[5.1]
-  
-  def up   
+
+  def up
     create_table :relationships do |t|
       t.references :relationship_seed, foreign_key: true
       t.references :person, foreign_key: { to_table: :people }
@@ -10,9 +10,9 @@ class CreateRelationships < ActiveRecord::Migration[5.1]
       t.timestamps
     end
 
-    remove_column :relationship_seeds, :person_from_id
-    rename_column :relationship_seeds, :person_to_id, :related_person_id
-    
+    #remove_column :relationship_seeds, :person_from_id
+    #rename_column :relationship_seeds, :person_to_id, :related_person_id
+
   end
 
   def down
