@@ -1,3 +1,13 @@
+set :stage, :staging
+set :rails_env, 'staging'
+
+#fetch(:ssh_options, { }).store(:keys, %w{config/permission.pem})
+
+server 'direct_sandbox.bitex.la', roles: [:web, :app, :db], primary: true
+
+set :pty,             true
+set :use_sudo,        false
+
 # server-based syntax
 # ======================
 # Defines a single server with a list of roles and multiple properties.

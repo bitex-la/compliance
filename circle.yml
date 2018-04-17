@@ -1,0 +1,4 @@
+machine:
+  pre:
+    - sudo apt-get -qq update && sudo apt-get -qq install libpango1.0-0 firefox
+    - sudo mv /usr/bin/firefox.ubuntu /usr/bin/firefox
