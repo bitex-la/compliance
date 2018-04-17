@@ -1,8 +1,6 @@
 set :stage, :staging
 set :rails_env, 'staging'
 
-#fetch(:ssh_options, { }).store(:keys, %w{config/permission.pem})
-
 server 'direct_sandbox.bitex.la', roles: [:web, :app, :db], primary: true
 
 set :pty,             true
