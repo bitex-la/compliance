@@ -10,8 +10,8 @@ class CreateRelationships < ActiveRecord::Migration[5.1]
       t.timestamps
     end
 
-    remove_column :relationship_seeds, :person_from_id
-    rename_column :relationship_seeds, :person_to_id, :related_person_id
+    #remove_column :relationship_seeds, :person_from_id
+    #rename_column :relationship_seeds, :person_to_id, :related_person_id
 
   end
 
