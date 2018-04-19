@@ -3,7 +3,9 @@ class EmailKind
  
  static_models_sparse [
    [1, :work],
-   [2, :personal] 
+   [2, :personal],
+   [3, :invoicing],
+   [4, :authentication] 
  ]
 
  def name
