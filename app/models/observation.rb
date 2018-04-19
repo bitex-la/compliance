@@ -29,7 +29,7 @@ class Observation < ApplicationRecord
   end
 
   def observe_issue
-    issue.observe!  
+    issue.observe! unless issue.observed?  
   end
 
   def state
