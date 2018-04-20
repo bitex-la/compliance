@@ -29,6 +29,10 @@ module ApiResponse
 
   def jsonapi_404(exception)
     jsonapi_error(404, 'not_found')
+  end 
+
+  def jsonapi_403
+    jsonapi_error(403, 'forbidden')     
   end
 
   def jsonapi_error(status, text)
