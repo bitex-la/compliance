@@ -1,0 +1,1293 @@
+{
+	"id": "728093cc-0a81-49ed-9292-f125af92a01f",
+	"name": "Compliance API",
+	"description": "# Overview\nCompliance API allows to create people KYC profiles and to add and edit his information using issues in a seed/fruit approach\n\n# Authentication\nRequest to Compliance API uses token based authentication, so an API token is mandatory to interact with the application, consumers can send the auth token in the request headers in this way:\n\n```\ncurl -X GET \\\n  https://<compliance_host>/api/people/3138 \\\n  -H 'Authorization: Token token=<a_valid_token>' \\\n\n```\n\nIf the token is not present or isn't valid, API responds with a 403 response code in JSON API format\n\n```\n{\n    \"errors\": [\n        {\n            \"links\": {},\n            \"status\": 403,\n            \"code\": \"forbidden\",\n            \"title\": \"forbidden\",\n            \"detail\": \"forbidden\",\n            \"source\": {},\n            \"meta\": {}\n        }\n    ]\n}\n```",
+	"auth": null,
+	"events": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "bd6cbaa8-a751-4020-8b67-96a2b235ae57",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f91695c8-9b1b-46e9-afe8-68c72afb0791",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variables": null,
+	"order": [],
+	"folders_order": [
+		"05710f21-aacd-43e9-8562-48362ac8953a",
+		"d3d6e1e7-0a0a-4ec1-97ed-dfee94a161b6"
+	],
+	"folders": [
+		{
+			"id": "d3d6e1e7-0a0a-4ec1-97ed-dfee94a161b6",
+			"name": "Issues",
+			"description": "",
+			"auth": null,
+			"events": null,
+			"collection": "728093cc-0a81-49ed-9292-f125af92a01f",
+			"folder": null,
+			"order": [
+				"d50d15a2-1df9-4a15-aeda-a985ec7f89a1",
+				"433c6b4d-282c-4b3a-9e64-6dada7ef022a",
+				"683869aa-d080-4f9b-bd8c-21eb10f38476"
+			],
+			"folders_order": []
+		},
+		{
+			"id": "05710f21-aacd-43e9-8562-48362ac8953a",
+			"name": "People",
+			"description": "",
+			"auth": null,
+			"events": null,
+			"collection": "728093cc-0a81-49ed-9292-f125af92a01f",
+			"folder": null,
+			"order": [
+				"c20aa522-931d-496d-b080-60740b193602",
+				"a77c777d-2399-4633-ac49-3c541895e658"
+			],
+			"folders_order": []
+		}
+	],
+	"requests": [
+		{
+			"id": "433c6b4d-282c-4b3a-9e64-6dada7ef022a",
+			"name": "http://23.21.231.213/api/people/{person_id}/issues/{issue_id}",
+			"url": "http://23.21.231.213/api/people/8/issues/13",
+			"description": "Get a specific issue that belongs to a person",
+			"data": null,
+			"dataMode": "params",
+			"headerData": [
+				{
+					"key": "Authorization",
+					"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"method": "GET",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": "d3d6e1e7-0a0a-4ec1-97ed-dfee94a161b6",
+			"responses": [
+				{
+					"id": "8364d0e6-8661-456a-9992-554aed634c21",
+					"name": "Query for an issue that belongs to a person that does not exist",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"errors\":[{\"links\":{},\"status\":404,\"code\":\"not_found\",\"title\":\"not_found\",\"detail\":\"not_found\",\"source\":{},\"meta\":{}}]}",
+					"responseCode": {
+						"code": 404,
+						"name": "Not Found",
+						"detail": "The requested resource could not be found but may be available again in the future. Subsequent requests by the client are permissible."
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/890/issues/13",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							}
+						],
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 20:09:17 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "5f872d4b-17c8-4dc6-bcdf-362acacfccfe",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.006963",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "433c6b4d-282c-4b3a-9e64-6dada7ef022a",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				},
+				{
+					"id": "83a0dd66-693b-4243-a58b-b3799babbc71",
+					"name": "Query for an issue who does not exist yet",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"errors\":[{\"links\":{},\"status\":404,\"code\":\"not_found\",\"title\":\"not_found\",\"detail\":\"not_found\",\"source\":{},\"meta\":{}}]}",
+					"responseCode": {
+						"code": 404,
+						"name": "Not Found",
+						"detail": "The requested resource could not be found but may be available again in the future. Subsequent requests by the client are permissible."
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues/188",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							}
+						],
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 20:08:18 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "70b61078-bc62-49a4-8098-38d4c9f8ef50",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.009623",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "433c6b4d-282c-4b3a-9e64-6dada7ef022a",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				},
+				{
+					"id": "9c53dc7a-43fb-4f14-b6a3-2c1931de61b8",
+					"name": "Get a person issue on draft state",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"data\":{\"id\":\"13\",\"type\":\"issues\",\"attributes\":{\"created_at\":1524254472,\"updated_at\":1524254472,\"state\":\"draft\"},\"relationships\":{\"person\":{\"data\":{\"id\":\"8\",\"type\":\"people\"}},\"natural_docket_seed\":{\"data\":null},\"legal_entity_docket_seed\":{\"data\":{\"id\":\"2\",\"type\":\"legal_entity_docket_seeds\"}},\"argentina_invoicing_detail_seed\":{\"data\":null},\"chile_invoicing_detail_seed\":{\"data\":null},\"allowance_seeds\":{\"data\":[]},\"observations\":{\"data\":[]},\"domicile_seeds\":{\"data\":[]},\"identification_seeds\":{\"data\":[]},\"phone_seeds\":{\"data\":[]},\"email_seeds\":{\"data\":[]},\"note_seeds\":{\"data\":[]},\"affinity_seeds\":{\"data\":[]}}},\"included\":[{\"id\":\"8\",\"type\":\"people\",\"attributes\":{\"enabled\":false,\"risk\":null,\"created_at\":1524251715,\"updated_at\":1524251715},\"relationships\":{\"issues\":{\"data\":[{\"id\":\"11\",\"type\":\"issues\"},{\"id\":\"12\",\"type\":\"issues\"},{\"id\":\"13\",\"type\":\"issues\"}]},\"domiciles\":{\"data\":[]},\"identifications\":{\"data\":[]},\"natural_dockets\":{\"data\":[]},\"legal_entity_dockets\":{\"data\":[]},\"allowances\":{\"data\":[]},\"phones\":{\"data\":[]},\"emails\":{\"data\":[]},\"affinities\":{\"data\":[]},\"argentina_invoicing_details\":{\"data\":[]},\"chile_invoicing_details\":{\"data\":[]},\"notes\":{\"data\":[]},\"attachments\":{\"data\":[]}}},{\"id\":\"2\",\"type\":\"legal_entity_docket_seeds\",\"attributes\":{\"industry\":\"software\",\"business_description\":\"software factory\",\"country\":\"AR\",\"commercial_name\":\"my soft\",\"legal_name\":\"mySoft SRL\",\"created_at\":\"2018-04-20T20:01:12.000Z\",\"updated_at\":\"2018-04-20T20:01:12.000Z\"},\"relationships\":{\"issue\":{\"data\":{\"id\":\"13\",\"type\":\"issues\"}},\"fruit\":{\"data\":null},\"attachments\":{\"data\":[]}}}]}",
+					"responseCode": {
+						"code": 200,
+						"name": "OK",
+						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues/13",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							}
+						],
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, private, must-revalidate",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 20:06:02 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"7cd4251a3b3ad2fba677ec4980c602b6\"",
+							"name": "ETag",
+							"description": "An identifier for a specific version of a resource, often a message digest"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "4511a439-88a2-43e0-9e5c-f958b11ca966",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.079272",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "433c6b4d-282c-4b3a-9e64-6dada7ef022a",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				}
+			],
+			"headers": "Authorization: Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583\n",
+			"pathVariables": {}
+		},
+		{
+			"id": "683869aa-d080-4f9b-bd8c-21eb10f38476",
+			"name": "http://23.21.231.213/api/people/{person_id}/issues/{issue_id}",
+			"url": "http://23.21.231.213/api/people/8/issues/13",
+			"description": "Update an issue",
+			"data": [],
+			"dataMode": "raw",
+			"headerData": [
+				{
+					"key": "Authorization",
+					"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"method": "PUT",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": "d3d6e1e7-0a0a-4ec1-97ed-dfee94a161b6",
+			"responses": [
+				{
+					"id": "550e0fd1-37d2-4178-8870-f440fd2d0c7a",
+					"name": "Trying to update an issue that does not exists",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"errors\":[{\"links\":{},\"status\":404,\"code\":\"not_found\",\"title\":\"not_found\",\"detail\":\"not_found\",\"source\":{},\"meta\":{}}]}",
+					"responseCode": {
+						"code": 404,
+						"name": "Not Found",
+						"detail": "The requested resource could not be found but may be available again in the future. Subsequent requests by the client are permissible."
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues/13000",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"disabled": false
+							}
+						],
+						"data": "{\n    \"data\": {\n        \"id\": \"13\",\n        \"type\": \"issues\",\n        \"attributes\": {\n            \"state\": \"draft\"\n        },\n        \"relationships\": {\n            \"person\": {\n                \"data\": {\n                    \"id\": \"8\",\n                    \"type\": \"people\"\n                }\n            },\n            \"legal_entity_docket_seed\": {\n                \"data\": {\n                    \"id\": \"2\",\n                    \"type\": \"legal_entity_docket_seeds\"\n                }\n            }\n        }\n    },\n    \"included\": [\n       {\n            \"id\": \"2\",\n            \"type\": \"legal_entity_docket_seeds\",\n            \"attributes\": {\n                \"industry\": \"Technology and Iot\",\n                \"business_description\": \"software factory\",\n                \"country\": \"AR\",\n                \"commercial_name\": \"UVI Soft\",\n                \"legal_name\": \"mySoft SRL\",\n                \"created_at\": \"2018-04-20T20:01:12.000Z\",\n                \"updated_at\": \"2018-04-20T20:01:12.000Z\"\n            },\n            \"relationships\": {\n                \"issue\": {\n                    \"data\": {\n                        \"id\": \"13\",\n                        \"type\": \"issues\"\n                    }\n                },\n                \"fruit\": {\n                    \"data\": null\n                },\n                \"attachments\": {\n                    \"data\": []\n                }\n            }\n        }\n    ]\n}",
+						"method": "PUT",
+						"dataMode": "raw"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 20:22:06 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "f410ceae-2281-4752-846f-9e734c9848f3",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.023536",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "683869aa-d080-4f9b-bd8c-21eb10f38476",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				},
+				{
+					"id": "5cae4562-4016-4130-b7dc-affe1cde47d3",
+					"name": "Update an existent issue",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"data\":{\"id\":\"13\",\"type\":\"issues\",\"attributes\":{\"created_at\":1524254472,\"updated_at\":1524254472,\"state\":\"draft\"},\"relationships\":{\"person\":{\"data\":{\"id\":\"8\",\"type\":\"people\"}},\"natural_docket_seed\":{\"data\":null},\"legal_entity_docket_seed\":{\"data\":{\"id\":\"2\",\"type\":\"legal_entity_docket_seeds\"}},\"argentina_invoicing_detail_seed\":{\"data\":null},\"chile_invoicing_detail_seed\":{\"data\":null},\"allowance_seeds\":{\"data\":[]},\"observations\":{\"data\":[]},\"domicile_seeds\":{\"data\":[]},\"identification_seeds\":{\"data\":[]},\"phone_seeds\":{\"data\":[]},\"email_seeds\":{\"data\":[]},\"note_seeds\":{\"data\":[]},\"affinity_seeds\":{\"data\":[]}}},\"included\":[{\"id\":\"8\",\"type\":\"people\",\"attributes\":{\"enabled\":false,\"risk\":null,\"created_at\":1524251715,\"updated_at\":1524251715},\"relationships\":{\"issues\":{\"data\":[{\"id\":\"11\",\"type\":\"issues\"},{\"id\":\"12\",\"type\":\"issues\"},{\"id\":\"13\",\"type\":\"issues\"}]},\"domiciles\":{\"data\":[]},\"identifications\":{\"data\":[]},\"natural_dockets\":{\"data\":[]},\"legal_entity_dockets\":{\"data\":[]},\"allowances\":{\"data\":[]},\"phones\":{\"data\":[]},\"emails\":{\"data\":[]},\"affinities\":{\"data\":[]},\"argentina_invoicing_details\":{\"data\":[]},\"chile_invoicing_details\":{\"data\":[]},\"notes\":{\"data\":[]},\"attachments\":{\"data\":[]}}},{\"id\":\"2\",\"type\":\"legal_entity_docket_seeds\",\"attributes\":{\"industry\":\"Technology and Iot\",\"business_description\":\"software factory\",\"country\":\"AR\",\"commercial_name\":\"UVI Soft\",\"legal_name\":\"mySoft SRL\",\"created_at\":\"2018-04-20T20:01:12.000Z\",\"updated_at\":\"2018-04-20T20:19:02.000Z\"},\"relationships\":{\"issue\":{\"data\":{\"id\":\"13\",\"type\":\"issues\"}},\"fruit\":{\"data\":null},\"attachments\":{\"data\":[]}}}]}",
+					"responseCode": {
+						"code": 200,
+						"name": "OK",
+						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues/13",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"disabled": false
+							}
+						],
+						"data": "{\n    \"data\": {\n        \"id\": \"13\",\n        \"type\": \"issues\",\n        \"attributes\": {\n            \"state\": \"draft\"\n        },\n        \"relationships\": {\n            \"person\": {\n                \"data\": {\n                    \"id\": \"8\",\n                    \"type\": \"people\"\n                }\n            },\n            \"legal_entity_docket_seed\": {\n                \"data\": {\n                    \"id\": \"2\",\n                    \"type\": \"legal_entity_docket_seeds\"\n                }\n            }\n        }\n    },\n    \"included\": [\n       {\n            \"id\": \"2\",\n            \"type\": \"legal_entity_docket_seeds\",\n            \"attributes\": {\n                \"industry\": \"Technology and Iot\",\n                \"business_description\": \"software factory\",\n                \"country\": \"AR\",\n                \"commercial_name\": \"UVI Soft\",\n                \"legal_name\": \"mySoft SRL\",\n                \"created_at\": \"2018-04-20T20:01:12.000Z\",\n                \"updated_at\": \"2018-04-20T20:01:12.000Z\"\n            },\n            \"relationships\": {\n                \"issue\": {\n                    \"data\": {\n                        \"id\": \"13\",\n                        \"type\": \"issues\"\n                    }\n                },\n                \"fruit\": {\n                    \"data\": null\n                },\n                \"attachments\": {\n                    \"data\": []\n                }\n            }\n        }\n    ]\n}",
+						"method": "PUT",
+						"dataMode": "raw"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, private, must-revalidate",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 20:20:23 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"cca20c2f8d8367934a128271487a1afd\"",
+							"name": "ETag",
+							"description": "An identifier for a specific version of a resource, often a message digest"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "0a9ed021-8f4d-4505-ac76-68010502e3a5",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.165495",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "683869aa-d080-4f9b-bd8c-21eb10f38476",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				}
+			],
+			"rawModeData": "{\n    \"data\": {\n        \"id\": \"13\",\n        \"type\": \"issues\",\n        \"attributes\": {\n            \"state\": \"draft\"\n        },\n        \"relationships\": {\n            \"person\": {\n                \"data\": {\n                    \"id\": \"8\",\n                    \"type\": \"people\"\n                }\n            },\n            \"legal_entity_docket_seed\": {\n                \"data\": {\n                    \"id\": \"2\",\n                    \"type\": \"legal_entity_docket_seeds\"\n                }\n            }\n        }\n    },\n    \"included\": [\n       {\n            \"id\": \"2\",\n            \"type\": \"legal_entity_docket_seeds\",\n            \"attributes\": {\n                \"industry\": \"Technology and Iot\",\n                \"business_description\": \"software factory\",\n                \"country\": \"AR\",\n                \"commercial_name\": \"UVI Soft\",\n                \"legal_name\": \"mySoft SRL\",\n                \"created_at\": \"2018-04-20T20:01:12.000Z\",\n                \"updated_at\": \"2018-04-20T20:01:12.000Z\"\n            },\n            \"relationships\": {\n                \"issue\": {\n                    \"data\": {\n                        \"id\": \"13\",\n                        \"type\": \"issues\"\n                    }\n                },\n                \"fruit\": {\n                    \"data\": null\n                },\n                \"attachments\": {\n                    \"data\": []\n                }\n            }\n        }\n    ]\n}",
+			"headers": "Authorization: Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583\nContent-Type: application/json\n",
+			"pathVariables": {}
+		},
+		{
+			"id": "a77c777d-2399-4633-ac49-3c541895e658",
+			"name": "http://23.21.231.213/api/people/{person_id}",
+			"url": "http://23.21.231.213/api/people/8",
+			"description": "Get a Person (Natural or Legal Entity)",
+			"data": null,
+			"dataMode": "params",
+			"headerData": [
+				{
+					"key": "Authorization",
+					"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"method": "GET",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": {
+				"type": "noauth"
+			},
+			"events": [],
+			"folder": "05710f21-aacd-43e9-8562-48362ac8953a",
+			"responses": [
+				{
+					"id": "85776491-e33b-4cd7-bea4-142bcc8a0b23",
+					"name": "Get an empty person",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"data\":{\"id\":\"8\",\"type\":\"people\",\"attributes\":{\"enabled\":false,\"risk\":null,\"created_at\":1524251715,\"updated_at\":1524251715},\"relationships\":{\"issues\":{\"data\":[]},\"domiciles\":{\"data\":[]},\"identifications\":{\"data\":[]},\"natural_dockets\":{\"data\":[]},\"legal_entity_dockets\":{\"data\":[]},\"allowances\":{\"data\":[]},\"phones\":{\"data\":[]},\"emails\":{\"data\":[]},\"affinities\":{\"data\":[]},\"argentina_invoicing_details\":{\"data\":[]},\"chile_invoicing_details\":{\"data\":[]},\"notes\":{\"data\":[]},\"attachments\":{\"data\":[]}}},\"included\":[]}",
+					"responseCode": {
+						"code": 200,
+						"name": "OK",
+						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							}
+						],
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, private, must-revalidate",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 19:17:06 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"6eec0b84a83dbf822e1908ed54034891\"",
+							"name": "ETag",
+							"description": "An identifier for a specific version of a resource, often a message digest"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "c0b10334-2084-4219-b30f-6c2022fdd446",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.057378",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "a77c777d-2399-4633-ac49-3c541895e658",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				}
+			],
+			"headers": "Authorization: Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583\n",
+			"pathVariables": {}
+		},
+		{
+			"id": "c20aa522-931d-496d-b080-60740b193602",
+			"name": "http://23.21.231.213/api/people",
+			"url": "http://23.21.231.213/api/people",
+			"description": "Create a Person (Natural or Legal Entity)",
+			"data": [],
+			"dataMode": "raw",
+			"headerData": [
+				{
+					"key": "Authorization",
+					"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"method": "POST",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": null,
+			"folder": "05710f21-aacd-43e9-8562-48362ac8953a",
+			"responses": [
+				{
+					"id": "2ce7f35f-6d5a-46af-922d-2b9de54118a0",
+					"name": "Creating an empty person",
+					"status": "200",
+					"mime": null,
+					"language": "json",
+					"text": "{\n  \"data\": {\n  \"type\": \"people\",\n  \"id\": \"new_person_id\",\n  \"attributes\": {\n     \"enabled\": false,\n     \"risk\": \"medium\",  \n     \"created_at\": 1514764800,\n     \"updated_at\": 1514764800 \n   },\n   \"relationships\": {\n     \"issues\": {\"data\": []}, \n     \"domiciles\": {\"data\": []},\n     \"identifications\": {\"data\": []},\n     \"natural_dockets\": {\"data\": []},\n     \"legal_entity_dockets\": {\"data\": []},\n     \"argentina_invoicing_details\": {\"data\": []},\n     \"chile_invoicing_details\": {\"data\": []},\n     \"allowances\": {\"data\": []},\n     \"phones\": {\"data\": []},\n     \"emails\": {\"data\": []},\n     \"notes\": {\"data\": []},\n     \"affinities\": {\"data\": []},\n     \"attachments\": {\"data\": []}\n   }\n },\n \"included\": []\n}",
+					"responseCode": {
+						"code": 200,
+						"name": ""
+					},
+					"requestObject": {
+						"url": "https://compliance_sandbox.bitex.la/api/people",
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"data": "{\n\t\"data\": null\n}",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"headers": null,
+					"cookies": null,
+					"request": "c20aa522-931d-496d-b080-60740b193602",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				},
+				{
+					"id": "a3369f5b-1ceb-4693-a5d1-ebe838ce4b4a",
+					"name": "Forbidden Request",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\n  \"errors\": [\n    {\n      \"links\": {},\n      \"status\": 403,\n      \"code\": \"forbidden\",\n      \"title\": \"forbidden\",\n      \"detail\": \"forbidden\",\n      \"source\": {},\n      \"meta\": {}\n    }\n  ]\n}",
+					"responseCode": {
+						"code": 403,
+						"name": "Forbidden"
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [],
+						"data": "",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"headers": [],
+					"cookies": [],
+					"request": "c20aa522-931d-496d-b080-60740b193602",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				}
+			],
+			"rawModeData": "",
+			"headers": "Authorization: Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583\n",
+			"pathVariables": {}
+		},
+		{
+			"id": "d50d15a2-1df9-4a15-aeda-a985ec7f89a1",
+			"name": "http://23.21.231.213/api/people/{person_id}/issues",
+			"url": "http://23.21.231.213/api/people/8/issues",
+			"description": "To create an issue is the way to propose changes, additions or make an observation over a specific person in compliance",
+			"data": [],
+			"dataMode": "raw",
+			"headerData": [
+				{
+					"key": "Authorization",
+					"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"method": "POST",
+			"pathVariableData": [],
+			"queryParams": [],
+			"auth": null,
+			"events": [],
+			"folder": "d3d6e1e7-0a0a-4ec1-97ed-dfee94a161b6",
+			"responses": [
+				{
+					"id": "09fa3c74-15fe-424b-bc7a-d5d8f3718662",
+					"name": "Invalid payload",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"errors\":[{\"links\":{},\"status\":422,\"code\":\"unprocessable_entity\",\"title\":\"unprocessable_entity\",\"detail\":\"unprocessable_entity\",\"source\":{},\"meta\":{}}]}",
+					"responseCode": {
+						"code": 422,
+						"name": "Unprocessable Entity"
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							}
+						],
+						"data": "",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 19:26:00 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "1227a341-4c8c-41ac-9a41-3661c8ec5b10",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.029091",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "d50d15a2-1df9-4a15-aeda-a985ec7f89a1",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				},
+				{
+					"id": "700a3bb6-8332-427c-889b-62e3a71fdfc2",
+					"name": "Create an issue with a legal entity person",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\n    \"data\": {\n        \"id\": \"13\",\n        \"type\": \"issues\",\n        \"attributes\": {\n            \"created_at\": 1524254472,\n            \"updated_at\": 1524254472,\n            \"state\": \"draft\"\n        },\n        \"relationships\": {\n            \"person\": {\n                \"data\": {\n                    \"id\": \"8\",\n                    \"type\": \"people\"\n                }\n            },\n            \"natural_docket_seed\": {\n                \"data\": null\n            },\n            \"legal_entity_docket_seed\": {\n                \"data\": {\n                    \"id\": \"2\",\n                    \"type\": \"legal_entity_docket_seeds\"\n                }\n            },\n            \"argentina_invoicing_detail_seed\": {\n                \"data\": null\n            },\n            \"chile_invoicing_detail_seed\": {\n                \"data\": null\n            },\n            \"allowance_seeds\": {\n                \"data\": []\n            },\n            \"observations\": {\n                \"data\": []\n            },\n            \"domicile_seeds\": {\n                \"data\": []\n            },\n            \"identification_seeds\": {\n                \"data\": []\n            },\n            \"phone_seeds\": {\n                \"data\": []\n            },\n            \"email_seeds\": {\n                \"data\": []\n            },\n            \"note_seeds\": {\n                \"data\": []\n            },\n            \"affinity_seeds\": {\n                \"data\": []\n            }\n        }\n    },\n    \"included\": [\n        {\n            \"id\": \"8\",\n            \"type\": \"people\",\n            \"attributes\": {\n                \"enabled\": false,\n                \"risk\": null,\n                \"created_at\": 1524251715,\n                \"updated_at\": 1524251715\n            },\n            \"relationships\": {\n                \"issues\": {\n                    \"data\": [\n                        {\n                            \"id\": \"11\",\n                            \"type\": \"issues\"\n                        },\n                        {\n                            \"id\": \"12\",\n                            \"type\": \"issues\"\n                        },\n                        {\n                            \"id\": \"13\",\n                            \"type\": \"issues\"\n                        }\n                    ]\n                },\n                \"domiciles\": {\n                    \"data\": []\n                },\n                \"identifications\": {\n                    \"data\": []\n                },\n                \"natural_dockets\": {\n                    \"data\": []\n                },\n                \"legal_entity_dockets\": {\n                    \"data\": []\n                },\n                \"allowances\": {\n                    \"data\": []\n                },\n                \"phones\": {\n                    \"data\": []\n                },\n                \"emails\": {\n                    \"data\": []\n                },\n                \"affinities\": {\n                    \"data\": []\n                },\n                \"argentina_invoicing_details\": {\n                    \"data\": []\n                },\n                \"chile_invoicing_details\": {\n                    \"data\": []\n                },\n                \"notes\": {\n                    \"data\": []\n                },\n                \"attachments\": {\n                    \"data\": []\n                }\n            }\n        },\n        {\n            \"id\": \"2\",\n            \"type\": \"legal_entity_docket_seeds\",\n            \"attributes\": {\n                \"industry\": \"software\",\n                \"business_description\": \"software factory\",\n                \"country\": \"AR\",\n                \"commercial_name\": \"my soft\",\n                \"legal_name\": \"mySoft SRL\",\n                \"created_at\": \"2018-04-20T20:01:12.000Z\",\n                \"updated_at\": \"2018-04-20T20:01:12.000Z\"\n            },\n            \"relationships\": {\n                \"issue\": {\n                    \"data\": {\n                        \"id\": \"13\",\n                        \"type\": \"issues\"\n                    }\n                },\n                \"fruit\": {\n                    \"data\": null\n                },\n                \"attachments\": {\n                    \"data\": [\n                    \t{\n                            \"id\": \"4\",\n                            \"type\": \"attachments\"\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}",
+					"responseCode": {
+						"code": 201,
+						"name": "Created"
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true,
+								"disabled": false
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"disabled": false
+							}
+						],
+						"data": "{\n  \"data\": {\n      \"type\": \"issues\",\n      \"attributes\": {\n      },\n      \"relationships\": {\n          \"person\": {\n              \"data\": {\n                  \"id\": \"8\",\n                  \"type\": \"people\"\n            \t}\n          },\n          \"legal_entity_docket_seed\": {\n              \"data\": {\n                  \"type\": \"legal_entity_docket_seeds\"\n            \t}\n          }\n      }\n\t},\n\t\"included\": [\n\t\t {\n          \"type\": \"legal_entity_docket_seeds\",\n          \"attributes\": {\n        \t\t\"industry\": \"software\",\n\t            \"business_description\": \"software factory\",\n\t            \"country\": \"AR\",\n\t            \"commercial_name\": \"my soft\",\n\t            \"legal_name\": \"mySoft SRL\"\n          },\n          \"relationships\": {\n              \"attachments\": {\n                \"data\": [\n                \t{        \n                    \"type\": \"attachments\"\n                  }\n                ]\n              }\n          }\n      },\n      {\n        \"type\": \"attachments\",\n        \"attributes\": {\n          \"document\": \"data:image/png;base6,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8==\",\n          \"document_file_name\": \"simple.png\",\n          \"document_content_type\": \"image/png\" \n        }\n      }\n\t]\n}",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"headers": [
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1635",
+							"name": "Content-Length",
+							"description": "The length of the response body in octets (8-bit bytes)"
+						},
+						{
+							"key": "Content-Type",
+							"value": "text/html; charset=UTF-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 19:56:42 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "7a1a0ac8-c963-4cbc-b52d-a8f01489f64a",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.019404",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						}
+					],
+					"cookies": [],
+					"request": "d50d15a2-1df9-4a15-aeda-a985ec7f89a1",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				},
+				{
+					"id": "8705ba33-e8c6-446d-a230-39505e71f246",
+					"name": "Create an issue with a natural docket seed",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\"data\":{\"id\":\"12\",\"type\":\"issues\",\"attributes\":{\"created_at\":1524253209,\"updated_at\":1524253209,\"state\":\"draft\"},\"relationships\":{\"person\":{\"data\":{\"id\":\"8\",\"type\":\"people\"}},\"natural_docket_seed\":{\"data\":{\"id\":\"10\",\"type\":\"natural_docket_seeds\"}},\"legal_entity_docket_seed\":{\"data\":null},\"argentina_invoicing_detail_seed\":{\"data\":null},\"chile_invoicing_detail_seed\":{\"data\":null},\"allowance_seeds\":{\"data\":[]},\"observations\":{\"data\":[]},\"domicile_seeds\":{\"data\":[]},\"identification_seeds\":{\"data\":[]},\"phone_seeds\":{\"data\":[]},\"email_seeds\":{\"data\":[]},\"note_seeds\":{\"data\":[]},\"affinity_seeds\":{\"data\":[]}}},\"included\":[{\"id\":\"8\",\"type\":\"people\",\"attributes\":{\"enabled\":false,\"risk\":null,\"created_at\":1524251715,\"updated_at\":1524251715},\"relationships\":{\"issues\":{\"data\":[{\"id\":\"11\",\"type\":\"issues\"},{\"id\":\"12\",\"type\":\"issues\"}]},\"domiciles\":{\"data\":[]},\"identifications\":{\"data\":[]},\"natural_dockets\":{\"data\":[]},\"legal_entity_dockets\":{\"data\":[]},\"allowances\":{\"data\":[]},\"phones\":{\"data\":[]},\"emails\":{\"data\":[]},\"affinities\":{\"data\":[]},\"argentina_invoicing_details\":{\"data\":[]},\"chile_invoicing_details\":{\"data\":[]},\"notes\":{\"data\":[]},\"attachments\":{\"data\":[]}}},{\"id\":\"10\",\"type\":\"natural_docket_seeds\",\"attributes\":{\"first_name\":\"Pablo Eduardo\",\"last_name\":\"Saviola Rojas\",\"nationality\":\"AR\",\"gender\":\"2\",\"marital_status\":\"1\",\"job_title\":null,\"job_description\":null,\"politically_exposed\":null,\"politically_exposed_reason\":null,\"birth_date\":\"1985-10-08\",\"created_at\":\"2018-04-20T19:40:09.000Z\",\"updated_at\":\"2018-04-20T19:40:09.000Z\"},\"relationships\":{\"issue\":{\"data\":{\"id\":\"12\",\"type\":\"issues\"}},\"fruit\":{\"data\":null},\"attachments\":{\"data\":[]}}}]}",
+					"responseCode": {
+						"code": 201,
+						"name": "Created"
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"data": "{\n  \"data\": {\n      \"type\": \"issues\",\n      \"attributes\": {\n      },\n      \"relationships\": {\n          \"person\": {\n              \"data\": {\n                  \"id\": \"8\",\n                  \"type\": \"people\"\n            \t}\n          },\n          \"natural_docket_seed\": {\n              \"data\": {\n                  \"type\": \"natural_docket_seeds\"\n            \t}\n          }\n      }\n\t},\n\t\"included\": [\n\t\t {\n          \"type\": \"natural_docket_seeds\",\n          \"attributes\": {\n              \"first_name\": \"Pablo Eduardo\",\n              \"last_name\": \"Saviola Rojas\",\n              \"birth_date\": \"1985-10-08\",\n              \"nationality\": \"AR\",\n              \"gender\": \"2\",\n              \"marital_status\": \"1\",\n              \"job_title\": \"vendedor\",\n              \"job_description\": \"vendo cosas en portales de e-commerce\",\n              \"politically_exposed\": false,\n              \"politically_exposed_reason\": \"\"\n          },\n          \"relationships\": {\n              \"attachments\": {\n                \"data\": [\n                ]\n              }\n          }\n      }\n\t]\n}",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, private, must-revalidate",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 19:40:09 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"14b3c3ac57e920d418eb6856cba9b114\"",
+							"name": "ETag",
+							"description": "An identifier for a specific version of a resource, often a message digest"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "a3da82cc-08e8-4c0a-b469-46e5e345dfdf",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.159068",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "d50d15a2-1df9-4a15-aeda-a985ec7f89a1",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				},
+				{
+					"id": "ae33d56b-e8b1-4bf0-b4f2-dcc37cd71ca0",
+					"name": "Create an empty issue",
+					"status": "",
+					"mime": "",
+					"language": "json",
+					"text": "{\n    \"data\": {\n        \"id\": \"11\",\n        \"type\": \"issues\",\n        \"attributes\": {\n            \"created_at\": 1524252716,\n            \"updated_at\": 1524252716,\n            \"state\": \"draft\"\n        },\n        \"relationships\": {\n            \"person\": {\n                \"data\": {\n                    \"id\": \"8\",\n                    \"type\": \"people\"\n                }\n            },\n            \"natural_docket_seed\": {\n                \"data\": null\n            },\n            \"legal_entity_docket_seed\": {\n                \"data\": null\n            },\n            \"argentina_invoicing_detail_seed\": {\n                \"data\": null\n            },\n            \"chile_invoicing_detail_seed\": {\n                \"data\": null\n            },\n            \"allowance_seeds\": {\n                \"data\": []\n            },\n            \"observations\": {\n                \"data\": []\n            },\n            \"domicile_seeds\": {\n                \"data\": []\n            },\n            \"identification_seeds\": {\n                \"data\": []\n            },\n            \"phone_seeds\": {\n                \"data\": []\n            },\n            \"email_seeds\": {\n                \"data\": []\n            },\n            \"note_seeds\": {\n                \"data\": []\n            },\n            \"affinity_seeds\": {\n                \"data\": []\n            }\n        }\n    },\n    \"included\": [\n        {\n            \"id\": \"8\",\n            \"type\": \"people\",\n            \"attributes\": {\n                \"enabled\": false,\n                \"risk\": null,\n                \"created_at\": 1524251715,\n                \"updated_at\": 1524251715\n            },\n            \"relationships\": {\n                \"issues\": {\n                    \"data\": [\n                        {\n                            \"id\": \"11\",\n                            \"type\": \"issues\"\n                        }\n                    ]\n                },\n                \"domiciles\": {\n                    \"data\": []\n                },\n                \"identifications\": {\n                    \"data\": []\n                },\n                \"natural_dockets\": {\n                    \"data\": []\n                },\n                \"legal_entity_dockets\": {\n                    \"data\": []\n                },\n                \"allowances\": {\n                    \"data\": []\n                },\n                \"phones\": {\n                    \"data\": []\n                },\n                \"emails\": {\n                    \"data\": []\n                },\n                \"affinities\": {\n                    \"data\": []\n                },\n                \"argentina_invoicing_details\": {\n                    \"data\": []\n                },\n                \"chile_invoicing_details\": {\n                    \"data\": []\n                },\n                \"notes\": {\n                    \"data\": []\n                },\n                \"attachments\": {\n                    \"data\": []\n                }\n            }\n        }\n    ]\n}",
+					"responseCode": {
+						"code": 201,
+						"name": "Created"
+					},
+					"requestObject": {
+						"url": "http://23.21.231.213/api/people/8/issues",
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Authorization",
+								"value": "Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583",
+								"description": "",
+								"enabled": true
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"data": "{\n  \"data\": {\n      \"type\": \"issues\",\n      \"attributes\": {\n      },\n      \"relationships\": {\n          \"person\": {\n              \"data\": {\n                  \"id\": \"8\",\n                  \"type\": \"people\"\n              }\n          }\n      }\n\t},\n\t\"included\": []\n}",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"headers": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json; charset=utf-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 20 Apr 2018 19:26:00 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1 (Ubuntu)",
+							"name": "Server",
+							"description": "A name for the server"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff",
+							"name": "X-Content-Type-Options",
+							"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN",
+							"name": "X-Frame-Options",
+							"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+						},
+						{
+							"key": "X-Request-Id",
+							"value": "1227a341-4c8c-41ac-9a41-3661c8ec5b10",
+							"name": "X-Request-Id",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-Runtime",
+							"value": "0.029091",
+							"name": "X-Runtime",
+							"description": "Custom header"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block",
+							"name": "X-XSS-Protection",
+							"description": "Cross-site scripting (XSS) filter"
+						}
+					],
+					"cookies": [],
+					"request": "d50d15a2-1df9-4a15-aeda-a985ec7f89a1",
+					"collection": "728093cc-0a81-49ed-9292-f125af92a01f"
+				}
+			],
+			"rawModeData": "{\n  \"data\": {\n      \"type\": \"issues\",\n      \"attributes\": {\n      },\n      \"relationships\": {\n          \"person\": {\n              \"data\": {\n                  \"id\": \"8\",\n                  \"type\": \"people\"\n            \t}\n          },\n          \"legal_entity_docket_seed\": {\n              \"data\": {\n                  \"type\": \"legal_entity_docket_seeds\"\n            \t}\n          }\n      }\n\t},\n\t\"included\": [\n\t\t {\n          \"type\": \"legal_entity_docket_seeds\",\n          \"attributes\": {\n        \t\t\"industry\": \"software\",\n\t            \"business_description\": \"software factory\",\n\t            \"country\": \"AR\",\n\t            \"commercial_name\": \"my soft\",\n\t            \"legal_name\": \"mySoft SRL\"\n          },\n          \"relationships\": {\n              \"attachments\": {\n                \"data\": [\n                \n                ]\n              }\n          }\n      }\n\t]\n}",
+			"headers": "Authorization: Token token=1b08ecb6f366c42b129872204ca92b8feb13f26d53fddad49774019295f7c583\nContent-Type: application/json\n",
+			"pathVariables": {}
+		}
+	]
+}
