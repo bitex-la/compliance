@@ -266,7 +266,8 @@ describe 'an admin user' do
       expect(page).to_not have_content(issue.id)
     end
 
-    get "/api/people/#{person.id}/issues/#{Issue.first.id}"
+    get "/api/people/#{person.id}/issues/#{Issue.first.id}",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }	
 
     issue_document = JSON.parse(response.body).deep_symbolize_keys
 
@@ -285,7 +286,9 @@ describe 'an admin user' do
 
     patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
       params: JSON.dump(issue_document),
-      headers: {"CONTENT_TYPE" => 'application/json' }
+      headers: {"CONTENT_TYPE" => 'application/json',
+                "Authorization" => "Token token=#{admin_user.api_token}"}
+    
     assert_response 200
 
     Issue.first.should be_answered
@@ -518,7 +521,9 @@ describe 'an admin user' do
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
     reason = create :human_world_check_reason
 
-    post "/api/people/"
+    post "/api/people/",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }    
+
     person = api_response.data
 
     issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
@@ -529,7 +534,9 @@ describe 'an admin user' do
       '@1', reason, "Please run worldcheck for them")
     issue_request[:data][:id] = "@1"
 
-    post "/api/people/#{person.id}/issues", params: issue_request
+    post "/api/people/#{person.id}/issues", 
+      params: issue_request,
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
     
     login_as admin_user
 
@@ -547,14 +554,18 @@ describe 'an admin user' do
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
 
-    get "/api/people/#{person.id}/issues/#{issue.id}"
+    get "/api/people/#{person.id}/issues/#{issue.id}",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
     api_response.data.attributes.state.should == 'answered'
     api_response.included.find{|i| i.type == 'observations'}
       .attributes.state.should == 'answered'
 
     click_link 'Approve'
 
-    get "/api/people/#{person.id}/issues/#{issue.id}"
+    get "/api/people/#{person.id}/issues/#{issue.id}",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+  
     api_response.data.attributes.state.should == 'approved'
 
     click_link 'Dashboard'
@@ -569,7 +580,9 @@ describe 'an admin user' do
       expect(page).to_not have_content(issue.id)
     end
 
-    get "/api/people/#{person.id}"
+    get "/api/people/#{person.id}",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
     api_response.data.attributes.enabled.should be_truthy
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
@@ -587,7 +600,8 @@ describe 'an admin user' do
 
     post "/api/people/#{person.id}/issues", 
       params: JSON.dump(issue_payload),
-      headers: {"CONTENT_TYPE" => 'application/json'}
+      headers: {"CONTENT_TYPE" => 'application/json',
+                "Authorization" => "Token token=#{admin_user.api_token}"}
 
     assert_response 201
   
@@ -623,7 +637,9 @@ describe 'an admin user' do
   it 'Creates a user via API, asking for robot worldcheck run' do
     reason = create :world_check_reason
 
-    post "/api/people/"
+    post "/api/people/",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+ 
     person = api_response.data
 
     issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
@@ -636,7 +652,8 @@ describe 'an admin user' do
 
     post "/api/people/#{person.id}/issues",
       params: issue_request.to_json,
-      headers: {"CONTENT_TYPE" => 'application/json' }
+      headers: {"CONTENT_TYPE" => 'application/json',
+                "Authorization" => "Token token=#{admin_user.api_token}"}
 
     issue = api_response.data
     issue.attributes.state.should == 'observed'
@@ -647,14 +664,18 @@ describe 'an admin user' do
     expect(page).to_not have_content(issue.id)
 
     # Simulate that robot perform check and notify to compliance
-    get "/api/people/#{person.id}/issues/#{issue.id}"
+    get "/api/people/#{person.id}/issues/#{issue.id}",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
     issue_request = json_response
     issue_request[:included]
       .find{|x| x[:type] == 'observations' }[:attributes] = {reply: "No hits"}
 
     patch "/api/people/#{person.id}/issues/#{issue.id}",
       params: issue_request.to_json,
-      headers: {"CONTENT_TYPE" => 'application/json' }
+      headers: {"CONTENT_TYPE" => 'application/json',
+                "Authorization" => "Token token=#{admin_user.api_token}"}
+    
     assert_response 200
 
     api_response.data.attributes.state.should == 'answered'
@@ -670,13 +691,17 @@ describe 'an admin user' do
 
     click_link 'Approve'
 
-    get "/api/people/#{person.id}/issues/#{issue.id}"
+    get "/api/people/#{person.id}/issues/#{issue.id}",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
     api_response.data.attributes.state.should == 'approved'
 
     click_link 'Dashboard' 
     expect(page).to_not have_content(issue.id)
 
-    get "/api/people/#{person.id}"
+    get "/api/people/#{person.id}",
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }   
+
     api_response.data.attributes.enabled.should be_truthy
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
@@ -709,7 +734,9 @@ describe 'an admin user' do
 
       post api_person_issues_path(create(:full_natural_person).id),
         params: issue_request.to_json,
-        headers: {"CONTENT-TYPE": 'application/json'}
+        headers: {"CONTENT-TYPE": 'application/json',
+                  "Authorization": "Token token=#{admin_user.api_token}"}
+      
       issue = api_response.data
       
       login_as admin_user
@@ -767,7 +794,8 @@ describe 'an admin user' do
       issue_request = Api::IssuesHelper.issue_with_current_person(person.id)
       post api_person_issues_path(person.id),
         params: issue_request.to_json,
-        headers: {"CONTENT-TYPE": 'application/json'}
+        headers: {"CONTENT-TYPE": 'application/json',
+                  "Authorization": "Token token=#{admin_user.api_token}"}
       issue = api_response.data
 
       login_as admin_user

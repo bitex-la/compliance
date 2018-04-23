@@ -3,10 +3,14 @@ require 'helpers/api/people_helper'
 
 describe Person do
   Timecop.freeze Date.new(2018,01,01)
+  let(:admin_user) { create(:admin_user) }
+
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do
       expect do
-        post '/api/people', params: { data: nil }
+        post '/api/people', 
+                params: { data: nil },
+                headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       end.to change{ Person.count }.by(1)
 
       response.status.should == 201
@@ -44,7 +48,8 @@ describe Person do
       person = create :full_natural_person
       issue = person.issues.first
 
-      get "/api/people/#{person.id}"
+      get "/api/people/#{person.id}", 
+	headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 200
       json_response = JSON.parse(response.body).deep_symbolize_keys
 
@@ -401,7 +406,8 @@ describe Person do
     end
 
     it 'responds 404 when the person does not exist' do
-      get "/api/people/1"
+      get "/api/people/1",
+	headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 404
     end
 
