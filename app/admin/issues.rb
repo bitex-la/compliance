@@ -47,8 +47,8 @@ ActiveAdmin.register Issue do
       sf.input :last_name
       sf.input :birth_date, start_year: 1900
       sf.input :nationality, as: :country
-      sf.input :gender, collection: GenderKind.all
-      sf.input :marital_status, collection: MaritalStatusKind.all
+      sf.input :gender_id, as: :select, collection: GenderKind.all
+      sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
       sf.input :job_title
       sf.input :job_description
       sf.input :politically_exposed
@@ -214,8 +214,8 @@ ActiveAdmin.register Issue do
           n.column("Last Name")       { |seed| seed.last_name }
           n.column("Birthdate")       { |seed| seed.birth_date }
           n.column("Nationality")     { |seed| seed.nationality }
-          n.column("Gender")          { |seed| GenderKind.find(seed.gender) }
-          n.column("Marital Status")  { |seed| MaritalStatusKind.find(seed.marital_status) }
+          n.column("Gender")          { |seed| seed.gender }
+          n.column("Marital Status")  { |seed| seed.marital_status }
           n.column("Job Title") { |seed| seed.job_title }
           n.column("Job Description") { |seed| seed.job_description }
           n.column("Politically Exposed") { |seed| seed.politically_exposed }

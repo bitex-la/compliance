@@ -3,7 +3,26 @@
 # which become associated to the Person.
 # Each Fruit remembers its seed, and each Seed knows its fruit.
 # Other than that, Seeds belong to Issues and Fruits belong to People.
-module Garden 
+module Garden
+  module Kindify
+   extend ActiveSupport::Concern
+
+   class_methods do
+     def kind_mask_for(kind)
+         define_method kind do
+       	return nil if self.send("#{kind}_id").nil?
+          "#{kind.to_s.classify}Kind".constantize.all
+            .select{|x| x.id == self.send("#{kind}_id")}.first.code
+        end
+
+        define_method "#{kind}=" do |code|
+          "#{kind}_id".constantize = "#{kind.to_s.classify}Kind".constantize.all
+            .select{|x| x.code == code.to_sym}.first.id
+        end
+      end
+    end
+  end
+
   module Seed
     extend ActiveSupport::Concern
 
@@ -18,7 +37,7 @@ module Garden
       end
 
       accepts_nested_attributes_for :attachments, :allow_destroy => true
-    end  
+    end
 
     def harvest!
       fruit = self.class.naming.fruit.constantize.new(attributes.except(
@@ -45,19 +64,19 @@ module Garden
       else
          old_fruits =  fruit.person.send(self.class.naming.plural)
           .current.where('id != ?', fruit.id)
-         
-         if copy_attachments 
+
+         if copy_attachments
            old_fruits.each do |old_fruit|
              old_fruit.attachments.each{ |a| a.update!(
                attached_to_fruit: fruit,
                attached_to_seed: nil,
                person: issue.person
-             )} 
+             )}
            end
          end
          old_fruits.update_all(replaced_by_id: fruit.id)
       end
- 
+
       fruit
     end
   end
@@ -66,7 +85,7 @@ module Garden
     extend ActiveSupport::Concern
 
     included do
-      belongs_to :person 
+      belongs_to :person
       has_one :seed, required: false, class_name: Naming.new(name).seed,
         foreign_key: :fruit_id
       belongs_to :replaced_by, required: false, class_name: name
@@ -112,4 +131,3 @@ module Garden
     end
   end
 end
-

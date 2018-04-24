@@ -43,8 +43,8 @@ ActiveAdmin.register Person do
           n.column("Last Name")       { |docket| docket.last_name }
           n.column("Birthdate")       { |docket| docket.birth_date }
           n.column("Nationality")     { |docket| docket.nationality }
-          n.column("Gender")          { |docket| GenderKind.find(docket.gender) }
-          n.column("Marital Status")  { |docket| MaritalStatusKind.find(docket.marital_status) }
+          n.column("Gender")          { |docket| docket.gender }
+          n.column("Marital Status")  { |docket| docket.marital_status }
           n.column("Job Title") { |seed| seed.job_title }
           n.column("Job Description") { |seed| seed.job_description }
           n.column("Politically Exposed") { |seed| seed.politically_exposed }

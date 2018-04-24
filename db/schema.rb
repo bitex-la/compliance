@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180420141329) do
+ActiveRecord::Schema.define(version: 20180424192635) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -352,8 +352,8 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.string "last_name"
     t.date "birth_date"
     t.string "nationality"
-    t.string "gender"
-    t.string "marital_status"
+    t.bigint "gender_id"
+    t.bigint "marital_status_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
@@ -371,8 +371,8 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.string "last_name"
     t.date "birth_date"
     t.string "nationality"
-    t.string "gender"
-    t.string "marital_status"
+    t.bigint "gender_id"
+    t.bigint "marital_status_id"
     t.bigint "issue_id"
     t.bigint "person_id"
     t.datetime "created_at", null: false
