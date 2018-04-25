@@ -68,10 +68,10 @@ ActiveAdmin.register Issue do
     end
 
     ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
-      af.input :vat_status_id
+      af.input :vat_status_id, as: :select, collection: VatStatusKind.all
       af.input :tax_id
-      af.input :tax_id_type, collection: TaxIdKind.all
-      af.input :receipt_type, collection: ReceiptType.all
+      af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
+      af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
       af.input :name
       af.input :country
       af.input :address
@@ -80,7 +80,7 @@ ActiveAdmin.register Issue do
     end
 
     ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
-      cf.input :vat_status_id
+      cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
       cf.input :tax_id
       cf.input :giro
       cf.input :ciudad
@@ -91,7 +91,7 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
       sf.input :number
-      sf.input :kind, collection: IdentificationKind.all
+      sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
       sf.input :issuer, as: :country
       sf.input :replaces, collection: f.object.person.identifications 
       sf.input :public_registry_authority
@@ -116,7 +116,7 @@ ActiveAdmin.register Issue do
     end
 
     ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
-      rf.input :kind, collection: RelationshipKind.all
+      rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
       rf.input :related_person
       rf.input :replaces, collection: f.object.person.affinities
       rf.input :copy_attachments
@@ -134,7 +134,7 @@ ActiveAdmin.register Issue do
 
     ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
       pf.input :number
-      pf.input :kind, collection: PhoneKind.all
+      pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
       pf.input :country
       pf.input :replaces, collection: f.object.person.phones
       pf.input :has_whatsapp
@@ -147,7 +147,7 @@ ActiveAdmin.register Issue do
     ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
       ef.input :address
       ef.input :replaces, collection: f.object.person.emails 
-      ef.input :kind, collection: EmailKind.all
+      ef.input :email_kind_id, as: :select, collection: EmailKind.all
       ef.input :copy_attachments
       ArbreHelpers.has_many_attachments(context, ef)
     end 
@@ -243,8 +243,8 @@ ActiveAdmin.register Issue do
           end
           n.column("VAT status id")      { |seed| seed.vat_status_id }
           n.column("Tax ID")       { |seed| seed.tax_id }
-          n.column("Tax ID Type")       { |seed| seed.tax_id_type }
-          n.column("Receipt Type")       { |seed| seed.receipt_type }
+          n.column("Tax ID Type")       { |seed| seed.tax_id_kind }
+          n.column("Receipt Type")       { |seed| seed.receipt_kind }
           n.column("Name")       { |seed| seed.name }
           n.column("Country")       { |seed| seed.country }
           n.column("Address")       { |seed| seed.address }
@@ -350,7 +350,7 @@ ActiveAdmin.register Issue do
           i.column("ID") do |seed|
             link_to(seed.id, identification_seed_path(seed))
           end
-          i.column("Kind")    { |seed| IdentificationKind.find(seed.kind) }
+          i.column("Kind")    { |seed| seed.identification_kind }
           i.column("Number")  { |seed| seed.number }
           i.column("Issuer")  { |seed| seed.issuer }
           i.column("Public Registry Authority")  { |seed| seed.public_registry_authority }
@@ -378,7 +378,7 @@ ActiveAdmin.register Issue do
           i.column("ID") do |seed|
             link_to(seed.id, email_seed_path(seed))
           end
-          i.column("Kind")    { |seed| EmailKind.find(seed.kind) }
+          i.column("Kind")    { |seed| seed.email_kind }
           i.column("Address")  { |seed| seed.address }
           i.column("Replaces")  { |seed| seed.replaces }
           i.column("Attachments") do |seed|
@@ -403,7 +403,7 @@ ActiveAdmin.register Issue do
           i.column("ID") do |seed|
             link_to(seed.id, phone_seed_path(seed))
           end
-          i.column("Kind")    { |seed| PhoneKind.find(seed.kind) }
+          i.column("Kind")    { |seed| seed.phone_kind }
           i.column("Number")  { |seed| seed.number }
           i.column("Country")  { |seed| seed.country }
           i.column("Has whatsapp")  { |seed| seed.has_whatsapp }
@@ -455,7 +455,7 @@ ActiveAdmin.register Issue do
           i.column("ID") do |seed|
             link_to(seed.id, affinity_seed_path(seed))
           end
-          i.column("Kind")    { |seed| RelationshipKind.find(seed.kind).code }
+          i.column("Kind")    { |seed| seed.affinity_kind }
           i.column("Related Person")  { |seed| seed.related_person }
           i.column("Attachments") do |seed|
             seed.attachments

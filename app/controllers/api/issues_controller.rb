@@ -20,7 +20,7 @@ class Api::IssuesController < Api::ApiController
       jsonapi_response mapper.data, {}, 201
     else
       json_response mapper.all_errors, 422
-    end	
+    end
   end
 
   def update
@@ -32,7 +32,7 @@ class Api::IssuesController < Api::ApiController
       jsonapi_response mapper.data, {}, 200
     else
       json_response mapper.all_errors, 422
-    end	      
+    end
   end
 
   private
@@ -44,11 +44,11 @@ class Api::IssuesController < Api::ApiController
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [
         :people,
-        :observation_reasons, 
-        :domiciles, 
-        :identifications, 
-        :allowances, 
-        :phones, 
+        :observation_reasons,
+        :domiciles,
+        :identifications,
+        :allowances,
+        :phones,
         :emails,
         :notes,
         :affinities,
@@ -70,9 +70,9 @@ class Api::IssuesController < Api::ApiController
         :note_seeds,
         :affinity_seeds,
         :observations,
-        id: issue_id, 
+        id: issue_id,
         person_id: person_id
-      ], 
+      ],
       domicile_seeds: [
         :country,
         :state,
@@ -89,7 +89,7 @@ class Api::IssuesController < Api::ApiController
       ],
       phone_seeds: [
         :number,
-        :kind,
+        :phone_kind,
         :country,
         :has_whatsapp,
         :has_telegram,
@@ -101,7 +101,7 @@ class Api::IssuesController < Api::ApiController
       ],
       email_seeds: [
         :address,
-        :kind,
+        :email_kind,
         :attachments,
         :copy_attachments,
         :replaces,
@@ -116,7 +116,7 @@ class Api::IssuesController < Api::ApiController
         seed_scope
       ],
       affinity_seeds: [
-        :kind,
+        :affinity_kind,
         :related_person,
         :replaces,
         :attachments,
@@ -124,7 +124,7 @@ class Api::IssuesController < Api::ApiController
         seed_scope
       ],
       identification_seeds: [
-        :kind,
+        :identification_kind,
         :number,
         :issuer,
         :attachments,
@@ -154,10 +154,10 @@ class Api::IssuesController < Api::ApiController
         seed_scope
       ],
       argentina_invoicing_detail_seeds: [
-        :vat_status_id,
+        :vat_status,
         :tax_id,
-        :tax_id_type,
-        :receipt_type,
+        :tax_id_kind,
+        :receipt_kind,
         :name,
         :country,
         :address,
@@ -166,7 +166,7 @@ class Api::IssuesController < Api::ApiController
         seed_scope
       ],
       chile_invoicing_detail_seeds: [
-        :vat_status_id,
+        :vat_status,
         :tax_id,
         :giro,
         :ciudad,
@@ -200,7 +200,7 @@ class Api::IssuesController < Api::ApiController
       phones: [],
       emails: [],
       notes: [],
-      affinities: [], 
+      affinities: [],
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
       allowances: [],

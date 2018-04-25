@@ -8,16 +8,18 @@ module Garden
    extend ActiveSupport::Concern
 
    class_methods do
-     def kind_mask_for(kind)
-         define_method kind do
-       	return nil if self.send("#{kind}_id").nil?
-          "#{kind.to_s.classify}Kind".constantize.all
-            .select{|x| x.id == self.send("#{kind}_id")}.first.code
+     def kind_mask_for(kind, custom_model = nil)
+        kind_model = custom_model.nil? ? "#{kind.to_s.classify}Kind" : custom_model         
+ 
+        define_method kind do
+       	  return nil if self.send("#{kind}_id").nil?
+          kind_model.constantize.all
+            .select{|x| x.id == self.send("#{kind}_id").to_i}.first.code
         end
 
         define_method "#{kind}=" do |code|
-          "#{kind}_id".constantize = "#{kind.to_s.classify}Kind".constantize.all
-            .select{|x| x.code == code.to_sym}.first.id
+          self.send("#{kind}_id=", kind_model.constantize.all
+            .select{|x| x.code == code.to_sym}.first.id)
         end
       end
     end

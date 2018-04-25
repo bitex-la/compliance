@@ -90,10 +90,10 @@ ActiveAdmin.register Person do
           n.column("ID") do |detail|
             link_to(detail.id, argentina_invoicing_detail_path(detail))
           end
-          n.column("VAT status id")      { |detail| detail.vat_status_id }
+          n.column("VAT status id")      { |detail| detail.vat_status }
           n.column("Tax ID")       { |detail| detail.tax_id }
-          n.column("Tax ID Type")       { |detail| detail.tax_id_type }
-          n.column("Receipt Type")       { |detail| detail.receipt_type }
+          n.column("Tax ID Type")       { |detail| detail.tax_id_kind }
+          n.column("Receipt Type")       { |detail| detail.receipt_kind }
           n.column("Name")         { |detail| detail.name }
           n.column("Country")       { |detail| detail.country }
           n.column("Address")       { |detail| detail.address }
@@ -115,7 +115,7 @@ ActiveAdmin.register Person do
           n.column("ID") do |d|
             link_to(d.id, chile_invoicing_detail_path(d))
           end
-          n.column("VAT status id") { |d| d.vat_status_id }
+          n.column("VAT status id") { |d| d.vat_status }
           n.column("Tax ID")        { |d| d.tax_id }
           n.column("Giro")          { |d| d.giro }
           n.column("Ciudad")        { |d| d.ciudad }
@@ -141,7 +141,7 @@ ActiveAdmin.register Person do
           i.column("ID") do |identification|
             link_to(identification.id, identification_path(identification))
           end
-          i.column("Kind")    { |identification| IdentificationKind.find(identification.kind) }
+          i.column("Kind")    { |identification| identification.identification_kind }
           i.column("Number")  { |identification| identification.number }
           i.column("Issuer")  { |identification| identification.issuer }
           i.column("Public Registry Authority")  { |identification| identification.public_registry_authority }
@@ -212,7 +212,7 @@ ActiveAdmin.register Person do
           i.column("ID") do |email|
             link_to(email.id, email_path(email))
           end
-          i.column("Kind")    { |email| EmailKind.find(email.kind) }
+          i.column("Kind")    { |email| email.email_kind }
           i.column("Address")  { |email| email.address }
           i.column("Attachments") do |email|
             email.attachments
@@ -233,7 +233,7 @@ ActiveAdmin.register Person do
             link_to(phone.id, phone_path(phone))
           end
           q.column("Number") { |p| p.number }
-          q.column("Kind") { |p| PhoneKind.find(p.kind) }
+          q.column("Kind") { |p| p.phone_kind }
           q.column("Country")   { |p| p.country }
           q.column("Has whatsapp") { |p| p.has_whatsapp }
           q.column("Has telegram") { |p| p.has_telegram }
@@ -277,12 +277,7 @@ ActiveAdmin.register Person do
             link_to(fruit.id, affinity_path(fruit))
           end
           i.column("Kind") do |fruit| 
-             rk = RelationshipKind.find(fruit.kind)
-             if rk.nil?
-	       fruit.kind 	
-             else
-               rk.code
-             end 
+            fruit.affinity_kind
           end
           i.column("Related Person")  { |fruit| fruit.related_person }
           i.column("Attachments") do |fruit|

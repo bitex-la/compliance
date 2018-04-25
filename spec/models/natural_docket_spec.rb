@@ -7,8 +7,8 @@ RSpec.describe NaturalDocket, type: :model do
     create(:natural_docket, 
       person: person,
       nationality: 'CO',
-      gender: GenderKind.find(1).id,
-      marital_status: MaritalStatusKind.find(1).id
+      gender: "female",
+      marital_status: "single"
   )}
 
   it 'is not valid without a person' do

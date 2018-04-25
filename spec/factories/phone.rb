@@ -1,7 +1,7 @@
 FactoryBot.define_persons_item_and_seed(:phone,
   full_phone: proc {
     number  '+5491125410470'
-    kind    PhoneKind.find(1).id
+    phone_kind_id  PhoneKind.find(1).id
     country 'AR'
     has_whatsapp true
     has_telegram false

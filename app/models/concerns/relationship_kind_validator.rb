@@ -1,6 +1,6 @@
-class RelationshipKindValidator < ActiveModel::EachValidator
+class AffinityKindValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    if RelationshipKind.find(value.to_s).nil?
+    if AffinityKind.find(value.to_s).nil?
       record.errors.add(:kind, "kind not found")
     end
   end

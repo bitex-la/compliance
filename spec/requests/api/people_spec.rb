@@ -182,7 +182,7 @@ describe Person do
         { type: "identifications",
           id: person.identifications.last.id.to_s,
           attributes: {
-            kind: "7",
+            identification_kind: "national_id",
             number: "2545566",
             issuer: "AR",
             public_registry_authority: nil,
@@ -210,8 +210,8 @@ describe Person do
             first_name: "Joe",
             last_name: "Doe",
             nationality: "AR",
-            gender: "1",
-            marital_status: "1",
+            gender: "female",
+            marital_status: "single",
             job_title: 'Sr. Software developer',
             job_description: 'Build cool open source software',
             politically_exposed: false,
@@ -281,7 +281,7 @@ describe Person do
           id: person.phones.first.id.to_s,
           attributes: {
             number:  '+5491125410470',
-            kind:    '1',
+            phone_kind: 'main',
             country: 'AR',
             has_whatsapp: true,
             has_telegram: false,
@@ -306,7 +306,7 @@ describe Person do
           id: person.emails.first.id.to_s,
           attributes: {
             address:  'joe.doe@test.com',
-            kind:    '1',
+            email_kind:    'work',
             created_at: 1514764800, 
             updated_at: 1514764800         
           },
@@ -327,7 +327,7 @@ describe Person do
           type: "affinities",
           id: person.affinities.first.id.to_s,
           attributes: {
-            kind: person.affinities.first.kind.to_s,
+            affinity_kind: person.affinities.first.affinity_kind.to_s,
             created_at: 1514764800, 
             updated_at: 1514764800         
           },
@@ -355,10 +355,10 @@ describe Person do
           type: "argentina_invoicing_details",
           attributes: 
           {
-            vat_status_id: "2",
+            vat_status: "consumidor_final",
             tax_id: "20955754290",
-            tax_id_type: "80",
-            receipt_type: "1",
+            tax_id_kind: "cuit",
+            receipt_kind: "a",
             country: "AR",
             address: "Jujuy 3421",
             created_at: 1514764800, 
