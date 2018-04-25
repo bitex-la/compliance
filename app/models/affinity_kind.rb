@@ -1,11 +1,11 @@
-class RelationshipKind
+class AffinityKind
   include StaticModels::Model
- 
+
   static_models_sparse [
     [10, :spouse],
     [15, :business_partner],
     [20, :couple],
-    [25, :manager] 
+    [25, :manager]
   ]
 
   def name

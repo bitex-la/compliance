@@ -6,8 +6,8 @@ RSpec.describe NaturalDocketSeed, type: :model do
     create(:natural_docket_seed, 
       issue: create(:basic_issue),
       nationality: 'CO',
-      gender: GenderKind.find(1).id,
-      marital_status: MaritalStatusKind.find(1).id
+      gender: "female",
+      marital_status: "single"
   )}
 
   it 'is not valid without an issue' do

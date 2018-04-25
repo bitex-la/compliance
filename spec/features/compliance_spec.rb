@@ -54,7 +54,7 @@ describe 'an admin user' do
     })
 
     select "national_id",
-      from: "issue_identification_seeds_attributes_0_kind",
+      from: "issue_identification_seeds_attributes_0_identification_kind_id",
       visible: false
 
     select "Argentina",
@@ -72,7 +72,7 @@ describe 'an admin user' do
     })
 
     select "work",
-      from: "issue_email_seeds_attributes_0_kind",
+      from: "issue_email_seeds_attributes_0_email_kind_id",
       visible: false
 
     click_link "Add New Phone seed"
@@ -82,7 +82,7 @@ describe 'an admin user' do
     })
 
     select "main",
-      from: "issue_phone_seeds_attributes_0_kind",
+      from: "issue_phone_seeds_attributes_0_phone_kind_id",
       visible: false
 
     select "Argentina",
@@ -125,10 +125,10 @@ describe 'an admin user' do
     }, false)
 
     select "married",
-      from: "issue[natural_docket_seed_attributes][marital_status]",
+      from: "issue[natural_docket_seed_attributes][marital_status_id]",
       visible: false
     select "male",
-      from: "issue[natural_docket_seed_attributes][gender]",
+      from: "issue[natural_docket_seed_attributes][gender_id]",
       visible: false
     select "Argentina",
       from: "issue[natural_docket_seed_attributes][nationality]",
@@ -344,7 +344,7 @@ describe 'an admin user' do
     })
 
     select 'national_id',
-      from: 'issue_identification_seeds_attributes_0_kind',
+      from: 'issue_identification_seeds_attributes_0_identification_kind_id',
       visible: false
 
     select 'Argentina',
@@ -403,10 +403,10 @@ describe 'an admin user' do
     }, false)
 
     select "married",
-      from: "issue[natural_docket_seed_attributes][marital_status]",
+      from: "issue[natural_docket_seed_attributes][marital_status_id]",
       visible: false
     select "male",
-      from: "issue[natural_docket_seed_attributes][gender]",
+      from: "issue[natural_docket_seed_attributes][gender_id]",
       visible: false
     select "Argentina",
       from: "issue[natural_docket_seed_attributes][nationality]",
@@ -810,7 +810,7 @@ describe 'an admin user' do
       })
 
       select 'national_id',
-        from: 'issue_identification_seeds_attributes_0_kind',
+        from: 'issue_identification_seeds_attributes_0_identification_kind_id',
         visible: false
 
       select 'Argentina',
@@ -911,7 +911,7 @@ describe 'an admin user' do
       })
 
       select 'national_id',
-        from: 'issue_identification_seeds_attributes_0_kind',
+        from: 'issue_identification_seeds_attributes_0_identification_kind_id',
         visible: false
 
       select 'Argentina',

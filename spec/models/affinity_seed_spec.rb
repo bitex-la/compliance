@@ -5,7 +5,7 @@ RSpec.describe AffinitySeed, type: :model do
   let(:valid_seed)   { 
     create(:affinity_seed, 
       related_person: create(:empty_person),
-      kind: RelationshipKind.find(10).id
+      affinity_kind: "spouse"
   )}
 
   it 'is not valid without an issue' do

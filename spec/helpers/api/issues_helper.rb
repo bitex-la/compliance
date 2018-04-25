@@ -21,7 +21,7 @@ class Api::IssuesHelper
       data: {
         type: "issues",
         attributes: {
-          
+
         },
         relationships: {
           person: {
@@ -36,14 +36,14 @@ class Api::IssuesHelper
       ]
     }
   end
-  
+
   def self.issue_with_an_observation(person_id, reason, note)
     {
       data: {
         id: '@1',
         type: "issues",
         attributes: {
-          
+
         },
         relationships: {
           person: {
@@ -60,13 +60,13 @@ class Api::IssuesHelper
       ]
     }
   end
-  
+
   def self.basic_issue
     {
       data: {
         type: "issue",
         attributes: {
-          
+
         },
         relationships: {
           people: {
@@ -107,7 +107,7 @@ class Api::IssuesHelper
   end
 
   def self.issue_with_affinity_seed(related_person, attachment_type)
-    mime, bytes = 
+    mime, bytes =
     {
       data: {
         id: "@1",
@@ -124,7 +124,7 @@ class Api::IssuesHelper
           type: "affinity_seeds",
           id: "@1",
           attributes: {
-            kind: 15
+            affinity_kind: "spouse"
           },
           relationships: {
             issue: {
@@ -138,7 +138,7 @@ class Api::IssuesHelper
             },
             related_person: {
               data: {id: related_person.id, type: "people"}
-            } 
+            }
           }
         },
         attachment_for(attachment_type, '@1'),
@@ -148,7 +148,7 @@ class Api::IssuesHelper
 
 
   def self.issue_with_domicile_seed(attachment_type)
-    mime, bytes = 
+    mime, bytes =
     {
       data: {
         id: "@1",
@@ -192,7 +192,7 @@ class Api::IssuesHelper
   end
 
   def self.issue_with_phone_seed(attachment_type)
-    mime, bytes = 
+    mime, bytes =
     {
       data: {
         id: "@1",
@@ -210,7 +210,7 @@ class Api::IssuesHelper
           id: "@1",
           attributes: {
             number: "+54911282256470",
-            kind: "1",
+            phone_kind: "main",
             country: "AR",
             has_whatsapp: true,
             has_telegram: false,
@@ -231,10 +231,10 @@ class Api::IssuesHelper
         attachment_for(attachment_type, '@1'),
       ]
     }
-  end 
+  end
 
   def self.issue_with_email_seed(attachment_type)
-    mime, bytes = 
+    mime, bytes =
     {
       data: {
         id: "@1",
@@ -252,7 +252,7 @@ class Api::IssuesHelper
           id: "@1",
           attributes: {
             address: "joe.doe@test.com",
-            kind: "1",
+            email_kind: "personal",
           },
           relationships: {
             issue: {
@@ -269,10 +269,10 @@ class Api::IssuesHelper
         attachment_for(attachment_type, '@1'),
       ]
     }
-  end 
+  end
 
   def self.issue_with_argentina_invoicing_seed(attachment_type)
-    mime, bytes = 
+    mime, bytes =
     {
       data: {
         id: "@1",
@@ -289,10 +289,10 @@ class Api::IssuesHelper
           type: "argentina_invoicing_detail_seeds",
           id: "@1",
           attributes: {
-            vat_status_id: "2256470",
+            vat_status: "monotributo",
             tax_id: "2022443870",
-            tax_id_type: "86",
-            receipt_type: "1",
+            tax_id_kind: "cuit",
+            receipt_kind: "a",
             name: "Jorge Galvan",
             country: "AR",
             address: "Bucarelli 2675"
@@ -312,10 +312,10 @@ class Api::IssuesHelper
         attachment_for(attachment_type, '@1'),
       ]
     }
-  end 
+  end
 
   def self.issue_with_chile_invoicing_seed(attachment_type)
-    mime, bytes = 
+    mime, bytes =
     {
       data: {
         id: "@1",
@@ -332,9 +332,9 @@ class Api::IssuesHelper
           type: "chile_invoicing_detail_seeds",
           id: "@1",
           attributes: {
-            vat_status_id: "2",
+            vat_status: "monotributo",
             tax_id: "2022443870",
-            giro: 'sfsdffd', 
+            giro: 'sfsdffd',
             ciudad: 'Santiago',
             comuna: 'Condes'
           },
@@ -353,14 +353,14 @@ class Api::IssuesHelper
         attachment_for(attachment_type, '@1'),
       ]
     }
-  end 
+  end
 
   def self.issue_with_identification_seed(attachment_type)
     {
       data: {
         type: "issues",
         attributes: {
-          
+
         },
         relationships: {
           identification_seeds: {
@@ -373,7 +373,7 @@ class Api::IssuesHelper
           type: "identification_seeds",
           id: "@1",
           attributes: {
-            kind: "1",
+            identification_kind: "national_id",
             number: "AQ322812",
             issuer: "CO"
           },
@@ -396,11 +396,11 @@ class Api::IssuesHelper
       data: {
         type: "issues",
         attributes: {
-          
+
         },
         relationships: {
           natural_docket_seed: {
-            data: 
+            data:
             {
               id: "@1",
               type: "natural_docket_seeds"
@@ -417,8 +417,8 @@ class Api::IssuesHelper
             last_name: "doe",
             birth_date: "2018-01-01",
             nationality: "AR",
-            gender: "1",
-            marital_status: "1"
+            gender: "male",
+            marital_status: "single"
           },
           relationships: {
             attachments: {
@@ -439,7 +439,7 @@ class Api::IssuesHelper
       data: {
         type: "issues",
         attributes: {
-          
+
         },
         relationships: {
           legal_entity_docket_seed: {
@@ -480,11 +480,11 @@ class Api::IssuesHelper
     {
       data: {
         type: "issues",
-        attributes: {        
+        attributes: {
         },
         relationships: {
           allowance_seeds: {
-            data: 
+            data:
              [{
               id: "@1",
               type: "allowance_seeds"
@@ -524,8 +524,8 @@ class Api::IssuesHelper
         last_name: "jones",
         birth_date: "2018-01-01",
         nationality: "AR",
-        gender: "1",
-        marital_status: "1"
+        gender: "male",
+        marital_status: "single"
       },
       relationships: {
         attachments: {
@@ -558,7 +558,7 @@ class Api::IssuesHelper
     when :rar then "application/x-rar-compressed"
     else raise "No fixture for #{ext} files"
     end
-      
+
     fixtures = RSpec.configuration.file_fixture_path
     path = Pathname.new(File.join(fixtures, "simple.#{ext}"))
     bytes = Base64.encode64(path.read).delete!("\n")

@@ -395,7 +395,7 @@ describe Issue do
       PhoneSeed.first.tap do |seed|
         seed.reload
         seed.number.should == "+571165342178"
-        seed.kind.should == "2"
+        seed.phone_kind.should == :main
         seed.country.should == "CO"
         seed.has_whatsapp.should == true
         seed.has_telegram.should == false

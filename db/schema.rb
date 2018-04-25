@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180420141329) do
+ActiveRecord::Schema.define(version: 20180425133238) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.bigint "affinity_seed_id"
     t.bigint "person_id"
     t.bigint "related_person_id"
-    t.string "kind"
+    t.integer "affinity_kind_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
@@ -60,7 +60,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
 
   create_table "affinity_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
-    t.string "kind"
+    t.integer "affinity_kind_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "related_person_id"
@@ -108,8 +108,8 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
-    t.string "tax_id_type", null: false
-    t.string "receipt_type", null: false
+    t.integer "tax_id_kind_id", null: false
+    t.integer "receipt_kind_id", null: false
     t.string "name", null: false
     t.string "address", null: false
     t.string "country", null: false
@@ -126,8 +126,8 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
-    t.string "tax_id_type", null: false
-    t.string "receipt_type", null: false
+    t.integer "tax_id_kind_id", null: false
+    t.integer "receipt_kind_id", null: false
     t.string "name", null: false
     t.string "address", null: false
     t.string "country", null: false
@@ -162,7 +162,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
-    t.string "vat_status_id"
+    t.integer "vat_status_id"
     t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_chile_invoicing_detail_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_chile_invoicing_detail_seeds_on_replaces_id"
@@ -178,7 +178,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
-    t.string "vat_status_id"
+    t.integer "vat_status_id"
     t.index ["issue_id"], name: "index_chile_invoicing_details_on_issue_id"
     t.index ["person_id"], name: "index_chile_invoicing_details_on_person_id"
     t.index ["replaced_by_id"], name: "index_chile_invoicing_details_on_replaced_by_id"
@@ -235,7 +235,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
 
   create_table "email_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address"
-    t.string "kind"
+    t.integer "email_kind_id"
     t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -249,7 +249,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
 
   create_table "emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address"
-    t.string "kind"
+    t.integer "email_kind_id"
     t.bigint "issue_id"
     t.bigint "person_id"
     t.datetime "created_at", null: false
@@ -275,7 +275,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
 
   create_table "identification_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "issue_id"
-    t.string "kind"
+    t.integer "identification_kind_id"
     t.string "number"
     t.string "issuer"
     t.datetime "created_at", null: false
@@ -292,7 +292,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
 
   create_table "identifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "number"
-    t.string "kind"
+    t.integer "identification_kind_id"
     t.string "issuer"
     t.bigint "issue_id"
     t.bigint "person_id"
@@ -352,8 +352,8 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.string "last_name"
     t.date "birth_date"
     t.string "nationality"
-    t.string "gender"
-    t.string "marital_status"
+    t.bigint "gender_id"
+    t.bigint "marital_status_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
@@ -371,8 +371,8 @@ ActiveRecord::Schema.define(version: 20180420141329) do
     t.string "last_name"
     t.date "birth_date"
     t.string "nationality"
-    t.string "gender"
-    t.string "marital_status"
+    t.bigint "gender_id"
+    t.bigint "marital_status_id"
     t.bigint "issue_id"
     t.bigint "person_id"
     t.datetime "created_at", null: false
@@ -444,7 +444,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
 
   create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "number"
-    t.string "kind"
+    t.integer "phone_kind_id"
     t.string "country"
     t.boolean "has_whatsapp", null: false
     t.boolean "has_telegram", null: false
@@ -462,7 +462,7 @@ ActiveRecord::Schema.define(version: 20180420141329) do
 
   create_table "phones", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "number"
-    t.string "kind"
+    t.integer "phone_kind_id"
     t.string "country"
     t.boolean "has_whatsapp", null: false
     t.boolean "has_telegram", null: false
