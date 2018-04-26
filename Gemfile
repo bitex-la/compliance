@@ -40,8 +40,8 @@ gem 'kaminari'
 gem 'timecop'
 
 group :development, :test do
-  gem "capistrano", "~> 3.10", require: false
-  gem "capistrano-rails", "~> 1.3", require: false
+  gem 'capistrano', '~> 3.10', require: false
+  gem 'capistrano-rails', '~> 1.3', require: false
   gem 'capistrano-bundler', '~> 1.1.2', require: false
   gem 'capistrano-rbenv', '~> 2.0.2', require: false
   gem 'capistrano-rbenv-install', require: false
