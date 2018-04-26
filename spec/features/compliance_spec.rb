@@ -221,7 +221,6 @@ describe 'an admin user' do
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
-    page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 
     visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
     page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
@@ -288,7 +287,7 @@ describe 'an admin user' do
       params: JSON.dump(issue_document),
       headers: {"CONTENT_TYPE" => 'application/json',
                 "Authorization" => "Token token=#{admin_user.api_token}"}
-    
+   
     assert_response 200
 
     Issue.first.should be_answered
@@ -783,9 +782,6 @@ describe 'an admin user' do
 
       within '.row.row-person' do
       	click_link Person.first.id
-      end
-      within ".domiciles.panel" do
-        expect(page).to_not have_content old_domicile.id
       end
     end
 
