@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 20180425133238) do
 
-  create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
     t.text "body"
     t.string "resource_type"
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
   end
 
-  create_table "admin_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "admin_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
-  create_table "affinities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "affinities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "affinity_seed_id"
     t.bigint "person_id"
     t.bigint "related_person_id"
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_affinities_on_replaced_by_id"
   end
 
-  create_table "affinity_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "affinity_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "issue_id"
     t.integer "affinity_kind_id"
     t.datetime "created_at", null: false
@@ -71,7 +71,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["related_person_id"], name: "index_affinity_seeds_on_related_person_id"
   end
 
-  create_table "allowance_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "allowance_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.decimal "weight", precision: 10
     t.decimal "amount", precision: 10
     t.string "kind"
@@ -85,7 +85,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
   end
 
-  create_table "allowances", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "allowances", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.decimal "weight", precision: 10
     t.decimal "amount", precision: 10
     t.string "kind"
@@ -99,7 +99,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_allowances_on_replaced_by_id"
   end
 
-  create_table "argentina_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "argentina_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "vat_status_id", null: false
     t.string "tax_id", null: false
     t.bigint "issue_id"
@@ -118,7 +118,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaces_id"], name: "index_argentina_invoicing_detail_seeds_on_replaces_id"
   end
 
-  create_table "argentina_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "argentina_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "vat_status_id", null: false
     t.string "tax_id", null: false
     t.bigint "issue_id"
@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_argentina_invoicing_details_on_replaced_by_id"
   end
 
-  create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "person_id"
     t.integer "attached_to_seed_id"
     t.string "attached_to_seed_type"
@@ -151,7 +151,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["person_id"], name: "index_attachments_on_person_id"
   end
 
-  create_table "chile_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "chile_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "tax_id"
     t.string "giro"
     t.string "ciudad"
@@ -168,7 +168,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaces_id"], name: "index_chile_invoicing_detail_seeds_on_replaces_id"
   end
 
-  create_table "chile_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "chile_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "tax_id"
     t.string "giro"
     t.string "ciudad"
@@ -184,7 +184,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_chile_invoicing_details_on_replaced_by_id"
   end
 
-  create_table "comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "commentable_id"
     t.string "commentable_type"
     t.integer "author_id"
@@ -195,7 +195,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "domicile_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "domicile_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "country"
     t.string "state"
     t.string "city"
@@ -214,7 +214,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["issue_id"], name: "index_domicile_seeds_on_issue_id"
   end
 
-  create_table "domiciles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "domiciles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "country"
     t.string "state"
     t.string "city"
@@ -233,7 +233,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_domiciles_on_replaced_by_id"
   end
 
-  create_table "email_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "email_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "address"
     t.integer "email_kind_id"
     t.bigint "issue_id"
@@ -247,7 +247,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaces_id"], name: "index_email_seeds_on_replaces_id"
   end
 
-  create_table "emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "emails", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "address"
     t.integer "email_kind_id"
     t.bigint "issue_id"
@@ -260,7 +260,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_emails_on_replaced_by_id"
   end
 
-  create_table "fundings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "fundings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.decimal "amount", precision: 10
     t.string "kind"
     t.bigint "issue_id"
@@ -273,7 +273,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_fundings_on_replaced_by_id"
   end
 
-  create_table "identification_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "identification_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "issue_id"
     t.integer "identification_kind_id"
     t.string "number"
@@ -290,7 +290,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
   end
 
-  create_table "identifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "identifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "number"
     t.integer "identification_kind_id"
     t.string "issuer"
@@ -307,7 +307,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_identifications_on_replaced_by_id"
   end
 
-  create_table "issues", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "issues", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "person_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -315,7 +315,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["person_id"], name: "index_issues_on_person_id"
   end
 
-  create_table "legal_entity_docket_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "legal_entity_docket_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "issue_id"
     t.string "industry"
     t.text "business_description"
@@ -330,7 +330,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["issue_id"], name: "index_legal_entity_docket_seeds_on_issue_id"
   end
 
-  create_table "legal_entity_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "legal_entity_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "industry"
     t.text "business_description"
     t.string "country"
@@ -346,7 +346,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_legal_entity_dockets_on_replaced_by_id"
   end
 
-  create_table "natural_docket_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "natural_docket_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "issue_id"
     t.string "first_name"
     t.string "last_name"
@@ -366,7 +366,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["issue_id"], name: "index_natural_docket_seeds_on_issue_id"
   end
 
-  create_table "natural_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "natural_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "first_name"
     t.string "last_name"
     t.date "birth_date"
@@ -387,7 +387,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_natural_dockets_on_replaced_by_id"
   end
 
-  create_table "note_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "note_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "title"
     t.text "body"
     t.bigint "issue_id"
@@ -401,7 +401,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
   end
 
-  create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "title"
     t.text "body"
     t.bigint "issue_id"
@@ -414,7 +414,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaced_by_id"], name: "index_notes_on_replaced_by_id"
   end
 
-  create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "subject"
     t.text "body"
     t.datetime "created_at", null: false
@@ -422,7 +422,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.integer "scope"
   end
 
-  create_table "observations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "observations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -435,14 +435,14 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["observation_reason_id"], name: "index_observations_on_observation_reason_id"
   end
 
-  create_table "people", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "people", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false, null: false
     t.integer "risk"
   end
 
-  create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "number"
     t.integer "phone_kind_id"
     t.string "country"
@@ -460,7 +460,7 @@ ActiveRecord::Schema.define(version: 20180425133238) do
     t.index ["replaces_id"], name: "index_phone_seeds_on_replaces_id"
   end
 
-  create_table "phones", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "phones", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "number"
     t.integer "phone_kind_id"
     t.string "country"
