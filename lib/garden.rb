@@ -18,8 +18,14 @@ module Garden
         end
 
         define_method "#{kind}=" do |code|
-          self.send("#{kind}_id=", kind_model.constantize.all
-            .select{|x| x.code == code.to_sym}.first.id)
+          candidate = kind_model.constantize.all.
+	    select{|x| x.code == code.to_sym}
+           
+          if candidate.blank?
+            self.errors.add(kind, "#{kind} not found")
+          else
+            self.send("#{kind}_id=", candidate.first.id)
+          end
         end
       end
     end
