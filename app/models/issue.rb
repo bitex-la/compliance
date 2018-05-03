@@ -8,7 +8,7 @@ class Issue < ApplicationRecord
     legal_entity_docket_seed
     argentina_invoicing_detail_seed
     chile_invoicing_detail_seed
-  }.each do |relationship|  
+  }.each do |relationship|
     has_one relationship, required: false
   end
 
@@ -21,8 +21,8 @@ class Issue < ApplicationRecord
   accepts_nested_attributes_for :chile_invoicing_detail_seed, allow_destroy: true,
     reject_if: proc { |attr| attr['tax_id'].blank? }
 
-  accepts_nested_attributes_for :natural_docket_seed, allow_destroy: true, 
-    reject_if: proc { |attr| attr['first_name'].blank? || attr['last_name'].blank? } 
+  accepts_nested_attributes_for :natural_docket_seed, allow_destroy: true,
+    reject_if: proc { |attr| attr['first_name'].blank? || attr['last_name'].blank? }
 
   HAS_MANY = %i{
     allowance_seeds
@@ -30,7 +30,7 @@ class Issue < ApplicationRecord
     identification_seeds
     phone_seeds
     email_seeds
-    note_seeds 
+    note_seeds
     affinity_seeds
   }.each do |relationship|
     has_many relationship
@@ -41,9 +41,9 @@ class Issue < ApplicationRecord
   accepts_nested_attributes_for :observations, allow_destroy: true
 
   scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
- 
+
   scope :incomplete, -> { where('aasm_state=?', 'draft') }
-  scope :just_created, -> { where('aasm_state=?', 'new') } 
+  scope :just_created, -> { where('aasm_state=?', 'new') }
   scope :answered, -> { where('aasm_state=?', 'answered') }
   scope :reviewable, -> { just_created.or(answered) }
 
@@ -72,11 +72,11 @@ class Issue < ApplicationRecord
     end
 
     event :dismiss do
-      transitions  from: :draft, to: :dismissed 
+      transitions  from: :draft, to: :dismissed
       transitions from: :new, to: :dismissed
       transitions from: :answered, to: :dismissed
       transitions from: :observed, to: :dismissed
-    end 
+    end
 
     event :reject do
       after do
@@ -95,8 +95,8 @@ class Issue < ApplicationRecord
       end
       transitions from: :draft, to: :approved
       transitions from: :new, to: :approved
-      transitions from: :answered, to: :approved 
-    end 
+      transitions from: :answered, to: :approved
+    end
 
     event :abandon do
       transitions from: :draft, to: :abandoned
@@ -108,11 +108,11 @@ class Issue < ApplicationRecord
 
   def modifications_count
     count = 0
-    
+
     HAS_ONE.each do |relation|
       count += 1 unless send(relation).nil?
     end
-    
+
     HAS_MANY.each do |relation|
       count += send(relation).count unless send(relation).blank?
     end
@@ -121,6 +121,10 @@ class Issue < ApplicationRecord
 
   def state
     aasm_state
+  end
+
+  def state=(status)
+    self.aasm_state = status
   end
 
   def editable?

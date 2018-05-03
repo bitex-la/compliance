@@ -58,6 +58,7 @@ class Api::IssuesController < Api::ApiController
         :legal_entity_dockets,
       ],
       issues: [
+        :state,
         :domicile_seeds,
         :identification_seeds,
         :natural_docket_seed,
@@ -139,6 +140,10 @@ class Api::IssuesController < Api::ApiController
         :nationality,
         :gender,
         :marital_status,
+        :job_title,
+        :job_description,
+        :politically_exposed,
+        :politically_exposed_reason,
         :attachments,
         :copy_attachments,
         seed_scope
