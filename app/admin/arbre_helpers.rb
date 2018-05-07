@@ -5,10 +5,10 @@ module ArbreHelpers
       panel title, class: title.gsub(' ','').underscore do
         table_for issues do |i|
           i.column("ID") { |issue|
-            link_to(issue.id, person_issue_path(issue.person, issue)) 
+            link_to(issue.id, person_issue_path(issue.person, issue))
           }
           i.column("Person") { |issue|
-            link_to(issue.person.id, person_path(issue.person)) 
+            link_to(issue.person.id, person_path(issue.person))
           }
           i.column("Seeds") { |issue|
             issue.modifications_count
@@ -17,10 +17,10 @@ module ArbreHelpers
             issue.observations.count
           }
           i.column("Created at") { |issue|
-            issue.created_at 
+            issue.created_at
           }
           i.column("Updated at") { |issue|
-            issue.updated_at 
+            issue.updated_at
           }
           i.column("Actions") { |issue|
             span link_to("View", person_issue_path(issue.person, issue))
@@ -56,7 +56,7 @@ module ArbreHelpers
     end
   end
 
-  def self.attachments_panel(context, relationship, attachments)
+  def self.attachments_block(context, relationship, attachments)
     context.instance_eval do
       panel relationship do
         table_for attachments.each do |a|
@@ -74,12 +74,12 @@ module ArbreHelpers
   end
 
   def self.multi_entity_attachments(context, builder, relationship)
-    b_object =  builder.object.send(relationship)
+    b_object =  builder.send(relationship)
     context.instance_eval do
       if b_object.any?
         b_object.each do |entity|
           if entity.attachments.any?
-            ArbreHelpers.attachments_panel(context, relationship, entity.attachments)
+            ArbreHelpers.attachments_block(context, relationship, entity.attachments)
           end
         end
       end
@@ -87,27 +87,27 @@ module ArbreHelpers
   end
 
   def self.entity_attachments(context, builder, relationship)
-    b_object =  builder.object.send(relationship)
+    b_object =  builder.send(relationship)
     context.instance_eval do
       if b_object.present? && b_object.attachments.any?
-        ArbreHelpers.attachments_panel(context, relationship, b_object.attachments)  
+        ArbreHelpers.attachments_block(context, relationship, b_object.attachments)
       end
     end
-  end 
+  end
 
   def self.has_one_form(context, builder, title, relationship, &fields)
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
     builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
     if b_object.persisted?
       context.span(context.link_to(
-        "Show", 
-        b_object, 
+        "Show",
+        b_object,
         target: '_blank'))
 
       unless b_object.class.name == 'Attachment'
-        context.span(context.link_to("Remove Entity", 
-          b_object, 
-          method: :delete, 
+        context.span(context.link_to("Remove Entity",
+          b_object,
+          method: :delete,
           data: {confirm: "Are you sure?"}))
       end
     end
@@ -118,18 +118,18 @@ module ArbreHelpers
       instance_exec(f, context, &fields)
       if f.object.persisted?
         f.template.concat(context.link_to(
-          "Show", 
-          f.object, 
+          "Show",
+          f.object,
           target: '_blank'
         ))
 
         unless f.object.class.name == 'Attachment'
-          f.template.concat(context.link_to("Remove Entity", 
-            f.object, 
-            method: :delete, 
+          f.template.concat(context.link_to("Remove Entity",
+            f.object,
+            method: :delete,
             data: {confirm: "Are you sure?"}
           ))
-        end 
+        end
       end
     end
   end

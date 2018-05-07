@@ -172,17 +172,17 @@ ActiveAdmin.register Issue do
         f.actions
       end
       tab :attachments do
-        ArbreHelpers.entity_attachments self, f, :natural_docket_seed
-        ArbreHelpers.entity_attachments self, f, :legal_entity_docket_seed
-        ArbreHelpers.entity_attachments self, f, :argentina_invoicing_detail_seed
-        ArbreHelpers.entity_attachments self, f, :chile_invoicing_detail_seed
-        ArbreHelpers.multi_entity_attachments self, f, :identification_seeds
-        ArbreHelpers.multi_entity_attachments self, f, :domicile_seeds
-        ArbreHelpers.multi_entity_attachments self, f, :affinity_seeds
-        ArbreHelpers.multi_entity_attachments self, f, :allowance_seeds
-        ArbreHelpers.multi_entity_attachments self, f, :phone_seeds
-        ArbreHelpers.multi_entity_attachments self, f, :email_seeds
-        ArbreHelpers.multi_entity_attachments self, f, :note_seeds 
+        ArbreHelpers.entity_attachments self, f.object, :natural_docket_seed
+        ArbreHelpers.entity_attachments self, f.object, :legal_entity_docket_seed
+        ArbreHelpers.entity_attachments self, f.object, :argentina_invoicing_detail_seed
+        ArbreHelpers.entity_attachments self, f.object, :chile_invoicing_detail_seed
+        ArbreHelpers.multi_entity_attachments self, f.object, :identification_seeds
+        ArbreHelpers.multi_entity_attachments self, f.object, :domicile_seeds
+        ArbreHelpers.multi_entity_attachments self, f.object, :affinity_seeds
+        ArbreHelpers.multi_entity_attachments self, f.object, :allowance_seeds
+        ArbreHelpers.multi_entity_attachments self, f.object, :phone_seeds
+        ArbreHelpers.multi_entity_attachments self, f.object, :email_seeds
+        ArbreHelpers.multi_entity_attachments self, f.object, :note_seeds
       end
     end
   end
