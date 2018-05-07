@@ -74,7 +74,12 @@ module ArbreHelpers
   end
 
   def self.multi_entity_attachments(context, builder, relationship)
-    b_object =  builder.send(relationship)
+    b_object = if relationship.to_s.include? 'seed'
+      builder.send(relationship)
+    else
+      builder.send(relationship).current
+    end
+
     context.instance_eval do
       if b_object.any?
         b_object.each do |entity|
@@ -87,7 +92,12 @@ module ArbreHelpers
   end
 
   def self.entity_attachments(context, builder, relationship)
-    b_object =  builder.send(relationship)
+    b_object = if relationship.to_s.include? 'seed'
+      builder.send(relationship)
+    else
+      builder.send(relationship).current
+    end
+
     context.instance_eval do
       if b_object.present? && b_object.attachments.any?
         ArbreHelpers.attachments_block(context, relationship, b_object.attachments)
