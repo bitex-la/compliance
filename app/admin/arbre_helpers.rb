@@ -56,6 +56,45 @@ module ArbreHelpers
     end
   end
 
+  def self.attachments_panel(context, relationship, attachments)
+    context.instance_eval do
+      panel relationship do
+        table_for attachments.each do |a|
+          a.column do |attachment|
+            h3 "#{attachment.document_file_name} - #{attachment.document_content_type}"
+            if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type)
+              image_tag(attachment.document.url, width: '100%')
+            elsif DOWNLOADABLE_CONTENT_TYPES.include?(attachment.document_content_type)
+              link_to 'Download file', attachment.document.url, target: "_blank"
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def self.multi_entity_attachments(context, builder, relationship)
+    b_object =  builder.object.send(relationship)
+    context.instance_eval do
+      if b_object.any?
+        b_object.each do |entity|
+          if entity.attachments.any?
+            ArbreHelpers.attachments_panel(context, relationship, entity.attachments)
+          end
+        end
+      end
+    end
+  end
+
+  def self.entity_attachments(context, builder, relationship)
+    b_object =  builder.object.send(relationship)
+    context.instance_eval do
+      if b_object.present? && b_object.attachments.any?
+        ArbreHelpers.attachments_panel(context, relationship, b_object.attachments)  
+      end
+    end
+  end 
+
   def self.has_one_form(context, builder, title, relationship, &fields)
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
     builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)

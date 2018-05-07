@@ -32,142 +32,159 @@ ActiveAdmin.register Issue do
   end
 
   form do |f|
-    if f.object.persisted?
-      f.inputs 'Basics' do
-        f.input :person_id
+    tabs do
+      tab :seeds do
+        if f.object.persisted?
+          f.inputs 'Basics' do
+            f.input :person_id
+          end
+        else
+          f.inputs 'Select a person' do
+            f.input :person_id, as: :select, collection: Person.all
+          end
+        end
+
+        ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
+          sf.input :first_name
+          sf.input :last_name
+          sf.input :birth_date, start_year: 1900
+          sf.input :nationality, as: :country
+          sf.input :gender_id, as: :select, collection: GenderKind.all
+          sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
+          sf.input :job_title
+          sf.input :job_description
+          sf.input :politically_exposed
+          sf.input :politically_exposed_reason, input_html: {rows: 3}
+          sf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(self, sf)
+       end
+
+        ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+          sf.input :industry
+          sf.input :business_description, input_html: {rows: 3}
+          sf.input :country
+          sf.input :commercial_name
+          sf.input :legal_name
+          sf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(self, sf)
+        end
+
+        ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
+          af.input :vat_status_id, as: :select, collection: VatStatusKind.all
+          af.input :tax_id
+          af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
+          af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
+          af.input :name
+          af.input :country
+          af.input :address
+          af.input :copy_attachments
+          ArbreHelpers.has_many_attachments(self, af)
+        end
+
+        ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
+          cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
+          cf.input :tax_id
+          cf.input :giro
+          cf.input :ciudad
+          cf.input :comuna
+          cf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(self, cf)
+        end
+
+        ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
+          sf.input :number
+          sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
+          sf.input :issuer, as: :country
+          sf.input :replaces, collection: f.object.person.identifications
+          sf.input :public_registry_authority
+          sf.input :public_registry_book
+          sf.input :public_registry_extra_data
+          sf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, sf)
+        end
+
+        ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
+          sf.input :country
+          sf.input :state
+          sf.input :city
+          sf.input :street_address
+          sf.input :street_number
+          sf.input :postal_code
+          sf.input :floor
+          sf.input :apartment
+          sf.input :replaces, collection: f.object.person.domiciles
+          sf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, sf)
+        end
+
+        ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
+          rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
+          rf.input :related_person
+          rf.input :replaces, collection: f.object.person.affinities
+          rf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, rf)
+        end
+
+        ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
+          sf.input :weight
+          sf.input :amount
+          sf.input :kind
+          sf.input :replaces, collection: f.object.person.allowances
+          sf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, sf)
+        end
+
+        ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
+          pf.input :number
+          pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
+          pf.input :country
+          pf.input :replaces, collection: f.object.person.phones
+          pf.input :has_whatsapp
+          pf.input :has_telegram
+          pf.input :note, input_html: {rows: 3}
+          pf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, pf)
+        end
+
+        ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
+          ef.input :address
+          ef.input :replaces, collection: f.object.person.emails
+          ef.input :email_kind_id, as: :select, collection: EmailKind.all
+          ef.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, ef)
+        end
+
+        ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
+          nf.input :title
+          nf.input :replaces, collection: f.object.person.notes
+          nf.input :body, input_html: {rows: 3}
+          nf.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, nf)
+        end
+
+        ArbreHelpers.has_many_form self, f, :observations do |sf|
+          sf.input :observation_reason
+          sf.input :scope
+          sf.input :note, input_html: {rows: 3}
+          sf.input :reply, input_html: {rows: 3}
+        end
+
+        f.actions
       end
-    else
-      f.inputs 'Select a person' do
-        f.input :person_id, as: :select, collection: Person.all
+      tab :attachments do
+        ArbreHelpers.entity_attachments self, f, :natural_docket_seed
+        ArbreHelpers.entity_attachments self, f, :legal_entity_docket_seed
+        ArbreHelpers.entity_attachments self, f, :argentina_invoicing_detail_seed
+        ArbreHelpers.entity_attachments self, f, :chile_invoicing_detail_seed
+        ArbreHelpers.multi_entity_attachments self, f, :identification_seeds
+        ArbreHelpers.multi_entity_attachments self, f, :domicile_seeds
+        ArbreHelpers.multi_entity_attachments self, f, :affinity_seeds
+        ArbreHelpers.multi_entity_attachments self, f, :allowance_seeds
+        ArbreHelpers.multi_entity_attachments self, f, :phone_seeds
+        ArbreHelpers.multi_entity_attachments self, f, :email_seeds
+        ArbreHelpers.multi_entity_attachments self, f, :note_seeds 
       end
     end
-
-    ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-      sf.input :first_name
-      sf.input :last_name
-      sf.input :birth_date, start_year: 1900
-      sf.input :nationality, as: :country
-      sf.input :gender_id, as: :select, collection: GenderKind.all
-      sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
-      sf.input :job_title
-      sf.input :job_description
-      sf.input :politically_exposed
-      sf.input :politically_exposed_reason, input_html: {rows: 3}
-      sf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(self, sf) 
-   end
-
-    ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
-      sf.input :industry
-      sf.input :business_description, input_html: {rows: 3}
-      sf.input :country
-      sf.input :commercial_name
-      sf.input :legal_name
-      sf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(self, sf)
-    end
-
-    ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
-      af.input :vat_status_id, as: :select, collection: VatStatusKind.all
-      af.input :tax_id
-      af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
-      af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
-      af.input :name
-      af.input :country
-      af.input :address
-      af.input :copy_attachments
-      ArbreHelpers.has_many_attachments(self, af)      
-    end
-
-    ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
-      cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
-      cf.input :tax_id
-      cf.input :giro
-      cf.input :ciudad
-      cf.input :comuna
-      cf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(self, cf)
-    end
-
-    ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
-      sf.input :number
-      sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-      sf.input :issuer, as: :country
-      sf.input :replaces, collection: f.object.person.identifications 
-      sf.input :public_registry_authority
-      sf.input :public_registry_book
-      sf.input :public_registry_extra_data
-      sf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(context, sf)
-    end
-
-    ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
-      sf.input :country
-      sf.input :state
-      sf.input :city
-      sf.input :street_address
-      sf.input :street_number
-      sf.input :postal_code
-      sf.input :floor
-      sf.input :apartment
-      sf.input :replaces, collection: f.object.person.domiciles
-      sf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(context, sf)
-    end
-
-    ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
-      rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
-      rf.input :related_person
-      rf.input :replaces, collection: f.object.person.affinities
-      rf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(context, rf)
-    end
-
-    ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
-      sf.input :weight 
-      sf.input :amount
-      sf.input :kind
-      sf.input :replaces, collection: f.object.person.allowances
-      sf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(context, sf)
-    end
-
-    ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
-      pf.input :number
-      pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
-      pf.input :country
-      pf.input :replaces, collection: f.object.person.phones
-      pf.input :has_whatsapp
-      pf.input :has_telegram
-      pf.input :note, input_html: {rows: 3} 
-      pf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(context, pf)
-    end  
-
-    ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
-      ef.input :address
-      ef.input :replaces, collection: f.object.person.emails 
-      ef.input :email_kind_id, as: :select, collection: EmailKind.all
-      ef.input :copy_attachments
-      ArbreHelpers.has_many_attachments(context, ef)
-    end 
-
-    ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
-      nf.input :title
-      nf.input :replaces, collection: f.object.person.notes
-      nf.input :body, input_html: {rows: 3}
-      nf.input :copy_attachments
-      ArbreHelpers.has_many_attachments(context, nf)
-    end  
-
-    ArbreHelpers.has_many_form self, f, :observations do |sf|
-      sf.input :observation_reason
-      sf.input :scope
-      sf.input :note, input_html: {rows: 3}
-      sf.input :reply, input_html: {rows: 3}
-    end
-
-    f.actions
   end
 
   show do
@@ -176,7 +193,7 @@ ActiveAdmin.register Issue do
       row :created_at
       row :updated_at
       row :person
-    end 
+    end
 
     if issue.legal_entity_docket_seed.present?
       panel 'legal entity docket seed' do
@@ -408,7 +425,7 @@ ActiveAdmin.register Issue do
           i.column("Country")  { |seed| seed.country }
           i.column("Has whatsapp")  { |seed| seed.has_whatsapp }
           i.column("Has telegram")  { |seed| seed.has_telegram }
-          i.column("Note")  { |seed| seed.note } 
+          i.column("Note")  { |seed| seed.note }
           i.column("Replaces")  { |seed| seed.replaces }
           i.column("Attachments") do |seed|
             seed.attachments
@@ -479,15 +496,15 @@ ActiveAdmin.register Issue do
             link_to(obv.id, observation_path(obv))
           end
           o.column("Created at") { |obv| obv.created_at }
-          o.column("Updated at") { |obv| obv.updated_at } 
+          o.column("Updated at") { |obv| obv.updated_at }
           o.column("Note")    { |obv| obv.note }
           o.column("Reply")   { |obv| obv.reply }
           o.column("Reason")  { |obv|
-            unless obv.observation_reason.nil? 
-              obv.observation_reason.subject 
+            unless obv.observation_reason.nil?
+              obv.observation_reason.subject
             end
           }
-          o.column("Scope")   { |obv| obv.scope }  
+          o.column("Scope")   { |obv| obv.scope }
         end
       end
     end
