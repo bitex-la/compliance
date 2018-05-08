@@ -183,6 +183,8 @@ if Rails.env.demo? || Rails.env.development?
     issue: issue
   )
 
+  issue.complete!
+
   ########## AN ARGENTINE LEGAL ENTITY PERSON TO CHECK ##############
 
   # 1. Create an empty person
@@ -802,4 +804,159 @@ if Rails.env.demo? || Rails.env.development?
   # 15. Approving Hooli's onboarding as company
   issue.approve!
 
+  ############# AN ARGENTINE NATURAL PERSON WITH SOME REPLIES ##############
+  # 1. Create an empty person
+  nelson_bighetti = Person.create!(
+    enabled: false,
+    risk: nil
+  )
+
+  # 2. Create an empty issue for the seed data
+  issue = Issue.create!(
+    person: nelson_bighetti
+  )
+
+  # 3. Create a natural docket seed
+  nd = NaturalDocketSeed.create!(
+    first_name:  'Nelson',
+    last_name:   'Bighetti',
+    nationality: 'AR',
+    gender: 'male',
+    marital_status: 'single',
+    job_title: 'Risk Investor',
+    job_description: 'Investor at Big Head Inc',
+    birth_date: DateTime.now,
+    issue: issue
+  )
+
+  # 4. Add some attachments
+   %i(png gif pdf jpg zip).each do |ext|
+     Attachment.create!(
+       person: nelson_bighetti,
+       attached_to_seed: nd,
+       document: File.new("#{Rails.root}/spec/fixtures/files/simple.#{ext}")
+     )
+   end
+
+   # 5. Create an argentina invoicing detail seed
+   ad = ArgentinaInvoicingDetailSeed.create!(
+     vat_status:   'monotributo',
+     tax_id:       '20955464310',
+     tax_id_kind:  'cuil',
+     receipt_kind: 'a',
+     name:         'Nelson Bighetti',
+     country:      'AR',
+     address:      'Federico Lacroze 342 apto 4B',
+     issue: issue
+   )
+
+   # 6. Add some attachments
+    %i(png gif pdf jpg zip).each do |ext|
+      Attachment.create!(
+        person: nelson_bighetti,
+        attached_to_seed: ad,
+        document: File.new("#{Rails.root}/spec/fixtures/files/simple.#{ext}")
+      )
+    end
+
+    # 7. Create some identification seeds
+    ids = IdentificationSeed.create!(
+      identification_kind: 'national_id',
+      number: '95546431',
+      issuer: 'AR',
+      issue:  issue
+    )
+
+    passport = IdentificationSeed.create!(
+      identification_kind: 'passport',
+      number: 'AQ76413',
+      issuer: 'US',
+      issue:  issue
+    )
+
+    # 8. Add some attachments
+     %i(png gif pdf jpg zip).each do |ext|
+       Attachment.create!(
+         person: nelson_bighetti,
+         attached_to_seed: ids,
+         document: File.new("#{Rails.root}/spec/fixtures/files/simple.#{ext}")
+       )
+     end
+
+   # 9. Add a domicile seed
+   ds = DomicileSeed.create!(
+     country: 'AR',
+     state: 'Buenos Aires',
+     city: 'C.A.B.A',
+     street_address:  'Federico Lacroze',
+     street_number: '342',
+     floor: '4',
+     apartment: 'B',
+     postal_code: '1431',
+     issue: issue
+   )
+
+   # 10. Add some attachments
+    %i(png gif pdf jpg zip).each do |ext|
+      Attachment.create!(
+        person: nelson_bighetti,
+        attached_to_seed: ds,
+        document: File.new("#{Rails.root}/spec/fixtures/files/simple.#{ext}")
+      )
+    end
+
+   # 11. Add a phone seed
+   ps = PhoneSeed.create!(
+     number: '1165251454',
+     phone_kind: 'main',
+     country: 'AR',
+     note: 'Solo en dias hábiles!!!',
+     has_whatsapp: false,
+     has_telegram: false,
+     issue: issue
+   )
+
+   # 12. Add some attachments
+   %i(png gif pdf jpg zip).each do |ext|
+     Attachment.create!(
+       person: nelson_bighetti,
+       attached_to_seed: ps,
+       document: File.new("#{Rails.root}/spec/fixtures/files/simple.#{ext}")
+     )
+   end
+
+   # 13. Add some email seeds
+   es = EmailSeed.create!(
+     address: 'bighead@example.com',
+     email_kind: 'personal',
+     issue: issue
+   )
+
+   # 15. Add a note
+   NoteSeed.create!(
+     title: 'Nickname',
+     body: 'Please call me Big Head',
+     issue: issue
+   )
+
+   issue.complete!
+
+   observation_one =  Observation.create!(
+     issue: issue,
+     note: 'Basic info is incomplete',
+     scope: 0,
+     observation_reason: incomplete_domicile
+   )
+
+   observation_two = Observation.create!(
+     issue: issue,
+     note: 'ID images are ilegible or does not exist',
+     scope: 0,
+     observation_reason: ilegible_id
+   )
+
+  observation_one.reply = 'Info completed, please check!'
+  observation_two.reply = 'I sent a new photo, please check it ;)'
+  observation_one.save
+  observation_two.save
 end

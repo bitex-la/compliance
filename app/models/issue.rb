@@ -45,6 +45,7 @@ class Issue < ApplicationRecord
   scope :incomplete, -> { where('aasm_state=?', 'draft') }
   scope :just_created, -> { where('aasm_state=?', 'new') }
   scope :answered, -> { where('aasm_state=?', 'answered') }
+  scope :observed, -> { where('aasm_state=?', 'observed') }
   scope :reviewable, -> { just_created.or(answered) }
 
   aasm do

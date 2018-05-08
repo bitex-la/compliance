@@ -3,7 +3,7 @@ ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc{ I18n.t("active_admin.dashboard") }
 
   content title: proc{ I18n.t("active_admin.dashboard") } do
-    
+
     tabs do
       tab :recent_issues do
         ArbreHelpers.issues_panel(self, Issue.just_created, 'Recent Issues')
@@ -17,14 +17,18 @@ ActiveAdmin.register_page "Dashboard" do
         ArbreHelpers.issues_panel(self, Issue.incomplete, 'Drafts')
       end
 
+      tab :observed do
+        ArbreHelpers.issues_panel(self, Issue.observed, 'Observed Issues')
+      end
+
       tab :observations_to_review do
         panel 'Observations to review' do
           table_for Observation.admin_pending do |o|
             o.column(:id) { |obv| obv.id }
             o.column(:note) { |obv| obv.note }
             o.column("observation reason") { |obv|
-              unless obv.observation_reason.nil? 
-                obv.observation_reason.subject 
+              unless obv.observation_reason.nil?
+                obv.observation_reason.subject
               end
            }
            o.column(:created_at)
