@@ -36,7 +36,7 @@ describe 'an admin user' do
     click_button 'Create Person'
 
     Person.count.should == 1
-    
+
     visit '/'
     click_link 'People'
     within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
@@ -61,7 +61,7 @@ describe 'an admin user' do
       from: "issue_identification_seeds_attributes_0_issuer",
       visible: false
 
-    within(".has_many_container.identification_seeds") do 
+    within(".has_many_container.identification_seeds") do
       click_link "Add New Attachment"
       fill_attachment('identification_seeds', 'jpg')
     end
@@ -78,7 +78,7 @@ describe 'an admin user' do
     click_link "Add New Phone seed"
     fill_seed("phone",{
       number: '+541145250470',
-      note: 'Only in office hours'  
+      note: 'Only in office hours'
     })
 
     select "main",
@@ -87,12 +87,12 @@ describe 'an admin user' do
 
     select "Argentina",
       from: "issue[phone_seeds_attributes][0][country]",
-      visible: false 
+      visible: false
 
-    click_link "Add New Domicile seed" 
+    click_link "Add New Domicile seed"
     select "Argentina",
       from: "issue[domicile_seeds_attributes][0][country]",
-      visible: false 
+      visible: false
     fill_seed('domicile', {
        state: 'Buenos Aires',
        city: 'C.A.B.A',
@@ -100,21 +100,21 @@ describe 'an admin user' do
        street_number: '4567',
        postal_code: '1657',
        floor: '1',
-       apartment: 'C' 
+       apartment: 'C'
     })
-    within(".has_many_container.domicile_seeds") do 
+    within(".has_many_container.domicile_seeds") do
       click_link "Add New Attachment"
-      fill_attachment('domicile_seeds', 'zip') 
+      fill_attachment('domicile_seeds', 'zip')
     end
 
     click_link "Add New Allowance seed"
     fill_seed("allowance", {
       weight: "100",
       kind: "ARS",
-      amount: "100" 
+      amount: "100"
     })
 
-    within(".has_many_container.allowance_seeds") do 
+    within(".has_many_container.allowance_seeds") do
       click_link "Add New Attachment"
       fill_attachment('allowance_seeds', 'gif')
     end
@@ -149,9 +149,9 @@ describe 'an admin user' do
      politically_exposed_reason: "Nothing I am a legit guy!"
     }, false)
 
-    
+
     #find("#natural_docket_seed", visible: false).click_link("Add New Attachment")
-    within("#natural_docket_seed") do 
+    within("#natural_docket_seed") do
        find('.has_many_container.attachments').click_link("Add New Attachment")
        fill_attachment('natural_docket_seed', 'png', false)
     end
@@ -164,31 +164,31 @@ describe 'an admin user' do
     select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please check this guy on world check'
- 
+
     click_button "Create Issue"
 
     issue = Issue.last
     observation = Observation.last
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
-      issue.send(seed).count.should == 1 
-      issue.send(seed).first.attachments.count == 1 
+      issue.send(seed).count.should == 1
+      issue.send(seed).first.attachments.count == 1
     end
 
     issue.natural_docket_seed.should == NaturalDocketSeed.last
-    issue.should be_observed 
+    issue.should be_observed
     observation.should be_new
-     
+
     fill_in 'issue[observations_attributes][0][reply]',
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
-    
+
     issue.reload.should be_answered
     observation.reload.should be_answered
- 
-    click_link "Approve" 
 
-    issue.reload.should be_approved  
+    click_link "Approve"
+
+    issue.reload.should be_approved
     Person.last.should be_enabled
   end
 
@@ -199,7 +199,7 @@ describe 'an admin user' do
     observation_reason = create(:observation_reason)
 
     Issue.count.should == 1
-    Person.count.should == 2 
+    Person.count.should == 2
     DomicileSeed.count.should == 1
     IdentificationSeed.count.should == 1
     NaturalDocketSeed.count.should == 1
@@ -237,19 +237,19 @@ describe 'an admin user' do
        click_link 'Show'
       end
     end
-   
+
     window = page.driver.browser.window_handles
     page.driver.browser.switch_to.window(window.first)
 
     # Admin sends an observation to customer about their identification (it was blurry)
-    click_link 'Add New Observation' 
+    click_link 'Add New Observation'
     select observation_reason.subject.truncate(140),
       from: "issue[observations_attributes][0][observation_reason_id]",
       visible: false
     select 'Client', from: 'issue[observations_attributes][0][scope]', visible: false
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please re-send your document'
-    click_button 'Update Issue'    
+    click_button 'Update Issue'
 
     Observation.where(issue: issue).count.should == 1
     Issue.first.should be_observed
@@ -266,7 +266,7 @@ describe 'an admin user' do
     end
 
     get "/api/people/#{person.id}/issues/#{Issue.first.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }	
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
     issue_document = JSON.parse(response.body).deep_symbolize_keys
 
@@ -287,7 +287,7 @@ describe 'an admin user' do
       params: JSON.dump(issue_document),
       headers: {"CONTENT_TYPE" => 'application/json',
                 "Authorization" => "Token token=#{admin_user.api_token}"}
-   
+
     assert_response 200
 
     Issue.first.should be_answered
@@ -301,7 +301,7 @@ describe 'an admin user' do
 
     visit '/'
 
-    click_on 'Pending For Review' 
+    click_on 'Pending For Review'
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
@@ -314,7 +314,6 @@ describe 'an admin user' do
     Issue.last.should be_approved
     Observation.last.should be_answered
     click_link 'Dashboard' 
-    expect(page).to_not have_content(issue.id)
 
     visit "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
     page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}"
@@ -324,13 +323,13 @@ describe 'an admin user' do
     observation_reason = create(:human_world_check_reason)
     person = create(:full_natural_person)
     login_as admin_user
-    
+
     click_link 'People'
-    
+
     within("tr[id='person_#{person.id}'] td[class='col col-actions']") do
       click_link('View')
     end
-   
+
     click_link "Add Person Information"
 
     select "#{person.id}",
@@ -350,10 +349,10 @@ describe 'an admin user' do
       from: 'issue_identification_seeds_attributes_0_issuer',
       visible: false
 
-    select person.identifications.first.id, 
+    select person.identifications.first.id,
       from: "issue[identification_seeds_attributes][0][replaces_id]"
 
-    within(".has_many_container.identification_seeds") do 
+    within(".has_many_container.identification_seeds") do
       click_link "Add New Attachment"
       fill_attachment('identification_seeds', 'jpg')
     end
@@ -361,10 +360,10 @@ describe 'an admin user' do
     find(:css, '#issue_identification_seeds_attributes_0_copy_attachments').set true
 
     click_link "Add New Domicile seed"
-   
+
     select "Argentina",
       from: "issue[domicile_seeds_attributes][0][country]",
-      visible: false 
+      visible: false
     fill_seed('domicile', {
        state: 'Buenos Aires',
        city: 'C.A.B.A',
@@ -372,26 +371,26 @@ describe 'an admin user' do
        street_number: '4567',
        postal_code: '1657',
        floor: '1',
-       apartment: 'C' 
+       apartment: 'C'
     })
 
     select person.domiciles.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]"
 
-    within(".has_many_container.domicile_seeds") do 
+    within(".has_many_container.domicile_seeds") do
       click_link "Add New Attachment"
-      fill_attachment('domicile_seeds', 'zip') 
+      fill_attachment('domicile_seeds', 'zip')
     end
 
     click_link "Add New Allowance seed"
     fill_seed("allowance", {
       weight: "100",
       kind: "ARS",
-      amount: "100" 
+      amount: "100"
     })
 
    select person.allowances.first.id, from: "issue[allowance_seeds_attributes][0][replaces_id]"
 
-    within(".has_many_container.allowance_seeds") do 
+    within(".has_many_container.allowance_seeds") do
       click_link "Add New Attachment"
       fill_attachment('allowance_seeds', 'gif')
     end
@@ -421,7 +420,7 @@ describe 'an admin user' do
       from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
       visible: false
 
-    within("#natural_docket_seed") do 
+    within("#natural_docket_seed") do
       click_link "Add New Attachment"
       fill_attachment('natural_docket_seed', 'png', false)
     end
@@ -434,25 +433,25 @@ describe 'an admin user' do
     select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please check this guy on world check'
- 
+
     click_button "Create Issue"
-   
+
     issue = Issue.last
     observation = Observation.last
-    issue.should be_observed 
+    issue.should be_observed
     observation.should be_new
-     
+
     fill_in 'issue[observations_attributes][0][reply]',
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
-    
+
     issue.reload.should be_answered
     observation.reload.should be_answered
- 
-    click_link "Approve" 
 
-    issue.reload.should be_approved  
-   
+    click_link "Approve"
+
+    issue.reload.should be_approved
+
     old_domicile = Domicile.first
     new_domicile = Domicile.last
     old_identification = Identification.first
@@ -466,11 +465,11 @@ describe 'an admin user' do
     new_domicile.replaced_by_id.should be_nil
 
     old_identification.replaced_by_id.should == new_identification.id
-    new_identification.replaced_by_id.should be_nil 
-    
+    new_identification.replaced_by_id.should be_nil
+
     old_natural_docket.replaced_by_id.should == new_natural_docket.id
     new_natural_docket.replaced_by_id.should be_nil
-    
+
     old_allowance.replaced_by_id.should == new_allowance.id
     new_allowance.replaced_by_id.should be_nil
 
@@ -521,7 +520,7 @@ describe 'an admin user' do
     reason = create :human_world_check_reason
 
     post "/api/people/",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }    
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
     person = api_response.data
 
@@ -533,10 +532,10 @@ describe 'an admin user' do
       '@1', reason, "Please run worldcheck for them")
     issue_request[:data][:id] = "@1"
 
-    post "/api/people/#{person.id}/issues", 
+    post "/api/people/#{person.id}/issues",
       params: issue_request,
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-    
+
     login_as admin_user
 
     issue = api_response.data
@@ -564,11 +563,11 @@ describe 'an admin user' do
 
     get "/api/people/#{person.id}/issues/#{issue.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-  
+
     api_response.data.attributes.state.should == 'approved'
 
     click_link 'Dashboard'
-    
+
     click_on 'Recent Issues'
     within ".recent_issues" do
       expect(page).to_not have_content(issue.id)
@@ -593,28 +592,28 @@ describe 'an admin user' do
     person.should be_enabled
     reason = create(:human_world_check_reason)
 
-    issue_payload = Api::IssuesHelper.issue_with_an_observation(person.id, 
-      reason, 
+    issue_payload = Api::IssuesHelper.issue_with_an_observation(person.id,
+      reason,
       "Please run worldcheck over this guy")
 
-    post "/api/people/#{person.id}/issues", 
+    post "/api/people/#{person.id}/issues",
       params: JSON.dump(issue_payload),
       headers: {"CONTENT_TYPE" => 'application/json',
                 "Authorization" => "Token token=#{admin_user.api_token}"}
 
     assert_response 201
-  
+
     issue = person.issues.last
     login_as admin_user
     issue.should be_observed
 
     click_on 'Recent Issues'
-    within '.recent_issues.panel' do 
+    within '.recent_issues.panel' do
       expect(page).to_not have_content(issue.id)
     end
 
     click_on 'Pending For Review'
-    within '.pending_for_review.panel' do 
+    within '.pending_for_review.panel' do
       expect(page).to_not have_content(issue.id)
     end
     # Admin clicks in the observation to see the issue detail
@@ -638,7 +637,7 @@ describe 'an admin user' do
 
     post "/api/people/",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
- 
+
     person = api_response.data
 
     issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
@@ -674,19 +673,19 @@ describe 'an admin user' do
       params: issue_request.to_json,
       headers: {"CONTENT_TYPE" => 'application/json',
                 "Authorization" => "Token token=#{admin_user.api_token}"}
-    
+
     assert_response 200
 
     api_response.data.attributes.state.should == 'answered'
     api_response.included.find{|i| i.type == 'observations'}
       .attributes.state.should == 'answered'
 
-    visit '/' 
+    visit '/'
     click_on 'Pending For Review'
     within("#issue_#{issue.id} td.col.col-actions") do
       click_link('View')
     end
-    page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit" 
+    page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit"
 
     click_link 'Approve'
 
@@ -695,11 +694,11 @@ describe 'an admin user' do
 
     api_response.data.attributes.state.should == 'approved'
 
-    click_link 'Dashboard' 
+    click_link 'Dashboard'
     expect(page).to_not have_content(issue.id)
 
     get "/api/people/#{person.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }   
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
     api_response.data.attributes.enabled.should be_truthy
 
@@ -735,9 +734,9 @@ describe 'an admin user' do
         params: issue_request.to_json,
         headers: {"CONTENT-TYPE": 'application/json',
                   "Authorization": "Token token=#{admin_user.api_token}"}
-      
+
       issue = api_response.data
-      
+
       login_as admin_user
       click_on 'Drafts'
       within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
@@ -747,8 +746,8 @@ describe 'an admin user' do
       within ".has_many_container.domicile_seeds" do
         select "Argentina",
         from: "issue[domicile_seeds_attributes][0][country]",
-        visible: false 
-    
+        visible: false
+
         fill_seed('domicile', {
           state: 'Buenos Aires',
           city: 'C.A.B.A',
@@ -756,20 +755,20 @@ describe 'an admin user' do
           street_number: '4567',
           postal_code: '1657',
           floor: '1',
-          apartment: 'C' 
+          apartment: 'C'
         })
-      
-        select Domicile.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]" 
-       
+
+        select Domicile.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]"
+
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
         click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'gif', true, 0, 1) 
-      end   
+        fill_attachment('domicile_seeds', 'gif', true, 0, 1)
+      end
 
       click_button "Update Issue"
       issue = Issue.last
       issue.should be_draft
-      
+
       click_link "Approve"
       issue.reload.should be_approved
 
@@ -813,7 +812,7 @@ describe 'an admin user' do
         from: 'issue_identification_seeds_attributes_0_issuer',
         visible: false
 
-      within(".has_many_container.identification_seeds") do 
+      within(".has_many_container.identification_seeds") do
         click_link "Add New Attachment"
         fill_attachment('identification_seeds', 'jpg')
       end
@@ -822,7 +821,7 @@ describe 'an admin user' do
 
       select "Argentina",
        from: "issue[domicile_seeds_attributes][0][country]",
-       visible: false 
+       visible: false
       fill_seed('domicile', {
         state: 'Buenos Aires',
         city: 'C.A.B.A',
@@ -830,17 +829,17 @@ describe 'an admin user' do
         street_number: '4567',
         postal_code: '1657',
         floor: '1',
-        apartment: 'C' 
+        apartment: 'C'
       })
-      within(".has_many_container.domicile_seeds fieldset:nth-of-type(1)") do 
+      within(".has_many_container.domicile_seeds fieldset:nth-of-type(1)") do
         click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'zip') 
+        fill_attachment('domicile_seeds', 'zip')
       end
 
       click_button "Update Issue"
       issue = Issue.last
       issue.should be_draft
-      
+
       click_link "Approve"
       issue.reload.should be_approved
 
@@ -857,7 +856,7 @@ describe 'an admin user' do
       issue = person.issues.first
 
       Issue.count.should == 1
-      Person.count.should == 2 
+      Person.count.should == 2
       DomicileSeed.count.should == 1
       IdentificationSeed.count.should == 1
       NaturalDocketSeed.count.should == 1
@@ -871,7 +870,7 @@ describe 'an admin user' do
       # Admin sees issue in dashboard.
       click_on 'Drafts'
       expect(page).to have_content issue.id
-      
+
       within("#issue_#{issue.id} td.col.col-actions") do
         click_link('View')
       end
@@ -898,7 +897,7 @@ describe 'an admin user' do
       DomicileSeed.count.should == 1
       IdentificationSeed.count.should == 0
       NaturalDocketSeed.count.should == 1
-     
+
       visit "/people/#{person.id}/issues/#{Issue.last.id}"
 
       click_link "Add New Identification seed"
@@ -914,12 +913,12 @@ describe 'an admin user' do
         from: 'issue_identification_seeds_attributes_0_issuer',
         visible: false
 
-      within(".has_many_container.identification_seeds") do 
+      within(".has_many_container.identification_seeds") do
         click_link "Add New Attachment"
         fill_attachment('identification_seeds', 'jpg')
       end
-      
-      click_button 'Update Issue' 
+
+      click_button 'Update Issue'
 
       click_link 'Approve'
       issue.reload.should be_approved
@@ -934,7 +933,7 @@ describe 'an admin user' do
 
   it 'manually enables/disables and sets risk for a person' do
     person = create(:full_natural_person)
-    
+
     login_as admin_user
 
     click_link 'People'
@@ -944,7 +943,7 @@ describe 'an admin user' do
     end
     page.current_path.should == "/people/#{person.id}/edit"
 
-    find(:css, "#person_enabled").set(false) 
+    find(:css, "#person_enabled").set(false)
     select 'low', from: 'person_risk', visible: false
     click_button 'Update Person'
 
@@ -963,7 +962,7 @@ describe 'an admin user' do
     # The customer sends further data (via API) (along with a comment)
     # An admin reviews the data and decides it's not enough. (and places further comments)
     # The customer finally attaches all the required documents
-    # The admin accepts the documents, assigns a value and periodicity to the new allowances backed by the documents. 
+    # The admin accepts the documents, assigns a value and periodicity to the new allowances backed by the documents.
   end
 
   it 'lets admins run blacklist checks manually' do

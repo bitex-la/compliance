@@ -26,6 +26,7 @@ class Person < ApplicationRecord
     if self.enabled
       natural_dockets.current.first
     else
+      return nil if issues.blank?
       issues.last.natural_docket_seed
     end
   end
@@ -34,6 +35,7 @@ class Person < ApplicationRecord
     if self.enabled
       legal_entity_dockets.current.first
     else
+      return nil if issues.blank?
       issues.last.legal_entity_docket_seed
     end
   end
@@ -42,6 +44,7 @@ class Person < ApplicationRecord
     if self.enabled
       !natural_dockets.current.blank?
     else
+      return false if issues.blank?
       !issues.last.natural_docket_seed.blank?
     end
   end
@@ -50,6 +53,7 @@ class Person < ApplicationRecord
     if self.enabled
       !legal_entity_dockets.current.blank?
     else
+      return false if issues.blank?
       !issues.last.legal_entity_docket_seed.blank?
     end
   end

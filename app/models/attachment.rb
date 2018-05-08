@@ -28,6 +28,10 @@ class Attachment < ApplicationRecord
     /rar\z/,
   ]
 
+  def document_url
+    self.document.url
+  end
+
   private
   def relate_to_person
     unless destroyed?
