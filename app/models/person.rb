@@ -8,7 +8,7 @@ class Person < ApplicationRecord
     allowances
     phones
     emails
-    notes 
+    notes
     argentina_invoicing_details
     chile_invoicing_details
     affinities
@@ -19,11 +19,39 @@ class Person < ApplicationRecord
 
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
-  
+
   enum risk: %i(low medium high)
 
   def natural_docket
-    natural_dockets.current.first
+    if self.enabled
+      natural_dockets.current.first
+    else
+      issues.last.natural_docket_seed
+    end
+  end
+
+  def legal_entity_docket
+    if self.enabled
+      legal_entity_dockets.current.first
+    else
+      issues.last.legal_entity_docket_seed
+    end
+  end
+
+  def is_a_natural_person?
+    if self.enabled
+      !natural_dockets.current.blank?
+    else
+      !issues.last.natural_docket_seed.blank?
+    end
+  end
+
+  def is_a_legal_entity?
+    if self.enabled
+      !legal_entity_dockets.current.blank?
+    else
+      !issues.last.legal_entity_docket_seed.blank?
+    end
   end
 
   def name

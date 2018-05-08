@@ -24,8 +24,20 @@ ActiveAdmin.register Person do
     f.actions
   end
 
-  show do
+  index do
+    column :id
+    column :enabled
+    column :risk
+    column :is_a_natural_person?
+    column :natural_docket
+    column :is_a_legal_entity?
+    column :legal_entity_docket
+    column :created_at
+    column :updated_at
+    actions
+  end
 
+  show do
     tabs do
       tab :person_info do
         attributes_table do
