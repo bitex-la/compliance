@@ -501,7 +501,7 @@ ActiveAdmin.register Issue do
           o.column("Reply")   { |obv| obv.reply }
           o.column("Reason")  { |obv|
             unless obv.observation_reason.nil?
-              obv.observation_reason.subject
+              obv.observation_reason.subject_en
             end
           }
           o.column("Scope")   { |obv| obv.scope }

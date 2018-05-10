@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180425133238) do
+ActiveRecord::Schema.define(version: 20180509193719) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -415,11 +415,15 @@ ActiveRecord::Schema.define(version: 20180425133238) do
   end
 
   create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string "subject"
-    t.text "body"
+    t.string "subject_en"
+    t.text "body_en"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "scope"
+    t.string "subject_es"
+    t.text "body_es"
+    t.string "subject_pt"
+    t.text "body_pt"
   end
 
   create_table "observations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|

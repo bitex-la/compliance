@@ -10,38 +10,62 @@ if Rails.env.demo? || Rails.env.development?
  ############# CREATE SUPPORT ENTITIES #################
  # 1. Observations reasons
  human_worldcheck = ObservationReason.create!(
-   subject: 'Admin must run a manual worldcheck review',
-   body: 'Please go to worlcheck and check the customer',
+   subject_en: 'Admin must run a manual worldcheck review',
+   body_en: 'Please go to worlcheck and check the customer',
+   subject_es: 'Admin debe correr una revisión manual en worldcheck',
+   body_es: 'Por favor vaya a worldcheck y haga una revisión manual',
+   subject_pt: 'O administrador deve executar uma revisão manual do worldcheck',
+   body_pt: 'Por favor, vá para worlcheck e verifique o cliente',
    scope: 2
  )
 
  robot_worldcheck = ObservationReason.create!(
-   subject: 'Robot must run an automated worldcheck review',
-   body: 'Mr. Robot please go to worldcheck and check the customer',
+   subject_en: 'Robot must run an automated worldcheck review',
+   body_en: 'Mr. Robot please go to worldcheck and check the customer',
+   subject_es: 'Robot debe correr una revisión automatica en worldcheck',
+   body_es: 'Mr. Robot por favor vaya a worldcheck y revise al cliente',
+   subject_pt: 'O robô deve executar uma revisão automatizada do worldcheck',
+   body_pt: 'Mr. Robot, por favor, vá para o Worldcheck e verifique o cliente',
    scope: 1
  )
 
  ilegible_id = ObservationReason.create!(
-   subject: 'ID attachement(s) are ilegible',
-   body: 'Please submit again your ID attachments',
+   subject_en: 'ID attachement(s) are ilegible',
+   body_en: 'Please submit again your ID attachments',
+   subject_es: 'Los anexos de la identificación son ilegibles',
+   body_es: 'Por favor anexe de nuevo los anexos de la identificación',
+   subject_pt: 'O anexo de identificação (s) é ilegível',
+   body_pt: 'Por favor, envie novamente seus anexos de identificação',
    scope: 0
  )
 
  incomplete_domicile = ObservationReason.create!(
-   subject: 'Incomplete domicile(s) info',
-   body: 'Please complete domicile(s) info',
+   subject_en: 'Incomplete domicile(s) info',
+   body_en: 'Please complete domicile(s) info',
+   subject_es: 'Información de domicilio incompleta',
+   body_es: 'Por favor complete la información del domicilio',
+   subject_pt: 'Informações incompletas sobre domicílio (s)',
+   body_pt: 'Por favor, complete as informações do (s) domicílio (s)',
    scope: 0
  )
 
  incomplete_basic_info = ObservationReason.create!(
-   subject: 'Incomplete natural person info',
-   body: 'Please complete basic info for a natural person',
+   subject_en: 'Incomplete natural person info',
+   body_en: 'Please complete basic info for a natural person',
+   subject_es: 'Información de persona natural incompleta',
+   body_es: 'Por favor complete la información básica para una persona natural',
+   subject_pt: 'Informação de pessoa natural incompleta',
+   body_pt: 'Por favor, preencha as informações básicas para uma pessoa natural',
    scope: 0
  )
 
  incomplete_company_info = ObservationReason.create!(
-   subject: 'Incomplete legal entity info',
-   body: 'Please complete basic info for a legal entity',
+   subject_en: 'Incomplete legal entity info',
+   body_en: 'Please complete basic info for a legal entity',
+   subject_es: 'Información de entidad legal incompleta',
+   body_es: 'Por favor complete la información básica para una entidad legal',
+   subject_pt: 'Informações sobre entidade legal incompleta',
+   body_pt: 'Por favor, preencha as informações básicas para uma entidade legal',
    scope: 0
  )
  ############# AN ARGENTINE NATURAL PERSON TO CHECK ##############
