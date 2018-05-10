@@ -28,7 +28,7 @@ ActiveAdmin.register_page "Dashboard" do
             o.column(:note) { |obv| obv.note }
             o.column("observation reason") { |obv|
               unless obv.observation_reason.nil?
-                obv.observation_reason.subject
+                obv.observation_reason.subject_en
               end
            }
            o.column(:created_at)

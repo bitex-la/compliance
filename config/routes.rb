@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   # Concern must go first!
   namespace :api do
+    resources :observation_reasons, only: [:show, :index] 
     resources :people, only: [:create, :show, :index, :update] do
       resources :issues, only: [:create, :show, :index, :update]
     end

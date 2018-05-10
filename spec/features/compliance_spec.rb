@@ -158,7 +158,7 @@ describe 'an admin user' do
 
     click_link "Add New Observation"
 
-    select observation_reason.subject.truncate(140),
+    select observation_reason.subject_en.truncate(140),
       from: "issue[observations_attributes][0][observation_reason_id]",
       visible: false
     select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
@@ -243,7 +243,7 @@ describe 'an admin user' do
 
     # Admin sends an observation to customer about their identification (it was blurry)
     click_link 'Add New Observation'
-    select observation_reason.subject.truncate(140),
+    select observation_reason.subject_en.truncate(140),
       from: "issue[observations_attributes][0][observation_reason_id]",
       visible: false
     select 'Client', from: 'issue[observations_attributes][0][scope]', visible: false
@@ -427,7 +427,7 @@ describe 'an admin user' do
 
     click_link "Add New Observation"
 
-    select observation_reason.subject.truncate(140),
+    select observation_reason.subject_en.truncate(140),
       from: "issue[observations_attributes][0][observation_reason_id]",
       visible: false
     select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
