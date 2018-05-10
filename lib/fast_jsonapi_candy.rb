@@ -16,7 +16,9 @@ module FastJsonapiCandy
       def derive_seed_serializer!
         klass = Class.new
         Object.const_set(@naming.seed_serializer, klass)
-        klass.class_eval{ include FastJsonapiCandy::Seed }  
+        klass.class_eval{
+          include FastJsonapiCandy::Seed
+        }
       end
     end
   end
@@ -29,7 +31,7 @@ module FastJsonapiCandy
       include Serializer
       set_type naming.seed_plural
       build_belongs_to :issue
-      belongs_to :fruit, record_type: naming.plural
+      belongs_to :fruit, record_type: naming.plural, serializer: naming.fruit
       build_has_many :attachments
 
       if attrs = naming.serializer.constantize.attributes_to_serialize

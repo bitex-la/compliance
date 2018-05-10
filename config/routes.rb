@@ -4,9 +4,21 @@ Rails.application.routes.draw do
 
   # Concern must go first!
   namespace :api do
-    resources :observation_reasons, only: [:show, :index] 
+    resources :observation_reasons, only: [:show, :index]
     resources :people, only: [:create, :show, :index, :update] do
-      resources :issues, only: [:create, :show, :index, :update]
+      resources :issues, only: [:create, :show, :index, :update] do
+        %i(
+          domicile_seeds
+          allowance_seeds
+          identification_seeds
+          phone_seeds
+          email_seeds
+          note_seeds
+          affinity_seeds
+        ).each do |entities|
+          resources entities, only: [:show, :index, :create, :update]
+        end
+      end
     end
   end
 end
