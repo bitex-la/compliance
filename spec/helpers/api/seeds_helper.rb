@@ -2,6 +2,151 @@ require 'spec_helper'
 class Api::SeedsHelper
   include RSpec::Rails::FixtureFileUploadSupport
 
+  def self.note_seed(issue, attachment_type)
+    {
+      data: {
+        type: "note_seeds",
+        id: "@1",
+        attributes: {
+          title: 'My nickname',
+          body: 'Call me mr. robot' 
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included:[
+        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+      ]
+    }
+  end
+
+  def self.allowance_seed(issue, attachment_type)
+    {
+      data: {
+        type: "allowance_seeds",
+        id: "@1",
+        attributes: {
+          weight: 10,
+          amount: 1000,
+          kind: "USD"
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included:[
+        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+      ]
+    }
+  end
+
+  def self.identification_seed(issue, attachment_type)
+    {
+      data: {
+        type: "identification_seeds",
+        id: "@1",
+        attributes: {
+          identification_kind: "national_id",
+          number: "AQ322812",
+          issuer: "CO"
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included:[
+        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+      ]
+    }
+  end
+
+  def self.email_seed(issue, attachment_type)
+    mime, bytes =
+    {
+      data: {
+        type: "email_seeds",
+        id: "@1",
+        attributes: {
+          address: "joe.doe@test.com",
+          email_kind: "personal",
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included: [
+        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end
+
+  def self.domicile_seed(issue, attachment_type)
+    mime, bytes =
+    {
+      data: {
+        type: "domicile_seeds",
+        id: "@1",
+        attributes: {
+          country: "AR",
+          state: "buenos aires",
+          city: "CABA",
+          street_address: "cullen",
+          street_number: "2345",
+          postal_code: "1234",
+          floor: "4",
+          apartment: "a"
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included: [
+        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end
+
   def self.affinity_seed(related_issue, related_person, attachment_type)
     mime, bytes =
     {
@@ -23,6 +168,38 @@ class Api::SeedsHelper
           },
           related_person: {
             data: {id: related_person.id, type: "people"}
+          }
+        }
+      },
+      included: [
+        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end
+
+  def self.phone_seed(issue, attachment_type)
+    mime, bytes =
+    {
+      data: {
+        type: "phone_seeds",
+        id: "@1",
+        attributes: {
+          number: "+54911282256470",
+          phone_kind: "main",
+          country: "AR",
+          has_whatsapp: true,
+          has_telegram: false,
+          note: "only on office hours",
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
           }
         }
       },

@@ -96,6 +96,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :attachments,
         :copy_attachments,
         :replaces,
+        :issue
       ],
       email_seeds: [
         :address,
@@ -103,6 +104,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :attachments,
         :copy_attachments,
         :replaces,
+        :issue
       ],
       note_seeds: [
         :title,
@@ -110,6 +112,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :attachments,
         :copy_attachments,
         :replaces,
+        :issue
       ],
       affinity_seeds: [
         :affinity_kind,
@@ -126,6 +129,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :attachments,
         :copy_attachments,
         :replaces,
+        :issue
       ],
       natural_docket_seeds: [
         :first_name,
@@ -162,6 +166,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :address,
         :attachments,
         :copy_attachments,
+        :issue
       ],
       chile_invoicing_detail_seeds: [
         :vat_status,
@@ -171,6 +176,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :comuna,
         :attachments,
         :copy_attachments,
+        :issue
       ],
       allowance_seeds: [
         :weight,
@@ -179,6 +185,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :attachments,
         :copy_attachments,
         :replaces,
+        :issue
       ],
       observations: [
         :note,
