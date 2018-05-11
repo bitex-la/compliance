@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     resources :observation_reasons, only: [:show, :index]
     resources :people, only: [:create, :show, :index, :update] do
       resources :issues, only: [:create, :show, :index, :update] do
+        resource :natural_docket_seed, only: %w(index create update)
         %i(
           domicile_seeds
           allowance_seeds

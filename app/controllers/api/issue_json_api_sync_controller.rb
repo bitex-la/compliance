@@ -1,0 +1,192 @@
+class Api::IssueJsonApiSyncController < Api::ApiController
+  def show
+    jsonapi_response get_resource(scope)
+  end
+
+  def create
+    map_and_save(201)
+  end
+
+  def update
+    get_resource(scope)
+    map_and_save(200)
+  end
+
+  def get_resource(scope)
+  end
+
+  protected
+
+  def scoped_collection(&block)
+    page, per_page = Util::PageCalculator.call(params, 0, 10)
+    resource = block.call(scope)
+      .order(updated_at: :desc).page(page).per(per_page)
+
+    jsonapi_response resource, {
+      meta: { total_pages: (resource.count.to_f / per_page).ceil }
+    }
+  end
+
+  def scope
+    scope = Person.find(params[:person_id])
+    if issue_id = params[:issue_id]
+      scope = scope.issues.find(params[:issue_id])
+    end
+    scope
+  end
+
+  def map_and_save(success_code)
+    mapper = get_mapper 
+
+    return jsonapi_422(nil) unless mapper.data
+
+    if mapper.save_all
+      jsonapi_response mapper.data, {}, success_code
+    else
+      json_response mapper.all_errors, 422
+    end
+  end
+
+  def get_mapper
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      %w(issues domicile_seeds phone_seeds email_seeds note_seeds
+        affinity_seeds identification_seeds natural_docket_seeds
+        legal_entity_docket_seeds argentina_invoicing_detail_seeds
+        chile_invoicing_detail_seeds allowance_seeds observations attachments
+      ),
+      issues: [
+        :state,
+        :domicile_seeds,
+        :identification_seeds,
+        :natural_docket_seed,
+        :legal_entity_docket_seed,
+        :argentina_invoicing_detail_seed,
+        :chile_invoicing_detail_seed,
+        :allowance_seeds,
+        :phone_seeds,
+        :email_seeds,
+        :note_seeds,
+        :affinity_seeds,
+        :observations,
+        :person,
+      ],
+      domicile_seeds: [
+        :country,
+        :state,
+        :city,
+        :street_address,
+        :street_number,
+        :postal_code,
+        :floor,
+        :apartment,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        :issue
+      ],
+      phone_seeds: [
+        :number,
+        :phone_kind,
+        :country,
+        :has_whatsapp,
+        :has_telegram,
+        :note,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+      ],
+      email_seeds: [
+        :address,
+        :email_kind,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+      ],
+      note_seeds: [
+        :title,
+        :body,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+      ],
+      affinity_seeds: [
+        :affinity_kind,
+        :related_person,
+        :replaces,
+        :attachments,
+        :copy_attachments,
+      ],
+      identification_seeds: [
+        :identification_kind,
+        :number,
+        :issuer,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+      ],
+      natural_docket_seeds: [
+        :first_name,
+        :last_name,
+        :birth_date,
+        :nationality,
+        :gender,
+        :marital_status,
+        :job_title,
+        :job_description,
+        :politically_exposed,
+        :politically_exposed_reason,
+        :attachments,
+        :copy_attachments,
+      ],
+      legal_entity_docket_seeds: [
+        :industry,
+        :business_description,
+        :country,
+        :commercial_name,
+        :legal_name,
+        :attachments,
+        :copy_attachments,
+      ],
+      argentina_invoicing_detail_seeds: [
+        :vat_status,
+        :tax_id,
+        :tax_id_kind,
+        :receipt_kind,
+        :name,
+        :country,
+        :address,
+        :attachments,
+        :copy_attachments,
+      ],
+      chile_invoicing_detail_seeds: [
+        :vat_status,
+        :tax_id,
+        :giro,
+        :ciudad,
+        :comuna,
+        :attachments,
+        :copy_attachments,
+      ],
+      allowance_seeds: [
+        :weight,
+        :amount,
+        :kind,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+      ],
+      observations: [
+        :note,
+        :reply,
+        :scope,
+        :observation_reason,
+      ],
+      attachments: [
+        :document,
+        :document_file_name,
+        :document_content_type,
+        :attached_to_seed,
+        :person,
+      ]
+  end
+end
