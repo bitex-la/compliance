@@ -36,8 +36,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
   end
 
   def map_and_save(success_code)
-    mapper = get_mapper 
-
+    mapper = get_mapper
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
@@ -53,6 +52,9 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         affinity_seeds identification_seeds natural_docket_seeds
         legal_entity_docket_seeds argentina_invoicing_detail_seeds
         chile_invoicing_detail_seeds allowance_seeds observations attachments
+        people observation_reasons domiciles identifications allowances phones 
+        emails notes affinities argentina_invoicing_details chile_invoicing_details 
+        natural_dockets legal_entity_dockets
       ),
       issues: [
         :state,
@@ -115,6 +117,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :replaces,
         :attachments,
         :copy_attachments,
+        :issue
       ],
       identification_seeds: [
         :identification_kind,
@@ -137,6 +140,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :politically_exposed_reason,
         :attachments,
         :copy_attachments,
+        :issue
       ],
       legal_entity_docket_seeds: [
         :industry,
@@ -146,6 +150,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :legal_name,
         :attachments,
         :copy_attachments,
+        :issue
       ],
       argentina_invoicing_detail_seeds: [
         :vat_status,
@@ -187,6 +192,19 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :document_content_type,
         :attached_to_seed,
         :person,
-      ]
+      ],
+      people: [],
+      observation_reasons: [],
+      domiciles: [],
+      identifications: [],
+      natural_dockets: [],
+      legal_entity_dockets: [],
+      phones: [],
+      emails: [],
+      notes: [],
+      affinities: [],
+      argentina_invoicing_details: [],
+      chile_invoicing_details: [],
+      allowances: [] 
   end
 end

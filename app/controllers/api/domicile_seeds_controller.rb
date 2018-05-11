@@ -1,4 +1,4 @@
-class Api::DomicileSeedController < Api::IssueJsonApiSyncController
+class Api::DomicileSeedsController < Api::IssueJsonApiSyncController
   def index
     scoped_collection{|s| s.domicile_seeds }
   end

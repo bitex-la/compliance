@@ -8,6 +8,9 @@ Rails.application.routes.draw do
     resources :people, only: [:create, :show, :index, :update] do
       resources :issues, only: [:create, :show, :index, :update] do
         resource :natural_docket_seed, only: %w(index create update)
+        resource :legal_entity_docket_seed, only: %w(index create update)
+        resource :argentina_invoicing_docket_seed, only: %w(index create update)
+        resource :chile_invoicing_docket_seed, only: %w(index create update)
         %i(
           domicile_seeds
           allowance_seeds
