@@ -67,9 +67,9 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       payload[:data][:attributes][:kind] = 'USD'
   end
 
-  put "/api/people/#{issue.person.id}/issues/#{issue.id}/#{relationship}/#{seed_id}",
+  put "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed_name.pluralize.underscore}/#{seed_id}",
     params: JSON.dump(payload),
-    headers: { 
+    headers: {
       'CONTENT_TYPE': 'application/json',
       'Authorization': "Token token=#{admin_user.api_token}" }
 
@@ -90,7 +90,7 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       issue.chile_invoicing_detail_seed.ciudad.should == 'Valparaiso'
       issue.chile_invoicing_detail_seed.comuna.should == 'La Rosita'
     when 'AffinitySeed'
-      issue.affinity_seeds.first.affinity_kind.should  == :manager 
+      issue.affinity_seeds.first.affinity_kind.should  == :manager
     when 'DomicileSeed'
       issue.domicile_seeds.first.street_address.should == 'Cerati'
       issue.domicile_seeds.first.street_number.should == '100'
@@ -115,22 +115,22 @@ end
 ALL_SEEDS.each do |seed|
   describe seed.constantize do
     let(:issue) {create(:basic_issue)}
-    let(:admin_user) { create(:admin_user) } 
+    let(:admin_user) { create(:admin_user) }
 
     describe "Creating a new #{seed}" do
       it "creates a new #{seed} with an attachment" do
         seed_payload = build_seed_payload(seed)
-         
-        relationship = if PLURAL_SEEDS.include? seed 
+
+        relationship = if PLURAL_SEEDS.include? seed
             seed.pluralize.underscore
           else
             seed.underscore
           end
 
-        post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{relationship}",
+        post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
           params: seed_payload,
           headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-         
+
         assert_response 201
         if PLURAL_SEEDS.include? seed
           issue.send("#{relationship}").count.should == 1
@@ -145,14 +145,14 @@ ALL_SEEDS.each do |seed|
     describe "Updating a new #{seed}" do
       it "creates, gets and updates a new #{seed} with an attachment" do
         seed_payload = build_seed_payload(seed)
-         
-        relationship = if PLURAL_SEEDS.include? seed 
+
+        relationship = if PLURAL_SEEDS.include? seed
             seed.pluralize.underscore
           else
             seed.underscore
           end
 
-        post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{relationship}",
+        post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
           params: seed_payload,
           headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
         assert_response 201
@@ -164,21 +164,19 @@ ALL_SEEDS.each do |seed|
         end
 
         # For plural seeds show endpoint exists, otherwise goes to seed index
-        if PLURAL_SEEDS.include? seed 
-          get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{relationship}/#{seed_id}",
+        if PLURAL_SEEDS.include? seed
+          get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}/#{seed_id}",
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
         else
-          get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{relationship}",
+          get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
         end
-        assert_response 200  
+        assert_response 200
 
-        seed_payload = JSON.parse(response.body).deep_symbolize_keys 
-     
+        seed_payload = JSON.parse(response.body).deep_symbolize_keys
+
         assert_seed_update(admin_user, issue, seed, seed_id, relationship, seed_payload)
       end
     end
   end
 end
-
-

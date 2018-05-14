@@ -1,4 +1,4 @@
-class Api::NaturalDocketSeedController < Api::IssueJsonApiSyncController
+class Api::NaturalDocketSeedsController < Api::IssueJsonApiSyncController
   def index
     show
   end
