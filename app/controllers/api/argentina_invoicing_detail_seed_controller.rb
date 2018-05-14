@@ -1,4 +1,4 @@
-class Api::ArgentinaInvoicingDetailSeedsController < Api::IssueJsonApiSyncController
+class Api::ArgentinaInvoicingDetailSeedController < Api::IssueJsonApiSyncController
   def index
     show
   end

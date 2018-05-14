@@ -9,7 +9,7 @@ class Api::SeedsHelper
         id: "@1",
         attributes: {
           title: 'My nickname',
-          body: 'Call me mr. robot' 
+          body: 'Call me mr. robot'
         },
         relationships: {
           issue: {
@@ -190,6 +190,131 @@ class Api::SeedsHelper
           has_whatsapp: true,
           has_telegram: false,
           note: "only on office hours",
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included: [
+        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end
+
+  def self.natural_docket_seed(issue, attachment_type)
+    {
+      data: {
+        type: "natural_docket_seeds",
+        id: "@1",
+        attributes: {
+          first_name: "joe",
+          last_name: "doe",
+          birth_date: "2018-01-01",
+          nationality: "AR",
+          gender: "male",
+          marital_status: "single"
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included:[
+        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+      ]
+    }
+  end
+
+  def self.legal_entity_docket_seed(issue, attachment_type)
+    {
+      data: {
+        type: "legal_entity_docket_seeds",
+        id: "@1",
+        attributes: {
+          industry: "software",
+          business_description: "software factory",
+          country: "AR",
+          commercial_name: "my soft",
+          legal_name: "mySoft SRL"
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included:[
+        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+      ]
+    }
+  end
+
+  def self.argentina_invoicing_detail_seed(issue, attachment_type)
+    mime, bytes =
+    {
+      data: {
+        type: "argentina_invoicing_detail_seeds",
+        id: "@1",
+        attributes: {
+          vat_status: "monotributo",
+          tax_id: "2022443870",
+          tax_id_kind: "cuit",
+          receipt_kind: "a",
+          name: "Jorge Galvan",
+          country: "AR",
+          address: "Bucarelli 2675"
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included: [
+        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end
+
+  def self.chile_invoicing_detail_seed(issue, attachment_type)
+    mime, bytes =
+    {
+      data: {
+        type: "chile_invoicing_detail_seeds",
+        id: "@1",
+        attributes: {
+          vat_status: "monotributo",
+          tax_id: "2022443870",
+          giro: 'sfsdffd',
+          ciudad: 'Santiago',
+          comuna: 'Condes'
         },
         relationships: {
           issue: {

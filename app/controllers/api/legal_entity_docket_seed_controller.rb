@@ -1,4 +1,4 @@
-class Api::LegalEntityDocketSeedsController < Api::IssueJsonApiSyncController
+class Api::LegalEntityDocketSeedController < Api::IssueJsonApiSyncController
   def index
     show
   end

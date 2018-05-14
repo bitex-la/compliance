@@ -52,8 +52,8 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         affinity_seeds identification_seeds natural_docket_seeds
         legal_entity_docket_seeds argentina_invoicing_detail_seeds
         chile_invoicing_detail_seeds allowance_seeds observations attachments
-        people observation_reasons domiciles identifications allowances phones 
-        emails notes affinities argentina_invoicing_details chile_invoicing_details 
+        people observation_reasons domiciles identifications allowances phones
+        emails notes affinities argentina_invoicing_details chile_invoicing_details
         natural_dockets legal_entity_dockets
       ),
       issues: [
@@ -212,6 +212,6 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       affinities: [],
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
-      allowances: [] 
+      allowances: []
   end
 end
