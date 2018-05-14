@@ -16,7 +16,7 @@ module ApiResponse
       options[:include] = serializer.relationships_to_serialize.keys
     end
     ser = serializer.new(it, options)
-    body = ser.serialized_json 
+    body = ser.serialized_json
     json_response body, status
   end
 
@@ -31,10 +31,10 @@ module ApiResponse
 
   def jsonapi_404(exception)
     jsonapi_error(404, 'not_found')
-  end 
+  end
 
   def jsonapi_403
-    jsonapi_error(403, 'forbidden')     
+    jsonapi_error(403, 'forbidden')
   end
 
   def jsonapi_error(status, text)

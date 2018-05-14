@@ -1,6 +1,9 @@
-class Api::DomicileSeedsController < ApplicationController
-  def show
-    domicile_seed = DomicileSeed.find(params[:id])
-    render json: DomicileSeedSerializer.new(domicile_seed).serialized_json
+class Api::DomicileSeedsController < Api::IssueJsonApiSyncController
+  def index
+    scoped_collection{|s| s.domicile_seeds }
+  end
+
+  def get_resource(scope)
+    scope.domicile_seeds.find(params[:id])
   end
 end
