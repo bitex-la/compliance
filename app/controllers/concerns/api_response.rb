@@ -11,7 +11,8 @@ module ApiResponse
   end
 
   def jsonapi_response(it, options = {}, status = 200)
-    serializer = "#{it.try(:klass) || it.class}Serializer".constantize
+    payload = it.is_a?(Array) ? it.first : it
+    serializer = "#{payload.try(:klass) || payload.class}Serializer".constantize
     unless serializer.relationships_to_serialize.nil?
       options[:include] = serializer.relationships_to_serialize.keys
     end

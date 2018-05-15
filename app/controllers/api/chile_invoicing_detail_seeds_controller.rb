@@ -1,8 +1,4 @@
-class Api::ChileInvoicingDetailSeedsController < Api::IssueJsonApiSyncController
-  def index
-    show
-  end
-
+class Api::ChileInvoicingDetailSeedsController < Api::SingleResourceIssueJsonApiSyncController
   def get_resource(scope)
     scope.chile_invoicing_detail_seed
   end

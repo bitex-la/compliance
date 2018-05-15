@@ -32,39 +32,40 @@ def build_seed_payload(seed)
 end
 
 def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payload)
+  attrs = payload[:data][:attributes]
   case seed_name
     when 'NaturalDocketSeed'
-      payload[:data][:attributes][:first_name] = 'Zinedine'
-      payload[:data][:attributes][:last_name] = 'Zidane'
+      attrs[:first_name] = 'Zinedine'
+      attrs[:last_name] = 'Zidane'
     when 'LegalEntityDocketSeed'
-      payload[:data][:attributes][:commercial_name] = 'E Crop'
-      payload[:data][:attributes][:legal_name] = 'Evil Corp'
+      attrs[:commercial_name] = 'E Crop'
+      attrs[:legal_name] = 'Evil Corp'
     when 'ArgentinaInvoicingDetailSeed'
-      payload[:data][:attributes][:name] = 'Nick Ocean'
-      payload[:data][:attributes][:address] = 'Fake Street 123'
+      attrs[:name] = 'Nick Ocean'
+      attrs[:address] = 'Fake Street 123'
     when 'ChileInvoicingDetailSeed'
-      payload[:data][:attributes][:ciudad] = 'Valparaiso'
-      payload[:data][:attributes][:comuna] = 'La Rosita'
+      attrs[:ciudad] = 'Valparaiso'
+      attrs[:comuna] = 'La Rosita'
     when 'AffinitySeed'
-      payload[:data][:attributes][:affinity_kind] = 'manager'
+      attrs[:affinity_kind] = 'manager'
     when 'DomicileSeed'
-      payload[:data][:attributes][:street_address] = 'Cerati'
-      payload[:data][:attributes][:street_number] = '100'
+      attrs[:street_address] = 'Cerati'
+      attrs[:street_number] = '100'
     when 'IdentificationSeed'
-      payload[:data][:attributes][:number] = '95678431'
-      payload[:data][:attributes][:issuer] = 'AR'
+      attrs[:number] = '95678431'
+      attrs[:issuer] = 'AR'
     when 'PhoneSeed'
-      payload[:data][:attributes][:number] = '+573014825346'
-      payload[:data][:attributes][:country] = 'CO'
+      attrs[:number] = '+573014825346'
+      attrs[:country] = 'CO'
     when 'EmailSeed'
-      payload[:data][:attributes][:address] = 'zinedine@soccer.com'
-      payload[:data][:attributes][:email_kind] = 'personal'
+      attrs[:address] = 'zinedine@soccer.com'
+      attrs[:email_kind] = 'personal'
     when 'NoteSeed'
-      payload[:data][:attributes][:title] = 'My nickname'
-      payload[:data][:attributes][:body] = 'Call me zizu'
+      attrs[:title] = 'My nickname'
+      attrs[:body] = 'Call me zizu'
     when 'AllowanceSeed'
-      payload[:data][:attributes][:weight] = 1000
-      payload[:data][:attributes][:kind] = 'USD'
+      attrs[:weight] = 1000
+      attrs[:kind] = 'USD'
   end
 
   put "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed_name.pluralize.underscore}/#{seed_id}",
@@ -116,16 +117,13 @@ ALL_SEEDS.each do |seed|
   describe seed.constantize do
     let(:issue) {create(:basic_issue)}
     let(:admin_user) { create(:admin_user) }
+    let(:relationship) do 
+      PLURAL_SEEDS.include?(seed) ? seed.pluralize.underscore : seed.underscore
+    end
 
     describe "Creating a new #{seed}" do
       it "creates a new #{seed} with an attachment" do
         seed_payload = build_seed_payload(seed)
-
-        relationship = if PLURAL_SEEDS.include? seed
-            seed.pluralize.underscore
-          else
-            seed.underscore
-          end
 
         post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
           params: seed_payload,
@@ -133,11 +131,11 @@ ALL_SEEDS.each do |seed|
 
         assert_response 201
         if PLURAL_SEEDS.include? seed
-          issue.send("#{relationship}").count.should == 1
-          issue.send("#{relationship}").first.attachments.count.should == 1
+          issue.send(relationship).count.should == 1
+          issue.send(relationship).first.attachments.count.should == 1
         else
-          issue.send("#{relationship}").should_not be_nil
-          issue.send("#{relationship}").attachments.count.should == 1
+          issue.send(relationship).should_not be_nil
+          issue.send(relationship).attachments.count.should == 1
         end
       end
     end
@@ -146,31 +144,21 @@ ALL_SEEDS.each do |seed|
       it "creates, gets and updates a new #{seed} with an attachment" do
         seed_payload = build_seed_payload(seed)
 
-        relationship = if PLURAL_SEEDS.include? seed
-            seed.pluralize.underscore
-          else
-            seed.underscore
-          end
-
         post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
           params: seed_payload,
           headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
         assert_response 201
 
         seed_id = if PLURAL_SEEDS.include? seed
-          issue.send("#{relationship}").first.id
+          issue.send(relationship).first.id
         else
-          issue.send("#{relationship}").id
+          issue.send(relationship).id
         end
 
         # For plural seeds show endpoint exists, otherwise goes to seed index
-        if PLURAL_SEEDS.include? seed
-          get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}/#{seed_id}",
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-        else
-          get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-        end
+        get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}/#{seed_id}",
+          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
         assert_response 200
 
         seed_payload = JSON.parse(response.body).deep_symbolize_keys

@@ -27,18 +27,11 @@ class Api::IssueJsonApiSyncController < Api::ApiController
     }
   end
 
-  def scope
-    scope = Person.find(params[:person_id])
-    if issue_id = params[:issue_id]
-      scope = scope.issues.find(params[:issue_id])
-    end
-    scope
-  end
-
   def map_and_save(success_code)
     mapper = get_mapper
     return jsonapi_422(nil) unless mapper.data
 
+    debugger
     if mapper.save_all
       jsonapi_response mapper.data, {}, success_code
     else
@@ -46,8 +39,20 @@ class Api::IssueJsonApiSyncController < Api::ApiController
     end
   end
 
+  def person
+    @person ||= Person.find(params[:person_id])
+  end
+
+  def issue
+    @issue ||= person.issues.find(params[:issue_id])
+  end
+
+  def scope
+    issue
+  end
+
   def get_mapper
-    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+    mapper = JsonapiMapper.doc_unsafe!(params.permit!.to_h,
       %w(issues domicile_seeds phone_seeds email_seeds note_seeds
         affinity_seeds identification_seeds natural_docket_seeds
         legal_entity_docket_seeds argentina_invoicing_detail_seeds
@@ -213,5 +218,22 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
       allowances: []
+    )
+
+    if mapper.data.is_a?(Issue)
+      mapper.data.person = person
+    else
+      mapper.data.issue = issue
+    end
+
+    mapper.included do |i|
+      if i.is_a?(Issue)
+        i.person = person
+      else
+        i.issue = issue
+      end
+    end
+
+    mapper
   end
 end
