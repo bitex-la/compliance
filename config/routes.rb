@@ -7,11 +7,11 @@ Rails.application.routes.draw do
     resources :observation_reasons, only: [:show, :index]
     resources :people, only: [:create, :show, :index, :update] do
       resources :issues, only: [:create, :show, :index, :update] do
-        resources :natural_docket_seeds, only: %w(index create update)
-        resources :legal_entity_docket_seeds, only: %w(index create update)
-        resources :argentina_invoicing_detail_seeds, only: %w(index create update)
-        resources :chile_invoicing_detail_seeds, only: %w(index create update)
         %i(
+          natural_docket_seeds
+          legal_entity_docket_seeds
+          argentina_invoicing_detail_seeds
+          chile_invoicing_detail_seeds
           domicile_seeds
           allowance_seeds
           identification_seeds
@@ -20,7 +20,9 @@ Rails.application.routes.draw do
           note_seeds
           affinity_seeds
         ).each do |entities|
-          resources entities, only: [:show, :index, :create, :update]
+          resources entities, only: [:show, :index, :create, :update] do
+            resources :attachments, only: [:create, :update, :show, :index]
+          end
         end
       end
     end
