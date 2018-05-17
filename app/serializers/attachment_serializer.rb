@@ -15,8 +15,8 @@ class AttachmentSerializer
   end
 
   build_belongs_to :person
-  build_belongs_to :attached_to_fruit
-  build_belongs_to :attached_to_seed
+  belongs_to :attached_to_fruit, polymorphic: true
+  belongs_to :attached_to_seed, polymorphic: true
 end
 
 

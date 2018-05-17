@@ -1,35 +1,7 @@
 require 'rails_helper'
 require 'helpers/api/issues_helper'
+require 'helpers/api/api_helper'
 require 'json'
-
-PLURAL_SEEDS = %w(
-  AffinitySeed
-  PhoneSeed
-  DomicileSeed
-  EmailSeed
-  IdentificationSeed
-  AllowanceSeed
-  NoteSeed
-)
-
-SINGULAR_SEEDS = %w(
-  NaturalDocketSeed
-  LegalEntityDocketSeed
-  ArgentinaInvoicingDetailSeed
-  ChileInvoicingDetailSeed
-)
-
-ALL_SEEDS = PLURAL_SEEDS + SINGULAR_SEEDS
-
-def build_seed_payload(seed)
-  if seed == 'AffinitySeed'
-    related_person = create(:empty_person)
-    related_person.save
-    Api::SeedsHelper.affinity_seed(issue, related_person, :png)
-  else
-    Api::SeedsHelper.send(seed.underscore.to_sym, issue, :png)
-  end
-end
 
 def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payload)
   attrs = payload[:data][:attributes]

@@ -551,25 +551,60 @@ class Api::IssuesHelper
     }
   end
 
-  def self.attachment_for(ext, id)
-    mime = case ext
-    when :png, :jpg, :gif then "image/#{ext}"
-    when :pdf, :zip then "application/#{ext}"
-    when :rar then "application/x-rar-compressed"
-    else raise "No fixture for #{ext} files"
+  def self.mime_for(ext)
+    case ext
+      when :png, :jpg, :gif then "image/#{ext}"
+      when :pdf, :zip then "application/#{ext}"
+      when :rar then "application/x-rar-compressed"
+      else raise "No fixture for #{ext} files"
     end
+  end
 
+  def self.bytes_for(ext)
     fixtures = RSpec.configuration.file_fixture_path
     path = Pathname.new(File.join(fixtures, "simple.#{ext}"))
-    bytes = Base64.encode64(path.read).delete!("\n")
+    Base64.encode64(path.read).delete!("\n")
+  end
 
+  def self.attachment_for(ext, id)
     {
       type: "attachments",
       id: id,
       attributes: {
-        document: "data:#{mime};base64,#{bytes}",
+        document: "data:#{mime_for(ext)};base64,#{bytes_for(ext)}",
         document_file_name: "file.#{ext}",
-        document_content_type: mime
+        document_content_type: mime_for(ext)
+      }
+    }
+  end
+
+  def self.seed_attachment_payload(ext, id, person_id, seed_id, type)
+    {
+      data: {
+        type: "attachments",
+        id: id,
+        attributes: {
+          document: "data:#{mime_for(ext)};base64,#{bytes_for(ext)}",
+          document_file_name: "file.#{ext}",
+          document_content_type: mime_for(ext)
+        },
+        relationships: {
+          person: {
+            data: {
+              id: person_id,
+              type: "people"
+            }
+          },
+          attached_to_fruit: {
+            data: nil
+          },
+          attached_to_seed: {
+            data: {
+              id: seed_id,
+              type: type
+            }
+          }
+        }
       }
     }
   end

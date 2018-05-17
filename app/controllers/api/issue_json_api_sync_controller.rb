@@ -218,21 +218,20 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       chile_invoicing_details: [],
       allowances: []
     )
-
+ 
     if mapper.data.is_a?(Issue)
       mapper.data.person = person
-    else
+    elsif mapper.data.class.name.include? 'Seed'
       mapper.data.issue = issue
     end
 
     mapper.included do |i|
       if i.is_a?(Issue)
         i.person = person
-      else
+      elsif mapper.data.class.name.include? 'Seed'
         i.issue = issue
       end
     end
-
     mapper
   end
 end
