@@ -138,6 +138,37 @@ ALL_SEEDS.each do |seed|
           issue.send(relationship).attachments.count.should == 1
         end
       end
+
+      it "cannot create more than one seed for singular, othewise must add a new one to collection" do
+        seed_payload = build_seed_payload(seed)
+
+        post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
+          params: seed_payload,
+          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+        assert_response 201
+        if PLURAL_SEEDS.include? seed
+          issue.send(relationship).count.should == 1
+          issue.send(relationship).first.attachments.count.should == 1
+        else
+          issue.send(relationship).should_not be_nil
+          issue.send(relationship).attachments.count.should == 1
+        end
+
+        seed_payload = build_seed_payload(seed)
+
+        post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
+          params: seed_payload,
+          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+        if PLURAL_SEEDS.include? seed
+          assert_response 201  
+          issue.send(relationship).count.should == 2
+        else
+          issue.send(relationship).should_not be_nil
+          assert_response 422
+        end
+      end
     end
 
     describe "Updating a new #{seed}" do
@@ -168,5 +199,3 @@ ALL_SEEDS.each do |seed|
     end
   end
 end
-
-pending "cannot create more than one natural docket seed (or other has_one's)"
