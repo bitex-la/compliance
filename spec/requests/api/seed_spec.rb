@@ -168,3 +168,5 @@ ALL_SEEDS.each do |seed|
     end
   end
 end
+
+pending "cannot create more than one natural docket seed (or other has_one's)"

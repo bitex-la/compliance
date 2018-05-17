@@ -5,7 +5,7 @@ class Api::SingleResourceIssueJsonApiSyncController < Api::IssueJsonApiSyncContr
 
   def create
     if resource = get_resource(scope)
-      json_response({error: "Cant create more than one"}, 422)
+      return json_response({error: "Cant create more than one"}, 422)
     end
     super
   end

@@ -31,7 +31,6 @@ class Api::IssueJsonApiSyncController < Api::ApiController
     mapper = get_mapper
     return jsonapi_422(nil) unless mapper.data
 
-    debugger
     if mapper.save_all
       jsonapi_response mapper.data, {}, success_code
     else
