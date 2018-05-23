@@ -6,6 +6,22 @@ Rails.application.routes.draw do
   namespace :api do
     resources :observation_reasons, only: [:show, :index]
     resources :people, only: [:create, :show, :index, :update] do
+      %i(
+        natural_dockets
+        legal_entity_dockets
+        argentina_invoicing_details
+        chile_invoicing_details
+        domiciles
+        allowances
+        identifications
+        phones
+        emails
+        notes
+        affinities
+      ).each do |entities|
+        resources entities, only: [:show, :index]
+      end
+
       resources :issues, only: [:create, :show, :index, :update] do
         %i(
           natural_docket_seeds

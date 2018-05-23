@@ -56,6 +56,7 @@ class Api::IssuesController < Api::ApiController
         :chile_invoicing_details,
         :natural_dockets,
         :legal_entity_dockets,
+        :attachments
       ],
       issues: [
         :state,
@@ -196,6 +197,12 @@ class Api::IssuesController < Api::ApiController
         :observation_reason,
         seed_scope
       ],
+      attachments: [
+        :document,
+        :document_file_name,
+        :document_content_type,
+        person_id: person_id
+      ],
       people: [],
       observation_reasons: [],
       domiciles: [],
@@ -208,12 +215,6 @@ class Api::IssuesController < Api::ApiController
       affinities: [],
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
-      allowances: [],
-      attachments: [
-        :document,
-        :document_file_name,
-        :document_content_type,
-        person_id: person_id
-      ]
+      allowances: []
   end
 end
