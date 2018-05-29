@@ -28,7 +28,7 @@ describe Issue do
 
   describe 'Creating a new user Issue' do
     it 'responds with an Unprocessable Entity HTTP code (422) when body is empty' do
-      post "/api/people/#{person.id}/issues",  
+      post "/api/people/#{person.id}/issues",
         params: {},
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 422
@@ -37,7 +37,7 @@ describe Issue do
     it 'creates a new issue with an observation' do
       reason = create(:human_world_check_reason)
       issue  = Api::IssuesHelper.issue_with_an_observation(person.id, reason, 'test')
-      post "/api/people/#{person.id}/issues", 
+      post "/api/people/#{person.id}/issues",
         params: issue,
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 201
@@ -47,51 +47,51 @@ describe Issue do
       describe "receives a #{ext} attachment and" do
         it 'creates a new issue with a domicile seed' do
           issue  = Api::IssuesHelper.issue_with_domicile_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-          
-          assert_issue_integrity(["DomicileSeed"]) 
-          assert_response 201 
+
+          assert_issue_integrity(["DomicileSeed"])
+          assert_response 201
         end
 
         it 'creates a new issue with an identification seed' do
           issue  = Api::IssuesHelper.issue_with_identification_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-          
-          assert_issue_integrity(["IdentificationSeed"]) 
+
+          assert_issue_integrity(["IdentificationSeed"])
           assert_response 201
         end
 
         it 'creates a new issue with a phone seed' do
           issue  = Api::IssuesHelper.issue_with_phone_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-          
-          assert_issue_integrity(["PhoneSeed"]) 
+
+          assert_issue_integrity(["PhoneSeed"])
           assert_response 201
         end
 
         it 'creates a new issue with an email seed' do
           issue  = Api::IssuesHelper.issue_with_email_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-          
-          assert_issue_integrity(["EmailSeed"]) 
+
+          assert_issue_integrity(["EmailSeed"])
           assert_response 201
         end
 
         it 'creates a new issue with an affinity seed' do
           related_person = create(:empty_person)
           issue  = Api::IssuesHelper.issue_with_affinity_seed(related_person, ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-          
+
           Issue.count.should == 1
           Person.count.should == 2
           Issue.first.person.should == person
@@ -103,51 +103,51 @@ describe Issue do
 
         it 'creates a new issue with an argentina invoicing seed' do
           issue  = Api::IssuesHelper.issue_with_argentina_invoicing_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          assert_issue_integrity(["ArgentinaInvoicingDetailSeed"]) 
+          assert_issue_integrity(["ArgentinaInvoicingDetailSeed"])
           assert_response 201
         end
 
         it 'creates a new issue with a chile invoicing seed' do
           issue  = Api::IssuesHelper.issue_with_chile_invoicing_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          assert_issue_integrity(["ChileInvoicingDetailSeed"]) 
+          assert_issue_integrity(["ChileInvoicingDetailSeed"])
           assert_response 201
         end
 
         it 'creates a new issue with a natural docket seed' do
           issue  = Api::IssuesHelper.issue_with_natural_docket_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-          
-          assert_issue_integrity(["NaturalDocketSeed"]) 
+
+          assert_issue_integrity(["NaturalDocketSeed"])
           assert_response 201
         end
 
         it 'creates a new issue with a legal entity docket seed' do
           issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          assert_issue_integrity(["LegalEntityDocketSeed"]) 
+          assert_issue_integrity(["LegalEntityDocketSeed"])
           assert_response 201
         end
 
         it 'creates a new issue with a allowance seed' do
           issue  = Api::IssuesHelper.issue_with_allowance_seed(ext)
-          post "/api/people/#{person.id}/issues", 
+          post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-          
-          assert_issue_integrity(["AllowanceSeed"]) 
+
+          assert_issue_integrity(["AllowanceSeed"])
           assert_response 201
         end
       end
@@ -164,7 +164,7 @@ describe Issue do
             replaces: { data: { type: 'domiciles', id: Domicile.last.id.to_s } }
           })
 
-          post "/api/people/#{full_natural_person.id}/issues", 
+          post "/api/people/#{full_natural_person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
@@ -181,7 +181,7 @@ describe Issue do
             replaces: { data: { type: 'identifications', id: Identification.last.id.to_s } }
           })
 
-          post "/api/people/#{full_natural_person.id}/issues", 
+          post "/api/people/#{full_natural_person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
@@ -198,11 +198,11 @@ describe Issue do
             replaces: { data: { type: 'allowances', id: Allowance.last.id.to_s } }
           })
 
-          post "/api/people/#{full_natural_person.id}/issues", 
+          post "/api/people/#{full_natural_person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          Issue.count.should == 2 
+          Issue.count.should == 2
           AllowanceSeed.count.should == 3
           AllowanceSeed.last.issue.should == Issue.last
           AllowanceSeed.last.attachments.count.should == 1
@@ -218,11 +218,11 @@ describe Issue do
             replaces: { data: { type: 'phones', id: Phone.last.id.to_s } }
           })
 
-          post "/api/people/#{full_natural_person.id}/issues", 
+          post "/api/people/#{full_natural_person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          Issue.count.should == 2 
+          Issue.count.should == 2
           PhoneSeed.count.should == 2
           PhoneSeed.last.issue.should == Issue.last
           PhoneSeed.last.attachments.count.should == 1
@@ -238,11 +238,11 @@ describe Issue do
             replaces: { data: { type: 'emails', id: Email.last.id.to_s } }
           })
 
-          post "/api/people/#{full_natural_person.id}/issues", 
+          post "/api/people/#{full_natural_person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          Issue.count.should == 2 
+          Issue.count.should == 2
           EmailSeed.count.should == 2
           EmailSeed.last.issue.should == Issue.last
           EmailSeed.last.attachments.count.should == 1
@@ -259,11 +259,11 @@ describe Issue do
             replaces: { data: { type: 'affinities', id: full_natural_person.affinities.first.id.to_s } }
           })
 
-          post "/api/people/#{full_natural_person.id}/issues", 
+          post "/api/people/#{full_natural_person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          Issue.count.should == 2 
+          Issue.count.should == 2
           AffinitySeed.count.should == 2
           AffinitySeed.last.issue.should == Issue.last
           AffinitySeed.last.replaces.should == Person.second.affinities.first
@@ -294,22 +294,22 @@ describe Issue do
       post "/api/people/#{person.id}/issues",
         params: Api::IssuesHelper.issue_with_domicile_seed(:png),
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-  
+
       create(:observation, issue: Issue.last)
- 
+
       assert_issue_integrity(["DomicileSeed"])
 
       issue_document = json_response
 
-      issue_document[:included][1][:attributes] = {
+      issue_document[:included][0][:attributes] = {
         country: "AR",
-        state: "Baires", 
+        state: "Baires",
         street_address: "Mitre",
         street_number: "6782",
         postal_code: "1341",
         floor: "1",
-        apartment: "N/A"	  
-      } 
+        apartment: "N/A"
+      }
       issue_document[:included][2] = {
         type: 'observations',
         id: Observation.last.id,
@@ -319,9 +319,9 @@ describe Issue do
         relationships: {
           issue: {data: {id: Issue.last.id, type: "issues"}},
           observation_reason: {
-            data: 
+            data:
             {
-              id: Observation.last.observation_reason.id.to_s, 
+              id: Observation.last.observation_reason.id.to_s,
              type: "observation_reasons"
             }
           }
@@ -332,7 +332,7 @@ describe Issue do
         params: JSON.dump(issue_document),
         headers: {"CONTENT_TYPE" => 'application/json',
                  'Authorization' => "Token token=#{admin_user.api_token}"}
-              
+
       assert_response 200
 
       DomicileSeed.first.tap do |seed|
@@ -353,21 +353,21 @@ describe Issue do
       post "/api/people/#{person.id}/issues",
         params: Api::IssuesHelper.issue_with_phone_seed(:png),
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      
+
       create(:observation, issue: Issue.last)
- 
+
       assert_issue_integrity(["PhoneSeed"])
 
       issue_document = json_response
 
       issue_document[:included][1][:attributes] = {
         number: "+571165342178",
-        kind: "2", 
+        kind: "2",
         country: "CO",
         has_whatsapp: true,
         has_telegram: false,
         note: "Please use whatsapp"
-      } 
+      }
       issue_document[:included][2] = {
         type: 'observations',
         id: Observation.last.id,
@@ -377,9 +377,9 @@ describe Issue do
         relationships: {
           issue: {data: {id: Issue.last.id, type: "issues"}},
           observation_reason: {
-            data: 
+            data:
             {
-              id: Observation.last.observation_reason.id.to_s, 
+              id: Observation.last.observation_reason.id.to_s,
              type: "observation_reasons"
             }
           }
@@ -412,7 +412,7 @@ describe Issue do
 
       get "/api/people/#{person.id}/issues/#{issue.id}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      
+
       issue_request = json_response
 
       observation = Api::IssuesHelper.observation_for(
@@ -420,13 +420,13 @@ describe Issue do
 
       issue_request[:included]
         .find{|i| i[:type] == 'observations'}[:attributes] = { reply: "hits" }
-        
+
       issue_request[:data][:relationships][:observations][:data] <<
         observation.slice(:id, :type)
 
       issue_request[:included] << observation
 
-      patch "/api/people/#{person.id}/issues/#{issue.id}", 
+      patch "/api/people/#{person.id}/issues/#{issue.id}",
         params: issue_request.to_json,
         headers: {"CONTENT_TYPE" => 'application/json',
                   "Authorization" => "Token token=#{admin_user.api_token}"}
@@ -442,23 +442,23 @@ describe Issue do
     it 'responds with a not found error 404 when the issue does not exist' do
       get "/api/people/#{person.id}/issues/1",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      
+
       assert_response 404
     end
 
-    it 'shows all the person info when the issue exist' do  
+    it 'shows all the person info when the issue exist' do
       issue  = Api::IssuesHelper.issue_with_domicile_seed(:png)
-      post "/api/people/#{person.id}/issues", 
+      post "/api/people/#{person.id}/issues",
         params: issue,
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      
+
       response_for_post = response.body
 
       assert_issue_integrity(["DomicileSeed"])
-  
+
       get  "/api/people/#{person.id}/issues/#{Issue.first.id}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      
+
       assert_response 200
       response.body.should == response_for_post
     end

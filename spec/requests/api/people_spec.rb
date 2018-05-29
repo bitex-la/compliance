@@ -8,7 +8,7 @@ describe Person do
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do
       expect do
-        post '/api/people', 
+        post '/api/people',
                 params: { data: nil },
                 headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       end.to change{ Person.count }.by(1)
@@ -21,7 +21,7 @@ describe Person do
           attributes: {
             enabled: false,
             risk: nil,
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
@@ -48,7 +48,7 @@ describe Person do
       person = create :full_natural_person
       issue = person.issues.first
 
-      get "/api/people/#{person.id}", 
+      get "/api/people/#{person.id}",
 	headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 200
       json_response = JSON.parse(response.body).deep_symbolize_keys
@@ -59,7 +59,7 @@ describe Person do
         attributes: {
           enabled: true,
           risk: 'medium',
-          created_at: 1514764800, 
+          created_at: 1514764800,
           updated_at: 1514764800
         },
         relationships: {
@@ -80,13 +80,13 @@ describe Person do
           allowances: {data: person.allowances.map{ |x|
             {id: x.id.to_s, type: "allowances" }
           }},
-          argentina_invoicing_details: {data: person.argentina_invoicing_details.map { |x| 
+          argentina_invoicing_details: {data: person.argentina_invoicing_details.map { |x|
             {id: x.id.to_s, type: 'argentina_invoicing_details'}
           }},
-          chile_invoicing_details: {data: person.chile_invoicing_details.map { |x| 
+          chile_invoicing_details: {data: person.chile_invoicing_details.map { |x|
             {id: x.id.to_s, type: 'chile_invoicing_details'}
           }},
-          phones: {data: person.phones.map { |x| 
+          phones: {data: person.phones.map { |x|
             {id: x.id.to_s, type: 'phones'}
           }},
           emails: {data: person.emails.map { |x|
@@ -111,7 +111,7 @@ describe Person do
           id: issue.id.to_s,
           attributes: {
             state: 'approved',
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
@@ -149,7 +149,7 @@ describe Person do
               type: "argentina_invoicing_detail_seeds"
             }},
             chile_invoicing_detail_seed: {data: nil},
-            observations: {data: []}  
+            observations: {data: []}
           }
         },
         { type: "domiciles",
@@ -163,7 +163,7 @@ describe Person do
             postal_code: "1432",
             floor: "5",
             apartment: "A",
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
@@ -188,7 +188,7 @@ describe Person do
             public_registry_authority: nil,
             public_registry_book: nil,
             public_registry_extra_data: nil,
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
@@ -217,13 +217,13 @@ describe Person do
             politically_exposed: false,
             politically_exposed_reason: nil,
             birth_date: 1514775600,
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "natural_docket_seeds",	    
+	      type: "natural_docket_seeds",
               id: issue.natural_docket_seed.id.to_s
             }},
             replaced_by: {data: nil},
@@ -239,7 +239,7 @@ describe Person do
             weight: 1000,
             amount: 1000,
             kind: "USD",
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
@@ -261,7 +261,7 @@ describe Person do
             weight: 1000,
             amount: 1000,
             kind: "USD",
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
@@ -286,13 +286,13 @@ describe Person do
             has_whatsapp: true,
             has_telegram: false,
             note: 'please do not call on Sundays',
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "phone_seeds",	    
+	      type: "phone_seeds",
               id: issue.phone_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -307,13 +307,13 @@ describe Person do
           attributes: {
             address:  'joe.doe@test.com',
             email_kind:    'work',
-            created_at: 1514764800, 
-            updated_at: 1514764800         
+            created_at: 1514764800,
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "email_seeds",	    
+	      type: "email_seeds",
               id: issue.email_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -323,18 +323,18 @@ describe Person do
             }
           }
         },
-        { 
+        {
           type: "affinities",
           id: person.affinities.first.id.to_s,
           attributes: {
             affinity_kind: person.affinities.first.affinity_kind.to_s,
-            created_at: 1514764800, 
-            updated_at: 1514764800         
+            created_at: 1514764800,
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	            type: "affinity_seeds",	    
+	            type: "affinity_seeds",
               id: issue.affinity_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -344,32 +344,33 @@ describe Person do
             },
             related_person: {
               data: {
-                id: person.affinities.first.related_person.id.to_s, 
+                id: person.affinities.first.related_person.id.to_s,
                 type: "people"
               }
             }
           }
         },
         {
-	  id: person.argentina_invoicing_details.first.id.to_s,    
+	        id: person.argentina_invoicing_details.first.id.to_s,
           type: "argentina_invoicing_details",
-          attributes: 
+          attributes:
           {
             vat_status: "consumidor_final",
             tax_id: "20955754290",
             tax_id_kind: "cuit",
             receipt_kind: "a",
             country: "AR",
+            name: "Julio Iglesias",
             address: "Jujuy 3421",
-            created_at: 1514764800, 
+            created_at: 1514764800,
             updated_at: 1514764800
           },
-          relationships: 
+          relationships:
           {
             person: {data: { id: person.id.to_s, type:"people"}},
             seed:   {data: { id: issue.argentina_invoicing_detail_seed.id.to_s,  type: "argentina_invoicing_detail_seeds"}},
             replaced_by: {data: nil},
-            attachments: 
+            attachments:
             {
               data: person.argentina_invoicing_details.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
@@ -381,13 +382,13 @@ describe Person do
           attributes: {
             title:  'my nickname',
             body:   'Please call me by my nickname: Mr. Bond',
-            created_at: 1514764800, 
-            updated_at: 1514764800         
+            created_at: 1514764800,
+            updated_at: 1514764800
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "note_seeds",	    
+	      type: "note_seeds",
               id: issue.note_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -399,10 +400,20 @@ describe Person do
         }
       ]
 
-      # skip attachments because is too long
-      json_response[:included].select{|x| x[:type] != "attachments"}.each_with_index do |got, i|
-        got.should == expected_included[i]
+      %w(
+        argentina_invoicing_details
+        affinities
+        notes
+        emails
+        phones
+        natural_dockets
+        identifications
+        domiciles
+      ).each do |fruit|
+        json_response[:included].find{|x| x[:type] == fruit}.should ==
+        expected_included.find{|x| x[:type] == fruit}
       end
+
     end
 
     it 'responds 404 when the person does not exist' do
