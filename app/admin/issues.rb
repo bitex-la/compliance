@@ -172,6 +172,7 @@ ActiveAdmin.register Issue do
         f.actions
       end
       tab :attachments do
+        ArbreHelpers.person_attachments self, f.object.person
         ArbreHelpers.entity_attachments self, f.object, :natural_docket_seed
         ArbreHelpers.entity_attachments self, f.object, :legal_entity_docket_seed
         ArbreHelpers.entity_attachments self, f.object, :argentina_invoicing_detail_seed

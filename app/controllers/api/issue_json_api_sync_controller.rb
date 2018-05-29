@@ -1,6 +1,6 @@
 class Api::IssueJsonApiSyncController < Api::ApiController
   def show
-    jsonapi_response get_resource(scope)
+    jsonapi_response get_resource(scope), options_for_response
   end
 
   def create
@@ -22,9 +22,8 @@ class Api::IssueJsonApiSyncController < Api::ApiController
     resource = block.call(scope)
       .order(updated_at: :desc).page(page).per(per_page)
 
-    jsonapi_response resource, {
-      meta: { total_pages: (resource.count.to_f / per_page).ceil }
-    }
+    jsonapi_response resource, options_for_response.merge!(
+      meta: { total_pages: (resource.count.to_f / per_page).ceil })
   end
 
   def map_and_save(success_code)
@@ -32,10 +31,14 @@ class Api::IssueJsonApiSyncController < Api::ApiController
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
-      jsonapi_response mapper.data, {}, success_code
+      jsonapi_response mapper.data, options_for_response, success_code
     else
       json_response mapper.all_errors, 422
     end
+  end
+
+  def options_for_response
+    {}
   end
 
   def person
@@ -200,8 +203,11 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       attachments: [
         :document,
         :document_file_name,
+        :document_file_size,
         :document_content_type,
         :attached_to_seed,
+        :attached_to_seed_id,
+        :attached_to_seed_type,
         :person,
       ],
       people: [],
@@ -218,15 +224,15 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       chile_invoicing_details: [],
       allowances: []
     )
- 
-    if mapper.data.is_a?(Issue)
+
+    if mapper.data.is_a?(Issue) || mapper.data.is_a?(Attachment)
       mapper.data.person = person
     elsif mapper.data.class.name.include? 'Seed'
       mapper.data.issue = issue
     end
 
     mapper.included do |i|
-      if i.is_a?(Issue)
+      if i.is_a?(Issue) || mapper.data.is_a?(Attachment)
         i.person = person
       elsif mapper.data.class.name.include? 'Seed'
         i.issue = issue

@@ -105,6 +105,29 @@ module ArbreHelpers
     end
   end
 
+  def self.person_attachments(context, builder)
+    context.instance_eval do
+      if builder.present? && builder.attachments.any?
+        context.instance_eval do
+          panel "Orphan Attachments" do
+            table_for builder.attachments
+              .where("attached_to_seed_id is ? AND attached_to_fruit_id is ?", nil, nil)
+              .each do |a|
+                a.column do |attachment|
+                  h3 "#{attachment.document_file_name} - #{attachment.document_content_type}"
+                  if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type)
+                    image_tag(attachment.document.url, width: '100%')
+                  elsif DOWNLOADABLE_CONTENT_TYPES.include?(attachment.document_content_type)
+                    link_to 'Download file', attachment.document.url, target: "_blank"
+                  end
+                end
+            end
+          end
+        end
+      end
+    end
+  end
+
   def self.has_one_form(context, builder, title, relationship, &fields)
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
     builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)

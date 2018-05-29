@@ -14,8 +14,9 @@ module ApiResponse
     payload = it.is_a?(Array) ? it.first : it
     serializer = "#{payload.try(:klass) || payload.class}Serializer".constantize
     unless serializer.relationships_to_serialize.nil?
-      options[:include] = serializer.relationships_to_serialize.keys
+      options[:include] ||= serializer.relationships_to_serialize.keys
     end
+
     ser = serializer.new(it, options)
     body = ser.serialized_json
     json_response body, status

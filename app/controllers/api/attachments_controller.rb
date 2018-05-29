@@ -12,4 +12,10 @@ class Api::AttachmentsController < Api::IssueJsonApiSyncController
      .person
      .attachments.find(params[:id])
   end
+
+  def options_for_response
+    {
+      include: []
+    }
+  end
 end
