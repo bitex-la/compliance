@@ -2,13 +2,18 @@ class Api::IssuesController < Api::ApiController
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     issues = Person.find(params[:person_id]).issues.order(updated_at: :desc).page(page).per(per_page)
-    options = { meta: { total_pages: (issues.count.to_f / per_page).ceil } }
+    options = { 
+      meta: { total_pages: (issues.count.to_f / per_page).ceil }, 
+      include: included_for_issue
+    }
     jsonapi_response issues, options, 200
   end
 
   def show
     issue = Person.find(params[:person_id]).issues.find(params[:id])
-    jsonapi_response(issue, {}, 200)
+    jsonapi_response(issue, {
+      include: included_for_issue
+    }, 200)
   end
 
   def create
@@ -17,7 +22,9 @@ class Api::IssuesController < Api::ApiController
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
-      jsonapi_response mapper.data, {}, 201
+      jsonapi_response mapper.data, {
+        include: included_for_issue
+      }, 201
     else
       json_response mapper.all_errors, 422
     end
@@ -29,13 +36,44 @@ class Api::IssuesController < Api::ApiController
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
-      jsonapi_response mapper.data, {}, 200
+      jsonapi_response mapper.data, {
+        include: included_for_issue 
+      }, 200
     else
       json_response mapper.all_errors, 422
     end
   end
 
   private
+
+  def included_for_issue
+    [
+      :person,
+      :natural_docket_seed,
+      :'natural_docket_seed.attachments',
+      :legal_entity_docket_seed,
+      :'legal_entity_docket_seed.attachments',
+      :argentina_invoicing_detail_seed,
+      :'argentina_invoicing_detail_seed.atachments',
+      :chile_invoicing_detail_seed,
+      :'chile_invoicing_detail_seed.attachments',
+      :allowance_seeds,
+      :'allowance_seeds.attachments',
+      :phone_seeds,
+      :'phone_seeds.attachments',
+      :email_seeds,
+      :'email_seeds.attachments',
+      :note_seeds,
+      :'note_seeds.attachments',
+      :domicile_seeds,
+      :'domicile_seeds.attachments',
+      :affinity_seeds,
+      :'affinity_seeds.attachments',
+      :identification_seeds,
+      :'identifications_seeds.attachments',
+      :observations
+    ]
+  end
 
   def get_issue_jsonapi_mapper(person_id, issue_id = nil)
     hash_params = params.permit!.to_h
