@@ -107,7 +107,9 @@ module ArbreHelpers
 
   def self.person_attachments(context, builder)
     context.instance_eval do
-      if builder.present? && builder.attachments.any?
+      if builder.present? && 
+          builder.attachments.where(attached_to_seed: nil).any? &&
+          builder.attachments.where(attached_to_fruit: nil).any?
         context.instance_eval do
           panel "Orphan Attachments" do
             table_for builder.attachments
