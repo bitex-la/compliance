@@ -2,7 +2,8 @@ class AttachmentSerializer
   include FastJsonapiCandy::Serializer
   set_type 'attachments'
   attributes :document_file_name, :document_content_type,
-    :document_file_size, :document_url
+    :document_file_size, :document_url,
+    :attached_to_seed_id, :attached_to_seed_type
 
   %i(
     created_at

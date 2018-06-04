@@ -9,8 +9,8 @@ module Garden
 
    class_methods do
      def kind_mask_for(kind, custom_model = nil)
-        kind_model = custom_model.nil? ? "#{kind.to_s.classify}Kind" : custom_model         
- 
+        kind_model = custom_model.nil? ? "#{kind.to_s.classify}Kind" : custom_model
+
         define_method kind do
        	  return nil if self.send("#{kind}_id").nil?
           kind_model.constantize.all
@@ -20,7 +20,7 @@ module Garden
         define_method "#{kind}=" do |code|
           candidate = kind_model.constantize.all.
 	    select{|x| x.code == code.to_sym}
-           
+
           if candidate.blank?
             self.errors.add(kind, "#{kind} not found")
           else
@@ -37,6 +37,7 @@ module Garden
     included do
       cattr_accessor :naming { Naming.new(name) }
       belongs_to :issue
+      has_one :person, through: :issue
       belongs_to :fruit, class_name: naming.fruit, optional: true
       has_many :attachments, as: :attached_to_seed
 

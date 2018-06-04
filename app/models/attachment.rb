@@ -5,22 +5,23 @@ class Attachment < ApplicationRecord
   has_attached_file :document, optional: true
 
   after_commit :relate_to_person
+  before_save :classify_type
 
   validates_attachment :document,
-    content_type: { 
+    content_type: {
       content_type: [
-        'image/jpeg', 
+        'image/jpeg',
         'image/jpg',
-        'image/gif', 
+        'image/gif',
         'image/png',
         'application/pdf',
         'application/zip',
-        'application/x-rar-compressed' 
+        'application/x-rar-compressed'
     ]}
-  
+
   validates_attachment_file_name :document, matches: [
     /png\z/,
-    /jpg\z/, 
+    /jpg\z/,
     /jpeg\z/,
     /pdf\z/,
     /gif\z/,
@@ -35,7 +36,13 @@ class Attachment < ApplicationRecord
   private
   def relate_to_person
     unless destroyed?
-      self.update_column(:person_id, attached_to_seed.issue.person.id) if attached_to_seed
+      self.update_column(:person_id, attached_to_seed.issue.person.id) if self.attached_to_seed_type
     end
+  end
+
+  def classify_type
+    unless self.attached_to_seed_type.nil?
+      self.attached_to_seed_type = self.attached_to_seed_type.camelize.singularize
+    end 
   end
 end

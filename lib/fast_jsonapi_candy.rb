@@ -31,6 +31,7 @@ module FastJsonapiCandy
       include Serializer
       set_type naming.seed_plural
       build_belongs_to :issue
+      has_one :person
       belongs_to :fruit, record_type: naming.plural, serializer: naming.fruit
       build_has_many :attachments
 
