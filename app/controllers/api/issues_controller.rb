@@ -2,8 +2,8 @@ class Api::IssuesController < Api::ApiController
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     issues = Person.find(params[:person_id]).issues.order(updated_at: :desc).page(page).per(per_page)
-    options = { 
-      meta: { total_pages: (issues.count.to_f / per_page).ceil }, 
+    options = {
+      meta: { total_pages: (issues.count.to_f / per_page).ceil },
       include: included_for_issue
     }
     jsonapi_response issues, options, 200
@@ -37,7 +37,7 @@ class Api::IssuesController < Api::ApiController
 
     if mapper.save_all
       jsonapi_response mapper.data, {
-        include: included_for_issue 
+        include: included_for_issue
       }, 200
     else
       json_response mapper.all_errors, 422
@@ -71,7 +71,8 @@ class Api::IssuesController < Api::ApiController
       :'affinity_seeds.attachments',
       :identification_seeds,
       :'identifications_seeds.attachments',
-      :observations
+      :observations,
+      :'observations.observation_reason'
     ]
   end
 

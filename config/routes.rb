@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       end
 
       resources :issues, only: [:create, :show, :index, :update] do
+        resources :observations, only: [:create, :show, :index, :update]
         %i(
           natural_docket_seeds
           legal_entity_docket_seeds
