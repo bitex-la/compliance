@@ -49,6 +49,17 @@ class Api::IssuesController < Api::ApiController
   def included_for_issue
     [
       :person,
+      :'person.identifications',
+      :'person.domiciles',
+      :'person.natural_dockets',
+      :'person.legal_entity_dockets',
+      :'person.argentina_invoicing_details',
+      :'person.chile_invoicing_details',
+      :'person.phones',
+      :'person.emails',
+      :'person.notes',
+      :'person.affinities',
+      :'person.allowances',
       :natural_docket_seed,
       :'natural_docket_seed.attachments',
       :legal_entity_docket_seed,
