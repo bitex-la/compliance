@@ -11,5 +11,15 @@ class AdminUser < ApplicationRecord
   
   def set_api_token
     self.api_token = Digest::SHA256.hexdigest SecureRandom.hex if api_token.nil? 
-  end  
+  end
+
+  class << self
+    def current_admin_user=(user)
+      Thread.current[:current_admin_user] = user
+    end
+
+    def current_admin_user
+      Thread.current[:current_admin_user]
+    end
+  end
 end

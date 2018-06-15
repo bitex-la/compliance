@@ -19,7 +19,12 @@ class Observation < ApplicationRecord
     event :answer do
       transitions from: :new, to: :answered
       after do
-        issue.answer! if issue.may_answer?
+        Event::IssueLogger.call(
+          issue, 
+          'answer!',
+          AdminUser.current_admin_user,
+          :update_entity
+        ) if issue.may_answer?
       end
     end
   end
@@ -29,7 +34,12 @@ class Observation < ApplicationRecord
   end
 
   def observe_issue
-    issue.observe! unless issue.observed?  
+    Event::IssueLogger.call(
+      issue, 
+      'observe!', 
+      AdminUser.current_admin_user,
+      :update_entity
+    ) unless issue.observed? 
   end
 
   def state

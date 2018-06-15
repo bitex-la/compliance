@@ -13,7 +13,12 @@ ActiveAdmin.register Issue do
     end
 
     member_action action, method: :post do
-      resource.send("#{action}!")
+      Event::IssueLogger.call(
+        resource, 
+        "#{action}!", 
+        current_admin_user,
+        :update 
+      )
       redirect_to action: :show
     end
   end
