@@ -122,10 +122,11 @@ RSpec.describe Issue, type: :model do
       person = create :full_natural_person
       issue = create :basic_issue, person: person
 
-      create :full_domicile_seed, issue: issue, replaces: person.domiciles.last
+      create :full_domicile_seed, street_address: 'Cabildo', issue: issue, replaces: person.domiciles.reload.last
       create :salary_allowance_seed, issue: issue
       create :full_natural_docket_seed, issue: issue
 
+      issue.reload
       issue.complete!
       issue.should be_new
       issue.approve!

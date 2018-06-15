@@ -349,6 +349,8 @@ describe 'an admin user' do
       from: 'issue_identification_seeds_attributes_0_issuer',
       visible: false
 
+    person.identifications.reload
+
     select person.identifications.first.id,
       from: "issue[identification_seeds_attributes][0][replaces_id]"
 
@@ -374,6 +376,7 @@ describe 'an admin user' do
        apartment: 'C'
     })
 
+    person.domiciles.reload
     select person.domiciles.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]"
 
     within(".has_many_container.domicile_seeds") do
@@ -388,6 +391,7 @@ describe 'an admin user' do
       amount: "100"
     })
 
+   person.allowances.reload  
    select person.allowances.first.id, from: "issue[allowance_seeds_attributes][0][replaces_id]"
 
     within(".has_many_container.allowance_seeds") do
@@ -926,6 +930,8 @@ describe 'an admin user' do
       within '.row.row-person' do
       	click_link  person.id
       end
+      person.allowances.reload
+      person.identifications.reload
       person.allowances.first.weight.should == AllowanceSeed.last.weight
       person.identifications.first.number.should == IdentificationSeed.last.number
     end

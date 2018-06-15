@@ -1,6 +1,6 @@
 ActiveAdmin.register Issue do
   belongs_to :person
-  actions :all, :except => :destroy
+  actions :all, :except => :destroy 
 
   config.clear_action_items!
   action_item only: [:index] do
@@ -13,12 +13,7 @@ ActiveAdmin.register Issue do
     end
 
     member_action action, method: :post do
-      Event::IssueLogger.call(
-        resource, 
-        "#{action}!", 
-        current_admin_user,
-        :update 
-      )
+      resource.send("#{action}!")
       redirect_to action: :show
     end
   end

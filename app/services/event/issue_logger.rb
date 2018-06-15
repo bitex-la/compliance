@@ -1,12 +1,11 @@
 class Event::IssueLogger
 
-  def self.call(issue, event, user, verb)
-    issue.send(event)
+  def self.call(issue, user, verb)
     EventLog.create!(
       entity: issue,
       raw_data: IssueSerializer.new(
         issue,
-        {include: included_for_issue}
+        {include: Issue.included_for_issue}
       ).serialized_json,
       admin_user: user,
       verb: verb

@@ -256,7 +256,7 @@ describe Issue do
           full_natural_person = create(:full_natural_person)
           issue  = Api::IssuesHelper.issue_with_affinity_seed(new_partner, ext)
           issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'affinities', id: full_natural_person.affinities.first.id.to_s } }
+            replaces: { data: { type: 'affinities', id: full_natural_person.affinities.reload.first.id.to_s } }
           })
 
           post "/api/people/#{full_natural_person.id}/issues",

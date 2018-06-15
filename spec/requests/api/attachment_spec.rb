@@ -18,8 +18,10 @@ ALL_SEEDS.each do |seed|
         post "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}",
           params: seed_payload,
           headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
+        
         assert_response 201
+
+        issue.reload
         seed_id = if PLURAL_SEEDS.include? seed
           issue.send(relationship).first.id
         else
@@ -64,6 +66,7 @@ ALL_SEEDS.each do |seed|
           headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
         assert_response 201
+        issue.reload
         seed_id = if PLURAL_SEEDS.include? seed
           issue.send(relationship).first.id
         else
