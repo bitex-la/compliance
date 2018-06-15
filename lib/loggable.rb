@@ -6,7 +6,7 @@ module Loggable
     after_commit(on: [:update]) { log(:update_entity) }
 
     def log(verb)
-      "Event::#{self.class.name}Logger".constantize.call(
+      Event::EventLogger.call(
         self, 
         AdminUser.current_admin_user,
         verb

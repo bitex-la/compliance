@@ -4,7 +4,7 @@ class Api::IssuesController < Api::ApiController
     issues = Person.find(params[:person_id]).issues.order(updated_at: :desc).page(page).per(per_page)
     options = {
       meta: { total_pages: (issues.count.to_f / per_page).ceil },
-      include: Issue.included_for_issue
+      include: Issue.included_for
     }
     jsonapi_response issues, options, 200
   end
@@ -12,7 +12,7 @@ class Api::IssuesController < Api::ApiController
   def show
     issue = Person.find(params[:person_id]).issues.find(params[:id])
     jsonapi_response(issue, {
-      include: Issue.included_for_issue
+      include: Issue.included_for
     }, 200)
   end
 
@@ -23,7 +23,7 @@ class Api::IssuesController < Api::ApiController
 
     if mapper.save_all
       jsonapi_response mapper.data, {
-        include: Issue.included_for_issue
+        include: Issue.included_for
       }, 201
     else
       json_response mapper.all_errors, 422
@@ -37,7 +37,7 @@ class Api::IssuesController < Api::ApiController
 
     if mapper.save_all
       jsonapi_response mapper.data, {
-        include: Issue.included_for_issue
+        include: Issue.included_for
       }, 200
     else
       json_response mapper.all_errors, 422

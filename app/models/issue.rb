@@ -4,9 +4,6 @@ class Issue < ApplicationRecord
   belongs_to :person, optional: true
   validates :person, presence: true
 
-  #after_commit(on: [:create]) { log(:create_entity) }
-  #after_commit(on: [:update]) { log(:update_entity) }
-
   HAS_ONE = %i{
     natural_docket_seed
     legal_entity_docket_seed
@@ -145,18 +142,8 @@ class Issue < ApplicationRecord
     HAS_ONE.each{|assoc| send(assoc).try(:harvest!) }
   end
 
-=begin  
-  def log(verb)
-    Event::IssueLogger.call(
-      self, 
-      AdminUser.current_admin_user,
-      verb
-    )
-  end
-=end
-
   private  
-  def self.included_for_issue
+  def self.included_for
     [
       :person,
       :'person.identifications',
