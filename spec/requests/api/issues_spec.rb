@@ -358,7 +358,7 @@ describe Issue do
         }
       }
 
-      patch "/api/people/#{person.id}/issues/#{person.issues.last.id}",
+      patch "/api/people/#{person.id}/issues/#{person.issues.reload.last.id}",
         params: JSON.dump(issue_document),
         headers: {"CONTENT_TYPE" => 'application/json',
                  'Authorization' => "Token token=#{admin_user.api_token}"}
@@ -418,7 +418,7 @@ describe Issue do
         }
       }
 
-      patch "/api/people/#{person.id}/issues/#{person.issues.last.id}",
+      patch "/api/people/#{person.id}/issues/#{person.issues.reload.last.id}",
         params: JSON.dump(issue_document),
         headers: {"CONTENT_TYPE" => 'application/json',
                   "Authorization" => "Token token=#{admin_user.api_token}"}
@@ -441,7 +441,7 @@ describe Issue do
 
     it 'can answer an observation and add a new one in one step' do
       person = create :new_natural_person
-      issue = person.issues.last
+      issue = person.issues.reload.last
       create :robot_observation, issue: issue
 
       get "/api/people/#{person.id}/issues/#{issue.id}",

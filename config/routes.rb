@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   # Concern must go first!
   namespace :api do
     resources :observation_reasons, only: [:show, :index]
+    resources :event_logs, only: [:show, :index]
     resources :people, only: [:create, :show, :index, :update] do
       %i(
         natural_dockets

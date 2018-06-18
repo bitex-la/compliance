@@ -200,7 +200,7 @@ describe 'an admin user' do
 
   it 'reviews a newly created customer' do
     person = create :new_natural_person
-    issue = person.issues.first
+    issue = person.issues.reload.first
     assert_logging(issue, 0, 1)
     observation_reason = create(:observation_reason)
 
@@ -500,7 +500,7 @@ describe 'an admin user' do
 
   it "Dismisses an issue that had only bogus data" do
     person = create :new_natural_person
-    issue = person.issues.last
+    issue = person.issues.reload.last
     issue.complete!
     assert_logging(issue, 0, 1)
     assert_logging(issue, 1, 1)
@@ -519,7 +519,7 @@ describe 'an admin user' do
   it "Rejects an issue because an observation went unanswered" do
     person = create :new_natural_person, enabled: true
     person.should be_enabled
-    issue = person.issues.last
+    issue = person.issues.reload.last
     issue.complete!
     login_as admin_user
     click_on 'Pending For Review'
@@ -622,7 +622,7 @@ describe 'an admin user' do
 
     assert_response 201
 
-    issue = person.issues.last
+    issue = person.issues.reload.last
     login_as admin_user
     issue.should be_observed
     assert_logging(Issue.last, 0, 1)
@@ -731,7 +731,7 @@ describe 'an admin user' do
 
   it "Abandons a new person issue that was inactive" do
     person = create :new_natural_person
-    issue = person.issues.last
+    issue = person.issues.reload.last
     issue.complete!
 
     assert_logging(Issue.last, 0, 1)
@@ -889,7 +889,7 @@ describe 'an admin user' do
 
     it 'can remove existing seeds' do
       person = create :new_natural_person
-      issue = person.issues.first
+      issue = person.issues.reload.first
 
       Issue.count.should == 1
       Person.count.should == 2

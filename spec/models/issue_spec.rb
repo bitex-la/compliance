@@ -80,7 +80,7 @@ RSpec.describe Issue, type: :model do
       person = create :new_natural_person
       
       expect do
-        person.issues.last.approve!
+        person.issues.reload.last.approve!
       end.to change{ person.enabled }.to(true)
     end
   end
@@ -88,7 +88,7 @@ RSpec.describe Issue, type: :model do
   describe "when transitioning" do
     it 'creates new fruits for new person' do
       person = create :new_natural_person
-      issue = person.issues.last
+      issue = person.issues.reload.last
       %i(domiciles natural_dockets allowances identifications).each do |assoc|
         person.send(assoc).should be_empty
       end

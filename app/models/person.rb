@@ -1,4 +1,6 @@
 class Person < ApplicationRecord
+  include Loggable
+  
   HAS_MANY = %i{
     issues
     domiciles
@@ -60,5 +62,25 @@ class Person < ApplicationRecord
 
   def name
     "#{id}"
+  end
+
+  private
+
+  def self.included_for
+    [
+      :issues,
+      :domiciles,
+      :identifications,
+      :natural_dockets,
+      :legal_entity_dockets, 
+      :allowances, 
+      :phones, 
+      :emails, 
+      :affinities,
+      :argentina_invoicing_details, 
+      :chile_invoicing_details, 
+      :notes, 
+      :attachments
+    ]
   end
 end

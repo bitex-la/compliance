@@ -1,6 +1,6 @@
 ActiveAdmin.register Issue do
   belongs_to :person
-  actions :all, :except => :destroy 
+  actions :all, except: :destroy 
 
   config.clear_action_items!
   action_item only: [:index] do

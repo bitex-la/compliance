@@ -1,5 +1,6 @@
 class Observation < ApplicationRecord
   include AASM
+  include Loggable
   enum scope: %i(client robot admin)
   
   belongs_to :issue
@@ -42,5 +43,12 @@ class Observation < ApplicationRecord
     if scope != observation_reason.try(:scope)
       errors.add(:scope, "Observation and Observation reason scope must match")
     end
+  end
+
+  def self.included_for
+    [
+      :issue,
+      :observation_reason
+    ]
   end
 end
