@@ -41,6 +41,7 @@ describe Issue do
         params: issue,
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 201
+      assert_logging(Issue.last, 0, 1)
     end
 
     %i(png gif pdf jpg zip).each do |ext|
@@ -53,6 +54,7 @@ describe Issue do
 
           assert_issue_integrity(["DomicileSeed"])
           assert_response 201
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an identification seed' do
@@ -63,6 +65,7 @@ describe Issue do
 
           assert_issue_integrity(["IdentificationSeed"])
           assert_response 201
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with a phone seed' do
@@ -73,6 +76,7 @@ describe Issue do
 
           assert_issue_integrity(["PhoneSeed"])
           assert_response 201
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an email seed' do
@@ -83,6 +87,8 @@ describe Issue do
 
           assert_issue_integrity(["EmailSeed"])
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an affinity seed' do
@@ -99,6 +105,8 @@ describe Issue do
           AffinitySeed.last.issue.should == Issue.first
           AffinitySeed.last.attachments.count.should == 1
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an argentina invoicing seed' do
@@ -109,6 +117,8 @@ describe Issue do
 
           assert_issue_integrity(["ArgentinaInvoicingDetailSeed"])
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with a chile invoicing seed' do
@@ -119,6 +129,8 @@ describe Issue do
 
           assert_issue_integrity(["ChileInvoicingDetailSeed"])
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with a natural docket seed' do
@@ -129,6 +141,8 @@ describe Issue do
 
           assert_issue_integrity(["NaturalDocketSeed"])
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with a legal entity docket seed' do
@@ -139,6 +153,8 @@ describe Issue do
 
           assert_issue_integrity(["LegalEntityDocketSeed"])
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with a allowance seed' do
@@ -149,6 +165,8 @@ describe Issue do
 
           assert_issue_integrity(["AllowanceSeed"])
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
       end
     end
@@ -172,6 +190,8 @@ describe Issue do
           DomicileSeed.last.replaces.should == Domicile.last
           DomicileSeed.first.replaces.should be_nil
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an identification seed who wants to replace the current identification' do
@@ -189,6 +209,8 @@ describe Issue do
           IdentificationSeed.last.replaces.should == Identification.last
           IdentificationSeed.first.replaces.should be_nil
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an allowance seed who wants to replace the current allowance' do
@@ -209,6 +231,8 @@ describe Issue do
           AllowanceSeed.last.replaces.should == Allowance.last
           AllowanceSeed.first.replaces.should be_nil
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with a phone seed who wants to replace the current phone' do
@@ -229,6 +253,8 @@ describe Issue do
           PhoneSeed.last.replaces.should == Phone.last
           PhoneSeed.first.replaces.should be_nil
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an email seed who wants to replace the current email' do
@@ -249,6 +275,8 @@ describe Issue do
           EmailSeed.last.replaces.should == Email.last
           EmailSeed.first.replaces.should be_nil
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
 
         it 'creates a new issue with an affinity seed who wants to replace the current affinity' do
@@ -269,6 +297,8 @@ describe Issue do
           AffinitySeed.last.replaces.should == Person.second.affinities.first
           AffinitySeed.first.replaces.should be_nil
           assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
         end
       end
     end
@@ -347,6 +377,8 @@ describe Issue do
       end
 
       Issue.last.should be_answered
+      assert_logging(Issue.last, 0, 1)
+      assert_logging(Issue.last, 1, 3)
     end
 
     it 'responds to an observation changing the phone' do
@@ -403,6 +435,8 @@ describe Issue do
       end
 
       Issue.last.should be_answered
+      assert_logging(Issue.last, 0, 1)
+      assert_logging(Issue.last, 1, 3)
     end
 
     it 'can answer an observation and add a new one in one step' do
@@ -435,6 +469,9 @@ describe Issue do
       observations = api_response.included.select{|i| i.type == 'observations' }
       observations.count.should == 2
       observations.map{|o| o.attributes.state }.should == %w(answered new)
+    
+      assert_logging(Issue.last, 0, 1)
+      assert_logging(Issue.last, 1, 3)
     end
   end
 

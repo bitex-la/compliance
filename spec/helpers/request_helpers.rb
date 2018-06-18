@@ -6,6 +6,10 @@ module RequestHelpers
   def api_response
     JSON.parse(response.body, object_class: OpenStruct)
   end
+
+  def assert_logging(entity, verb, expected_count)
+    EventLog.where(entity: entity, verb: verb).count.should == expected_count
+  end
 end
 
 RSpec.configuration.include RequestHelpers, type: :request
