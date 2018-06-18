@@ -1,5 +1,6 @@
 class Observation < ApplicationRecord
   include AASM
+  include Loggable
   enum scope: %i(client robot admin)
   
   belongs_to :issue
@@ -19,7 +20,7 @@ class Observation < ApplicationRecord
     event :answer do
       transitions from: :new, to: :answered
       after do
-        issue.answer! if issue.may_answer?
+        issue.answer!
       end
     end
   end
@@ -29,7 +30,7 @@ class Observation < ApplicationRecord
   end
 
   def observe_issue
-    issue.observe! unless issue.observed?  
+    issue.observe!
   end
 
   def state
@@ -42,5 +43,12 @@ class Observation < ApplicationRecord
     if scope != observation_reason.try(:scope)
       errors.add(:scope, "Observation and Observation reason scope must match")
     end
+  end
+
+  def self.included_for
+    [
+      :issue,
+      :observation_reason
+    ]
   end
 end

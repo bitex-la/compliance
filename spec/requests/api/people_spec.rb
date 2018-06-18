@@ -52,6 +52,7 @@ describe Person do
 	headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 200
       json_response = JSON.parse(response.body).deep_symbolize_keys
+      person.reload
 
       json_response[:data].should == {
         type: 'people',

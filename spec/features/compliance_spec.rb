@@ -27,6 +27,10 @@ describe 'an admin user' do
         File.absolute_path("./spec/fixtures/files/simple.#{ext}"), wait: 10.seconds)
   end
 
+  #def assert_logging(entity, verb, expected_count)
+  #  EventLog.where(entity: entity, verb: verb).count.should == expected_count
+  #end
+
   it 'creates a new natural person and its issue via admin' do
     observation_reason = create(:human_world_check_reason)
     login_as admin_user
@@ -169,6 +173,7 @@ describe 'an admin user' do
 
     issue = Issue.last
     observation = Observation.last
+    assert_logging(issue, 0, 1)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -189,13 +194,14 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
+    assert_logging(issue, 1, 2)
     Person.last.should be_enabled
   end
 
   it 'reviews a newly created customer' do
     person = create :new_natural_person
-    issue = person.issues.first
-
+    issue = person.issues.reload.first
+    assert_logging(issue, 0, 1)
     observation_reason = create(:observation_reason)
 
     Issue.count.should == 1
@@ -208,6 +214,7 @@ describe 'an admin user' do
 
     # assume that issue info is complete
     issue.complete!
+    assert_logging(issue, 1, 1)
 
     # Admin does not see it as pending
     login_as admin_user
@@ -251,6 +258,7 @@ describe 'an admin user' do
       with: 'Please re-send your document'
     click_button 'Update Issue'
 
+    assert_logging(issue, 1, 2)
     Observation.where(issue: issue).count.should == 1
     Issue.first.should be_observed
 
@@ -291,6 +299,7 @@ describe 'an admin user' do
     assert_response 200
 
     Issue.first.should be_answered
+    assert_logging(issue, 1, 4)
     Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
@@ -312,6 +321,7 @@ describe 'an admin user' do
     click_link 'Approve'
 
     Issue.last.should be_approved
+    assert_logging(issue, 1, 5)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
@@ -349,6 +359,8 @@ describe 'an admin user' do
       from: 'issue_identification_seeds_attributes_0_issuer',
       visible: false
 
+    person.identifications.reload
+
     select person.identifications.first.id,
       from: "issue[identification_seeds_attributes][0][replaces_id]"
 
@@ -374,6 +386,7 @@ describe 'an admin user' do
        apartment: 'C'
     })
 
+    person.domiciles.reload
     select person.domiciles.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]"
 
     within(".has_many_container.domicile_seeds") do
@@ -388,6 +401,7 @@ describe 'an admin user' do
       amount: "100"
     })
 
+   person.allowances.reload  
    select person.allowances.first.id, from: "issue[allowance_seeds_attributes][0][replaces_id]"
 
     within(".has_many_container.allowance_seeds") do
@@ -435,8 +449,8 @@ describe 'an admin user' do
       with: 'Please check this guy on world check'
 
     click_button "Create Issue"
-
     issue = Issue.last
+    assert_logging(issue, 0, 1)
     observation = Observation.last
     issue.should be_observed
     observation.should be_new
@@ -445,6 +459,7 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
+    assert_logging(issue, 1, 1) 
     issue.reload.should be_answered
     observation.reload.should be_answered
 
@@ -485,8 +500,10 @@ describe 'an admin user' do
 
   it "Dismisses an issue that had only bogus data" do
     person = create :new_natural_person
-    issue = person.issues.last
+    issue = person.issues.reload.last
     issue.complete!
+    assert_logging(issue, 0, 1)
+    assert_logging(issue, 1, 1)
     login_as admin_user
     click_on "Recent Issues"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
@@ -502,7 +519,7 @@ describe 'an admin user' do
   it "Rejects an issue because an observation went unanswered" do
     person = create :new_natural_person, enabled: true
     person.should be_enabled
-    issue = person.issues.last
+    issue = person.issues.reload.last
     issue.complete!
     login_as admin_user
     click_on 'Pending For Review'
@@ -540,6 +557,7 @@ describe 'an admin user' do
 
     issue = api_response.data
     issue.attributes.state.should == 'observed'
+    assert_logging(Issue.last, 0, 1)
     observation = api_response.included.find{|i| i.type == 'observations'}
 
     click_on 'Observations To Review'
@@ -551,6 +569,7 @@ describe 'an admin user' do
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
+    assert_logging(Issue.last, 1, 1)
 
     get "/api/people/#{person.id}/issues/#{issue.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -603,10 +622,11 @@ describe 'an admin user' do
 
     assert_response 201
 
-    issue = person.issues.last
+    issue = person.issues.reload.last
     login_as admin_user
     issue.should be_observed
-
+    assert_logging(Issue.last, 0, 1)
+    
     click_on 'Recent Issues'
     within '.recent_issues.panel' do
       expect(page).to_not have_content(issue.id)
@@ -629,6 +649,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
+    assert_logging(Issue.last, 1, 1)
     Observation.last.should be_answered
   end
 
@@ -655,6 +676,7 @@ describe 'an admin user' do
 
     issue = api_response.data
     issue.attributes.state.should == 'observed'
+    assert_logging(Issue.last, 0, 1)
     observation = api_response.included.find{|i| i.type == 'observations'}
     observation.attributes.scope.should == 'robot'
 
@@ -673,8 +695,9 @@ describe 'an admin user' do
       params: issue_request.to_json,
       headers: {"CONTENT_TYPE" => 'application/json',
                 "Authorization" => "Token token=#{admin_user.api_token}"}
-
     assert_response 200
+
+    assert_logging(Issue.last, 1, 2)
 
     api_response.data.attributes.state.should == 'answered'
     api_response.included.find{|i| i.type == 'observations'}
@@ -708,8 +731,12 @@ describe 'an admin user' do
 
   it "Abandons a new person issue that was inactive" do
     person = create :new_natural_person
-    issue = person.issues.last
+    issue = person.issues.reload.last
     issue.complete!
+
+    assert_logging(Issue.last, 0, 1)
+    assert_logging(Issue.last, 1, 1)
+
     login_as admin_user
     click_on 'Pending For Review'
     visit "/people/#{person.id}/issues/#{issue.id}"
@@ -769,8 +796,12 @@ describe 'an admin user' do
       issue = Issue.last
       issue.should be_draft
 
+      assert_logging(Issue.last, 0, 1)
+      assert_logging(Issue.last, 1, 1)
+
       click_link "Approve"
       issue.reload.should be_approved
+      assert_logging(Issue.last, 1, 2)
 
       old_domicile = Domicile.first
       new_domicile = Domicile.last
@@ -840,8 +871,13 @@ describe 'an admin user' do
       issue = Issue.last
       issue.should be_draft
 
+      assert_logging(Issue.last, 0, 1)
+      assert_logging(Issue.last, 1, 1)
+
       click_link "Approve"
       issue.reload.should be_approved
+
+      assert_logging(Issue.last, 1, 2)
 
       within ".row.row-person" do
         click_link person.id
@@ -853,7 +889,7 @@ describe 'an admin user' do
 
     it 'can remove existing seeds' do
       person = create :new_natural_person
-      issue = person.issues.first
+      issue = person.issues.reload.first
 
       Issue.count.should == 1
       Person.count.should == 2
@@ -919,13 +955,18 @@ describe 'an admin user' do
       end
 
       click_button 'Update Issue'
+      assert_logging(Issue.last, 0, 1)
+      assert_logging(Issue.last, 1, 1) 
 
       click_link 'Approve'
       issue.reload.should be_approved
+      assert_logging(Issue.last, 1, 2)
 
       within '.row.row-person' do
       	click_link  person.id
       end
+      person.allowances.reload
+      person.identifications.reload
       person.allowances.first.weight.should == AllowanceSeed.last.weight
       person.identifications.first.number.should == IdentificationSeed.last.number
     end

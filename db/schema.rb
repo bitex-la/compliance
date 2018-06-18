@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180509193719) do
+ActiveRecord::Schema.define(version: 20180615144802) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -258,6 +258,17 @@ ActiveRecord::Schema.define(version: 20180509193719) do
     t.index ["issue_id"], name: "index_emails_on_issue_id"
     t.index ["person_id"], name: "index_emails_on_person_id"
     t.index ["replaced_by_id"], name: "index_emails_on_replaced_by_id"
+  end
+
+  create_table "event_logs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "entity_id"
+    t.string "entity_type"
+    t.text "raw_data", limit: 4294967295
+    t.bigint "admin_user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "verb"
+    t.index ["admin_user_id"], name: "index_event_logs_on_admin_user_id"
   end
 
   create_table "fundings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -516,6 +527,7 @@ ActiveRecord::Schema.define(version: 20180509193719) do
   add_foreign_key "emails", "emails", column: "replaced_by_id"
   add_foreign_key "emails", "issues"
   add_foreign_key "emails", "people"
+  add_foreign_key "event_logs", "admin_users"
   add_foreign_key "fundings", "fundings", column: "replaced_by_id"
   add_foreign_key "fundings", "issues"
   add_foreign_key "fundings", "people"

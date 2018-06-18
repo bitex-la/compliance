@@ -30,7 +30,7 @@ module FactoryBot
             factory factory_name do 
               after(:create) do |resource, evaluator|
                 create("#{factory_name}_seed",
-                  issue: resource.person.issues.first,
+                  issue: resource.person.issues.reload.first,
                   fruit: resource)
               end
             end
