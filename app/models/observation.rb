@@ -20,7 +20,7 @@ class Observation < ApplicationRecord
     event :answer do
       transitions from: :new, to: :answered
       after do
-        issue.answer!
+        issue.answer! if issue.may_answer?
       end
     end
   end
@@ -30,7 +30,7 @@ class Observation < ApplicationRecord
   end
 
   def observe_issue
-    issue.observe!
+    issue.observe! if issue.may_observe?
   end
 
   def state

@@ -6,6 +6,7 @@ ActiveAdmin.register EventLog do
     column :id
     column :entity_id
     column :entity_type
+    column :verb
     column :created_at
     column :updated_at
     actions
