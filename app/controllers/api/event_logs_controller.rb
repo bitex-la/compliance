@@ -1,7 +1,14 @@
 class Api::EventLogsController < Api::ApiController
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
-    events = EventLog.order(updated_at: :desc).page(page).per(per_page)
+    events = if !params[:filter].blank?
+      EventLog.where(entity_type: params[:filter][:entity_type])
+        .order(updated_at: :desc)
+        .page(page)
+        .per(per_page)
+    else 
+      EventLog.order(updated_at: :desc).page(page).per(per_page)
+    end
     options = {
       meta: { total_pages: (events.count.to_f / per_page).ceil },
     }
