@@ -199,6 +199,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :reply,
         :scope,
         :observation_reason,
+        :issue
       ],
       attachments: [
         :document,

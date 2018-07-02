@@ -68,6 +68,17 @@ if Rails.env.demo? || Rails.env.development?
    body_pt: 'Por favor, preencha as informações básicas para uma entidade legal',
    scope: 0
  )
+
+ risk_score_alert = ObservationReason.create!(
+  subject_en: 'Risk score alert',
+  body_en: 'New score assessment',
+  subject_es: 'Alerta de score de riesgo',
+  body_es: 'Nuevo score de riesgo',
+  subject_pt: 'Alerta de pontuação de risco',
+  body_pt: 'Nova avaliação de pontuação',
+  scope: 2
+ )
+
  ############# AN ARGENTINE NATURAL PERSON TO CHECK ##############
  # 1. Create an empty person
  richard_hendricks = Person.create!(
