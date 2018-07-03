@@ -54,6 +54,7 @@ class Api::IssuesController < Api::ApiController
         :people,
         :observation_reasons,
         :domiciles,
+        :risk_scores,
         :identifications,
         :allowances,
         :phones,
@@ -68,6 +69,7 @@ class Api::IssuesController < Api::ApiController
       ],
       issues: [
         :state,
+        :risk_score_seeds,
         :domicile_seeds,
         :identification_seeds,
         :natural_docket_seed,
@@ -82,6 +84,16 @@ class Api::IssuesController < Api::ApiController
         :observations,
         id: issue_id,
         person_id: person_id
+      ],
+      risk_score_seeds: [
+        :score,
+        :provider,
+        :extra_info,
+        :external_link,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        seed_scope
       ],
       domicile_seeds: [
         :country,
@@ -214,6 +226,7 @@ class Api::IssuesController < Api::ApiController
       people: [],
       observation_reasons: [],
       domiciles: [],
+      risk_scores: [],
       identifications: [],
       natural_dockets: [],
       legal_entity_dockets: [],

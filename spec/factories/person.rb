@@ -23,6 +23,7 @@ FactoryBot.define do
       create :basic_issue, person: person, aasm_state: 'approved'
       %i(
         full_domicile
+        full_risk_score
         full_natural_person_identification
         full_natural_docket
         full_argentina_invoicing_detail

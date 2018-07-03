@@ -113,6 +113,35 @@ class Api::SeedsHelper
     }
   end
 
+  def self.risk_score_seed(issue, attachment_type)
+    mime, bytes = {
+      data: {
+        type: "risk_score_seeds",
+        id: "@1",
+        attributes: {
+          score: "green",
+          provider: "chainalysis",
+          extra_info: '{"hello": "world"}',
+          external_link: "https://test.chainalysis.com/docs/risk-api/#/"
+        },
+        relationships: {
+          issue: {
+            data: {id: issue.id, type: 'issues'}
+          },
+          attachments: {
+            data: [{
+              id: "@1",
+              type: "attachments"
+            }]
+          }
+        }
+      },
+      included: [
+        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+      ]
+    }
+  end
+
   def self.domicile_seed(issue, attachment_type)
     mime, bytes =
     {

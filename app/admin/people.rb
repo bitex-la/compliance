@@ -99,6 +99,31 @@ ActiveAdmin.register Person do
           end
         end
 
+        if person.risk_scores.any?
+          panel 'risk scores' do
+            table_for person.risk_scores do |rs|
+              rs.column("ID") do |score|
+                link_to(score.id, risk_score_path(score))
+              end
+              rs.column(:score)
+              rs.column(:provider)
+              rs.column(:extra_info)
+              rs.column(:external_link)
+              rs.column("Attachments") do |score|
+                score.attachments
+                  .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+                  .join("<br />").html_safe
+              end
+              rs.column("") { |score|
+                link_to("View", risk_score_path(score))
+              }
+              rs.column("") { |score|
+                link_to("Edit", edit_risk_score_path(score))
+              }
+            end
+          end 
+        end
+
         if person.argentina_invoicing_details.any?
           panel 'argentina invoicing details' do
             table_for person.argentina_invoicing_details do |n|
@@ -329,6 +354,7 @@ ActiveAdmin.register Person do
       tab :attachments do
         ArbreHelpers.multi_entity_attachments self, person, :natural_dockets
         ArbreHelpers.multi_entity_attachments self, person, :legal_entity_dockets
+        ArbreHelpers.multi_entity_attachments self, person, :risk_scores
         ArbreHelpers.multi_entity_attachments self, person, :argentina_invoicing_details
         ArbreHelpers.multi_entity_attachments self, person, :chile_invoicing_details
         ArbreHelpers.multi_entity_attachments self, person, :identifications
