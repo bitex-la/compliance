@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       %i(
         natural_dockets
         legal_entity_dockets
+        risk_scores
         argentina_invoicing_details
         chile_invoicing_details
         domiciles
@@ -28,6 +29,7 @@ Rails.application.routes.draw do
         %i(
           natural_docket_seeds
           legal_entity_docket_seeds
+          risk_score_seeds
           argentina_invoicing_detail_seeds
           chile_invoicing_detail_seeds
           domicile_seeds

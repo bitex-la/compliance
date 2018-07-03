@@ -8,6 +8,7 @@ FactoryBot.define do
     after(:create) do |issue, evaluator|
       %i(
         full_domicile_seed 
+        full_risk_score_seed
         full_natural_docket_seed 
         full_natural_person_identification_seed 
         full_argentina_invoicing_detail_seed

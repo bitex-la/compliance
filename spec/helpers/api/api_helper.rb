@@ -5,6 +5,7 @@ PLURAL_SEEDS ||= %w(
   EmailSeed
   IdentificationSeed
   AllowanceSeed
+  RiskScoreSeed
   NoteSeed
 )
 

@@ -56,17 +56,18 @@ class Api::IssueJsonApiSyncController < Api::ApiController
   def get_mapper
     mapper = JsonapiMapper.doc_unsafe!(params.permit!.to_h,
       %w(issues domicile_seeds phone_seeds email_seeds note_seeds
-        affinity_seeds identification_seeds natural_docket_seeds
+        affinity_seeds identification_seeds natural_docket_seeds risk_score_seeds
         legal_entity_docket_seeds argentina_invoicing_detail_seeds
         chile_invoicing_detail_seeds allowance_seeds observations attachments
         people observation_reasons domiciles identifications allowances phones
         emails notes affinities argentina_invoicing_details chile_invoicing_details
-        natural_dockets legal_entity_dockets
+        natural_dockets legal_entity_dockets risk_scores
       ),
       issues: [
         :state,
         :domicile_seeds,
         :identification_seeds,
+        :risk_score_seeds,
         :natural_docket_seed,
         :legal_entity_docket_seed,
         :argentina_invoicing_detail_seed,
@@ -88,6 +89,16 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :postal_code,
         :floor,
         :apartment,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        :issue
+      ],
+      risk_score_seeds: [
+        :score,
+        :provider,
+        :extra_info,
+        :external_link,
         :attachments,
         :copy_attachments,
         :replaces,
@@ -199,6 +210,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :reply,
         :scope,
         :observation_reason,
+        :issue
       ],
       attachments: [
         :document,
@@ -216,6 +228,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       identifications: [],
       natural_dockets: [],
       legal_entity_dockets: [],
+      risk_scores: [],
       phones: [],
       emails: [],
       notes: [],

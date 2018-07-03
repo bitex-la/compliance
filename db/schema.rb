@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180615144802) do
+ActiveRecord::Schema.define(version: 20180703132125) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -492,6 +492,36 @@ ActiveRecord::Schema.define(version: 20180615144802) do
     t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
   end
 
+  create_table "risk_score_seeds", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "score"
+    t.string "provider"
+    t.text "extra_info"
+    t.string "external_link"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "replaces_id"
+    t.bigint "fruit_id"
+    t.boolean "copy_attachments"
+    t.bigint "issue_id"
+    t.index ["fruit_id"], name: "index_risk_score_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_risk_score_seeds_on_issue_id"
+  end
+
+  create_table "risk_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "score"
+    t.string "provider"
+    t.text "extra_info"
+    t.string "external_link"
+    t.bigint "issue_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_risk_scores_on_issue_id"
+    t.index ["person_id"], name: "index_risk_scores_on_person_id"
+    t.index ["replaced_by_id"], name: "index_risk_scores_on_replaced_by_id"
+  end
+
   add_foreign_key "affinities", "affinities", column: "replaced_by_id"
   add_foreign_key "affinities", "affinity_seeds"
   add_foreign_key "affinities", "people"
@@ -560,4 +590,9 @@ ActiveRecord::Schema.define(version: 20180615144802) do
   add_foreign_key "phones", "issues"
   add_foreign_key "phones", "people"
   add_foreign_key "phones", "phones", column: "replaced_by_id"
+  add_foreign_key "risk_score_seeds", "issues"
+  add_foreign_key "risk_score_seeds", "risk_scores", column: "fruit_id"
+  add_foreign_key "risk_scores", "issues"
+  add_foreign_key "risk_scores", "people"
+  add_foreign_key "risk_scores", "risk_scores", column: "replaced_by_id"
 end

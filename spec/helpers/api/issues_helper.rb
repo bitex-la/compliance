@@ -391,6 +391,43 @@ class Api::IssuesHelper
     }
   end
 
+  def self.issue_with_risk_score_seed(attachment_type)
+    {
+      data: {
+        type: "issues",
+        attributes: {
+
+        },
+        relationships: {
+          risk_score_seeds: {
+            data: [{ id: "@1", type: "risk_score_seeds" }]
+          }
+        }
+      },
+      included:[
+        {
+          type: "risk_score_seeds",
+          id: "@1",
+          attributes: {
+            score: "green",
+            provider: "chainalysis",
+            extra_info: '{"hello": "world"}',
+            external_link: "https://test.chainalysis.com/docs/risk-api/#/"
+          },
+          relationships: {
+            attachments: {
+              data: [{
+                id: "@1",
+                type: "attachments"
+              }]
+            }
+          }
+        },
+        attachment_for(attachment_type, '@1')
+      ]
+    }
+  end
+
   def self.issue_with_natural_docket_seed(attachment_type)
     {
       data: {

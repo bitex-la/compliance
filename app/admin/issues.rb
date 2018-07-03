@@ -69,6 +69,16 @@ ActiveAdmin.register Issue do
           ArbreHelpers.has_many_attachments(self, sf)
         end
 
+        ArbreHelpers.has_many_form self, f, :risk_score_seeds do |rs, context|
+          rs.input :score
+          rs.input :provider
+          rs.input :extra_info
+          rs.input :external_link
+          rs.input :replaces
+          rs.input :copy_attachments
+          ArbreHelpers.has_many_attachments(context, rs)
+        end
+
         ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
           af.input :vat_status_id, as: :select, collection: VatStatusKind.all
           af.input :tax_id
@@ -175,6 +185,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.person_attachments self, f.object.person
         ArbreHelpers.entity_attachments self, f.object, :natural_docket_seed
         ArbreHelpers.entity_attachments self, f.object, :legal_entity_docket_seed
+        ArbreHelpers.multi_entity_attachments self, f.object, :risk_score_seeds
         ArbreHelpers.entity_attachments self, f.object, :argentina_invoicing_detail_seed
         ArbreHelpers.entity_attachments self, f.object, :chile_invoicing_detail_seed
         ArbreHelpers.multi_entity_attachments self, f.object, :identification_seeds
@@ -251,6 +262,31 @@ ActiveAdmin.register Issue do
           }
         end
       end
+    end
+
+    if issue.risk_score_seeds.any?
+      panel 'risk score seeds' do
+        table_for issue.risk_score_seeds do |rs|
+          rs.column("ID") do |seed|
+            link_to(seed.id, risk_score_seed_path(seed))
+          end
+          rs.column(:score)
+          rs.column(:provider)
+          rs.column(:extra_info)
+          rs.column(:external_link)
+          rs.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          rs.column("") { |seed|
+            link_to("View", risk_score_seed_path(seed))
+          }
+          rs.column("") { |seed|
+            link_to("Edit", edit_risk_score_seed_path(seed))
+          }
+        end
+      end 
     end
 
     if issue.argentina_invoicing_detail_seed.present?

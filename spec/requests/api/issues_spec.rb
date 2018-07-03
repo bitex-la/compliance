@@ -21,7 +21,7 @@ describe Issue do
     Issue.count == 2
     seed_list.each do |seed_type|
       seed_type.constantize.count.should == 2
-      seed_type.constantize.last.issue.should == Issue.last
+      seed_type.constantize.last.reload.issue.should == Issue.last
       seed_type.constantize.last.attachments.count.should == 1
     end
   end
@@ -64,6 +64,17 @@ describe Issue do
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
           assert_issue_integrity(["IdentificationSeed"])
+          assert_response 201
+          assert_logging(Issue.last, 0, 1)
+        end
+
+        it 'creates a new issue with a risk score seed' do
+          issue  = Api::IssuesHelper.issue_with_risk_score_seed(ext)
+          post "/api/people/#{person.id}/issues",
+            params: issue,
+            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+          assert_issue_integrity(["RiskScoreSeed"])
           assert_response 201
           assert_logging(Issue.last, 0, 1)
         end
@@ -208,6 +219,25 @@ describe Issue do
           assert_replacement_issue_integrity(["IdentificationSeed"])
           IdentificationSeed.last.replaces.should == Identification.last
           IdentificationSeed.first.replaces.should be_nil
+          assert_response 201
+
+          assert_logging(Issue.last, 0, 1)
+        end
+
+        it 'creates a new issue with an risk score seed who wants to replace the current risk score' do
+          full_natural_person = create(:full_natural_person)
+          issue  = Api::IssuesHelper.issue_with_risk_score_seed(ext)
+          issue[:included][0][:relationships].merge!({
+            replaces: { data: { type: 'risk_scores', id: RiskScore.last.id.to_s } }
+          })
+
+          post "/api/people/#{full_natural_person.id}/issues",
+            params: issue,
+            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+          assert_replacement_issue_integrity(["RiskScoreSeed"])
+          RiskScoreSeed.last.replaces.should == RiskScore.last
+          RiskScoreSeed.first.replaces.should be_nil
           assert_response 201
 
           assert_logging(Issue.last, 0, 1)

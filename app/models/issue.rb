@@ -33,6 +33,7 @@ class Issue < ApplicationRecord
     email_seeds
     note_seeds
     affinity_seeds
+    risk_score_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
@@ -175,6 +176,8 @@ class Issue < ApplicationRecord
       :'note_seeds.attachments',
       :domicile_seeds,
       :'domicile_seeds.attachments',
+      :risk_score_seeds,
+      :'risk_score_seeds.attachments',
       :affinity_seeds,
       :'affinity_seeds.attachments',
       :identification_seeds,
