@@ -101,7 +101,7 @@ ActiveAdmin.register Person do
 
         if person.risk_scores.any?
           panel 'risk scores' do
-            table_for person.risk_scores do |rs|
+            table_for person.risk_scores.current do |rs|
               rs.column("ID") do |score|
                 link_to(score.id, risk_score_path(score))
               end

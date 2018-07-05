@@ -102,7 +102,7 @@ module Garden
         foreign_key: :replaced_by_id
       has_many :attachments, as: :attached_to_fruit
 
-      scope :current, -> { where(replaced_by_id: nil) }
+      scope :current, -> { where(replaced_by_id: nil).order(updated_at: :desc) }
     end
   end
 
