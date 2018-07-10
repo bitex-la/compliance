@@ -6,6 +6,7 @@ PLURAL_SEEDS ||= %w(
   IdentificationSeed
   AllowanceSeed
   RiskScoreSeed
+  FundDepositSeed
   NoteSeed
 )
 

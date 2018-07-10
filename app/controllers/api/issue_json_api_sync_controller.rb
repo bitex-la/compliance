@@ -61,7 +61,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         chile_invoicing_detail_seeds allowance_seeds observations attachments
         people observation_reasons domiciles identifications allowances phones
         emails notes affinities argentina_invoicing_details chile_invoicing_details
-        natural_dockets legal_entity_dockets risk_scores
+        natural_dockets legal_entity_dockets risk_scores fund_deposit_seeds fund_deposits
       ),
       issues: [
         :state,
@@ -73,6 +73,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :argentina_invoicing_detail_seed,
         :chile_invoicing_detail_seed,
         :allowance_seeds,
+        :fund_deposit_seeds,
         :phone_seeds,
         :email_seeds,
         :note_seeds,
@@ -92,6 +93,13 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :attachments,
         :copy_attachments,
         :replaces,
+        :issue
+      ],
+      fund_deposit_seeds:[
+        :amount,
+        :currency,
+        :deposit_method,
+        :attachments,
         :issue
       ],
       risk_score_seeds: [
@@ -235,7 +243,8 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       affinities: [],
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
-      allowances: []
+      allowances: [],
+      fund_deposits: []
     )
 
     if mapper.data.is_a?(Issue) || mapper.data.is_a?(Attachment)

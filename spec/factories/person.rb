@@ -31,6 +31,7 @@ FactoryBot.define do
         full_email
         full_note
         full_affinity
+        full_fund_deposit
         salary_allowance
         savings_allowance
       ).each do |name|

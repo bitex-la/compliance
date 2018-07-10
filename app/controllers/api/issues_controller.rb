@@ -57,6 +57,7 @@ class Api::IssuesController < Api::ApiController
         :risk_scores,
         :identifications,
         :allowances,
+        :fund_deposits,
         :phones,
         :emails,
         :notes,
@@ -77,6 +78,7 @@ class Api::IssuesController < Api::ApiController
         :argentina_invoicing_detail_seed,
         :chile_invoicing_detail_seed,
         :allowance_seeds,
+        :fund_deposit_seeds,
         :phone_seeds,
         :email_seeds,
         :note_seeds,
@@ -93,6 +95,13 @@ class Api::IssuesController < Api::ApiController
         :attachments,
         :copy_attachments,
         :replaces,
+        seed_scope
+      ],
+      fund_deposit_seeds: [
+        :amount,
+        :currency,
+        :deposit_method,
+        :attachments,
         seed_scope
       ],
       domicile_seeds: [
@@ -236,6 +245,7 @@ class Api::IssuesController < Api::ApiController
       affinities: [],
       argentina_invoicing_details: [],
       chile_invoicing_details: [],
-      allowances: []
+      allowances: [],
+      fund_deposits: []
   end
 end

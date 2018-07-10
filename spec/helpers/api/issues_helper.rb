@@ -428,6 +428,42 @@ class Api::IssuesHelper
     }
   end
 
+  def self.issue_with_fund_deposit_seed(attachment_type)
+    {
+      data: {
+        type: "issues",
+        attributes: {
+
+        },
+        relationships: {
+          fund_deposit_seeds: {
+            data: [{ id: "@1", type: "fund_deposit_seeds" }]
+          }
+        }
+      },
+      included:[
+        {
+          type: "fund_deposit_seeds",
+          id: "@1",
+          attributes: {
+            currency: "usd",
+            deposit_method: "bank",
+            amount: 1000
+          },
+          relationships: {
+            attachments: {
+              data: [{
+                id: "@1",
+                type: "attachments"
+              }]
+            }
+          }
+        },
+        attachment_for(attachment_type, '@1')
+      ]
+    }
+  end
+
   def self.issue_with_natural_docket_seed(attachment_type)
     {
       data: {

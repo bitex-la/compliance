@@ -71,19 +71,21 @@ module Garden
           )} if copy_attachments
         end
       else
-         old_fruits =  fruit.person.send(self.class.naming.plural)
+        old_fruits =  fruit.person.send(self.class.naming.plural)
           .current.where('id != ?', fruit.id)
 
-         if copy_attachments
-           old_fruits.each do |old_fruit|
-             old_fruit.attachments.each{ |a| a.update!(
-               attached_to_fruit: fruit,
-               attached_to_seed: nil,
-               person: issue.person
-             )}
-           end
-         end
-         old_fruits.update_all(replaced_by_id: fruit.id)
+        if respond_to?(:copy_attachments)
+          if copy_attachments
+            old_fruits.each do |old_fruit|
+              old_fruit.attachments.each{ |a| a.update!(
+                attached_to_fruit: fruit,
+                attached_to_seed: nil,
+                person: issue.person
+              )}
+            end
+          end
+        end
+        old_fruits.update_all(replaced_by_id: fruit.id) if respond_to?(:replaces)
       end
 
       fruit

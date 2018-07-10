@@ -225,6 +225,27 @@ ActiveAdmin.register Person do
           end
         end
 
+        if person.fund_deposits.any?
+          panel 'Fund Deposits' , class: 'fund_deposits' do
+            table_for person.fund_deposits do |q|
+              q.column("ID") do |deposit|
+                link_to(deposit.id, fund_deposit_path(deposit))
+              end
+              q.column("Amount") { |deposit| deposit.amount }
+              q.column("Currency") { |deposit| deposit.currency }
+              q.column("Deposit Method") { |deposit| deposit.deposit_method }
+              q.column("Attachments") do |deposit|
+                deposit.attachments
+                  .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+                  .join("<br />").html_safe
+              end
+              q.column("") { |deposit|
+                link_to("View", fund_deposit_path(deposit))
+              }
+            end
+          end
+        end
+
         if person.allowances.any?
           panel 'Allowances' , class: 'allowances' do
             table_for person.allowances.current do |q|
