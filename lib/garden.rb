@@ -85,7 +85,7 @@ module Garden
             end
           end
         end
-        old_fruits.update_all(replaced_by_id: fruit.id) if respond_to?(:replaces)
+        old_fruits.update_all(replaced_by_id: fruit.id)
       end
 
       fruit
