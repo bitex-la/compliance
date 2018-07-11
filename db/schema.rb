@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180710204419) do
+ActiveRecord::Schema.define(version: 20180711180437) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -272,7 +272,7 @@ ActiveRecord::Schema.define(version: 20180710204419) do
   end
 
   create_table "fund_deposit_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.decimal "amount", precision: 10
+    t.decimal "amount", precision: 20, scale: 8
     t.integer "currency_id"
     t.integer "deposit_method_id"
     t.bigint "issue_id"
@@ -286,7 +286,7 @@ ActiveRecord::Schema.define(version: 20180710204419) do
   end
 
   create_table "fund_deposits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.decimal "amount", precision: 10
+    t.decimal "amount", precision: 20, scale: 8
     t.integer "currency_id"
     t.integer "deposit_method_id"
     t.bigint "person_id"
