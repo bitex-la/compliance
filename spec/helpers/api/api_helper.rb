@@ -17,6 +17,10 @@ SINGULAR_SEEDS ||= %w(
   ChileInvoicingDetailSeed
 )
 
+SELF_HARVESTABLE_SEEDS ||= %w(
+  FundDepositSeed
+)
+
 ALL_SEEDS ||= PLURAL_SEEDS + SINGULAR_SEEDS
 
 def build_seed_payload(seed)

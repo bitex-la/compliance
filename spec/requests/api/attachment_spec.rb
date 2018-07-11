@@ -41,7 +41,11 @@ ALL_SEEDS.each do |seed|
         assert_response 201
         
         if PLURAL_SEEDS.include? seed
-          issue.send(relationship).first.attachments.count.should == 2
+          if SELF_HARVESTABLE_SEEDS.include? seed 
+            issue.send(relationship).first.attachments.count.should == 1
+          else
+            issue.send(relationship).first.attachments.count.should == 2
+          end
           attachment_id = issue.send(relationship).first.attachments.last.id
         else
           issue.send(relationship).attachments.count.should == 2
@@ -74,33 +78,37 @@ ALL_SEEDS.each do |seed|
         end
 
         if PLURAL_SEEDS.include? seed
-          attachment_id = issue.send(relationship).first.attachments.last.id
+          if !SELF_HARVESTABLE_SEEDS.include? seed 
+            attachment_id = issue.send(relationship).first.attachments.last.id
+          end
         else
           attachment_id = issue.send(relationship).attachments.last.id
         end
 
-        put "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}/#{seed_id}/attachments/#{attachment_id}",
-          params: Api::IssuesHelper.seed_attachment_payload(
-            :gif, 
-            attachment_id, 
-            issue.person.id, 
-            seed_id,
-            seed.pluralize.underscore
-          ),
-          headers: { 'Authorization': "Token token=#{admin_user.api_token}" } 
+        if !SELF_HARVESTABLE_SEEDS.include? seed 
+          put "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}/#{seed_id}/attachments/#{attachment_id}",
+            params: Api::IssuesHelper.seed_attachment_payload(
+              :gif, 
+              attachment_id, 
+              issue.person.id, 
+              seed_id,
+              seed.pluralize.underscore
+            ),
+            headers: { 'Authorization': "Token token=#{admin_user.api_token}" } 
 
-        assert_response 200
-       
-        if PLURAL_SEEDS.include? seed
-          issue.send(relationship).first.attachments.count.should == 1
-        else
-          issue.send(relationship).attachments.count.should == 1
+          assert_response 200
+        
+          if PLURAL_SEEDS.include? seed
+            issue.send(relationship).first.attachments.count.should == 1
+          else
+            issue.send(relationship).attachments.count.should == 1
+          end
+
+          json_response[:data][:id].should == attachment_id.to_s
+          attachment_data = json_response[:data][:attributes]
+          attachment_data[:document_content_type].should == 'image/gif'
+          attachment_data[:document_file_name].should == 'file.gif'
         end
-
-        json_response[:data][:id].should == attachment_id.to_s
-        attachment_data = json_response[:data][:attributes]
-        attachment_data[:document_content_type].should == 'image/gif'
-        attachment_data[:document_file_name].should == 'file.gif'
       end
     end
   end

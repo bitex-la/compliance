@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'helpers/api/issues_helper'
+require 'helpers/api/api_helper'
 require 'json'
 
 describe Issue do
@@ -13,7 +14,9 @@ describe Issue do
     seed_list.each do |seed_type|
       seed_type.constantize.count.should == 1
       seed_type.constantize.last.issue.should == Issue.first
-      seed_type.constantize.last.attachments.count.should == 1
+      if !SELF_HARVESTABLE_SEEDS.include? seed_type
+        seed_type.constantize.last.attachments.count.should == 1
+      end
     end
   end
 

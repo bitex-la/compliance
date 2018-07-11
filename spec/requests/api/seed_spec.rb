@@ -114,7 +114,9 @@ ALL_SEEDS.each do |seed|
         issue.reload
         if PLURAL_SEEDS.include? seed
           issue.send(relationship).count.should == 1
-          issue.send(relationship).first.attachments.count.should == 1
+          if !SELF_HARVESTABLE_SEEDS.include? seed
+            issue.send(relationship).first.attachments.count.should == 1
+          end
         else
           issue.send(relationship).should_not be_nil
           issue.send(relationship).attachments.count.should == 1
@@ -133,7 +135,9 @@ ALL_SEEDS.each do |seed|
         issue.reload
         if PLURAL_SEEDS.include? seed
           issue.send(relationship).count.should == 1
-          issue.send(relationship).first.attachments.count.should == 1
+          if !SELF_HARVESTABLE_SEEDS.include? seed
+            issue.send(relationship).first.attachments.count.should == 1
+          end
         else
           issue.send(relationship).should_not be_nil
           issue.send(relationship).attachments.count.should == 1
@@ -172,14 +176,13 @@ ALL_SEEDS.each do |seed|
         end
 
         # For plural seeds show endpoint exists, otherwise goes to seed index
-        get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}/#{seed_id}",
-          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-        assert_response 200
-
-        seed_payload = JSON.parse(response.body).deep_symbolize_keys
-
-        assert_seed_update(admin_user, issue, seed, seed_id, relationship, seed_payload)
+        if !SELF_HARVESTABLE_SEEDS.include? seed
+          get "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed.pluralize.underscore}/#{seed_id}",
+            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+          assert_response 200
+          seed_payload = JSON.parse(response.body).deep_symbolize_keys
+          assert_seed_update(admin_user, issue, seed, seed_id, relationship, seed_payload)
+        end
       end
     end
   end
