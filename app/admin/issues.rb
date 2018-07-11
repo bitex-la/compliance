@@ -135,6 +135,13 @@ ActiveAdmin.register Issue do
           ArbreHelpers.has_many_attachments(context, rf)
         end
 
+        ArbreHelpers.has_many_form self, f, :fund_deposit_seeds do |ds, context|
+          ds.input :amount
+          ds.input :currency_id, as: :select, collection: Currency.all
+          ds.input :deposit_method_id, as: :select, collection: DepositMethod.all
+          ArbreHelpers.has_many_attachments(context, ds)
+        end
+
         ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
           sf.input :weight
           sf.input :amount
@@ -191,6 +198,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.multi_entity_attachments self, f.object, :identification_seeds
         ArbreHelpers.multi_entity_attachments self, f.object, :domicile_seeds
         ArbreHelpers.multi_entity_attachments self, f.object, :affinity_seeds
+        ArbreHelpers.multi_entity_attachments self, f.object, :fund_deposit_seeds
         ArbreHelpers.multi_entity_attachments self, f.object, :allowance_seeds
         ArbreHelpers.multi_entity_attachments self, f.object, :phone_seeds
         ArbreHelpers.multi_entity_attachments self, f.object, :email_seeds
@@ -311,7 +319,7 @@ ActiveAdmin.register Issue do
             link_to("View", argentina_invoicing_detail_seed_path(seed))
           }
           n.column("") { |seed|
-            link_to("Edit", argentina_invoicing_detail_seed_path(seed))
+            link_to("Edit", edit_argentina_invoicing_detail_seed_path(seed))
           }
         end
       end
@@ -337,7 +345,31 @@ ActiveAdmin.register Issue do
             link_to("View", chile_invoicing_detail_seed_path(seed))
           }
           n.column("") { |seed|
-            link_to("Edit", chile_invoicing_detail_seed_path(seed))
+            link_to("Edit", edit_chile_invoicing_detail_seed_path(seed))
+          }
+        end
+      end
+    end
+
+    if issue.fund_deposit_seeds.any?
+      panel 'Fund deposit seeds' do
+        table_for issue.fund_deposit_seeds do |q|
+          q.column("ID") do |seed|
+            link_to(seed.id, fund_deposit_seeds_path(seed))
+          end
+          q.column("Amount") { |seed| seed.amount }
+          q.column("Currency")   { |seed| seed.currency }
+          q.column("Deposit method")  { |seed| seed.deposit_method }
+          q.column("Attachments") do |seed|
+            seed.attachments
+              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+              .join("<br />").html_safe
+          end
+          q.column("") { |seed|
+            link_to("View", fund_deposit_seed_path(seed))
+          }
+          q.column("") { |seed|
+            link_to("Edit", edit_fund_deposit_seed_path(seed))
           }
         end
       end

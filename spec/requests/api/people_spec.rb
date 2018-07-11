@@ -33,11 +33,13 @@ describe Person do
             argentina_invoicing_details: {data: []},
             chile_invoicing_details: {data: []},
             allowances: {data: []},
+            fund_deposits: {data: []},
             phones: {data: []},
             emails: {data: []},
             notes: {data: []},
             affinities: {data: []},
-            attachments: {data: []}
+            risk_scores: {data: []},
+            attachments: {data: []},
           }
         },
         included: []
@@ -81,6 +83,9 @@ describe Person do
           allowances: {data: person.allowances.map{ |x|
             {id: x.id.to_s, type: "allowances" }
           }},
+          fund_deposits: {data: person.fund_deposits.map{ |x|
+            {id: x.id.to_s, type: "fund_deposits" }
+          }},
           argentina_invoicing_details: {data: person.argentina_invoicing_details.map { |x|
             {id: x.id.to_s, type: 'argentina_invoicing_details'}
           }},
@@ -98,6 +103,9 @@ describe Person do
           }},
           affinities: {data: person.affinities.map { |x|
             {id: x.id.to_s, type: 'affinities'}
+          }},
+          risk_scores: {data: person.risk_scores.map{ |x|
+            {id: x.id.to_s, type: "risk_scores" }
           }},
           attachments: {data: issue.person.attachments.map { |x|
             {id: x.id.to_s, type: "attachments"}

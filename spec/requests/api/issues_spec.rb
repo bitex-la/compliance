@@ -79,6 +79,17 @@ describe Issue do
           assert_logging(Issue.last, 0, 1)
         end
 
+        it 'creates a new issue with a fund deposit seed' do
+          issue  = Api::IssuesHelper.issue_with_fund_deposit_seed(ext)
+          post "/api/people/#{person.id}/issues",
+            params: issue,
+            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+          assert_issue_integrity(["FundDepositSeed"])
+          assert_response 201
+          assert_logging(Issue.last, 0, 1)
+        end
+
         it 'creates a new issue with a phone seed' do
           issue  = Api::IssuesHelper.issue_with_phone_seed(ext)
           post "/api/people/#{person.id}/issues",
@@ -224,7 +235,7 @@ describe Issue do
           assert_logging(Issue.last, 0, 1)
         end
 
-        it 'creates a new issue with an risk score seed who wants to replace the current risk score' do
+        it 'creates a new issue with a risk score seed who wants to replace the current risk score' do
           full_natural_person = create(:full_natural_person)
           issue  = Api::IssuesHelper.issue_with_risk_score_seed(ext)
           issue[:included][0][:relationships].merge!({

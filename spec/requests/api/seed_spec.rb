@@ -25,6 +25,8 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       attrs[:street_number] = '100'
     when 'RiskScoreSeed'
       attrs[:score] = 'red'
+    when 'FundDepositSeed'
+      attrs[:amount] = 2000
     when 'IdentificationSeed'
       attrs[:number] = '95678431'
       attrs[:issuer] = 'AR'
@@ -74,6 +76,8 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       issue.identification_seeds.first.issuer.should == 'AR'
     when 'RiskScoreSeed'
       issue.risk_score_seeds.first.score.should == 'red'
+    when 'FundDepositSeed'
+      issue.fund_deposit_seeds.first.amount.should == 2000
     when 'PhoneSeed'
       issue.phone_seeds.first.number.should == '+573014825346'
       issue.phone_seeds.first.country.should == 'CO'

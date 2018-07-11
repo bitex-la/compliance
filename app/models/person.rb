@@ -7,6 +7,7 @@ class Person < ApplicationRecord
     identifications
     natural_dockets
     legal_entity_dockets
+    fund_deposits
     allowances
     phones
     emails
@@ -73,7 +74,8 @@ class Person < ApplicationRecord
       :domiciles,
       :identifications,
       :natural_dockets,
-      :legal_entity_dockets, 
+      :legal_entity_dockets,
+      :fund_deposits,
       :allowances, 
       :phones, 
       :emails, 

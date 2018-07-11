@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180703132125) do
+ActiveRecord::Schema.define(version: 20180710204419) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -269,6 +269,34 @@ ActiveRecord::Schema.define(version: 20180703132125) do
     t.datetime "updated_at", null: false
     t.integer "verb"
     t.index ["admin_user_id"], name: "index_event_logs_on_admin_user_id"
+  end
+
+  create_table "fund_deposit_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "amount", precision: 10
+    t.integer "currency_id"
+    t.integer "deposit_method_id"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "fruit_id"
+    t.integer "replaces_id"
+    t.boolean "copy_attachments"
+    t.index ["fruit_id"], name: "index_fund_deposit_seeds_on_fruit_id"
+    t.index ["issue_id"], name: "index_fund_deposit_seeds_on_issue_id"
+  end
+
+  create_table "fund_deposits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal "amount", precision: 10
+    t.integer "currency_id"
+    t.integer "deposit_method_id"
+    t.bigint "person_id"
+    t.bigint "issue_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "replaced_by_id"
+    t.index ["issue_id"], name: "index_fund_deposits_on_issue_id"
+    t.index ["person_id"], name: "index_fund_deposits_on_person_id"
+    t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"
   end
 
   create_table "fundings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -558,6 +586,11 @@ ActiveRecord::Schema.define(version: 20180703132125) do
   add_foreign_key "emails", "issues"
   add_foreign_key "emails", "people"
   add_foreign_key "event_logs", "admin_users"
+  add_foreign_key "fund_deposit_seeds", "fund_deposits", column: "fruit_id"
+  add_foreign_key "fund_deposit_seeds", "issues"
+  add_foreign_key "fund_deposits", "fund_deposits", column: "replaced_by_id"
+  add_foreign_key "fund_deposits", "issues"
+  add_foreign_key "fund_deposits", "people"
   add_foreign_key "fundings", "fundings", column: "replaced_by_id"
   add_foreign_key "fundings", "issues"
   add_foreign_key "fundings", "people"

@@ -9,7 +9,7 @@ class IssueSerializer
   build_has_one :natural_docket_seed, :legal_entity_docket_seed, 
     :argentina_invoicing_detail_seed, :chile_invoicing_detail_seed
 
-  build_has_many :allowance_seeds, :observations, :domicile_seeds,
+  build_has_many :allowance_seeds, :fund_deposit_seeds, :observations, :domicile_seeds,
     :identification_seeds, :phone_seeds, :email_seeds, 
     :note_seeds, :affinity_seeds, :risk_score_seeds
   attributes :state

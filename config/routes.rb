@@ -15,6 +15,7 @@ Rails.application.routes.draw do
         chile_invoicing_details
         domiciles
         allowances
+        fund_deposits
         identifications
         phones
         emails
@@ -34,6 +35,7 @@ Rails.application.routes.draw do
           chile_invoicing_detail_seeds
           domicile_seeds
           allowance_seeds
+          fund_deposit_seeds
           identification_seeds
           phone_seeds
           email_seeds
