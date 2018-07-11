@@ -4,6 +4,18 @@
 # Each Fruit remembers its seed, and each Seed knows its fruit.
 # Other than that, Seeds belong to Issues and Fruits belong to People.
 module Garden
+  module SelfHarvestable
+    extend ActiveSupport::Concern
+
+    included do 
+      after_save -> { self_harvest! }
+    end
+
+    def self_harvest!
+      issue.approve! if issue.may_approve?
+    end
+  end
+
   module Kindify
    extend ActiveSupport::Concern
 

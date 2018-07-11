@@ -1,5 +1,6 @@
 class FundDepositSeed < ApplicationRecord
   include Garden::Seed
+  include Garden::SelfHarvestable
   include Garden::Kindify
 
   validates :deposit_method, inclusion: { in: DepositMethod.all.map(&:code) }
