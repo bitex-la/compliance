@@ -101,7 +101,9 @@ class Api::IssuesController < Api::ApiController
         :amount,
         :currency,
         :deposit_method,
+        :external_id,
         :attachments,
+        :replaces,
         seed_scope
       ],
       domicile_seeds: [

@@ -99,7 +99,9 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :amount,
         :currency,
         :deposit_method,
+        :external_id,
         :attachments,
+        :replaces,
         :issue
       ],
       risk_score_seeds: [

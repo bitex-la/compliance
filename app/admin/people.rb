@@ -225,15 +225,16 @@ ActiveAdmin.register Person do
           end
         end
 
-        if person.fund_deposits.any?
+        if person.fund_deposits.current.any?
           panel 'Fund Deposits' , class: 'fund_deposits' do
-            table_for person.fund_deposits do |q|
+            table_for person.fund_deposits.current do |q|
               q.column("ID") do |deposit|
                 link_to(deposit.id, fund_deposit_path(deposit))
               end
               q.column("Amount") { |deposit| deposit.amount }
               q.column("Currency") { |deposit| deposit.currency }
               q.column("Deposit Method") { |deposit| deposit.deposit_method }
+              q.column("External ID") { |deposit| deposit.external_id }
               q.column("Attachments") do |deposit|
                 deposit.attachments
                   .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
@@ -381,6 +382,7 @@ ActiveAdmin.register Person do
         ArbreHelpers.multi_entity_attachments self, person, :identifications
         ArbreHelpers.multi_entity_attachments self, person, :domiciles
         ArbreHelpers.multi_entity_attachments self, person, :affinities
+        ArbreHelpers.multi_entity_attachments self, person, :fund_deposits
         ArbreHelpers.multi_entity_attachments self, person, :allowances
         ArbreHelpers.multi_entity_attachments self, person, :phones
         ArbreHelpers.multi_entity_attachments self, person, :emails

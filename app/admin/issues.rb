@@ -139,6 +139,7 @@ ActiveAdmin.register Issue do
           ds.input :amount
           ds.input :currency_id, as: :select, collection: Currency.all
           ds.input :deposit_method_id, as: :select, collection: DepositMethod.all
+          ds.input :external_id
           ArbreHelpers.has_many_attachments(context, ds)
         end
 
@@ -360,6 +361,7 @@ ActiveAdmin.register Issue do
           q.column("Amount") { |seed| seed.amount }
           q.column("Currency")   { |seed| seed.currency }
           q.column("Deposit method")  { |seed| seed.deposit_method }
+          q.column("External ID")  { |seed| seed.external_id }
           q.column("Attachments") do |seed|
             seed.attachments
               .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}

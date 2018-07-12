@@ -448,7 +448,8 @@ class Api::IssuesHelper
           attributes: {
             currency: "usd",
             deposit_method: "bank",
-            amount: 1000
+            amount: 1000,
+            external_id: 1
           },
           relationships: {
             attachments: {

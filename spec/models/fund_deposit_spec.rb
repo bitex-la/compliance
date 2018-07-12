@@ -7,7 +7,8 @@ RSpec.describe FundDeposit, type: :model do
     create(:fund_deposit,
       person: person,
       currency: 'usd',
-      deposit_method: 'bank'
+      deposit_method: 'bank',
+      external_id: 1
   )}
 
   it 'is not valid without a person' do
