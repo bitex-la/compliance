@@ -1,0 +1,9 @@
+= form_tag attach_to_fruit_attachment_path(attachment), method: :post do
+  %div 
+    %h3 Select the fruit to attach
+    = select_tag "fruit", options_from_collection_for_select(person.fruits, "id", "name")
+  %hr
+  %div  
+    %button{ type: 'submit'}
+      Attach
+      

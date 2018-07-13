@@ -9,6 +9,6 @@ class FundDeposit < ApplicationRecord
   kind_mask_for :currency, "Currency"
 
   def name
-    [id, amount, currency, deposit_method].join(',')
+    [self.class.name, id, amount, currency, deposit_method].join(',')
   end
 end

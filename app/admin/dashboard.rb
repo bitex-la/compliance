@@ -45,6 +45,29 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
       end
+
+      tab :orphan_attachments do
+        panel 'Orphan Attachments' do 
+          table_for Attachment.fruit_orphan do |a|
+            a.column(:id)
+            a.column("Person") do |attachment|
+              link_to(attachment.person.id, person_path(attachment.person))
+            end
+            a.column(:document_file_name)
+            a.column(:document_content_type)
+            a.column(:document_file_size)
+            a.column("") do |attachment|
+              link_to "View file", attachment.document.url, target: '_blank'
+            end
+            a.column("") do |attachment|
+              link_to("View detail", attachment_path(attachment))
+            end
+            a.column("") do |attachment|
+              link_to("Attach to fruit", attach_attachment_path(attachment))
+            end
+          end
+        end
+      end
     end
   end # content
 end

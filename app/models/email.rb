@@ -7,6 +7,6 @@ class Email < ApplicationRecord
   kind_mask_for :email_kind, "EmailKind"
 
   def name
-    [id, address, email_kind].join(',')
+    [self.class.name, id, address, email_kind].join(',')
   end
 end

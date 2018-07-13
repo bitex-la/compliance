@@ -387,6 +387,7 @@ ActiveAdmin.register Person do
         ArbreHelpers.multi_entity_attachments self, person, :phones
         ArbreHelpers.multi_entity_attachments self, person, :emails
         ArbreHelpers.multi_entity_attachments self, person, :notes
+        ArbreHelpers.person_attachments self, person
       end
     end
   end

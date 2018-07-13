@@ -211,6 +211,9 @@ GEM
       archive-zip (~> 0.7)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
+    haml (5.0.4)
+      temple (>= 0.8.0)
+      tilt
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
@@ -371,6 +374,7 @@ GEM
     sshkit (1.16.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    temple (0.8.0)
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.8)
@@ -426,6 +430,7 @@ DEPENDENCIES
   font-awesome-rails
   foreman
   geckodriver-helper
+  haml
   jbuilder (~> 2.5)
   jsonapi_mapper!
   kaminari
@@ -452,4 +457,4 @@ RUBY VERSION
    ruby 2.4.1p111
 
 BUNDLED WITH
-   1.16.1
+   1.16.2

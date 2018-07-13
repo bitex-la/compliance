@@ -9,6 +9,6 @@ class NaturalDocket < ApplicationRecord
   kind_mask_for :gender
 
   def name
-    [id, first_name, last_name].join(',')    
+    [self.class.name, id, first_name, last_name].join(',')    
   end
 end

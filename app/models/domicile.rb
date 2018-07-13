@@ -3,6 +3,6 @@ class Domicile < ApplicationRecord
   validates :country, country: true 
   
   def name
-    [id, country, city, street_address, street_number].join(',')    
+    [self.class.name, id, country, city, street_address, street_number].join(',')    
   end 
 end

@@ -29,6 +29,8 @@ class Attachment < ApplicationRecord
     /rar\z/,
   ]
 
+  scope :fruit_orphan, -> { where('attached_to_seed_id is ? AND attached_to_fruit_id is ?', nil, nil).order(updated_at: :asc) }
+
   def document_url
     self.document.url
   end
