@@ -2,6 +2,6 @@ class Note < ApplicationRecord
  include Garden::Fruit
 
  def name
-   [id, title].join(',')
+   [self.class.name, id, title].join(',')
  end  
 end

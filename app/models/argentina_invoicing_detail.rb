@@ -11,5 +11,4 @@ class ArgentinaInvoicingDetail < ApplicationRecord
   kind_mask_for :tax_id_kind, "TaxIdKind"
   kind_mask_for :receipt_kind, "ReceiptKind"
   kind_mask_for :vat_status, "VatStatusKind"
-
 end

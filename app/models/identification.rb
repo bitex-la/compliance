@@ -7,6 +7,6 @@ class Identification < ApplicationRecord
   kind_mask_for :identification_kind, "IdentificationKind"
 
   def name
-    [id, number, identification_kind, issuer].join(',')    
+    [self.class.name, id, number, identification_kind, issuer].join(',')    
   end
 end

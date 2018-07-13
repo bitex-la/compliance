@@ -15,6 +15,22 @@ ActiveAdmin.register Attachment do
 
   menu false
 
+  action_item :fix, only: :show, if: lambda { resource.attached_to_fruit.nil? && resource.attached_to_seed.nil? } do
+    link_to 'Attach to fruit', attach_attachment_path(resource), method: :get
+  end
+
+  member_action :attach, method: :get do 
+    render 'attachments/attach.html.haml', 
+      locals: {person: resource.person, attachment: resource}
+  end
+
+  member_action :attach_to_fruit, method: :post do
+    resource.attached_to_fruit = resource.person.fruits.find{ |x| x.id == params[:fruit].to_i }
+    resource.save
+    flash[:notice] = 'Attachment updated successfully!'
+    redirect_to attachment_path(resource) 
+  end
+
   begin
     permit_params :id, :document, :person_id
 

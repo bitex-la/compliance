@@ -62,8 +62,9 @@ module ArbreHelpers
         table_for attachments.each do |a|
           a.column do |attachment|
             h3 "#{attachment.document_file_name} - #{attachment.document_content_type}"
-            if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type)
-              image_tag(attachment.document.url, width: '100%')
+            if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type) 
+              context.div(image_tag(attachment.document.url, width: '100%'))
+              context.div(link_to 'View', attachment_path(attachment))
             elsif DOWNLOADABLE_CONTENT_TYPES.include?(attachment.document_content_type)
               link_to 'Download file', attachment.document.url, target: "_blank"
             end
@@ -118,7 +119,8 @@ module ArbreHelpers
                 a.column do |attachment|
                   h3 "#{attachment.document_file_name} - #{attachment.document_content_type}"
                   if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type)
-                    image_tag(attachment.document.url, width: '100%')
+                    context.div(image_tag(attachment.document.url, width: '100%'))
+                    context.div(link_to 'View', attachment_path(attachment))
                   elsif DOWNLOADABLE_CONTENT_TYPES.include?(attachment.document_content_type)
                     link_to 'Download file', attachment.document.url, target: "_blank"
                   end

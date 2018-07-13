@@ -22,6 +22,7 @@ gem 'jbuilder', '~> 2.5'
 
 gem 'settingslogic'
 gem 'activeadmin'
+gem 'haml'
 gem 'devise'
 gem 'cancancan'
 gem 'draper'

@@ -8,6 +8,6 @@ class Phone < ApplicationRecord
   kind_mask_for :phone_kind, "PhoneKind"
 
   def name
-    [id, number, phone_kind, country].join(',')
+    [self.class.name, id, number, phone_kind, country].join(',')
   end
 end

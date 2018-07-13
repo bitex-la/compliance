@@ -66,6 +66,21 @@ class Person < ApplicationRecord
     "#{id}"
   end
 
+  def fruits
+    domiciles.current +
+    identifications.current +
+    natural_dockets.current +
+    legal_entity_dockets.current +
+    fund_deposits.current +
+    allowances.current +
+    phones.current + 
+    emails.current + 
+    affinities.current +
+    argentina_invoicing_details.current + 
+    chile_invoicing_details.current +
+    notes.current
+  end
+
   private
 
   def self.included_for
