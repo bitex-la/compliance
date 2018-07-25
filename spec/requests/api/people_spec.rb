@@ -231,11 +231,11 @@ describe Person do
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
+            replaced_by: {data: nil},
             seed: { data: {
 	      type: "natural_docket_seeds",
               id: issue.natural_docket_seed.id.to_s
             }},
-            replaced_by: {data: nil},
             attachments: {
               data: person.natural_dockets.last.attachments
                 .map{|x| {id: x.id.to_s, type: 'attachments'}}
