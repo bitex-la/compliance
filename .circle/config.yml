@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/home/compliance
+    docker:
+      - image: bitexla/compliance_web
+        environment:
+      - image: mysql
+        environment:
+          MYSQL_ROOT_PASSWORD: example
+      - image: redis
+    steps:
+      - checkout
+      - run: bundle install --path vendor/bundle
+      - run: dockerize -wait tcp://localhost:3306 -timeout 1m
+      - run: bundle exec rails db:create db:schema:load db:migrate
+      - run: bundle exec rspec
+
+    
