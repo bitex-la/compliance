@@ -16,7 +16,7 @@ jobs:
         environment:
           MYSQL_ROOT_PASSWORD: example
           MYSQL_USER: root
-          MYSQL_HOST: '127.0.0.1'
+          MYSQL_HOST: localhost
           MYSQL_ROOT_HOST: %
       - image: redis
     steps:
