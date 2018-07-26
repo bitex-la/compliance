@@ -213,8 +213,8 @@ describe Person do
             }
           }
         },
-        { type: "natural_dockets",
-          id: person.natural_dockets.first.id.to_s,
+        { id: person.natural_dockets.first.id.to_s,
+          type: "natural_dockets",
           attributes: {
             first_name: "Joe",
             last_name: "Doe",
@@ -233,8 +233,8 @@ describe Person do
             person: {data: {id: person.id.to_s, type: "people"}},
             replaced_by: {data: nil},
             seed: { data: {
-              id: issue.natural_docket_seed.id.to_s,
-	            type: "natural_docket_seeds"
+	            type: "natural_docket_seeds",
+              id: issue.natural_docket_seed.id.to_s
             }},
             attachments: {
               data: person.natural_dockets.last.attachments
@@ -408,8 +408,6 @@ describe Person do
           }
         }
       ]
-
-      pp json_response[:included].find{|x| x[:type] == 'natural_dockets'}
 
       %w(
         argentina_invoicing_details
