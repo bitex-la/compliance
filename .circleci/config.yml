@@ -2,6 +2,7 @@ version: 2
 jobs:
   build:
     working_directory: ~/home/compliance
+    parallelism: 2
     environment:
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
@@ -24,6 +25,13 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Which bundler?
+          command: bundle -v
+      - restore_cache:
+          keys:
+            - rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
+            - rails-compliance-bundle-v2-
+      - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
           environment:
@@ -31,10 +39,14 @@ jobs:
       - run:
           name: Wait for db
           command: dockerize -wait tcp://localhost:3306 -timeout 1m
-      - run: bundle install --path vendor/bundle
+      - run: 'bundle check || bundle install'
+      - save_cache:
+          key: rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
       - run: bundle exec rails db:create db:schema:load db:migrate
       - run: mkdir -p $CIRCLE_TEST_REPORTS/rspec
-      - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress
+      - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
       - store_test_results:
           path: /tmp/circleci-test-results
       - store_artifacts:

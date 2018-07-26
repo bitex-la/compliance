@@ -54,6 +54,7 @@ group :development, :test do
   gem 'geckodriver-helper'
   gem 'factory_bot'
   gem 'dotenv-rails'
+  gem 'rspec_junit_formatter', '0.2.2'
 end
 
 group :development do
