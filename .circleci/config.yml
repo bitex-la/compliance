@@ -9,6 +9,7 @@ jobs:
           MYSQL_USERNAME: root
           MYSQL_HOST: localhost
           MYSQL_PASSWORD: example
+          MYSQL_PORT: 3306
           REDIS_HOST: redis
           REDIS_PORT: 6379
       - image: mysql
