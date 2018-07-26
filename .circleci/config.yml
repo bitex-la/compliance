@@ -46,7 +46,7 @@ jobs:
             - vendor/bundle
       - run: bundle exec rails db:create db:schema:load db:migrate
       - run: mkdir -p $CIRCLE_TEST_REPORTS/rspec
-      - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split)
       - store_test_results:
           path: /tmp/circleci-test-results
       - store_artifacts:
