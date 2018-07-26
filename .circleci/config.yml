@@ -12,7 +12,7 @@ jobs:
           MYSQL_PORT: 3306
           REDIS_HOST: redis
           REDIS_PORT: 6379
-      - image: circle/mysql
+      - image: circleci/mysql
         environment:
           MYSQL_ROOT_PASSWORD: example
           MYSQL_USER: root
