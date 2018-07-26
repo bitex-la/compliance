@@ -5,6 +5,12 @@ jobs:
     docker:
       - image: bitexla/compliance_web
         environment:
+          RAILS_ENV: development
+          MYSQL_USERNAME: root
+          MYSQL_HOST: localhost
+          MYSQL_PASSWORD: example
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
       - image: mysql
         environment:
           MYSQL_ROOT_PASSWORD: example
