@@ -419,8 +419,8 @@ describe Person do
         identifications
         domiciles
       ).each do |fruit|
-        json_response[:included].find{|x| x[:type] == fruit}.should ==
-        expected_included.find{|x| x[:type] == fruit}
+        json_response[:included].find{|x| x[:type] == fruit}[:attributes].should ==
+        expected_included.find{|x| x[:type] == fruit}[:attributes]
       end
 
     end

@@ -2,6 +2,9 @@ version: 2
 jobs:
   build:
     working_directory: ~/home/compliance
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
     docker:
       - image: bitexla/compliance_web
         environment:
@@ -30,6 +33,13 @@ jobs:
           command: dockerize -wait tcp://localhost:3306 -timeout 1m
       - run: bundle install --path vendor/bundle
       - run: bundle exec rails db:create db:schema:load db:migrate
-      - run: bundle exec rspec
-
+      - run: mkdir -p $CIRCLE_TEST_REPORTS/rspec
+      - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress
+      - store_test_results:
+          path: /tmp/circleci-test-results
+      - store_artifacts:
+          path: /tmp/circleci-artifacts
+      - store_artifacts:
+          path: /tmp/circleci-test-results
+        
     
