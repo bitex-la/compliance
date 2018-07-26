@@ -66,7 +66,9 @@ RSpec.configure do |config|
   config.include RSpec::Rails::RequestExampleGroup, type: :feature
 
   Capybara.register_driver :firefox do |app|
-    Capybara::Selenium::Driver.new(app, browser: :firefox)
+    browser_options = ::Selenium::WebDriver::Firefox::Options.new()
+    browser_options.args << '--headless' if ENV['SELENIUM_HEADLESS']
+    Capybara::Selenium::Driver.new(app, browser: :firefox, options: browser_options)
   end
 
   Capybara.configure do |config|

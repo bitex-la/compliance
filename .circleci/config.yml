@@ -12,6 +12,7 @@ jobs:
           MYSQL_PORT: 3306
           REDIS_HOST: redis
           REDIS_PORT: 6379
+          SELENIUM_HEADLESS: true
       - image: mysql/mysql-server:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=example
