@@ -233,8 +233,8 @@ describe Person do
             person: {data: {id: person.id.to_s, type: "people"}},
             replaced_by: {data: nil},
             seed: { data: {
-	      type: "natural_docket_seeds",
-              id: issue.natural_docket_seed.id.to_s
+              id: issue.natural_docket_seed.id.to_s,
+	            type: "natural_docket_seeds"
             }},
             attachments: {
               data: person.natural_dockets.last.attachments
@@ -408,6 +408,8 @@ describe Person do
           }
         }
       ]
+
+      pp json_response[:included].find{|x| x[:type] == 'natural_dockets'}
 
       %w(
         argentina_invoicing_details
