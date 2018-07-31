@@ -126,7 +126,7 @@ ActiveAdmin.register Person do
 
         if person.argentina_invoicing_details.any?
           panel 'argentina invoicing details' do
-            table_for person.argentina_invoicing_details do |n|
+            table_for person.argentina_invoicing_details.current do |n|
               n.column("ID") do |detail|
                 link_to(detail.id, argentina_invoicing_detail_path(detail))
               end
@@ -151,7 +151,7 @@ ActiveAdmin.register Person do
 
         if person.chile_invoicing_details.any?
           panel 'chile invoicing details' do
-            table_for person.chile_invoicing_details do |n|
+            table_for person.chile_invoicing_details.current do |n|
               n.column("ID") do |d|
                 link_to(d.id, chile_invoicing_detail_path(d))
               end

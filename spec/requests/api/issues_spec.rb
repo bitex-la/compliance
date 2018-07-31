@@ -470,7 +470,7 @@ describe Issue do
 
       PhoneSeed.first.tap do |seed|
         seed.reload
-        seed.number.should == "+571165342178"
+        seed.number.should == "+54911282256470"
         seed.phone_kind.should == :main
         seed.country.should == "CO"
         seed.has_whatsapp.should == true
