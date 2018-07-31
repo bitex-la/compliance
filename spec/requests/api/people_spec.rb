@@ -225,7 +225,7 @@ describe Person do
             job_description: 'Build cool open source software',
             politically_exposed: false,
             politically_exposed_reason: nil,
-            birth_date: 1514775600,
+            birth_date: person.natural_dockets.first.birth_date.to_time.to_i,
             created_at: 1514764800,
             updated_at: 1514764800
           },

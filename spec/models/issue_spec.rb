@@ -149,9 +149,5 @@ RSpec.describe Issue, type: :model do
         d.replaces.should == person.natural_dockets.first
       end
     end
-
-    it 'create a new issue using previous fruits as seeds'
-      
-    end
   end  
 end
