@@ -472,10 +472,10 @@ describe Issue do
         seed.reload
         seed.number.should == "+54911282256470"
         seed.phone_kind.should == :main
-        seed.country.should == "CO"
+        seed.country.should == "AR"
         seed.has_whatsapp.should == true
         seed.has_telegram.should == false
-        seed.note.should == "Please use whatsapp"
+        seed.note.should == "only on office hours"
       end
 
       Issue.last.should be_answered

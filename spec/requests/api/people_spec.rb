@@ -225,7 +225,7 @@ describe Person do
             job_description: 'Build cool open source software',
             politically_exposed: false,
             politically_exposed_reason: nil,
-            birth_date: 1514764800,
+            birth_date: 1514775600,
             created_at: 1514764800,
             updated_at: 1514764800
           },

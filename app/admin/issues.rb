@@ -43,6 +43,9 @@ ActiveAdmin.register Issue do
             f.input :person_id, as: :select, collection: Person.all
           end
         end
+        f.inputs 'Issue behavior' do
+          f.input :fill_with_previous_info
+        end
 
         ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
           sf.input :first_name

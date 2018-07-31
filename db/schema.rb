@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180712141429) do
+ActiveRecord::Schema.define(version: 20180731194536) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -353,6 +353,7 @@ ActiveRecord::Schema.define(version: 20180712141429) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "aasm_state"
+    t.boolean "fill_with_previous_info", default: false
     t.index ["person_id"], name: "index_issues_on_person_id"
   end
 

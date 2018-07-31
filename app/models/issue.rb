@@ -4,7 +4,7 @@ class Issue < ApplicationRecord
   belongs_to :person, optional: true
   validates :person, presence: true
 
-  after_create :fill_seeds_if_apply
+  #after_create :fill_seeds_if_apply
 
   ORIGINABLE_FRUITS = %i{
     natural_dockets
