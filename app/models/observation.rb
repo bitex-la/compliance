@@ -23,10 +23,15 @@ class Observation < ApplicationRecord
         issue.answer! if issue.may_answer? && !issue.has_open_observations?
       end
     end
+
+    event :reset do 
+      transitions from: :answered, to: :new
+    end
   end
 
   def check_for_answer
     answer! if reply.present? && may_answer?
+    reset! if !reply.present? && answered?
   end
 
   def observe_issue
