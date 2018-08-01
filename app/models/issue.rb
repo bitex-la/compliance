@@ -4,7 +4,7 @@ class Issue < ApplicationRecord
   belongs_to :person, optional: true
   validates :person, presence: true
 
-  #after_create :fill_seeds_if_apply
+  after_create :fill_seeds_if_apply, if: :fill_with_previous_info?
 
   ORIGINABLE_FRUITS = %i{
     natural_dockets
@@ -185,6 +185,10 @@ class Issue < ApplicationRecord
         end
       end
     end
+  end
+
+  def fill_with_previous_info?
+    fill_with_previous_info
   end
 
   private  

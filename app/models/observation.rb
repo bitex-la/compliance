@@ -7,7 +7,7 @@ class Observation < ApplicationRecord
   belongs_to :observation_reason, optional: true
 
   before_save  :check_for_answer
-  after_create :observe_issue
+  after_commit :observe_issue
 
   validate :validate_scope_integrity
 
@@ -23,6 +23,10 @@ class Observation < ApplicationRecord
         issue.answer! if issue.may_answer?
       end
     end
+
+    event :reset do
+      transitions from: :answered, to: :new
+    end
   end
 
   def check_for_answer
@@ -30,7 +34,10 @@ class Observation < ApplicationRecord
   end
 
   def observe_issue
-    issue.observe! if issue.may_observe?
+    reset! if reply.present? && may_reset?
+    if issue.may_observe?
+      issue.observe!
+    end
   end
 
   def state
