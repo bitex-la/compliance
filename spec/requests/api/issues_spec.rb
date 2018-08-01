@@ -396,7 +396,7 @@ describe Issue do
             data:
             {
               id: Observation.last.observation_reason.id.to_s,
-             type: "observation_reasons"
+              type: "observation_reasons"
             }
           }
         }
@@ -508,14 +508,14 @@ describe Issue do
         params: issue_request.to_json,
         headers: {"CONTENT_TYPE" => 'application/json',
                   "Authorization" => "Token token=#{admin_user.api_token}"}
-
+           
       api_response.data.attributes.state.should == "observed"
       observations = api_response.included.select{|i| i.type == 'observations' }
       observations.count.should == 2
       observations.map{|o| o.attributes.state }.should == %w(answered new)
     
       assert_logging(Issue.last, 0, 1)
-      assert_logging(Issue.last, 1, 3)
+      assert_logging(Issue.last, 1, 4)
     end
   end
 

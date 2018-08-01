@@ -194,7 +194,7 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, 1, 2)
+    assert_logging(issue, 1, 3)
     Person.last.should be_enabled
   end
 
@@ -258,7 +258,7 @@ describe 'an admin user' do
       with: 'Please re-send your document'
     click_button 'Update Issue'
 
-    assert_logging(issue, 1, 2)
+    assert_logging(issue, 1, 3)
     Observation.where(issue: issue).count.should == 1
     Issue.first.should be_observed
 
@@ -299,7 +299,7 @@ describe 'an admin user' do
     assert_response 200
 
     Issue.first.should be_answered
-    assert_logging(issue, 1, 4)
+    assert_logging(issue, 1, 5)
     Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
@@ -321,7 +321,7 @@ describe 'an admin user' do
     click_link 'Approve'
 
     Issue.last.should be_approved
-    assert_logging(issue, 1, 5)
+    assert_logging(issue, 1, 6)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
@@ -459,7 +459,7 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
-    assert_logging(issue, 1, 1) 
+    assert_logging(issue, 1, 2) 
     issue.reload.should be_answered
     observation.reload.should be_answered
 
@@ -569,7 +569,7 @@ describe 'an admin user' do
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
-    assert_logging(Issue.last, 1, 1)
+    assert_logging(Issue.last, 1, 2)
 
     get "/api/people/#{person.id}/issues/#{issue.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -649,7 +649,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
-    assert_logging(Issue.last, 1, 1)
+    assert_logging(Issue.last, 1, 2)
     Observation.last.should be_answered
   end
 
@@ -697,7 +697,7 @@ describe 'an admin user' do
                 "Authorization" => "Token token=#{admin_user.api_token}"}
     assert_response 200
 
-    assert_logging(Issue.last, 1, 2)
+    assert_logging(Issue.last, 1, 3)
 
     api_response.data.attributes.state.should == 'answered'
     api_response.included.find{|i| i.type == 'observations'}

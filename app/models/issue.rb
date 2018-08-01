@@ -191,6 +191,10 @@ class Issue < ApplicationRecord
     fill_with_previous_info
   end
 
+  def has_open_observations?
+    observations.where(aasm_state: 'new').any?
+  end
+
   private  
   def self.included_for
     [
