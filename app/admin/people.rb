@@ -314,7 +314,7 @@ ActiveAdmin.register Person do
 
         if person.notes.any?
           panel 'Notes' do
-            table_for person.notes.current do |i|
+            table_for person.notes.includes(:attachments).current do |i|
               i.column("ID") do |note|
                 link_to(note.id, note_path(note))
               end
@@ -334,7 +334,7 @@ ActiveAdmin.register Person do
 
         if person.affinities.any?
           panel 'Affinities' do
-            table_for person.affinities do |i|
+            table_for person.affinities.includes(:attachments) do |i|
               i.column("ID") do |fruit|
                 link_to(fruit.id, affinity_path(fruit))
               end

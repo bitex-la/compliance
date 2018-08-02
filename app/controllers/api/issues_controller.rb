@@ -1,7 +1,12 @@
 class Api::IssuesController < Api::ApiController
   def index
-    page, per_page = Util::PageCalculator.call(params, 0, 10)
-    issues = Person.find(params[:person_id]).issues.order(updated_at: :desc).page(page).per(per_page)
+    page, per_page = Util::PageCalculator.call(params, 0, 3)
+    issues = Person.find(params[:person_id]).issues
+      .includes(*build_eager_load_list)
+      .order(updated_at: :desc)
+      .page(page)
+      .per(per_page)
+
     options = {
       meta: { total_pages: (issues.count.to_f / per_page).ceil },
       include: Issue.included_for
@@ -10,7 +15,13 @@ class Api::IssuesController < Api::ApiController
   end
 
   def show
-    issue = Person.find(params[:person_id]).issues.find(params[:id])
+    issue = Person
+      .preload(*eager_person_entities)
+      .find(params[:person_id])
+      .issues
+      .preload(*eager_issue_entities)
+      .find(params[:id])
+
     jsonapi_response(issue, {
       include: Issue.included_for
     }, 200)
@@ -31,7 +42,9 @@ class Api::IssuesController < Api::ApiController
   end
 
   def update
-    issue = Person.find(params[:person_id]).issues.find(params[:id])
+    issue = Person
+      .find(params[:person_id])
+      .issues.find(params[:id])
     mapper = get_issue_jsonapi_mapper(issue.person.id, issue.id)
     return jsonapi_422(nil) unless mapper.data
 
@@ -45,6 +58,71 @@ class Api::IssuesController < Api::ApiController
   end
 
   private
+
+  SEEDS = %w[
+    natural_docket_seed
+    legal_entity_docket_seed
+    argentina_invoicing_detail_seed
+    chile_invoicing_detail_seed
+    affinity_seeds
+    allowance_seeds
+    domicile_seeds
+    email_seeds
+    phone_seeds
+    risk_score_seeds
+    fund_deposit_seeds
+    identification_seeds
+    note_seeds
+  ]
+
+  FRUITS = %w[
+    natural_dockets
+    legal_entity_dockets
+    argentina_invoicing_details
+    chile_invoicing_details
+    affinities
+    allowances
+    domiciles
+    emails
+    phones
+    risk_scores
+    fund_deposits
+    identifications
+    notes
+  ]
+
+  def build_eager_load_list
+    [
+      *eager_issue_entities,
+      [observations: [:observation_reason]],
+      [person: eager_person_entities]
+    ]
+  end
+
+  def eager_issue_entities
+    entities = []
+    SEEDS.each do |seed|
+      entities.push(["#{seed}": eager_seed_entities])
+    end
+    entities
+  end
+
+  def eager_person_entities
+    entities = []
+    FRUITS.each do |fruit|
+      entities.push("#{fruit}": eager_fruit_entities)
+    end
+    entities
+  end
+
+  def eager_seed_entities
+    [:person, :fruit , attachments:[:attached_to_fruit, :attached_to_seed]]
+  end
+
+  def eager_fruit_entities
+    [:seed , attachments:[:attached_to_fruit, :attached_to_seed]]
+  end
+
   def get_issue_jsonapi_mapper(person_id, issue_id = nil)
     hash_params = params.permit!.to_h
     seed_scope = issue_id ? { issue_id: issue_id } : { id: nil }

@@ -278,7 +278,7 @@ ActiveAdmin.register Issue do
 
     if issue.risk_score_seeds.any?
       panel 'risk score seeds' do
-        table_for issue.risk_score_seeds do |rs|
+        table_for issue.risk_score_seeds.includes(:replaces, :attachments) do |rs|
           rs.column("ID") do |seed|
             link_to(seed.id, risk_score_seed_path(seed))
           end
@@ -357,7 +357,7 @@ ActiveAdmin.register Issue do
 
     if issue.fund_deposit_seeds.any?
       panel 'Fund deposit seeds' do
-        table_for issue.fund_deposit_seeds do |q|
+        table_for issue.fund_deposit_seeds.includes(:replaces, :attachments) do |q|
           q.column("ID") do |seed|
             link_to(seed.id, fund_deposit_seeds_path(seed))
           end
@@ -382,7 +382,7 @@ ActiveAdmin.register Issue do
 
     if issue.allowance_seeds.any?
       panel 'Allowance seeds' do
-        table_for issue.allowance_seeds do |q|
+        table_for issue.allowance_seeds.includes(:replaces, :attachments) do |q|
           q.column("ID") do |seed|
             link_to(seed.id, allowance_seeds_path(seed))
           end
@@ -407,7 +407,7 @@ ActiveAdmin.register Issue do
 
     if issue.domicile_seeds.any?
       panel 'Domicile seed' do
-        table_for issue.domicile_seeds do |d|
+        table_for issue.domicile_seeds.includes(:replaces, :attachments) do |d|
           d.column("ID") do |seed|
             link_to(seed.id, domicile_seed_path(seed))
           end
@@ -437,7 +437,7 @@ ActiveAdmin.register Issue do
 
     if issue.identification_seeds.any?
       panel 'Identification seed' do
-        table_for issue.identification_seeds do |i|
+        table_for issue.identification_seeds.includes(:replaces, :attachments) do |i|
           i.column("ID") do |seed|
             link_to(seed.id, identification_seed_path(seed))
           end
@@ -465,7 +465,7 @@ ActiveAdmin.register Issue do
 
     if issue.email_seeds.any?
       panel 'Email seeds' do
-        table_for issue.email_seeds do |i|
+        table_for issue.email_seeds.includes(:replaces, :attachments) do |i|
           i.column("ID") do |seed|
             link_to(seed.id, email_seed_path(seed))
           end
@@ -490,7 +490,7 @@ ActiveAdmin.register Issue do
 
     if issue.phone_seeds.any?
       panel 'Phone seeds' do
-        table_for issue.phone_seeds do |i|
+        table_for issue.phone_seeds.includes(:replaces, :attachments) do |i|
           i.column("ID") do |seed|
             link_to(seed.id, phone_seed_path(seed))
           end
@@ -518,7 +518,7 @@ ActiveAdmin.register Issue do
 
     if issue.note_seeds.any?
       panel 'Note seeds' do
-        table_for issue.note_seeds do |i|
+        table_for issue.note_seeds.includes(:replaces, :attachments) do |i|
           i.column("ID") do |seed|
             link_to(seed.id, note_seed_path(seed))
           end
@@ -542,7 +542,7 @@ ActiveAdmin.register Issue do
 
     if issue.affinity_seeds.any?
       panel 'Affinity seeds' do
-        table_for issue.affinity_seeds do |i|
+        table_for issue.affinity_seeds.includes(:replaces, :attachments) do |i|
           i.column("ID") do |seed|
             link_to(seed.id, affinity_seed_path(seed))
           end
@@ -565,7 +565,7 @@ ActiveAdmin.register Issue do
 
     if issue.observations.any?
       panel 'Observations' do
-        table_for issue.observations do |o|
+        table_for issue.observations.includes(:observation_reason) do |o|
           o.column("ID") do |obv|
             link_to(obv.id, observation_path(obv))
           end
