@@ -83,6 +83,38 @@ class Person < ApplicationRecord
 
   private
 
+  def self.eager_person_entities
+    entities = []
+    HAS_MANY
+      .reject{|x| [:attachments, :issues].include? x}
+      .map(&:to_s).each do |fruit|
+      entities.push("#{fruit}": eager_fruit_entities)
+    end
+    entities.push(
+      :attachments,
+      issues: [
+      :natural_docket_seed,
+      :legal_entity_docket_seed,
+      :argentina_invoicing_detail_seed,
+      :chile_invoicing_detail_seed,
+      :allowance_seeds,
+      :domicile_seeds,
+      :identification_seeds,
+      :phone_seeds,
+      :email_seeds,
+      :note_seeds,
+      :affinity_seeds,
+      :risk_score_seeds,
+      :fund_deposit_seeds,
+      :observations
+    ])
+    entities
+  end
+
+  def self.eager_fruit_entities
+    [:seed , attachments:[:attached_to_fruit, :attached_to_seed]]
+  end
+
   def self.included_for
     [
       :issues,

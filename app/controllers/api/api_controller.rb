@@ -2,7 +2,7 @@ class Api::ApiController < ApplicationController
   skip_before_action :verify_authenticity_token
   include ApiResponse
 
-  #before_action :require_token
+  before_action :require_token
 
   private
   

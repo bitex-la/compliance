@@ -222,6 +222,19 @@ class Issue < ApplicationRecord
   end
 
   private  
+
+  def self.eager_issue_entities
+    entities = []
+    (HAS_ONE + HAS_MANY).map(&:to_s).each do |seed|
+      entities.push(["#{seed}": eager_seed_entities])
+    end
+    entities
+  end
+
+  def self.eager_seed_entities
+    [:person, :fruit , attachments:[:attached_to_fruit, :attached_to_seed]]
+  end
+
   def self.included_for
     [
       :person,

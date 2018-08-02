@@ -8,7 +8,9 @@ class Api::PeopleController < Api::ApiController
   end
 
   def show
-    jsonapi_response Person.find(params[:id])
+    jsonapi_response Person
+      .preload(*Person::eager_person_entities)
+      .find(params[:id])
   end
 
   def create
