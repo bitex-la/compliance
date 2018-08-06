@@ -25,7 +25,11 @@ ActiveAdmin.register Attachment do
   end
 
   member_action :attach_to_fruit, method: :post do
-    resource.attached_to_fruit = resource.person.fruits.find{ |x| x.id == params[:fruit].to_i }
+    fruit_class = params[:fruit].split(',')[0]
+    fruit_id = params[:fruit].split(',')[1]
+    fruit = fruit_class.constantize.find(fruit_id.to_i)
+
+    resource.attached_to_fruit = fruit
     resource.save
     flash[:notice] = 'Attachment updated successfully!'
     redirect_to attachment_path(resource) 
