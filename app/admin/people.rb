@@ -1,4 +1,9 @@
 ActiveAdmin.register Person do
+
+  controller do
+    include Zipline
+  end
+
   actions :all, except: [:destroy]
 
   action_item only: %i(show edit) do
@@ -7,6 +12,17 @@ ActiveAdmin.register Person do
 
   action_item only: %i(show edit) do
     link_to 'View Person Issues', person_issues_path(person)
+  end
+
+  action_item "Download Attachments", only: :show do
+    if resource.attachments.any?
+      link_to :download_files.to_s.titleize, [:download_files, :person], method: :post
+    end
+  end
+
+  member_action :download_files, method: :post do
+    files = resource.attachments.map { |a| [a.document, a.document_file_name] }
+    zipline(files, "person_#{resource.id}_kyc_files.zip")
   end
 
   form do |f|

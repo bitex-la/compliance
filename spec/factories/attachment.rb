@@ -25,4 +25,10 @@ FactoryBot.define do
       end
     end
   end
+
+  factory :orphan_attachment, class: Attachment do 
+    document { File.new("#{Rails.root}/spec/fixtures/files/simple.jpg") }
+    attached_to_seed nil
+    attached_to_fruit nil
+  end
 end
