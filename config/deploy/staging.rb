@@ -1,7 +1,7 @@
 set :stage, :staging
 set :rails_env, 'staging'
 
-server 'direct_sandbox.bitex.la', roles: [:web, :app, :db], primary: true
+server ENV['compliance_host'], roles: [:web, :app, :db], primary: true
 
 set :pty,             true
 set :use_sudo,        false
