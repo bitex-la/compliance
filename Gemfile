@@ -65,6 +65,7 @@ group :development do
   gem 'capistrano-rbenv', '~> 2.0.2', require: false
   gem 'capistrano-rbenv-install', require: false
   gem 'capistrano3-puma',   require: false
+  gem 'capistrano-rails-db', require: false
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
