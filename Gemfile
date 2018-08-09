@@ -41,9 +41,7 @@ gem 'kaminari'
 
 gem 'timecop'
 
-group :development, :test do
-  gem 'dotenv-rails'
-end
+gem 'dotenv-rails'
 
 group :test do 
   gem 'rspec-rails'
