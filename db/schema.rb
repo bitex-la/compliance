@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180809180440) do
+ActiveRecord::Schema.define(version: 20180809184301) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -100,8 +100,8 @@ ActiveRecord::Schema.define(version: 20180809180440) do
   end
 
   create_table "argentina_invoicing_detail_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string "vat_status_id", null: false
-    t.string "tax_id", null: false
+    t.string "vat_status_id"
+    t.string "tax_id"
     t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -119,8 +119,8 @@ ActiveRecord::Schema.define(version: 20180809180440) do
   end
 
   create_table "argentina_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string "vat_status_id", null: false
-    t.string "tax_id", null: false
+    t.string "vat_status_id"
+    t.string "tax_id"
     t.bigint "issue_id"
     t.bigint "person_id"
     t.datetime "created_at", null: false
