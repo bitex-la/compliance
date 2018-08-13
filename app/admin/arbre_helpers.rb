@@ -10,6 +10,13 @@ module ArbreHelpers
           i.column("Person") { |issue|
             link_to(issue.person.id, person_path(issue.person))
           }
+          i.column("Email") { |issue|
+            if issue.person.emails.any?
+              link_to(issue.person.emails.first.address, person_path(issue.person))
+            elsif issue.email_seeds.any?
+              link_to(issue.email_seeds.first.address, person_path(issue.person))
+            end
+          }
           i.column("Seeds") { |issue|
             issue.modifications_count
           }
