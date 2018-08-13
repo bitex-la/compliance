@@ -48,9 +48,6 @@ describe 'an admin user' do
     end
 
     click_link 'Add Person Information'
-    select "#{Person.last.id}",
-      from: "issue[person_id]",
-      visible: false
 
     click_link "Add New Identification seed"
     fill_seed("identification",{
@@ -334,10 +331,6 @@ describe 'an admin user' do
 
     click_link "Add Person Information"
 
-    select "#{person.id}",
-      from: "issue[person_id]",
-      visible: false
-
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
@@ -497,15 +490,12 @@ describe 'an admin user' do
     assert_logging(issue, 0, 1)
     assert_logging(issue, 1, 1)
     login_as admin_user
-    click_on "Recent Issues"
+    click_on "Just Created"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Dismiss'
 
     issue.reload.should be_dismissed
     person.reload.should_not be_enabled
-
-    visit "/"
-    expect(page).to_not have_content(issue.id)
   end
 
   it "Rejects an issue because an observation went unanswered" do
@@ -730,9 +720,9 @@ describe 'an admin user' do
       issue = api_response.data
 
       login_as admin_user
-      click_on 'Drafts'
-      within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
-        click_link('View')
+      click_on 'Incomplete'
+      within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
+        click_link(issue.id)
       end
 
       within ".has_many_container.domicile_seeds" do
