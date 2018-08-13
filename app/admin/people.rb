@@ -6,6 +6,11 @@ ActiveAdmin.register Person do
 
   actions :all, except: [:destroy]
 
+  filter :created_at
+  filter :updated_at
+  filter :enabled
+  filter :risk
+
   action_item only: %i(show edit) do
     link_to 'Add Person Information', new_person_issue_path(person)
   end

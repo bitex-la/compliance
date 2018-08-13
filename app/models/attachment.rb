@@ -31,6 +31,10 @@ class Attachment < ApplicationRecord
 
   scope :fruit_orphan, -> { where('attached_to_seed_id is ? AND attached_to_fruit_id is ?', nil, nil).order(updated_at: :asc) }
 
+  def fruit_orphan?
+    attached_to_fruit.nil? && attached_to_seed.nil?
+  end
+
   def document_url
     self.document.url
   end

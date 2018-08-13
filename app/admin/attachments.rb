@@ -13,9 +13,29 @@ ActiveAdmin.register Attachment do
     'application/x-rar-compressed'
   ]
 
-  menu false
+  scope :fruit_orphan, default: true
+  scope :all
 
-  action_item :fix, only: :show, if: lambda { resource.attached_to_fruit.nil? && resource.attached_to_seed.nil? } do
+  index do
+    column(:id)
+    column(:person)
+    column(:document_file_name)
+    column(:document_content_type)
+    column(:document_file_size)
+    column("") do |attachment|
+      link_to "View file", attachment.document.url, target: '_blank'
+    end
+    column("") do |attachment|
+      link_to("View detail", attachment_path(attachment))
+    end
+    column("") do |attachment|
+      if attachment.fruit_orphan?
+        link_to("Attach to fruit", attach_attachment_path(attachment))
+      end
+    end
+  end
+
+  action_item :fix, only: :show, if: lambda { resource.fruit_orphan? } do
     link_to 'Attach to fruit', attach_attachment_path(resource), method: :get
   end
 

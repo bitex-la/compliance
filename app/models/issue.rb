@@ -57,39 +57,27 @@ class Issue < ApplicationRecord
   has_many :observations
   accepts_nested_attributes_for :observations, allow_destroy: true
 
-  scope :recent, ->(page, per_page) { order(created_at: :desc).page(page).per(per_page) }
-
-  scope :incomplete, -> { 
-    where('aasm_state=?', 'draft').includes(
+  scope :with_relations, -> {
+    includes(
       :person,
       *HAS_MANY,
       *HAS_ONE
     ) 
+  }
+  scope :incomplete, -> { 
+    with_relations.where('aasm_state=?', 'draft')
   }
 
   scope :just_created, -> { 
-    where('aasm_state=?', 'new').includes(
-      :person,
-      *HAS_MANY,
-      *HAS_ONE
-    ) 
+    with_relations.where('aasm_state=?', 'new')
   }
+
   scope :answered, -> { 
-    where('aasm_state=?', 'answered').includes(
-      :person,
-      *HAS_MANY,
-      *HAS_ONE
-    ) 
+    with_relations.where('aasm_state=?', 'answered')
   }
   scope :observed, -> { 
-    where('aasm_state=?', 'observed')
-    .includes(
-      :person,
-      *HAS_MANY,
-      *HAS_ONE
-    ) 
+    with_relations.where('aasm_state=?', 'observed')
   }
-  scope :reviewable, -> { just_created.or(answered) }
 
   aasm do
     state :draft, initial: true

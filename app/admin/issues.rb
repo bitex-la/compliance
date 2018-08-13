@@ -1,11 +1,24 @@
+#encoding: utf-8
 ActiveAdmin.register Issue do
   belongs_to :person
   actions :all, except: :destroy 
+
+  filter :state
+  filter :created_at
+  filter :updated_at
 
   config.clear_action_items!
   action_item only: [:index] do
     link_to 'New', new_person_issue_path(person)
   end
+
+  scope :just_created, default: true
+  scope :answered
+  scope :answered
+  scope :incomplete
+  scope :observed
+  scope :abandoned
+  scope :dismissed
 
   %i(complete approve abandon reject dismiss ).each do |action|
     action_item action, only: :edit, if: lambda { resource.send("may_#{action}?") } do
