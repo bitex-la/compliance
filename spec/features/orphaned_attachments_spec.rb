@@ -12,7 +12,8 @@ describe 'an admin user' do
     person.natural_docket.attachments.count.should == 5
 
     login_as admin_user
-    click_link('Orphan Attachments')
+    click_link('Attachments')
+    click_on 'Fruit Orphan'
     within("#attachment_#{orphan.id}") do
       click_link('Attach to fruit')
     end

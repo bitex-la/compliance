@@ -225,8 +225,8 @@ describe 'an admin user' do
     expect(page).to have_content issue.id
 
     # Admin clicks in the issue to see the detail
-    within("#issue_#{issue.id} td.col.col-actions") do
-      click_link('View')
+    within("#issue_#{issue.id} td.col.col-id") do
+      click_link(issue.id)
     end
 
     visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
@@ -264,14 +264,6 @@ describe 'an admin user' do
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
-    click_on 'Recent Issues'
-    within "#recent-issues" do
-      expect(page).to_not have_content(issue.id)
-    end
-    click_on 'Pending For Review'
-    within "#pending-for-review" do
-      expect(page).to_not have_content(issue.id)
-    end
 
     get "/api/people/#{person.id}/issues/#{Issue.first.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -310,9 +302,9 @@ describe 'an admin user' do
 
     visit '/'
 
-    click_on 'Pending For Review'
-    within("#issue_#{issue.id} td.col.col-actions") do
-      click_link('View')
+    click_on 'Answered'
+    within("#issue_#{issue.id} td.col.col-id") do
+      click_link(issue.id)
     end
 
     page.should have_content 'Reject'
@@ -522,15 +514,12 @@ describe 'an admin user' do
     issue = person.issues.reload.last
     issue.complete!
     login_as admin_user
-    click_on 'Pending For Review'
+    click_on 'Answered'
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Reject'
 
     issue.reload.should be_rejected
     person.reload.should_not be_enabled
-
-    visit "/"
-    expect(page).to_not have_content(issue.id)
   end
 
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
@@ -560,9 +549,9 @@ describe 'an admin user' do
     assert_logging(Issue.last, 0, 1)
     observation = api_response.included.find{|i| i.type == 'observations'}
 
-    click_on 'Observations To Review'
-    within("#observation_#{observation.id} td.col.col-actions") do
-      click_link('View')
+    click_on 'Observed'
+    within("#issue_#{issue.id} td.col.col-id") do
+      click_link(issue.id)
     end
     page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit"
 
@@ -584,18 +573,6 @@ describe 'an admin user' do
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
     api_response.data.attributes.state.should == 'approved'
-
-    click_link 'Dashboard'
-
-    click_on 'Recent Issues'
-    within ".recent_issues" do
-      expect(page).to_not have_content(issue.id)
-    end
-
-    click_on 'Pending For Review'
-    within ".pending_for_review" do
-      expect(page).to_not have_content(issue.id)
-    end
 
     get "/api/people/#{person.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -627,19 +604,10 @@ describe 'an admin user' do
     issue.should be_observed
     assert_logging(Issue.last, 0, 1)
     
-    click_on 'Recent Issues'
-    within '.recent_issues.panel' do
-      expect(page).to_not have_content(issue.id)
-    end
-
-    click_on 'Pending For Review'
-    within '.pending_for_review.panel' do
-      expect(page).to_not have_content(issue.id)
-    end
     # Admin clicks in the observation to see the issue detail
-    click_on 'Observations To Review'
-    within("#observation_#{Observation.last.id} td.col.col-actions") do
-      click_link('View')
+    click_on 'Observed'
+    within("#issue_#{issue.id} td.col.col-id") do
+      click_link(issue.id)
     end
     page.current_path.should == "/people/#{person.id}/issues/#{Issue.last.id}/edit"
 
@@ -681,7 +649,6 @@ describe 'an admin user' do
     observation.attributes.scope.should == 'robot'
 
     login_as admin_user
-    expect(page).to_not have_content(issue.id)
 
     # Simulate that robot perform check and notify to compliance
     get "/api/people/#{person.id}/issues/#{issue.id}",
@@ -704,9 +671,9 @@ describe 'an admin user' do
       .attributes.state.should == 'answered'
 
     visit '/'
-    click_on 'Pending For Review'
-    within("#issue_#{issue.id} td.col.col-actions") do
-      click_link('View')
+    click_on 'Answered'
+    within("#issue_#{issue.id} td.col.col-id") do
+      click_link(issue.id)
     end
     page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit"
 
@@ -716,9 +683,6 @@ describe 'an admin user' do
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
     api_response.data.attributes.state.should == 'approved'
-
-    click_link 'Dashboard'
-    expect(page).to_not have_content(issue.id)
 
     get "/api/people/#{person.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -738,15 +702,16 @@ describe 'an admin user' do
     assert_logging(Issue.last, 1, 1)
 
     login_as admin_user
-    click_on 'Pending For Review'
+    click_on 'Answered'
     visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Abandon'
 
     issue.reload.should be_abandoned
     person.reload.should_not be_enabled
 
-    visit "/"
-    expect(page).to_not have_content(issue.id)
+    visit '/'
+    click_on "Abandoned"
+    expect(page).to have_content(issue.id)
   end
 
   describe 'when admin edits an issue' do
@@ -825,9 +790,9 @@ describe 'an admin user' do
       issue = api_response.data
 
       login_as admin_user
-      click_on 'Drafts'
-      within("tr[id='issue_#{issue.id}'] td[class='col col-actions']") do
-        click_link('View')
+      click_on 'Incomplete'
+      within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
+        click_link(issue.id)
       end
 
       click_link "Add New Identification seed"
@@ -904,11 +869,11 @@ describe 'an admin user' do
       expect(page).to have_content 'Signed in successfully.'
 
       # Admin sees issue in dashboard.
-      click_on 'Drafts'
+      click_on 'Incomplete'
       expect(page).to have_content issue.id
 
-      within("#issue_#{issue.id} td.col.col-actions") do
-        click_link('View')
+      within("#issue_#{issue.id} td.col.col-id") do
+        click_link(issue.id)
       end
       page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 

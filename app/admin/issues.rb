@@ -62,14 +62,8 @@ ActiveAdmin.register Issue do
   form do |f|
     tabs do
       tab :seeds do
-        if f.object.persisted?
-          f.inputs 'Basics' do
-            f.input :person_id
-          end
-        else
-          f.inputs 'Select a person' do
-            f.input :person_id, as: :select, collection: Person.all
-          end
+        f.inputs 'Basics' do
+          f.input :person_id
         end
         f.inputs 'Issue behavior' do
           f.input :fill_with_previous_info

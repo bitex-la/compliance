@@ -43,6 +43,10 @@ gem 'timecop'
 
 gem 'dotenv-rails'
 
+group :development, :test do 
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+end
+
 group :test do 
   gem 'rspec-rails'
   gem 'capybara'
@@ -66,7 +70,6 @@ group :development do
   gem 'capistrano-rbenv-install', require: false
   gem 'capistrano3-puma',   require: false
   gem 'capistrano-rails-db', require: false
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring'

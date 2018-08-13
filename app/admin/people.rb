@@ -376,6 +376,22 @@ ActiveAdmin.register Person do
           end
         end
 
+        if Affinity.where(related_person: person).any?
+          panel 'Affinities with me' do
+            table_for Affinity.where(related_person: person).includes(:attachments) do |i|
+              i.column("Person") do |fruit|
+                link_to fruit.person.person_email, fruit.person
+              end
+              i.column("Kind") do |fruit|
+                fruit.affinity_kind
+              end
+              i.column("") { |fruit|
+                link_to("View", affinity_path(fruit))
+              }
+            end
+          end
+        end
+
         if person.comments.any?
           panel 'Comments' , class: 'comments' do
             table_for person.comments do |q|
