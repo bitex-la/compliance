@@ -63,7 +63,7 @@ ActiveAdmin.register Issue do
     tabs do
       tab :seeds do
         f.inputs 'Basics' do
-          f.input :person_id
+          f.input :person_id, input_html: { disabled: true } 
         end
         f.inputs 'Issue behavior' do
           f.input :fill_with_previous_info
