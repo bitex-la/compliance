@@ -90,6 +90,7 @@ Rails.application.configure do
   config.paperclip_defaults = {
     storage: :s3,
     preserve_files: true,
+    path: 'kyc_files/:attachment/:id_partition/:style/:filename',
     s3_region: 'us-east-1',
     s3_credentials: {
       access_key_id: Secrets.s3.aws_access_key_id,
