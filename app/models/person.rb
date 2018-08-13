@@ -44,6 +44,17 @@ class Person < ApplicationRecord
     end
   end
 
+  def person_email
+    if self.enabled
+      return nil if emails.blank?
+      emails.first.address
+    else
+      return nil if issues.blank?
+      return nil if issues.last.email_seeds.blank?
+      issues.last.email_seeds.first.address
+    end
+  end
+
   def is_a_natural_person?
     if self.enabled
       !natural_dockets.current.blank?

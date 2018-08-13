@@ -42,6 +42,7 @@ ActiveAdmin.register Person do
 
   index do
     column :id
+    column :person_email
     column :enabled
     column :risk
     column :is_a_natural_person?
