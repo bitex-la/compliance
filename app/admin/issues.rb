@@ -3,16 +3,16 @@ ActiveAdmin.register Issue do
   belongs_to :person
   actions :all, except: :destroy 
 
-  filter :state
+  filter :aasm_state
   filter :created_at
   filter :updated_at
 
   index do
     column(:id)  do |o|
-      link_to o.id, [:admin, :issues, o.id] 
+      link_to o.id, [o.person, o]
     end
     column(:person) do |o|
-      link_to o.person.person_email, [:admin, :people, o.person_id] 
+      link_to o.person.person_email, o.person
     end
     column(:person_enabled)do |o|
       o.person.enabled
