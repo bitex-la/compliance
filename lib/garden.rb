@@ -121,6 +121,14 @@ module Garden
           .includes(:attachments)
           .order(updated_at: :desc) 
       }
+
+      def previous_versions
+        [replaces, *replaces.try(:history)].compact
+      end
+
+      def issue
+        seed.try(:issue)
+      end
     end
   end
 

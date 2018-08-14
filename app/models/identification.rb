@@ -7,6 +7,7 @@ class Identification < ApplicationRecord
   kind_mask_for :identification_kind, "IdentificationKind"
 
   def name
-    [self.class.name, id, number, identification_kind, issuer].join(',')    
+    replaced = "*" if replaced_by
+    "##{id}#{replaced}: #{identification_kind} #{number}, #{issuer}"
   end
 end

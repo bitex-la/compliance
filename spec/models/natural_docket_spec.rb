@@ -18,4 +18,10 @@ RSpec.describe NaturalDocket, type: :model do
   it 'is valid with a person' do
     expect(valid_docket).to be_valid
   end
+
+  it 'serializes empty natural docket' do
+    expect do
+      NaturalDocketSerializer.new(NaturalDocket.new).serialized_json
+    end.not_to raise_exception
+  end
 end

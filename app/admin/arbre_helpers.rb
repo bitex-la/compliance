@@ -1,4 +1,40 @@
 module ArbreHelpers
+  def self.fruit_attribute_table(context, resource, &block)
+    context.instance_eval do 
+      if block
+        attributes_table_for(resource, &block)
+      else
+        attributes_table(resource, *(default_attribute_table_rows - [:id, :person, :issue, :created_at, :updated_at]))
+      end
+    end
+  end
+
+  def self.fruit_relations_panels(context, resource)
+    context.instance_eval do
+      person = resource.person
+
+      attributes_table_for(resource, :id, :person, :issue, :created_at, :updated_at)
+
+      if previous = resource.previous_versions.presence
+        panel "Previous versions" do
+          previous.each do |r|
+            span r.created_at.strftime("%e %b %Y :")
+            span link_to "#{r.name}", r
+          end
+        end
+      end
+
+      if others = resource.class.where(person: person).where("id != ?", resource.id)
+        panel "Other #{resource.class.name.pluralize.titleize} for #{person.name}" do
+          others.each do |r|
+            span r.created_at.strftime("%e %b %Y :")
+            span link_to "#{r.name}", r
+            br
+          end
+        end
+      end
+    end
+  end
 
   def self.issues_panel(context, issues, title)
     context.instance_eval do
@@ -113,25 +149,19 @@ module ArbreHelpers
     end
   end
 
-  def self.all_person_attachments(context, builder)
+  def self.attachments_panel(context, attachments)
     context.instance_eval do
-      attachments_query = builder
-        .attachments
-        .where("attached_to_seed_id is ? AND attached_to_fruit_id is not ?", nil, nil)
-
-      if builder.present?
-        panel "Attachments" do
-          if attachments_query.any?
-            table_for attachments_query.each do |a|
-              a.column do |attachment|
-                context.div(h4 "#{attachment.document_file_name} - #{attachment.document_content_type}")
-                context.div(span "#{attachment.attached_to_fruit.class.name}")
-                context.div(link_to 'View', attachment_path(attachment))
-              end
+      panel "Attachments" do
+        if attachments.any?
+          table_for attachments.each do |a|
+            a.column do |attachment|
+              context.div(h4 "#{attachment.document_file_name} - #{attachment.document_content_type}")
+              context.div(span "#{attachment.attached_to_fruit.class.name}")
+              context.div(link_to 'View', attachment_path(attachment))
             end
-          else 
-            span "0 attachments"
           end
+        else 
+          span "0 attachments"
         end
       end
     end

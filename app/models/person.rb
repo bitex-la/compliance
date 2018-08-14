@@ -74,7 +74,7 @@ class Person < ApplicationRecord
   end
 
   def name
-    "#{id}"
+    "##{id}: #{person_email}"
   end
 
   def fruits
@@ -90,6 +90,11 @@ class Person < ApplicationRecord
     argentina_invoicing_details.current + 
     chile_invoicing_details.current +
     notes.current
+  end
+
+  def fruit_attachments
+    attachments
+      .where("attached_to_seed_id is null AND attached_to_fruit_id is not null")
   end
 
   private

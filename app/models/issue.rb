@@ -164,7 +164,7 @@ class Issue < ApplicationRecord
   end
 
   def name
-    "Issue #{id} - #{state}"
+    "##{id} #{state.titleize}"
   end
 
   def harvest_all!
