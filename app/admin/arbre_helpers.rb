@@ -113,7 +113,51 @@ module ArbreHelpers
     end
   end
 
-  def self.person_attachments(context, builder)
+  def self.all_person_attachments(context, builder)
+    context.instance_eval do
+      attachments_query = builder
+        .attachments
+        .where("attached_to_seed_id is ? AND attached_to_fruit_id is not ?", nil, nil)
+
+      if builder.present?
+        panel "Attachments" do
+          if attachments_query.any?
+            table_for attachments_query.each do |a|
+              a.column do |attachment|
+                context.div(h4 "#{attachment.document_file_name} - #{attachment.document_content_type}")
+                context.div(span "#{attachment.attached_to_fruit.class.name}")
+                context.div(link_to 'View', attachment_path(attachment))
+              end
+            end
+          else 
+            span "0 attachments"
+          end
+        end
+      end
+    end
+  end
+
+  def self.all_issue_attachments(context, builder)
+    context.instance_eval do
+      attachments_query = builder
+        .attachments
+        .where("attached_to_seed_id is not ? AND attached_to_fruit_id is ?", nil, nil)
+
+      if builder.present? && attachments_query.any?
+        panel "Attachments" do
+          table_for attachments_query.each do |a|
+            a.column do |attachment|
+              context.div(h4 "#{attachment.document_file_name} - #{attachment.document_content_type}")
+              context.div(span "#{attachment.attached_to_seed.class.name}")
+              context.div(link_to 'View', attachment_path(attachment))
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def self.orphan_attachments(context, builder)
     context.instance_eval do
       if builder.present? && 
           builder.attachments.where(attached_to_seed: nil).any? &&
