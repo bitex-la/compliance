@@ -1,16 +1,4 @@
 ActiveAdmin.register Identification do
-# See permitted parameters documentation:
-# https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-#
-# permit_params :list, :of, :attributes, :on, :model
-#
-# or
-#
-# permit_params do
-#   permitted = [:permitted, :attributes]
-#   permitted << :other if params[:action] == 'create' && current_user.admin?
-#   permitted
-# end
 
 menu false
 
@@ -35,11 +23,11 @@ show do
         document_kind_id = identification.identification_kind_id
         previous_versions = 
           identification
-          .person
-          .identifications
-          .where('replaced_by_id is not ? and identification_kind_id = ?', nil, document_kind_id)
-          .order(created_at: :desc)
-          .page(1).per(10)
+            .person
+            .identifications
+            .where('replaced_by_id is not ? and identification_kind_id = ?', nil, document_kind_id)
+            .order(created_at: :desc)
+            .page(1).per(10)
 
         if previous_versions.any?
           table_for previous_versions.each do |i|
