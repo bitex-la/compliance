@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180809184301) do
+ActiveRecord::Schema.define(version: 20180814143218) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -74,13 +74,13 @@ ActiveRecord::Schema.define(version: 20180809184301) do
   create_table "allowance_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.decimal "weight", precision: 10
     t.decimal "amount", precision: 10
-    t.string "kind"
     t.bigint "issue_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
     t.integer "replaces_id"
     t.boolean "copy_attachments"
+    t.integer "kind_id"
     t.index ["fruit_id"], name: "index_allowance_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
   end
@@ -88,12 +88,12 @@ ActiveRecord::Schema.define(version: 20180809184301) do
   create_table "allowances", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.decimal "weight", precision: 10
     t.decimal "amount", precision: 10
-    t.string "kind"
     t.bigint "issue_id"
     t.bigint "person_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.integer "kind_id"
     t.index ["issue_id"], name: "index_allowances_on_issue_id"
     t.index ["person_id"], name: "index_allowances_on_person_id"
     t.index ["replaced_by_id"], name: "index_allowances_on_replaced_by_id"

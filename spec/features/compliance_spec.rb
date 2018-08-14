@@ -111,7 +111,7 @@ describe 'an admin user' do
     click_link "Add New Allowance seed"
     fill_seed("allowance", {
       weight: "100",
-      kind: "ARS",
+      kind: "usd",
       amount: "100"
     })
 

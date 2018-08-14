@@ -173,7 +173,7 @@ ActiveAdmin.register Issue do
             ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
               sf.input :weight
               sf.input :amount
-              sf.input :kind, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
+              sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
               sf.input :replaces, collection: f.object.person.allowances
               sf.input :copy_attachments
               ArbreHelpers.has_many_attachments(context, sf)
