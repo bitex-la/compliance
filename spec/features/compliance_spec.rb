@@ -109,9 +109,12 @@ describe 'an admin user' do
     end
 
     click_link "Add New Allowance seed"
+
+    select "us_dollar",
+      from: "issue[allowance_seeds_attributes][0][kind_id]",
+      visible: false
     fill_seed("allowance", {
       weight: "100",
-      kind: "usd",
       amount: "100"
     })
 
@@ -380,14 +383,16 @@ describe 'an admin user' do
     end
 
     click_link "Add New Allowance seed"
+    select "us_dollar",
+      from: "issue[allowance_seeds_attributes][0][kind_id]",
+      visible: false
     fill_seed("allowance", {
       weight: "100",
-      kind: "ARS",
       amount: "100"
     })
 
    person.allowances.reload  
-   select person.allowances.first.id, from: "issue[allowance_seeds_attributes][0][replaces_id]"
+   select person.allowances.first.name, from: "issue[allowance_seeds_attributes][0][replaces_id]"
 
     within(".has_many_container.allowance_seeds") do
       click_link "Add New Attachment"

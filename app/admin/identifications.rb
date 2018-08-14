@@ -1,5 +1,6 @@
 ActiveAdmin.register Identification do
   menu false
+  actions :all, :except => [:edit, :destroy]
 
   show do 
     columns do

@@ -1,5 +1,6 @@
 ActiveAdmin.register NaturalDocket do
   menu false
+  actions :all, :except => [:edit, :destroy]
 
   show do 
     columns do

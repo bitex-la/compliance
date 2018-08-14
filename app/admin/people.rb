@@ -139,9 +139,6 @@ ActiveAdmin.register Person do
               rs.column("") { |score|
                 link_to("View", risk_score_path(score))
               }
-              rs.column("") { |score|
-                link_to("Edit", edit_risk_score_path(score))
-              }
             end
           end 
         end
