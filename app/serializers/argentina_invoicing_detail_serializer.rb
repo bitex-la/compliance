@@ -1,6 +1,6 @@
 class ArgentinaInvoicingDetailSerializer
   include FastJsonapiCandy::Fruit
-  attributes :vat_status, :tax_id, :tax_id_kind, :receipt_kind,
+  attributes :vat_status_code, :tax_id, :tax_id_kind_code, :receipt_kind_code,
     :country, :address, :name
   build_timestamps
   derive_seed_serializer!

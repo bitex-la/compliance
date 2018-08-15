@@ -4,8 +4,8 @@ RSpec.describe FundDepositSeed, type: :model do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { 
     create(:fund_deposit_seed,
-      currency: 'usd',
-      deposit_method: 'bank',
+      currency: Currency.find_by_code('usd'),
+      deposit_method: DepositMethod.find_by_code('bank'),
       external_id: 1
     )
   }

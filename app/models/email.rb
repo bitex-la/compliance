@@ -1,10 +1,10 @@
 class Email < ApplicationRecord
   include Garden::Fruit
-  include Garden::Kindify
+  include StaticModels::BelongsTo
 
-  validates :email_kind, inclusion: { in: EmailKind.all.map(&:code) }
+  validates :email_kind, inclusion: { in: EmailKind.all }
 
-  kind_mask_for :email_kind, "EmailKind"
+  belongs_to :email_kind, class_name: "EmailKind"
 
   def name
     [self.class.name, id, address, email_kind].join(',')

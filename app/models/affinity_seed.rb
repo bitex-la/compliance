@@ -1,8 +1,9 @@
 class AffinitySeed < ApplicationRecord
   include Garden::Seed
-  include Garden::Kindify
-  belongs_to :related_person, class_name: 'Person'
-  validates  :affinity_kind, inclusion: { in: AffinityKind.all.map(&:code) }
+  include StaticModels::BelongsTo
 
-  kind_mask_for :affinity_kind, "AffinityKind"
+  belongs_to :related_person, class_name: 'Person'
+  validates  :affinity_kind, inclusion: { in: AffinityKind.all }
+
+  belongs_to :affinity_kind
 end

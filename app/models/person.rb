@@ -30,6 +30,14 @@ class Person < ApplicationRecord
     emails.first.try(:address)
   end
 
+	def natural_docket
+		natural_dockets.last
+	end
+
+	def legal_entity_docket
+		legal_entity_dockets.last
+	end
+
   def person_type
     if natural_dockets.any?
       :natural_person

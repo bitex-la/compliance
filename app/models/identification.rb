@@ -3,7 +3,7 @@ class Identification < ApplicationRecord
   include StaticModels::BelongsTo
 
   validates :issuer, country: true
-  validates :identification_kind, inclusion: { in: IdentificationKind.all.map(&:code) } 
+  validates :identification_kind, inclusion: { in: IdentificationKind.all } 
 
   belongs_to :identification_kind
 

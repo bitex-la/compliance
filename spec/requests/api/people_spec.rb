@@ -191,7 +191,7 @@ describe Person do
         { type: "identifications",
           id: person.identifications.last.id.to_s,
           attributes: {
-            identification_kind: "national_id",
+            identification_kind_code: "national_id",
             number: "2545566",
             issuer: "AR",
             public_registry_authority: nil,
@@ -219,8 +219,8 @@ describe Person do
             first_name: "Joe",
             last_name: "Doe",
             nationality: "AR",
-            gender: "female",
-            marital_status: "single",
+            gender_code: "female",
+            marital_status_code: "single",
             job_title: 'Sr. Software developer',
             job_description: 'Build cool open source software',
             politically_exposed: false,
@@ -269,7 +269,7 @@ describe Person do
           attributes: {
             weight: 1000,
             amount: 1000,
-            kind: "USD",
+            kind_code: "usd",
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -290,7 +290,7 @@ describe Person do
           id: person.phones.first.id.to_s,
           attributes: {
             number:  '+5491125410470',
-            phone_kind: 'main',
+            phone_kind_code: 'main',
             country: 'AR',
             has_whatsapp: true,
             has_telegram: false,
@@ -315,7 +315,7 @@ describe Person do
           id: person.emails.first.id.to_s,
           attributes: {
             address:  'joe.doe@test.com',
-            email_kind:    'work',
+            email_kind_code:    'work',
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -336,7 +336,7 @@ describe Person do
           type: "affinities",
           id: person.affinities.first.id.to_s,
           attributes: {
-            affinity_kind: person.affinities.first.affinity_kind.to_s,
+            affinity_kind_code: person.affinities.first.affinity_kind.to_s,
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -364,10 +364,10 @@ describe Person do
           type: "argentina_invoicing_details",
           attributes:
           {
-            vat_status: "consumidor_final",
+            vat_status_code: "consumidor_final",
             tax_id: "20955754290",
-            tax_id_kind: "cuit",
-            receipt_kind: "a",
+            tax_id_kind_code: "cuit",
+            receipt_kind_code: "a",
             country: "AR",
             name: "Julio Iglesias",
             address: "Jujuy 3421",

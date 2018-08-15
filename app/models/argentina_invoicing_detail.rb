@@ -1,14 +1,15 @@
 class ArgentinaInvoicingDetail < ApplicationRecord
   include Garden::Fruit
-  include Garden::Kindify
+  include StaticModels::BelongsTo
+  
   validates :country, country: true
   validates :address, presence: true
   validates :name, presence: true
-  validates :tax_id_kind, inclusion: { in: TaxIdKind.all.map(&:code) }
-  validates :receipt_kind, inclusion: { in: ReceiptKind.all.map(&:code) }
-  validates :vat_status, inclusion: { in: VatStatusKind.all.map(&:code) }
+  validates :tax_id_kind, inclusion: { in: TaxIdKind.all }
+  validates :receipt_kind, inclusion: { in: ReceiptKind.all }
+  validates :vat_status, inclusion: { in: VatStatusKind.all }
 
-  kind_mask_for :tax_id_kind, "TaxIdKind"
-  kind_mask_for :receipt_kind, "ReceiptKind"
-  kind_mask_for :vat_status, "VatStatusKind"
+  belongs_to :tax_id_kind
+  belongs_to :receipt_kind
+  belongs_to :vat_status, class_name: 'VatStatusKind'
 end

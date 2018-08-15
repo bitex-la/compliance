@@ -1,7 +1,7 @@
 class NaturalDocketSerializer
   include FastJsonapiCandy::Fruit
-  attributes :first_name, :last_name, :nationality, :gender,
-    :marital_status, :job_title, :job_description,
+  attributes :first_name, :last_name, :nationality, :gender_code,
+    :marital_status_code, :job_title, :job_description,
     :politically_exposed, :politically_exposed_reason
 
   attribute :birth_date do |obj|
