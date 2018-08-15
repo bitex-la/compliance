@@ -43,6 +43,7 @@ describe Issue do
       post "/api/people/#{person.id}/issues",
         params: issue,
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
       assert_response 201
       assert_logging(Issue.last, 0, 1)
     end
@@ -65,7 +66,7 @@ describe Issue do
           post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
+ 
           assert_issue_integrity(["IdentificationSeed"])
           assert_response 201
           assert_logging(Issue.last, 0, 1)
@@ -471,7 +472,7 @@ describe Issue do
       PhoneSeed.first.tap do |seed|
         seed.reload
         seed.number.should == "+54911282256470"
-        seed.phone_kind.should == :main
+        seed.phone_kind_code.should == :main
         seed.country.should == "AR"
         seed.has_whatsapp.should == true
         seed.has_telegram.should == false

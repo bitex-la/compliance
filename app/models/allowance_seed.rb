@@ -1,6 +1,6 @@
 class AllowanceSeed < ApplicationRecord
   include Garden::Seed
-  include Garden::Kindify
+  include StaticModels::BelongsTo
 
-  kind_mask_for :kind, "Currency"
+  belongs_to :kind, class_name: "Currency"
 end

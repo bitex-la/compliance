@@ -1,8 +1,8 @@
 class ChileInvoicingDetailSeed < ApplicationRecord
   include Garden::Seed
-  include Garden::Kindify
+  include StaticModels::BelongsTo
 
-  validates :vat_status, inclusion: { in: VatStatusKind.all.map(&:code) }
+  validates :vat_status, inclusion: { in: VatStatusKind.all }
   
-  kind_mask_for :vat_status, "VatStatusKind"
+  belongs_to :vat_status, class_name: "VatStatusKind"
 end

@@ -1,12 +1,13 @@
 class FundDeposit < ApplicationRecord
   include Garden::Fruit
-  include Garden::Kindify
+  include StaticModels::BelongsTo
 
   validates :external_id, presence: true
-  validates :deposit_method, inclusion: { in: DepositMethod.all.map(&:code) }
-  validates :currency, inclusion: { in: Currency.all.map(&:code) }
-  kind_mask_for :deposit_method, "DepositMethod"
-  kind_mask_for :currency, "Currency"
+  validates :deposit_method, inclusion: { in: DepositMethod.all }
+  validates :currency, inclusion: { in: Currency.all }
+
+  belongs_to :deposit_method, class_name: "DepositMethod"
+  belongs_to :currency, class_name: "Currency"
 
   def name
     [self.class.name, id, amount, currency, deposit_method].join(',')

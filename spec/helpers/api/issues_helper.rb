@@ -124,7 +124,7 @@ class Api::IssuesHelper
           type: "affinity_seeds",
           id: "@1",
           attributes: {
-            affinity_kind: "spouse"
+            affinity_kind_code: "spouse"
           },
           relationships: {
             issue: {
@@ -210,7 +210,7 @@ class Api::IssuesHelper
           id: "@1",
           attributes: {
             number: "+54911282256470",
-            phone_kind: "main",
+            phone_kind_code: "main",
             country: "AR",
             has_whatsapp: true,
             has_telegram: false,
@@ -252,7 +252,7 @@ class Api::IssuesHelper
           id: "@1",
           attributes: {
             address: "joe.doe@test.com",
-            email_kind: "personal",
+            email_kind_code: "personal",
           },
           relationships: {
             issue: {
@@ -289,10 +289,10 @@ class Api::IssuesHelper
           type: "argentina_invoicing_detail_seeds",
           id: "@1",
           attributes: {
-            vat_status: "monotributo",
+            vat_status_code: "monotributo",
             tax_id: "2022443870",
-            tax_id_kind: "cuit",
-            receipt_kind: "a",
+            tax_id_kind_code: "cuit",
+            receipt_kind_code: "a",
             name: "Jorge Galvan",
             country: "AR",
             address: "Bucarelli 2675"
@@ -332,7 +332,7 @@ class Api::IssuesHelper
           type: "chile_invoicing_detail_seeds",
           id: "@1",
           attributes: {
-            vat_status: "monotributo",
+            vat_status_code: "monotributo",
             tax_id: "2022443870",
             giro: 'sfsdffd',
             ciudad: 'Santiago',
@@ -373,7 +373,7 @@ class Api::IssuesHelper
           type: "identification_seeds",
           id: "@1",
           attributes: {
-            identification_kind: "national_id",
+            identification_kind_code: "national_id",
             number: "AQ322812",
             issuer: "CO"
           },
@@ -446,8 +446,8 @@ class Api::IssuesHelper
           type: "fund_deposit_seeds",
           id: "@1",
           attributes: {
-            currency: "usd",
-            deposit_method: "bank",
+            currency_code: "usd",
+            deposit_method_code: "bank",
             amount: 1000,
             external_id: 1
           },
@@ -491,8 +491,8 @@ class Api::IssuesHelper
             last_name: "doe",
             birth_date: "2018-01-01",
             nationality: "AR",
-            gender: "male",
-            marital_status: "single"
+            gender_code: "male",
+            marital_status_code: "single"
           },
           relationships: {
             attachments: {
@@ -573,7 +573,7 @@ class Api::IssuesHelper
           attributes: {
             weight: 10,
             amount: 1000,
-            kind: "USD"
+            kind_code: "usd"
           },
           relationships: {
             attachments: {
@@ -598,8 +598,8 @@ class Api::IssuesHelper
         last_name: "jones",
         birth_date: "2018-01-01",
         nationality: "AR",
-        gender: "male",
-        marital_status: "single"
+        gender_code: "male",
+        marital_status_code: "single"
       },
       relationships: {
         attachments: {

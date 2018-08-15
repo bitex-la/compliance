@@ -1,8 +1,8 @@
 class Allowance < ApplicationRecord
   include Garden::Fruit
-  include Garden::Kindify
+  include StaticModels::BelongsTo
 
-  kind_mask_for :kind, "Currency"
+  belongs_to :kind, class_name: "Currency"
 
   def name
     [self.class.name, id, weight, amount, kind].join(',')    

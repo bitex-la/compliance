@@ -97,8 +97,8 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       ],
       fund_deposit_seeds:[
         :amount,
-        :currency,
-        :deposit_method,
+        :currency_code,
+        :deposit_method_code,
         :external_id,
         :attachments,
         :replaces,
@@ -116,7 +116,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       ],
       phone_seeds: [
         :number,
-        :phone_kind,
+        :phone_kind_code,
         :country,
         :has_whatsapp,
         :has_telegram,
@@ -128,7 +128,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       ],
       email_seeds: [
         :address,
-        :email_kind,
+        :email_kind_code,
         :attachments,
         :copy_attachments,
         :replaces,
@@ -143,7 +143,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :issue
       ],
       affinity_seeds: [
-        :affinity_kind,
+        :affinity_kind_code,
         :related_person,
         :replaces,
         :attachments,
@@ -151,7 +151,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :issue
       ],
       identification_seeds: [
-        :identification_kind,
+        :identification_kind_code,
         :number,
         :issuer,
         :attachments,
@@ -164,8 +164,8 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :last_name,
         :birth_date,
         :nationality,
-        :gender,
-        :marital_status,
+        :gender_code,
+        :marital_status_code,
         :job_title,
         :job_description,
         :politically_exposed,
@@ -185,10 +185,10 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :issue
       ],
       argentina_invoicing_detail_seeds: [
-        :vat_status,
+        :vat_status_code,
         :tax_id,
-        :tax_id_kind,
-        :receipt_kind,
+        :tax_id_kind_code,
+        :receipt_kind_code,
         :name,
         :country,
         :address,
@@ -197,7 +197,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
         :issue
       ],
       chile_invoicing_detail_seeds: [
-        :vat_status,
+        :vat_status_code,
         :tax_id,
         :giro,
         :ciudad,
@@ -209,7 +209,7 @@ class Api::IssueJsonApiSyncController < Api::ApiController
       allowance_seeds: [
         :weight,
         :amount,
-        :kind,
+        :kind_code,
         :attachments,
         :copy_attachments,
         :replaces,

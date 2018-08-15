@@ -1,12 +1,12 @@
 class PhoneSeed < ApplicationRecord
   include Garden::Seed
-  include Garden::Kindify
+  include StaticModels::BelongsTo
 
   after_initialize :set_default_values, unless: :persisted?
 
-  validates :phone_kind, inclusion: { in: PhoneKind.all.map(&:code) }
+  validates :phone_kind, inclusion: { in: PhoneKind.all }
 
-  kind_mask_for :phone_kind, "PhoneKind"
+  belongs_to :phone_kind, class_name: "PhoneKind"
 
   private
   def set_default_values

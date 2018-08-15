@@ -7,11 +7,10 @@ GIT
       activesupport (~> 5.1, >= 5.1.4)
 
 GIT
-  remote: https://github.com/dev-yohan/static_models.git
-  revision: 9f0248668ee9868aaaf4c15600cb9baae21b09bf
-  branch: rails-5-support
+  remote: https://github.com/bitex-la/static_models.git
+  revision: ab90853c3aec282bf33164ae525f47fc235c5df9
   specs:
-    static_models (0.4.4)
+    static_models (0.4.5)
       activemodel (~> 5.1, >= 5.1.4)
       activesupport (~> 5.1, >= 5.1.4)
 
