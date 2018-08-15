@@ -1,10 +1,29 @@
 module ArbreHelpers
+  def self.fruit_show_page(context)
+    context.instance_eval do
+      columns do
+        column span: 2 do
+          ArbreHelpers.fruit_attribute_table(self, resource)
+          if attachments = resource.attachments.presence
+            h3 "Attachments"
+            ArbreHelpers.attachments_grid(self, attachments)
+          end
+        end
+
+        column do 
+          ArbreHelpers.fruit_relations_panels(self, resource)
+        end 
+      end  
+    end
+  end
+
   def self.fruit_attribute_table(context, resource, &block)
     context.instance_eval do 
       if block
         attributes_table_for(resource, &block)
       else
-        attributes_table(resource, *(default_attribute_table_rows - [:id, :person, :issue, :created_at, :updated_at]))
+        blacklist = %i(id person issue_id created_at updated_at replaced_by)
+        attributes_table_for(resource, *(default_attribute_table_rows - blacklist))
       end
     end
   end
@@ -13,24 +32,31 @@ module ArbreHelpers
     context.instance_eval do
       person = resource.person
 
-      attributes_table_for(resource, :id, :person, :issue, :created_at, :updated_at)
+      attributes_table_for(resource) do
+        row :id
+        if resource.replaced_by
+          row :replaced_by
+        end
+        row :person
+        row :issue
+        row :created_at
+      end
 
       if previous = resource.previous_versions.presence
-        panel "Previous versions" do
-          previous.each do |r|
-            span r.created_at.strftime("%e %b %Y :")
-            span link_to "#{r.name}", r
-          end
+        h3 "Previous versions"
+        previous.each do |r|
+          span r.created_at.strftime("%e %b %Y :")
+          span link_to "#{r.name}", r
+          br
         end
       end
 
-      if others = resource.class.where(person: person).where("id != ?", resource.id)
-        panel "Other #{resource.class.name.pluralize.titleize} for #{person.name}" do
-          others.each do |r|
-            span r.created_at.strftime("%e %b %Y :")
-            span link_to "#{r.name}", r
-            br
-          end
+      if others = resource.others_for_person.presence
+        h3 "Other #{resource.class.name.pluralize.titleize} for person"
+        others.each do |r|
+          span r.created_at.strftime("%e %b %Y :")
+          span link_to "#{r.name}", r
+          br
         end
       end
     end
@@ -73,78 +99,42 @@ module ArbreHelpers
     end
   end
 
-  def self.attachments_panel(context, attachments)
+  def self.attachments_grid(context, attachments, show_attached_to = false)
     context.instance_eval do
-      next if attachments.empty?
-
-      panel 'Attachments' do
-        table_for attachments do |a|
-          a.column("ID") do |attachment|
-            link_to(attachment.id, attachment_path(attachment))
-          end
-          a.column("File Name")    { |attachment| attachment.document_file_name }
-          a.column("Content Type") { |attachment| attachment.document_content_type }
-          a.column("File Size")    { |attachment| attachment.document_file_size }
-          a.column("") do |attachment|
-            link_to "View file", attachment.document.url, target: '_blank'
-          end
-          a.column("") do |attachment|
-            link_to("View detail", attachment_path(attachment))
-          end
-          a.column("") do |attachment|
-            link_to("Edit", edit_attachment_path(attachment))
-          end
-        end
-      end
-    end
-  end
-
-  def self.attachments_block(context, relationship, attachments)
-    context.instance_eval do
-      panel relationship do
-        table_for attachments.each do |a|
-          a.column do |attachment|
-            h3 "#{attachment.document_file_name} - #{attachment.document_content_type}"
-            if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type) 
-              context.div(image_tag(attachment.document.url, width: '100%'))
-              context.div(link_to 'View', attachment_path(attachment))
-            elsif DOWNLOADABLE_CONTENT_TYPES.include?(attachment.document_content_type)
-              link_to 'Download file', attachment.document.url, target: "_blank"
+      attachments.in_groups_of(2).each do |group|
+        columns do
+          group.each_with_index do |a, i|
+            column do
+              next if a.nil?
+              if IMAGEABLE_CONTENT_TYPES.include?(a.document_content_type) 
+                div do
+                  link_to image_tag(a.document.url, width: '100%'), a.document.url
+                end
+                attributes_table_for a do
+                  row(:attachment){|o| link_to o.name, attachment_path(o) }
+                  if show_attached_to
+                    row(:attached_to_type)
+                    row(:attached_to)
+                  end
+                end
+              else
+                div do
+                  link_to "Download (no preview available)", a.document.url,
+                    target: "_blank", class: 'button button-block'
+                end
+                attributes_table_for a do
+                  row(:type){|o| o.document_content_type }
+                  row(:size){|o| number_to_human_size o.document_file_size }
+                  row(:attachment){|o| link_to o.name, attachment_path(o) }
+                  if show_attached_to
+                    row(:attached_to_type)
+                    row(:attached_to)
+                  end
+                end
+              end
             end
           end
         end
-      end
-    end
-  end
-
-  def self.multi_entity_attachments(context, builder, relationship)
-    b_object = if relationship.to_s.include? 'seed'
-      builder.send(relationship)
-    else
-      builder.send(relationship).current
-    end
-
-    context.instance_eval do
-      if b_object.any?
-        b_object.each do |entity|
-          if entity.attachments.any?
-            ArbreHelpers.attachments_block(context, relationship, entity.attachments)
-          end
-        end
-      end
-    end
-  end
-
-  def self.entity_attachments(context, builder, relationship)
-    b_object = if relationship.to_s.include? 'seed'
-      builder.send(relationship)
-    else
-      builder.send(relationship).current
-    end
-
-    context.instance_eval do
-      if b_object.present? && b_object.attachments.any?
-        ArbreHelpers.attachments_block(context, relationship, b_object.attachments)
       end
     end
   end
@@ -162,26 +152,6 @@ module ArbreHelpers
           end
         else 
           span "0 attachments"
-        end
-      end
-    end
-  end
-
-  def self.all_issue_attachments(context, builder)
-    context.instance_eval do
-      attachments_query = builder
-        .attachments
-        .where("attached_to_seed_id is not ? AND attached_to_fruit_id is ?", nil, nil)
-
-      if builder.present? && attachments_query.any?
-        panel "Attachments" do
-          table_for attachments_query.each do |a|
-            a.column do |attachment|
-              context.div(h4 "#{attachment.document_file_name} - #{attachment.document_content_type}")
-              context.div(span "#{attachment.attached_to_seed.class.name}")
-              context.div(link_to 'View', attachment_path(attachment))
-            end
-          end
         end
       end
     end
@@ -222,7 +192,7 @@ module ArbreHelpers
         b_object,
         target: '_blank'))
 
-      unless b_object.class.name == 'Attachment'
+      unless b_object.class == Attachment
         context.span(context.link_to("Remove Entity",
           b_object,
           method: :delete,
@@ -235,17 +205,12 @@ module ArbreHelpers
     builder.has_many relationship do |f|
       instance_exec(f, context, &fields)
       if f.object.persisted?
-        f.template.concat(context.link_to(
-          "Show",
-          f.object,
-          target: '_blank'
-        ))
-
         unless f.object.class.name == 'Attachment'
-          f.template.concat(context.link_to("Remove Entity",
+          f.template.concat(context.link_to("Remove",
             f.object,
             method: :delete,
-            data: {confirm: "Are you sure?"}
+            data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
+            class: 'button has_many_remove'
           ))
         end
       end
@@ -254,17 +219,14 @@ module ArbreHelpers
 
   def self.has_many_attachments(context, form)
     ArbreHelpers.has_many_form context, form, :attachments do |af|
-      document = af.object.document
-      hint = if document.nil?
-        context.content_tag(:span, "No File Yet")
+      a = af.object
+      if a.persisted?
+        af.template.concat("<label class='label'>Attachment</label>".html_safe)
+        af.template.concat(context.link_to(a.name, a, target: '_blank'))
+        af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
       else
-        context.link_to('Click to enlarge', af.object.document.url, target: '_blank')
+        af.input :document, as: :file, label: "Attachment"
       end
-
-      af.input :document, as: :file, hint: hint,
-        label: "File #{af.object.document_file_name}"
-
-      af.input :_destroy, as: :boolean, required: false, label: 'Remove image'
     end
   end
 end

@@ -209,6 +209,34 @@ class Issue < ApplicationRecord
     observations.where(aasm_state: 'new').any?
   end
 
+  def all_attachments
+    all = []
+    HAS_MANY.map do |assoc|
+      send(assoc).map do |o|
+        next if o.nil?
+        all += o.fruit_id ? o.fruit.attachments : o.attachments
+      end
+    end
+
+    HAS_ONE.each do |assoc|
+      o = send(assoc)
+      next if o.nil?
+      all += o.fruit_id ? o.fruit.attachments : o.attachments
+    end
+
+    all
+  end
+
+  def for_person_type
+    return person.person_type if person && person.person_type 
+
+    if natural_docket_seed_id
+      :natural_person
+    elsif legal_entity_docket_seed_id
+      :legal_entity
+    end
+  end
+
   private  
 
   def self.eager_issue_entities

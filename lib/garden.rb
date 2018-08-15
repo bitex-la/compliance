@@ -123,11 +123,19 @@ module Garden
       }
 
       def previous_versions
-        [replaces, *replaces.try(:history)].compact
+        [replaces, *replaces.try(:previous_versions)].compact
+      end
+
+      def others_for_person
+        self.class.where(person: person, replaced_by: nil).where("id != ?", self)
       end
 
       def issue
         seed.try(:issue)
+      end
+
+      def build_name(body)
+        "##{id}#{"*" if replaced_by}: #{body}"
       end
     end
   end

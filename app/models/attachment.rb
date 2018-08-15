@@ -39,6 +39,18 @@ class Attachment < ApplicationRecord
     self.document.url
   end
 
+  def name
+    "##{id}: #{document_file_name} - #{document_content_type}"
+  end
+
+  def attached_to
+    attached_to_fruit || attached_to_seed
+  end
+
+  def attached_to_type
+    attached_to.class.name
+  end
+
   private
   def relate_to_person
     unless destroyed?

@@ -26,50 +26,15 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
-  def natural_docket
-    if self.enabled
-      natural_dockets.current.first
-    else
-      return nil if issues.blank?
-      issues.last.natural_docket_seed
-    end
-  end
-
-  def legal_entity_docket
-    if self.enabled
-      legal_entity_dockets.current.first
-    else
-      return nil if issues.blank?
-      issues.last.legal_entity_docket_seed
-    end
-  end
-
   def person_email
-    if self.enabled
-      return nil if emails.blank?
-      emails.first.address
-    else
-      return nil if issues.blank?
-      return nil if issues.last.email_seeds.blank?
-      issues.last.email_seeds.first.address
-    end
+    emails.first.try(:address)
   end
 
-  def is_a_natural_person?
-    if self.enabled
-      !natural_dockets.current.blank?
-    else
-      return false if issues.blank?
-      !issues.last.natural_docket_seed.blank?
-    end
-  end
-
-  def is_a_legal_entity?
-    if self.enabled
-      !legal_entity_dockets.current.blank?
-    else
-      return false if issues.blank?
-      !issues.last.legal_entity_docket_seed.blank?
+  def person_type
+    if natural_dockets.any?
+      :natural_person
+    elsif legal_entity_dockets.any?
+      :legal_entity
     end
   end
 

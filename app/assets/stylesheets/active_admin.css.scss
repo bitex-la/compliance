@@ -66,20 +66,14 @@ body.active_admin{
   .hidden{
     display: none;
   }
-  a.button, a:link.button, a:visited.button, input[type=submit], input[type=button], buttona{
-    background-image: none;
-    border-radius: 3px;
-    padding: 15px 30px;
-    border: none;
-    text-shadow: none;
-    font-weight: 400;
-    font-family: 'Open Sans';
+
+  div, a {
+    .button.button-block{
+      display: block;
+      text-align: center;
+    }
   }
-  a.button:hover, a:link.button:hover, a:visited.button:hover, input[type=submit]:hover, input[type=button]:hover, buttona:hover{
-    background-image: none;
-    border-radius: 3px;
-    border: none;
-  }
+
   #active_admin_content{
     padding-top: 0px;
     .flashes{
@@ -260,11 +254,6 @@ body.active_admin{
         text-decoration: none;
       }
     }
-    > ol{
-     > li{
-       padding: 10px 15px;
-     }
-    }
   }
 
   form fieldset.inputs {
@@ -273,6 +262,130 @@ body.active_admin{
     border: 1px solid rgba(0,0,0,0.07);
     box-shadow: none;
     padding: 0;
+  }
+
+	form {
+		fieldset.actions{
+				input[type=submit]{
+					padding: 15px 20px;
+					font-size: 1.2em;
+					border-radius: 10px;
+				}
+				.cancel {
+					padding-top: 10px;
+				}
+			}
+		.note_seeds > fieldset > ol > li.text.input {
+			label {
+				display: none;
+			}
+
+			textarea {
+				box-sizing: border-box;
+				width: 100%;
+			}
+		}
+	}
+
+  fieldset, .has_many_container {
+    > h3 {
+      display: none;
+    }
+
+    fieldset.has_many_fields {
+      padding-top: 20px;
+      margin-top: 10px;
+
+      ol li:last-child {
+        padding: 0;
+      }
+    }
+
+    .has_many_add {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+    }
+
+    .has_many_remove {
+      display: block;
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      padding: 5px 10px;
+      font-size: 0.9em;
+      line-height: 0.9em;
+
+			background-color: #FFFFFF;
+			background-image: linear-gradient(180deg, #FFFFFF, #E7E7E7);
+			box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 0 rgba(255, 255, 255, 0.8) inset;
+			border: solid 1px #c7c7c7;
+			border-color: #c7c7c7;
+			border-top-color: #d3d3d3;
+			border-right-color: #c7c7c7;
+			border-bottom-color: #c2c2c2;
+			border-left-color: #c7c7c7;
+			text-shadow: #fff 0 1px 0;
+			color: #5E6469;
+    }
+
+    li.has_many_container.attachments{
+			padding: 10px;
+
+      background: #eee;
+			.has_many_remove {
+				top: 9px;
+			}
+
+			.has_many_add {
+				display: inline;
+				padding: 5px 10px;
+				margin: 5px 0;
+
+				font-size: 1.0em;
+				line-height: 12px;
+				background-color: #FFFFFF;
+				background-image: linear-gradient(180deg, #FFFFFF, #E7E7E7);
+				box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 0 rgba(255, 255, 255, 0.8) inset;
+				border: solid 1px #c7c7c7;
+				border-color: #c7c7c7;
+				border-top-color: #d3d3d3;
+				border-right-color: #c7c7c7;
+				border-bottom-color: #c2c2c2;
+				border-left-color: #c7c7c7;
+				text-shadow: #fff 0 1px 0;
+				color: #5E6469;
+			}
+
+      fieldset {
+        padding: 10px;
+				margin: 5px 0 10px 0;
+				ol li.file.input {
+					padding: 0;
+				}
+      }
+
+      li.boolean.input{
+        float: right;
+
+				label {
+					display: block;
+					padding-left: 15px;
+					text-indent: -15px;
+				}
+				input {
+					width: 13px;
+					height: 13px;
+					padding: 0;
+					margin: 0 5px 0 0;
+					vertical-align: bottom;
+					position: relative;
+					top: -1px;
+					*overflow: hidden;
+				}
+      }
+    }
   }
 
   table.index_table{

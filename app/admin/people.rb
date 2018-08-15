@@ -1,4 +1,5 @@
 ActiveAdmin.register Person do
+  includes :emails, :legal_entity_dockets, :natural_dockets
 
   controller do
     include Zipline
@@ -50,10 +51,7 @@ ActiveAdmin.register Person do
     column :person_email
     column :enabled
     column :risk
-    column :is_a_natural_person?
-    column :natural_docket
-    column :is_a_legal_entity?
-    column :legal_entity_docket
+    column :person_type
     column :created_at
     column :updated_at
     actions

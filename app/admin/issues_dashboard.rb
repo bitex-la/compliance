@@ -1,5 +1,7 @@
 #encoding: utf-8
 ActiveAdmin.register Issue, as: "Dashboard" do
+  menu priority: 1
+
   actions :index
 
   scope :just_created, default: true

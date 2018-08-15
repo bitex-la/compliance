@@ -1,13 +1,13 @@
 class Identification < ApplicationRecord
   include Garden::Fruit
-  include Garden::Kindify
+  include StaticModels::BelongsTo
+
   validates :issuer, country: true
   validates :identification_kind, inclusion: { in: IdentificationKind.all.map(&:code) } 
 
-  kind_mask_for :identification_kind, "IdentificationKind"
+  belongs_to :identification_kind
 
   def name
-    replaced = "*" if replaced_by
-    "##{id}#{replaced}: #{identification_kind} #{number}, #{issuer}"
+    build_name("#{identification_kind} #{number}, #{issuer}")
   end
 end
