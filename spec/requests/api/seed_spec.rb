@@ -67,7 +67,7 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       issue.chile_invoicing_detail_seed.ciudad.should == 'Valparaiso'
       issue.chile_invoicing_detail_seed.comuna.should == 'La Rosita'
     when 'AffinitySeed'
-      issue.affinity_seeds.first.affinity_kind.should  == :manager
+      issue.affinity_seeds.first.affinity_kind_code.should  == :spouse
     when 'DomicileSeed'
       issue.domicile_seeds.first.street_address.should == 'Cerati'
       issue.domicile_seeds.first.street_number.should == '100'
@@ -83,13 +83,13 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       issue.phone_seeds.first.country.should == 'CO'
     when 'EmailSeed'
       issue.email_seeds.first.address.should == 'zinedine@soccer.com'
-      issue.email_seeds.first.email_kind.should == :personal
+      issue.email_seeds.first.email_kind_code.should == :personal
     when 'NoteSeed'
       issue.note_seeds.first.title.should == 'My nickname'
       issue.note_seeds.first.body.should == 'Call me zizu'
     when 'AllowanceSeed'
       issue.allowance_seeds.first.weight.should == 1000
-      issue.allowance_seeds.first.kind.should == :usd
+      issue.allowance_seeds.first.kind_code.should == :usd
   end
 end
 

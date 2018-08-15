@@ -336,7 +336,7 @@ describe Person do
           type: "affinities",
           id: person.affinities.first.id.to_s,
           attributes: {
-            affinity_kind: person.affinities.first.affinity_kind.to_s,
+            affinity_kind_code: person.affinities.first.affinity_kind.to_s,
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -364,10 +364,10 @@ describe Person do
           type: "argentina_invoicing_details",
           attributes:
           {
-            vat_status: "consumidor_final",
+            vat_status_code: "consumidor_final",
             tax_id: "20955754290",
-            tax_id_kind: "cuit",
-            receipt_kind: "a",
+            tax_id_kind_code: "cuit",
+            receipt_kind_code: "a",
             country: "AR",
             name: "Julio Iglesias",
             address: "Jujuy 3421",
