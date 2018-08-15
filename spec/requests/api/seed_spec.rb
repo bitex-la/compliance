@@ -41,7 +41,7 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       attrs[:body] = 'Call me zizu'
     when 'AllowanceSeed'
       attrs[:weight] = 1000
-      attrs[:kind] = 'USD'
+      attrs[:kind] = :usd
   end
 
   put "/api/people/#{issue.person.id}/issues/#{issue.id}/#{seed_name.pluralize.underscore}/#{seed_id}",
@@ -89,7 +89,7 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       issue.note_seeds.first.body.should == 'Call me zizu'
     when 'AllowanceSeed'
       issue.allowance_seeds.first.weight.should == 1000
-      issue.allowance_seeds.first.kind.should == 'USD'
+      issue.allowance_seeds.first.kind.should == :usd
   end
 end
 
