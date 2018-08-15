@@ -6,8 +6,8 @@ RSpec.describe FundDeposit, type: :model do
   let(:valid_fund_deposit) { 
     create(:fund_deposit,
       person: person,
-      currency: 'usd',
-      deposit_method: 'bank',
+      currency: Currency.find_by_code('usd'),
+      deposit_method: DepositMethod.find_by_code('bank'),
       external_id: 1
   )}
 

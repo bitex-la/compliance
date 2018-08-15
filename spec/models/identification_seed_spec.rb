@@ -4,7 +4,7 @@ RSpec.describe IdentificationSeed, type: :model do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { 
     create(:identification_seed, 
-      identification_kind: "national_id",
+      identification_kind: IdentificationKind.find_by_code('national_id'),
       issuer: 'CO'
   )}
 

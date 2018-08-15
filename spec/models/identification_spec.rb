@@ -6,7 +6,7 @@ RSpec.describe Identification, type: :model do
   let(:valid_identification)   { 
     create(:identification, 
       person: person,
-      identification_kind: "national_id",
+      identification_kind: IdentificationKind.find_by_code('national_id'),
       issuer: 'CO'
   )}
 
