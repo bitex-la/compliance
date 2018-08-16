@@ -407,20 +407,7 @@ ActiveAdmin.register Person do
         end
       end
       tab :attachments_preview do
-        ArbreHelpers.multi_entity_attachments self, person, :natural_dockets
-        ArbreHelpers.multi_entity_attachments self, person, :legal_entity_dockets
-        ArbreHelpers.multi_entity_attachments self, person, :risk_scores
-        ArbreHelpers.multi_entity_attachments self, person, :argentina_invoicing_details
-        ArbreHelpers.multi_entity_attachments self, person, :chile_invoicing_details
-        ArbreHelpers.multi_entity_attachments self, person, :identifications
-        ArbreHelpers.multi_entity_attachments self, person, :domiciles
-        ArbreHelpers.multi_entity_attachments self, person, :affinities
-        ArbreHelpers.multi_entity_attachments self, person, :fund_deposits
-        ArbreHelpers.multi_entity_attachments self, person, :allowances
-        ArbreHelpers.multi_entity_attachments self, person, :phones
-        ArbreHelpers.multi_entity_attachments self, person, :emails
-        ArbreHelpers.multi_entity_attachments self, person, :notes
-        ArbreHelpers.orphan_attachments self, person
+        
       end
     end
   end

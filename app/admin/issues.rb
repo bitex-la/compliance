@@ -378,31 +378,6 @@ ActiveAdmin.register Issue do
       end
     end
 
-    if issue.fund_deposit_seeds.any?
-      panel 'Fund deposit seeds' do
-        table_for issue.fund_deposit_seeds.includes(:replaces, :attachments) do |q|
-          q.column("ID") do |seed|
-            link_to(seed.id, fund_deposit_seeds_path(seed))
-          end
-          q.column("Amount") { |seed| seed.amount }
-          q.column("Currency")   { |seed| seed.currency }
-          q.column("Deposit method")  { |seed| seed.deposit_method }
-          q.column("External ID")  { |seed| seed.external_id }
-          q.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          q.column("") { |seed|
-            link_to("View", fund_deposit_seed_path(seed))
-          }
-          q.column("") { |seed|
-            link_to("Edit", edit_fund_deposit_seed_path(seed))
-          }
-        end
-      end
-    end
-
     if issue.allowance_seeds.any?
       panel 'Allowance seeds' do
         table_for issue.allowance_seeds.includes(:replaces, :attachments) do |q|

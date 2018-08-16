@@ -142,35 +142,6 @@ class Api::SeedsHelper
     }
   end
 
-  def self.fund_deposit_seed(issue, attachment_type)
-    mime, bytes = {
-      data: {
-        type: "fund_deposit_seeds",
-        id: "@1",
-        attributes: {
-          currency_code: "usd",
-          deposit_method_code: "bank",
-          amount: 1000,
-          external_id: 1
-        },
-        relationships: {
-          issue: {
-            data: {id: issue.id, type: 'issues'}
-          },
-          attachments: {
-            data: [{
-              id: "@1",
-              type: "attachments"
-            }]
-          }
-        }
-      },
-      included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
-      ]
-    }
-  end
-
   def self.domicile_seed(issue, attachment_type)
     mime, bytes =
     {

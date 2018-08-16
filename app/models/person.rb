@@ -75,7 +75,7 @@ class Person < ApplicationRecord
   def self.eager_person_entities
     entities = []
     HAS_MANY
-      .reject{|x| [:attachments, :issues].include? x}
+      .reject{|x| [:attachments, :issues, :fund_deposits].include? x}
       .map(&:to_s).each do |fruit|
       entities.push("#{fruit}": eager_fruit_entities)
     end
@@ -94,9 +94,9 @@ class Person < ApplicationRecord
       :note_seeds,
       :affinity_seeds,
       :risk_score_seeds,
-      :fund_deposit_seeds,
       :observations
     ])
+    entities.push(fund_deposits: :attachments)
     entities
   end
 
@@ -111,7 +111,6 @@ class Person < ApplicationRecord
       :identifications,
       :natural_dockets,
       :legal_entity_dockets,
-      :fund_deposits,
       :allowances, 
       :phones, 
       :emails, 
