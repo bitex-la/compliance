@@ -242,9 +242,9 @@ ActiveAdmin.register Person do
           end
         end
 
-        if person.fund_deposits.current.any?
+        if person.fund_deposits.any?
           panel 'Fund Deposits' , class: 'fund_deposits' do
-            table_for person.fund_deposits.current do |q|
+            table_for person.fund_deposits do |q|
               q.column("ID") do |deposit|
                 link_to(deposit.id, fund_deposit_path(deposit))
               end
