@@ -3,5 +3,4 @@ class FundDepositSerializer
   attributes :amount, :currency_code, :deposit_method_code, :external_id
 
   build_timestamps
-  derive_seed_serializer!
 end

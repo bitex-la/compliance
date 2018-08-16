@@ -48,7 +48,6 @@ class Issue < ApplicationRecord
     note_seeds
     affinity_seeds
     risk_score_seeds
-    fund_deposit_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
