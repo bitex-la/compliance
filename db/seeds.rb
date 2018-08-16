@@ -96,8 +96,8 @@ if Rails.env.demo? || Rails.env.development?
    first_name:  'Richard',
    last_name:   'Hendricks',
    nationality: 'AR',
-   gender: 'male',
-   marital_status: 'single',
+   gender_code: 'male',
+   marital_status_code: 'single',
    job_title: 'CEO',
    job_description: 'CEO at pied piper',
    birth_date: DateTime.now,
@@ -115,10 +115,10 @@ if Rails.env.demo? || Rails.env.development?
 
   # 5. Create an argentina invoicing detail seed
   ad = ArgentinaInvoicingDetailSeed.create!(
-    vat_status:   'monotributo',
+    vat_status_code:   'monotributo',
     tax_id:       '20655764290',
-    tax_id_kind:  'cuit',
-    receipt_kind: 'a',
+    tax_id_kind_code:  'cuit',
+    receipt_kind_code: 'a',
     name:         'Richard Hendricks',
     country:      'AR',
     address:      'Lavalle 456 apto. 5C',
@@ -136,14 +136,14 @@ if Rails.env.demo? || Rails.env.development?
 
    # 7. Create some identification seeds
    ids = IdentificationSeed.create!(
-     identification_kind: 'national_id',
+     identification_kind_code: 'national_id',
      number: '65576429',
      issuer: 'AR',
      issue:  issue
    )
 
    passport = IdentificationSeed.create!(
-     identification_kind: 'passport',
+     identification_kind_code: 'passport',
      number: 'AQ76543',
      issuer: 'AR',
      issue:  issue
@@ -181,7 +181,7 @@ if Rails.env.demo? || Rails.env.development?
   # 11. Add a phone seed
   ps = PhoneSeed.create!(
     number: '1125250468',
-    phone_kind: 'main',
+    phone_kind_code: 'main',
     country: 'AR',
     note: 'Solo en dias hábiles!!!',
     has_whatsapp: false,
@@ -201,13 +201,13 @@ if Rails.env.demo? || Rails.env.development?
   # 13. Add some email seeds
   es = EmailSeed.create!(
     address: 'therichard@example.com',
-    email_kind: 'personal',
+    email_kind_code: 'personal',
     issue: issue
   )
 
   EmailSeed.create!(
     address: 'richard@piedpider.io',
-    email_kind: 'work',
+    email_kind_code: 'work',
     issue: issue
   )
 
@@ -254,10 +254,10 @@ if Rails.env.demo? || Rails.env.development?
 
    # 5. Create an argentina invoicing detail seed
    ad = ArgentinaInvoicingDetailSeed.create!(
-     vat_status:   'inscripto',
+     vat_status_code:   'inscripto',
      tax_id:       '2065437230',
-     tax_id_kind:  'cuit',
-     receipt_kind: 'a',
+     tax_id_kind_code:  'cuit',
+     receipt_kind_code: 'a',
      name:         'Pied Piper Enterprises',
      country:      'AR',
      address:      'Cabildo 4532',
@@ -275,14 +275,14 @@ if Rails.env.demo? || Rails.env.development?
 
     # 7. Create some identification seeds
     ids = IdentificationSeed.create!(
-      identification_kind: 'tax_id',
+      identification_kind_code: 'tax_id',
       number: '65576429',
       issuer: 'AR',
       issue:  issue
     )
 
     passport = IdentificationSeed.create!(
-      identification_kind: 'company_registration',
+      identification_kind_code: 'company_registration',
       number: 'AR67894532',
       issuer: 'AR',
       issue:  issue
@@ -330,7 +330,7 @@ if Rails.env.demo? || Rails.env.development?
    # 11. Add a phone seed
    ps = PhoneSeed.create!(
      number: '01800456789',
-     phone_kind: 'main',
+     phone_kind_code: 'main',
      country: 'AR',
      note: 'Solo en dias hábiles!!!',
      has_whatsapp: false,
@@ -340,7 +340,7 @@ if Rails.env.demo? || Rails.env.development?
 
    PhoneSeed.create!(
      number: '1125678932',
-     phone_kind: 'alternative',
+     phone_kind_code: 'alternative',
      country: 'AR',
      note: 'Telefono personal CEO',
      has_whatsapp: false,
@@ -360,20 +360,20 @@ if Rails.env.demo? || Rails.env.development?
    # 13. Add some email seeds
    es = EmailSeed.create!(
      address: 'info@piedpiper.io',
-     email_kind: 'work',
+     email_kind_code: 'work',
      issue: issue
    )
 
    EmailSeed.create!(
      address: 'invoicing@piedpider.io',
-     email_kind: 'invoicing',
+     email_kind_code: 'invoicing',
      issue: issue
    )
 
    # 14. Richard Hendricks as Pied Piper manager
    afs = AffinitySeed.create!(
      related_person: richard_hendricks,
-     affinity_kind: 'manager',
+     affinity_kind_code: 'manager',
      issue: issue
    )
 
@@ -402,8 +402,8 @@ if Rails.env.demo? || Rails.env.development?
     first_name:  'Dinesh',
     last_name:   'Chugtai',
     nationality: 'AR',
-    gender: 'male',
-    marital_status: 'single',
+    gender_code: 'male',
+    marital_status_code: 'single',
     birth_date: DateTime.now,
     issue: issue
   )
@@ -419,7 +419,7 @@ if Rails.env.demo? || Rails.env.development?
 
   # 5. Create some identification seeds
   ids = IdentificationSeed.create!(
-    identification_kind: 'national_id',
+    identification_kind_code: 'national_id',
     number: '65576429',
     issuer: 'AR',
     issue:  issue
@@ -464,8 +464,8 @@ if Rails.env.demo? || Rails.env.development?
     first_name:  'Bertram',
     last_name:   'Gilfoyle',
     nationality: 'CA',
-    gender: 'male',
-    marital_status: 'single',
+    gender_code: 'male',
+    marital_status_code: 'single',
     job_title: 'DevOps leader',
     job_description: 'DevOps leader at pied piper',
     birth_date: DateTime.now,
@@ -483,10 +483,10 @@ if Rails.env.demo? || Rails.env.development?
 
    # 5. Create an argentina invoicing detail seed
    ad = ArgentinaInvoicingDetailSeed.create!(
-     vat_status:   'monotributo',
+     vat_status_code:   'monotributo',
      tax_id:       '20875764290',
-     tax_id_kind:  'cuil',
-     receipt_kind: 'a',
+     tax_id_kind_code:  'cuil',
+     receipt_kind_code: 'a',
      name:         'Bertram Gilfoyle',
      country:      'AR',
      address:      'Lavalle 456 apto. 5C',
@@ -504,14 +504,14 @@ if Rails.env.demo? || Rails.env.development?
 
     # 7. Create some identification seeds
     ids = IdentificationSeed.create!(
-      identification_kind: 'national_id',
+      identification_kind_code: 'national_id',
       number: '87576429',
       issuer: 'AR',
       issue:  issue
     )
 
     passport = IdentificationSeed.create!(
-      identification_kind: 'passport',
+      identification_kind_code: 'passport',
       number: 'AQ768343',
       issuer: 'CA',
       issue:  issue
@@ -549,7 +549,7 @@ if Rails.env.demo? || Rails.env.development?
    # 11. Add a phone seed
    ps = PhoneSeed.create!(
      number: '1125290468',
-     phone_kind: 'main',
+     phone_kind_code: 'main',
      country: 'AR',
      note: 'Solo en dias hábiles!!!',
      has_whatsapp: false,
@@ -569,13 +569,13 @@ if Rails.env.demo? || Rails.env.development?
    # 13. Add some email seeds
    es = EmailSeed.create!(
      address: 'gilfoyle@example.com',
-     email_kind: 'personal',
+     email_kind_code: 'personal',
      issue: issue
    )
 
    EmailSeed.create!(
      address: 'gilfoyle@piedpider.io',
-     email_kind: 'work',
+     email_kind_code: 'work',
      issue: issue
    )
 
@@ -607,8 +607,8 @@ if Rails.env.demo? || Rails.env.development?
     first_name:  'Gavin',
     last_name:   'Belson',
     nationality: 'US',
-    gender: 'male',
-    marital_status: 'single',
+    gender_code: 'male',
+    marital_status_code: 'single',
     job_title: 'CEO',
     job_description: 'CEO at Hooli',
     birth_date: DateTime.now,
@@ -626,7 +626,7 @@ if Rails.env.demo? || Rails.env.development?
 
    # 7. Create some identification seeds
    ids = IdentificationSeed.create!(
-     identification_kind: 'passport',
+     identification_kind_code: 'passport',
      number: 'AQ768332',
      issuer: 'US',
      issue:  issue
@@ -664,7 +664,7 @@ if Rails.env.demo? || Rails.env.development?
   # 11. Add a phone seed
   ps = PhoneSeed.create!(
     number: '1120290478',
-    phone_kind: 'main',
+    phone_kind_code: 'main',
     country: 'AR',
     note: 'Solo en dias hábiles!!!',
     has_whatsapp: false,
@@ -684,7 +684,7 @@ if Rails.env.demo? || Rails.env.development?
   # 13. Add some email seeds
   es = EmailSeed.create!(
     address: 'gavin@hooli.com',
-    email_kind: 'personal',
+    email_kind_code: 'personal',
     issue: issue
   )
 
@@ -725,10 +725,10 @@ if Rails.env.demo? || Rails.env.development?
 
    # 5. Create an argentina invoicing detail seed
    ad = ArgentinaInvoicingDetailSeed.create!(
-     vat_status:   'inscripto',
+     vat_status_code:   'inscripto',
      tax_id:       '20789056430',
-     tax_id_kind:  'cuit',
-     receipt_kind: 'b',
+     tax_id_kind_code:  'cuit',
+     receipt_kind_code: 'b',
      name:         'Hooli INC',
      country:      'AR',
      address:      'Ayacucho 235',
@@ -746,14 +746,14 @@ if Rails.env.demo? || Rails.env.development?
 
   # 7. Create some identification seeds
   ids = IdentificationSeed.create!(
-    identification_kind: 'tax_id',
+    identification_kind_code: 'tax_id',
     number: '20789056430',
     issuer: 'AR',
     issue:  issue
   )
 
   passport = IdentificationSeed.create!(
-    identification_kind: 'company_registration',
+    identification_kind_code: 'company_registration',
     number: 'AR78905643',
     issuer: 'AR',
     issue:  issue
@@ -791,7 +791,7 @@ if Rails.env.demo? || Rails.env.development?
   # 11. Add a phone seed
   ps = PhoneSeed.create!(
    number: '01800452689',
-   phone_kind: 'main',
+   phone_kind_code: 'main',
    country: 'AR',
    note: 'Solo en dias hábiles!!!',
    has_whatsapp: false,
@@ -811,20 +811,20 @@ if Rails.env.demo? || Rails.env.development?
   # 13. Add some email seeds
   es = EmailSeed.create!(
     address: 'hello@hooli.com',
-    email_kind: 'work',
+    email_kind_code: 'work',
     issue: issue
   )
 
   EmailSeed.create!(
     address: 'invoicing@hooli.com',
-    email_kind: 'invoicing',
+    email_kind_code: 'invoicing',
     issue: issue
   )
 
   # 14. Gavin Belson as Hooli manager
   afs = AffinitySeed.create!(
     related_person: gavin_belson,
-    affinity_kind: 'manager',
+    affinity_kind_code: 'manager',
     issue: issue
   )
 
@@ -856,8 +856,8 @@ if Rails.env.demo? || Rails.env.development?
     first_name:  'Nelson',
     last_name:   'Bighetti',
     nationality: 'AR',
-    gender: 'male',
-    marital_status: 'single',
+    gender_code: 'male',
+    marital_status_code: 'single',
     job_title: 'Risk Investor',
     job_description: 'Investor at Big Head Inc',
     birth_date: DateTime.now,
@@ -875,10 +875,10 @@ if Rails.env.demo? || Rails.env.development?
 
    # 5. Create an argentina invoicing detail seed
    ad = ArgentinaInvoicingDetailSeed.create!(
-     vat_status:   'monotributo',
+     vat_status_code:   'monotributo',
      tax_id:       '20955464310',
-     tax_id_kind:  'cuil',
-     receipt_kind: 'a',
+     tax_id_kind_code:  'cuil',
+     receipt_kind_code: 'a',
      name:         'Nelson Bighetti',
      country:      'AR',
      address:      'Federico Lacroze 342 apto 4B',
@@ -896,14 +896,14 @@ if Rails.env.demo? || Rails.env.development?
 
     # 7. Create some identification seeds
     ids = IdentificationSeed.create!(
-      identification_kind: 'national_id',
+      identification_kind_code: 'national_id',
       number: '95546431',
       issuer: 'AR',
       issue:  issue
     )
 
     passport = IdentificationSeed.create!(
-      identification_kind: 'passport',
+      identification_kind_code: 'passport',
       number: 'AQ76413',
       issuer: 'US',
       issue:  issue
@@ -943,7 +943,7 @@ if Rails.env.demo? || Rails.env.development?
    # 11. Add a phone seed
    ps = PhoneSeed.create!(
      number: '1165251454',
-     phone_kind: 'main',
+     phone_kind_code: 'main',
      country: 'AR',
      note: 'Solo en dias hábiles!!!',
      has_whatsapp: false,
@@ -963,7 +963,7 @@ if Rails.env.demo? || Rails.env.development?
    # 13. Add some email seeds
    es = EmailSeed.create!(
      address: 'bighead@example.com',
-     email_kind: 'personal',
+     email_kind_code: 'personal',
      issue: issue
    )
 

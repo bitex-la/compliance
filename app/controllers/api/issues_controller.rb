@@ -100,7 +100,6 @@ class Api::IssuesController < Api::ApiController
         :argentina_invoicing_detail_seed,
         :chile_invoicing_detail_seed,
         :allowance_seeds,
-        :fund_deposit_seeds,
         :phone_seeds,
         :email_seeds,
         :note_seeds,
@@ -116,15 +115,6 @@ class Api::IssuesController < Api::ApiController
         :external_link,
         :attachments,
         :copy_attachments,
-        :replaces,
-        seed_scope
-      ],
-      fund_deposit_seeds: [
-        :amount,
-        :currency_code,
-        :deposit_method_code,
-        :external_id,
-        :attachments,
         :replaces,
         seed_scope
       ],

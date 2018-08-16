@@ -48,7 +48,6 @@ class Issue < ApplicationRecord
     note_seeds
     affinity_seeds
     risk_score_seeds
-    fund_deposit_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
@@ -291,8 +290,6 @@ class Issue < ApplicationRecord
       :'chile_invoicing_detail_seed.attachments',
       :allowance_seeds,
       :'allowance_seeds.attachments',
-      :fund_deposit_seeds,
-      :'fund_deposit_seeds.attachments',
       :phone_seeds,
       :'phone_seeds.attachments',
       :email_seeds,
