@@ -58,6 +58,10 @@ module Garden
       end
 
       accepts_nested_attributes_for :attachments, :allow_destroy => true
+
+      def name
+        "#{self.class.name}##{id}"
+      end
     end
 
     def harvest!

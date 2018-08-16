@@ -40,7 +40,7 @@ class Attachment < ApplicationRecord
   end
 
   def name
-    "##{id}: #{document_file_name} - #{document_content_type}"
+    "##{id}: #{document_file_name} #{document_content_type}"
   end
 
   def attached_to

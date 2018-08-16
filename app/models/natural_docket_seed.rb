@@ -8,8 +8,4 @@ class NaturalDocketSeed < ApplicationRecord
 
   belongs_to :marital_status, class_name: 'MaritalStatusKind'
   belongs_to :gender, class_name: 'GenderKind'
-
-  def name
-    [id, first_name, last_name].join(',')
-  end
 end

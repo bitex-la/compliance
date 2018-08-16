@@ -9,6 +9,6 @@ class Phone < ApplicationRecord
   belongs_to :phone_kind, class_name: "PhoneKind"
 
   def name
-    [self.class.name, id, number, phone_kind, country].join(',')
+    build_name("#{number} #{phone_kind}")
   end
 end

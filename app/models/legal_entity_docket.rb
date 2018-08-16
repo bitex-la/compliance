@@ -3,6 +3,6 @@ class LegalEntityDocket < ApplicationRecord
   validates :country, country: true
 
   def name
-    [self.class.name, id, commercial_name, legal_name].join(',')    
+    build_name("#{commercial_name} #{legal_name}")
   end
 end

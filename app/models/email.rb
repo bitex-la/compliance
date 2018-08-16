@@ -4,9 +4,9 @@ class Email < ApplicationRecord
 
   validates :email_kind, inclusion: { in: EmailKind.all }
 
-  belongs_to :email_kind, class_name: "EmailKind"
+  belongs_to :email_kind
 
   def name
-    [self.class.name, id, address, email_kind].join(',')
+    build_name("#{address} #{email_kind}")
   end
 end

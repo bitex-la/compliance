@@ -109,6 +109,15 @@ body.active_admin{
       width: 130px;
     }
   }
+
+  .validation_errors {
+    padding: 10px;
+    background-color: #d9534f;
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: 500;
+  }
+
   &.logged_in{
     .flashes{
       .flash{
@@ -293,11 +302,13 @@ body.active_admin{
     }
 
     fieldset.has_many_fields {
-      padding-top: 20px;
       margin-top: 10px;
 
-      ol li:last-child {
-        padding: 0;
+      &.can_remove {
+        padding-top: 20px;
+        ol li:last-child {
+          padding: 0;
+        }
       }
     }
 

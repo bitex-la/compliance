@@ -6,10 +6,10 @@ class FundDeposit < ApplicationRecord
   validates :deposit_method, inclusion: { in: DepositMethod.all }
   validates :currency, inclusion: { in: Currency.all }
 
-  belongs_to :deposit_method, class_name: "DepositMethod"
-  belongs_to :currency, class_name: "Currency"
+  belongs_to :deposit_method
+  belongs_to :currency
 
   def name
-    [self.class.name, id, amount, currency, deposit_method].join(',')
+    build_name("#{amount} #{currency} #{deposit_method}")
   end
 end

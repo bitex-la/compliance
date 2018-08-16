@@ -2,6 +2,6 @@ class RiskScore < ApplicationRecord
   include Garden::Fruit
   
   def name
-    [self.class.name, id, score, provider].join(',')    
+    build_name("#{provider} #{score}")
   end
 end
