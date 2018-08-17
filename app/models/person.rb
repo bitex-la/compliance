@@ -65,9 +65,15 @@ class Person < ApplicationRecord
     notes.current
   end
 
-  def fruit_attachments
+  def all_attachments
     attachments
       .where("attached_to_seed_id is null AND attached_to_fruit_id is not null")
+  end
+
+  def all_current_attachments
+    all_attachments.select do |a|
+      a.attached_to_fruit.replaced_by.nil?
+    end.compact
   end
 
   private

@@ -407,7 +407,7 @@ ActiveAdmin.register Person do
         end
       end
       tab :attachments_preview do
-        
+        ArbreHelpers.attachments_grid(self, resource.all_current_attachments, true)
       end
     end
   end

@@ -5,6 +5,6 @@ class Allowance < ApplicationRecord
   belongs_to :kind, class_name: "Currency"
 
   def name
-    [self.class.name, id, weight, amount, kind].join(',')    
+    build_name("#{amount} #{kind}")
   end
 end

@@ -35,8 +35,8 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :dismissed
 
-  %i(complete approve abandon reject dismiss ).each do |action|
-    action_item action, only: :edit, if: lambda { resource.send("may_#{action}?") } do
+  %i(complete approve abandon reject dismiss).each do |action|
+    action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end
 
@@ -60,6 +60,24 @@ ActiveAdmin.register Issue do
   end
 
   form do |f|
+
+    unless f.object.errors.full_messages.empty?
+      ul class: 'validation_errors' do
+        f.object.errors.full_messages.each do |e|
+          li e
+        end
+      end
+      br
+
+      resource.all_attachments.each do |a|
+        next if a.persisted?
+        div class: 'flash flash_danger' do
+          "A new attachment for a #{a.attached_to_seed_type} was not saved, please select the file again."
+        end
+        br
+      end
+    end
+
     f.input :person_id, as: :hidden
 
     columns do
@@ -68,12 +86,15 @@ ActiveAdmin.register Issue do
           tab :docket do
             if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
               ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+                sf.input :commercial_name
+                sf.input :legal_name
                 sf.input :industry
                 sf.input :business_description, input_html: {rows: 3}
                 sf.input :country
-                sf.input :commercial_name
-                sf.input :legal_name
-                sf.input :copy_attachments, label: "Move existing Legal Entity Docket attachments here"
+                if resource.person.legal_entity_docket
+                  sf.input :copy_attachments,
+                    label: "Move existing Legal Entity Docket attachments to the new one"
+                end
                 ArbreHelpers.has_many_attachments(self, sf)
               end
             end
@@ -90,13 +111,16 @@ ActiveAdmin.register Issue do
                 sf.input :job_description
                 sf.input :politically_exposed
                 sf.input :politically_exposed_reason, input_html: {rows: 3}
-                sf.input :copy_attachments, label: "Move existing Natural Person Docket attachments here"
+                if resource.person.natural_docket
+                  sf.input :copy_attachments,
+                    label: "Move existing Natural Person Docket attachments to the new one"
+                end
                 ArbreHelpers.has_many_attachments(self, sf)
               end
             end
           end
 
-          tab :domicile do
+          tab "domicile (#{resource.domicile_seeds.count})" do
             ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
               sf.input :country
               sf.input :state
@@ -106,15 +130,12 @@ ActiveAdmin.register Issue do
               sf.input :postal_code
               sf.input :floor
               sf.input :apartment
-							if replaceable = f.object.person.domiciles.current.presence
-								sf.input :replaces, collection: replaceable
-								sf.input :copy_attachments, label: "Move attachments of replaced domicile to the new one"
-							end
+              ArbreHelpers.fields_for_replaces context, sf, :domiciles
               ArbreHelpers.has_many_attachments(context, sf)
             end
           end
 
-          tab :ID do
+          tab "ID (#{resource.identification_seeds.count})" do
             ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
               sf.input :number
               sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
@@ -122,21 +143,16 @@ ActiveAdmin.register Issue do
               sf.input :public_registry_authority
               sf.input :public_registry_book
               sf.input :public_registry_extra_data
-							if replaceable = f.object.person.identifications.current.presence
-								sf.input :replaces, collection: replaceable
-								sf.input :copy_attachments, label: "Move attachments of replaced identification to the new one"
-							end
+              ArbreHelpers.fields_for_replaces context, sf, :identifications
               ArbreHelpers.has_many_attachments(context, sf)
             end
           end
 
-          tab :allowance do
+          tab "Allowance (#{resource.allowance_seeds.count})" do
             ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
-              sf.input :weight
               sf.input :amount
               sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
-              sf.input :replaces, collection: f.object.person.allowances
-              sf.input :copy_attachments
+              ArbreHelpers.fields_for_replaces context, sf, :allowances
               ArbreHelpers.has_many_attachments(context, sf)
             end
           end
@@ -150,7 +166,8 @@ ActiveAdmin.register Issue do
               af.input :name
               af.input :country
               af.input :address
-              af.input :copy_attachments
+              ArbreHelpers.fields_for_replaces self, af,
+                :argentina_invoicing_details
               ArbreHelpers.has_many_attachments(self, af)
             end
 
@@ -160,69 +177,68 @@ ActiveAdmin.register Issue do
               cf.input :giro
               cf.input :ciudad
               cf.input :comuna
-              cf.input :copy_attachments
+              ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
               ArbreHelpers.has_many_attachments(self, cf)
             end
           end
 
-          tab :risk do
-            ArbreHelpers.has_many_form self, f, :risk_score_seeds do |rs, context|
-              rs.input :score
-              rs.input :provider
-              rs.input :extra_info
-              rs.input :external_link
-              rs.input :replaces
-              rs.input :copy_attachments
-              ArbreHelpers.has_many_attachments(context, rs)
-            end
-          end
-
-          tab :affinity do
+          tab "Affinity (#{resource.affinity_seeds.count})" do
             ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
               rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
               rf.input :related_person_id
-              rf.input :replaces, collection: f.object.person.affinities
-              rf.input :copy_attachments
+              ArbreHelpers.fields_for_replaces context, rf, :affinities
               ArbreHelpers.has_many_attachments(context, rf)
             end
           end
 
-          tab :contact do
+          tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
             ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
               pf.input :number
               pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
               pf.input :country
-              pf.input :replaces, collection: f.object.person.phones
               pf.input :has_whatsapp
               pf.input :has_telegram
               pf.input :note, input_html: {rows: 3}
+              if current = context.resource.person.phones.current.presence
+                pf.input :replaces, collection: current
+              end
             end
 
             ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
               ef.input :address
-              ef.input :replaces, collection: f.object.person.emails
               ef.input :email_kind_id, as: :select, collection: EmailKind.all
+              if current = context.resource.person.emails.current.presence
+                ef.input :replaces, collection: current
+              end
             end
           end
 
-          tab :attachments do
+          tab "Attachments" do
             ArbreHelpers.attachments_grid(self, resource.all_attachments, true)
           end
         end
       end
 
       column do
-				f.actions
-				h3 "Notes Seeds"
-				div class: 'note_seeds' do
-					ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
-						nf.input :body, input_html: {rows: 3}
-						ArbreHelpers.has_many_attachments(context, nf)
-					end
-				end
+        attributes_table_for resource do
+          row :id
+          row :state
+          row :created_at
+          row :updated_at
+          row :person
+        end
+        f.actions
 
-				h3 "Observations"
-        ArbreHelpers.has_many_form self, f, :observations do |sf|
+        h3 "Notes Seeds"
+        div class: 'note_seeds' do
+          ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
+            nf.input :body, input_html: {rows: 3}
+            ArbreHelpers.has_many_attachments(context, nf)
+          end
+        end
+
+        h3 "Observations"
+        ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
           sf.input :observation_reason
           sf.input :scope
           sf.input :note, input_html: {rows: 3}
@@ -235,66 +251,64 @@ ActiveAdmin.register Issue do
   end
 
   show do
-    attributes_table do
-      row :id
-      row :created_at
-      row :updated_at
-      row :person
-    end
+    columns do
+      column span: 2 do
+        tabs do
+          tab :docket do
+            if seed = issue.legal_entity_docket_seed.presence
+              attributes_table_for seed do
+                row("ID") do
+                  link_to(seed.name, seed)
+                end
+                row(:commercial_name)
+                row(:legal_name)
+                row(:industry)
+                row(:business_description)
+                row(:country)
+                l.column("Attachments") do |seed|
+                  seed.attachments
+                    .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
+                    .join("<br />").html_safe
+                end
+                l.column("") { |seed|
+                  link_to("Edit", edit_legal_entity_docket_seed_path(seed))
+                }
+              end
+            end
 
-    if issue.legal_entity_docket_seed.present?
-      panel 'legal entity docket seed' do
-        table_for issue.legal_entity_docket_seed do |l|
-          l.column("ID") do |seed|
-            link_to(seed.id, legal_entity_docket_seed_path(seed))
+            if seed = issue.natural_docket_seed.presence
+              attributes_table_for seed do
+                row :id
+                row :first_name
+                row :last_name
+                row :birth_date
+                row :nationality
+                row :gender
+                row :marital_status
+                row :job_title
+                row :job_description
+                row :politically_exposed
+                row :politicall_exposed_reason
+                row :attachments do |seed|
+                  ol do
+                    seed.attachments.each do |a|
+                      li link_to(a.document_file_name, a.document.url, target: '_blank')
+                    end
+                  end
+                end
+              end
+            end
           end
-          l.column("Industry")             { |seed| seed.industry }
-          l.column("Business Description") { |seed| seed.business_description }
-          l.column("Country")              { |seed| seed.country }
-          l.column("Commercial Name")      { |seed| seed.commercial_name }
-          l.column("Legal Name")           { |seed| seed.legal_name }
-          l.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          l.column("") { |seed|
-            link_to("View", legal_entity_docket_seed_path(seed))
-          }
-          l.column("") { |seed|
-            link_to("Edit", edit_legal_entity_docket_seed_path(seed))
-          }
         end
       end
-    end
 
-    if issue.natural_docket_seed.present?
-      panel 'natural docket seed' do
-        table_for issue.natural_docket_seed do |n|
-          n.column("ID") do |seed|
-            link_to(seed.id, natural_docket_seed_path(seed))
-          end
-          n.column("First Name")      { |seed| seed.first_name }
-          n.column("Last Name")       { |seed| seed.last_name }
-          n.column("Birthdate")       { |seed| seed.birth_date }
-          n.column("Nationality")     { |seed| seed.nationality }
-          n.column("Gender")          { |seed| seed.gender }
-          n.column("Marital Status")  { |seed| seed.marital_status }
-          n.column("Job Title") { |seed| seed.job_title }
-          n.column("Job Description") { |seed| seed.job_description }
-          n.column("Politically Exposed") { |seed| seed.politically_exposed }
-          n.column("Politically Exposed Reason") { |seed| seed.politically_exposed_reason }
-          n.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          n.column("") { |seed|
-            link_to("View", natural_docket_seed_path(seed))
-          }
-          n.column("") { |seed|
-            link_to("Edit", edit_natural_docket_seed_path(seed))
-          }
+      column do
+        attributes_table_for resource do
+          row :id
+          row :state
+          row :created_at
+          row :updated_at
+          row :person
         end
       end
     end

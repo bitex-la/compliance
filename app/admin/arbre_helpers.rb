@@ -17,6 +17,16 @@ module ArbreHelpers
     end
   end
 
+  def self.fields_for_replaces(context, form, assoc)
+    context.instance_eval do
+      if replaceable = context.resource.person.send(assoc).current.presence
+        form.input :replaces, collection: replaceable
+        form.input :copy_attachments,
+          label: "Move attachments of replaced #{assoc} to the new one"
+      end
+    end
+  end
+
   def self.fruit_attribute_table(context, resource, &block)
     context.instance_eval do 
       if block
@@ -105,13 +115,13 @@ module ArbreHelpers
         columns do
           group.each_with_index do |a, i|
             column do
-              next if a.nil?
+              next if a.nil? || a.new_record?
               if IMAGEABLE_CONTENT_TYPES.include?(a.document_content_type) 
                 div do
                   link_to image_tag(a.document.url, width: '100%'), a.document.url
                 end
                 attributes_table_for a do
-                  row(:attachment){|o| link_to o.name, attachment_path(o) }
+                  row(:attachment){|o| link_to o.name, o }
                   if show_attached_to
                     row(:attached_to_type)
                     row(:attached_to)
@@ -201,10 +211,10 @@ module ArbreHelpers
     end
   end
 
-  def self.has_many_form(context, builder, relationship, &fields)
-    builder.has_many relationship do |f|
+  def self.has_many_form(context, builder, relationship, extra={}, &fields)
+    builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
       instance_exec(f, context, &fields)
-      if f.object.persisted?
+      if f.object.persisted? && !extra[:cant_remove]
         unless f.object.class.name == 'Attachment'
           f.template.concat(context.link_to("Remove",
             f.object,

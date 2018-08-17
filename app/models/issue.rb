@@ -54,7 +54,8 @@ class Issue < ApplicationRecord
   end
 
   has_many :observations
-  accepts_nested_attributes_for :observations, allow_destroy: true
+  accepts_nested_attributes_for :observations,
+    reject_if: proc { |attr| attr['scope'].blank? || attr['observation_reason_id'].blank? }
 
   scope :with_relations, -> {
     includes(
@@ -163,7 +164,7 @@ class Issue < ApplicationRecord
   end
 
   def name
-    "##{id} #{state.titleize}"
+    "##{id} #{state.titleize} for #{person.name}"
   end
 
   def harvest_all!
@@ -210,7 +211,7 @@ class Issue < ApplicationRecord
 
   def all_attachments
     all = []
-    HAS_MANY.map do |assoc|
+    HAS_MANY.each do |assoc|
       send(assoc).map do |o|
         next if o.nil?
         all += o.fruit_id ? o.fruit.attachments : o.attachments
