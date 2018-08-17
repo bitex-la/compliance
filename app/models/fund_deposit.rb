@@ -13,6 +13,6 @@ class FundDeposit < ApplicationRecord
   has_many :attachments, as: :attached_to_fruit
 
   def name
-    build_name("#{amount} #{currency} #{deposit_method}")
+    "##{id}: #{amount} #{currency_code} #{deposit_method_code}"
   end
 end
