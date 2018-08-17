@@ -1,4 +1,5 @@
 class FundDeposit < ApplicationRecord
+  include Loggable
   include StaticModels::BelongsTo
 
   validates :external_id, presence: true
