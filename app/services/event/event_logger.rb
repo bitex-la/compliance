@@ -5,7 +5,7 @@ class Event::EventLogger
       entity: entity,
       raw_data: "#{klass}Serializer".constantize.new(
         entity,
-        {include: klass.constantize.included_for}
+        {include: klass.constantize.try(:included_for)}
       ).serialized_json,
       admin_user: user,
       verb: verb

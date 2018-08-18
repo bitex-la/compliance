@@ -22,6 +22,11 @@ Rails.application.routes.draw do
         resources entities, only: [:show, :index]
       end
 
+      # routes for entities that does not fit into seed/fruit analogy
+      %i(fund_deposits).each do |entities| 
+        resources entities, only: [:show, :index, :create, :update]
+      end
+
       resources :issues, only: [:create, :show, :index, :update] do
         resources :observations, only: [:create, :show, :index, :update]
         %i(

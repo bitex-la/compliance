@@ -1,5 +1,6 @@
 class FundDepositSerializer
   include FastJsonapi::ObjectSerializer
+  set_type 'fund_deposits'
 
   belongs_to :person, record_type: 'people'
   has_many :attachments, record_type: 'attachments'
