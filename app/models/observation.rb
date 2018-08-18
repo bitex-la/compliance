@@ -52,6 +52,10 @@ class Observation < ApplicationRecord
   def state
     aasm_state
   end
+
+  def name
+    "##{id} #{state}"
+  end
   
   private
 

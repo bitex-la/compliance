@@ -80,84 +80,118 @@ ActiveAdmin.register Issue do
 
     f.input :person_id, as: :hidden
 
-    columns do
-      column span: 2 do
-        tabs do
-          tab :docket do
-            if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-              ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
-                sf.input :commercial_name
-                sf.input :legal_name
-                sf.input :industry
-                sf.input :business_description, input_html: {rows: 3}
-                sf.input :country
-                if resource.person.legal_entity_docket
-                  sf.input :copy_attachments,
-                    label: "Move existing Legal Entity Docket attachments to the new one"
-                end
-                ArbreHelpers.has_many_attachments(self, sf)
-              end
-            end
-
-            if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-              ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-                sf.input :first_name
-                sf.input :last_name
-                sf.input :birth_date, start_year: 1900
-                sf.input :nationality, as: :country
-                sf.input :gender_id, as: :select, collection: GenderKind.all
-                sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
-                sf.input :job_title
-                sf.input :job_description
-                sf.input :politically_exposed
-                sf.input :politically_exposed_reason, input_html: {rows: 3}
-                if resource.person.natural_docket
-                  sf.input :copy_attachments,
-                    label: "Move existing Natural Person Docket attachments to the new one"
-                end
-                ArbreHelpers.has_many_attachments(self, sf)
-              end
+    tabs do
+      tab :base do
+        columns do
+          column do
+            attributes_table_for resource do
+              row :id
+              row :state
+              row :person
             end
           end
-
-          tab "domicile (#{resource.domicile_seeds.count})" do
-            ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
-              sf.input :country
-              sf.input :state
-              sf.input :city
-              sf.input :street_address
-              sf.input :street_number
-              sf.input :postal_code
-              sf.input :floor
-              sf.input :apartment
-              ArbreHelpers.fields_for_replaces context, sf, :domiciles
-              ArbreHelpers.has_many_attachments(context, sf)
+          column do
+            attributes_table_for resource do
+              row :created_at
+              row :updated_at
             end
           end
+        end
 
-          tab "ID (#{resource.identification_seeds.count})" do
-            ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
-              sf.input :number
-              sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-              sf.input :issuer, as: :country
-              sf.input :public_registry_authority
-              sf.input :public_registry_book
-              sf.input :public_registry_extra_data
-              ArbreHelpers.fields_for_replaces context, sf, :identifications
-              ArbreHelpers.has_many_attachments(context, sf)
-            end
+        h3 "Observations"
+        ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
+          sf.input :observation_reason
+          sf.input :scope
+          sf.input :note, input_html: {rows: 3}
+          sf.input :reply, input_html: {rows: 3}
+        end
+
+        h3 "Notes Seeds"
+        div class: 'note_seeds' do
+          ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
+            nf.input :body, input_html: {rows: 3}
+            ArbreHelpers.has_many_attachments(context, nf)
           end
+        end
+      end
 
-          tab "Allowance (#{resource.allowance_seeds.count})" do
-            ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
-              sf.input :amount
-              sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
-              ArbreHelpers.fields_for_replaces context, sf, :allowances
-              ArbreHelpers.has_many_attachments(context, sf)
+      tab :docket do
+        if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
+          ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+            sf.input :commercial_name
+            sf.input :legal_name
+            sf.input :industry
+            sf.input :business_description, input_html: {rows: 3}
+            sf.input :country
+            if resource.person.legal_entity_docket
+              sf.input :copy_attachments,
+                label: "Move existing Legal Entity Docket attachments to the new one"
             end
+            ArbreHelpers.has_many_attachments(self, sf)
           end
+        end
 
-          tab :invoicing do
+        if resource.for_person_type == :natural_person || resource.for_person_type.nil?
+          ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
+            sf.input :first_name
+            sf.input :last_name
+            sf.input :birth_date, start_year: 1900
+            sf.input :nationality, as: :country
+            sf.input :gender_id, as: :select, collection: GenderKind.all
+            sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
+            sf.input :job_title
+            sf.input :job_description
+            sf.input :politically_exposed
+            sf.input :politically_exposed_reason, input_html: {rows: 3}
+            if resource.person.natural_docket
+              sf.input :copy_attachments,
+                label: "Move existing Natural Person Docket attachments to the new one"
+            end
+            ArbreHelpers.has_many_attachments(self, sf)
+          end
+        end
+      end
+
+      tab "Domicile (#{resource.domicile_seeds.count})" do
+        ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
+          sf.input :country
+          sf.input :state
+          sf.input :city
+          sf.input :street_address
+          sf.input :street_number
+          sf.input :postal_code
+          sf.input :floor
+          sf.input :apartment
+          ArbreHelpers.fields_for_replaces context, sf, :domiciles
+          ArbreHelpers.has_many_attachments(context, sf)
+        end
+      end
+
+      tab "ID (#{resource.identification_seeds.count})" do
+        ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
+          sf.input :number
+          sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
+          sf.input :issuer, as: :country
+          sf.input :public_registry_authority
+          sf.input :public_registry_book
+          sf.input :public_registry_extra_data
+          ArbreHelpers.fields_for_replaces context, sf, :identifications
+          ArbreHelpers.has_many_attachments(context, sf)
+        end
+      end
+
+      tab "Allowance (#{resource.allowance_seeds.count})" do
+        ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
+          sf.input :amount
+          sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
+          ArbreHelpers.fields_for_replaces context, sf, :allowances
+          ArbreHelpers.has_many_attachments(context, sf)
+        end
+      end
+
+      tab :invoicing do
+        columns do 
+          column do
             ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
               af.input :vat_status_id, as: :select, collection: VatStatusKind.all
               af.input :tax_id
@@ -170,7 +204,8 @@ ActiveAdmin.register Issue do
                 :argentina_invoicing_details
               ArbreHelpers.has_many_attachments(self, af)
             end
-
+          end
+          column do
             ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
               cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
               cf.input :tax_id
@@ -181,68 +216,37 @@ ActiveAdmin.register Issue do
               ArbreHelpers.has_many_attachments(self, cf)
             end
           end
-
-          tab "Affinity (#{resource.affinity_seeds.count})" do
-            ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
-              rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
-              rf.input :related_person_id
-              ArbreHelpers.fields_for_replaces context, rf, :affinities
-              ArbreHelpers.has_many_attachments(context, rf)
-            end
-          end
-
-          tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
-            ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
-              pf.input :number
-              pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
-              pf.input :country
-              pf.input :has_whatsapp
-              pf.input :has_telegram
-              pf.input :note, input_html: {rows: 3}
-              if current = context.resource.person.phones.current.presence
-                pf.input :replaces, collection: current
-              end
-            end
-
-            ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
-              ef.input :address
-              ef.input :email_kind_id, as: :select, collection: EmailKind.all
-              if current = context.resource.person.emails.current.presence
-                ef.input :replaces, collection: current
-              end
-            end
-          end
-
-          tab "Attachments" do
-            ArbreHelpers.attachments_grid(self, resource.all_attachments, true)
-          end
         end
       end
 
-      column do
-        attributes_table_for resource do
-          row :id
-          row :state
-          row :created_at
-          row :updated_at
-          row :person
+      tab "Affinity (#{resource.affinity_seeds.count})" do
+        ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
+          rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
+          rf.input :related_person_id
+          ArbreHelpers.fields_for_replaces context, rf, :affinities
+          ArbreHelpers.has_many_attachments(context, rf)
         end
-        f.actions
+      end
 
-        h3 "Notes Seeds"
-        div class: 'note_seeds' do
-          ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
-            nf.input :body, input_html: {rows: 3}
-            ArbreHelpers.has_many_attachments(context, nf)
+      tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
+        ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
+          pf.input :number
+          pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
+          pf.input :country
+          pf.input :has_whatsapp
+          pf.input :has_telegram
+          pf.input :note, input_html: {rows: 3}
+          if current = context.resource.person.phones.current.presence
+            pf.input :replaces, collection: current
           end
         end
-
-        h3 "Observations"
-        ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
-          sf.input :observation_reason
-          sf.input :scope
-          sf.input :note, input_html: {rows: 3}
-          sf.input :reply, input_html: {rows: 3}
+        br
+        ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
+          ef.input :address
+          ef.input :email_kind_id, as: :select, collection: EmailKind.all
+          if current = context.resource.person.emails.current.presence
+            ef.input :replaces, collection: current
+          end
         end
       end
     end
@@ -251,348 +255,90 @@ ActiveAdmin.register Issue do
   end
 
   show do
-    columns do
-      column span: 2 do
-        tabs do
-          tab :docket do
-            if seed = issue.legal_entity_docket_seed.presence
-              attributes_table_for seed do
-                row("ID") do
-                  link_to(seed.name, seed)
-                end
-                row(:commercial_name)
-                row(:legal_name)
-                row(:industry)
-                row(:business_description)
-                row(:country)
-                l.column("Attachments") do |seed|
-                  seed.attachments
-                    .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-                    .join("<br />").html_safe
-                end
-                l.column("") { |seed|
-                  link_to("Edit", edit_legal_entity_docket_seed_path(seed))
-                }
-              end
-            end
+    next unless resource.approved? # Only show approved issues.
 
-            if seed = issue.natural_docket_seed.presence
-              attributes_table_for seed do
-                row :id
-                row :first_name
-                row :last_name
-                row :birth_date
-                row :nationality
-                row :gender
-                row :marital_status
-                row :job_title
-                row :job_description
-                row :politically_exposed
-                row :politicall_exposed_reason
-                row :attachments do |seed|
-                  ol do
-                    seed.attachments.each do |a|
-                      li link_to(a.document_file_name, a.document.url, target: '_blank')
-                    end
-                  end
-                end
-              end
+    tabs do
+      tab :base do
+        columns do
+          column do
+            attributes_table_for resource do
+              row :id
+              row :state
+              row :person
+            end
+          end
+          column do
+            attributes_table_for resource do
+              row :created_at
+              row :updated_at
             end
           end
         end
-      end
 
-      column do
-        attributes_table_for resource do
-          row :id
-          row :state
-          row :created_at
-          row :updated_at
-          row :person
+        if observations = resource.observations.presence
+          h3 "Observations"
+          ArbreHelpers.panel_grid(self, observations) do |d|
+            attributes_table_for d, :observation_reason, :scope, :created_at, :updated_at
+            para d.note
+            strong "Reply:"
+            span d.reply
+          end
+        end
+
+        if seeds = resource.note_seeds.presence
+          h3 "Note Seeds"
+          ArbreHelpers.panel_grid(self, seeds) do |d|
+            attributes_table_for d, :fruit
+            para d.body
+            ArbreHelpers.attachments_list self, d.fruit.try(:attachments)
+          end
         end
       end
-    end
 
-    if issue.risk_score_seeds.any?
-      panel 'risk score seeds' do
-        table_for issue.risk_score_seeds.includes(:replaces, :attachments) do |rs|
-          rs.column("ID") do |seed|
-            link_to(seed.id, risk_score_seed_path(seed))
+      tab :docket do
+        if seed = issue.legal_entity_docket_seed.presence
+          panel seed.name do
+            ArbreHelpers.seed_show_section(self, seed)
           end
-          rs.column(:score)
-          rs.column(:provider)
-          rs.column(:extra_info)
-          rs.column(:external_link)
-          rs.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          rs.column("") { |seed|
-            link_to("View", risk_score_seed_path(seed))
-          }
-          rs.column("") { |seed|
-            link_to("Edit", edit_risk_score_seed_path(seed))
-          }
         end
-      end 
-    end
 
-    if issue.argentina_invoicing_detail_seed.present?
-      panel 'argentina invoicing details seed' do
-        table_for issue.argentina_invoicing_detail_seed do |n|
-          n.column("ID") do |seed|
-            link_to(seed.id, argentina_invoicing_detail_seed_path(seed))
+        if seed = issue.natural_docket_seed.presence
+          panel seed.name do
+            ArbreHelpers.seed_show_section(self, seed)
           end
-          n.column("VAT status id")      { |seed| seed.vat_status_id }
-          n.column("Tax ID")       { |seed| seed.tax_id }
-          n.column("Tax ID Type")       { |seed| seed.tax_id_kind }
-          n.column("Receipt Type")       { |seed| seed.receipt_kind }
-          n.column("Name")       { |seed| seed.name }
-          n.column("Country")       { |seed| seed.country }
-          n.column("Address")       { |seed| seed.address }
-          n.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          n.column("") { |seed|
-            link_to("View", argentina_invoicing_detail_seed_path(seed))
-          }
-          n.column("") { |seed|
-            link_to("Edit", edit_argentina_invoicing_detail_seed_path(seed))
-          }
         end
       end
-    end
 
-    if issue.chile_invoicing_detail_seed.present?
-      panel 'chile invoicing details seed' do
-        table_for issue.chile_invoicing_detail_seed do |n|
-          n.column("ID") do |seed|
-            link_to(seed.id, chile_invoicing_detail_seed_path(seed))
+      ArbreHelpers.seed_collection_show_tab(self, "Domicile", :domicile_seeds)
+      ArbreHelpers.seed_collection_show_tab(self, "Id", :identification_seeds)
+      ArbreHelpers.seed_collection_show_tab(self, "Allowance", :allowance_seeds)
+
+      tab "Invoicing" do
+        if seed = issue.argentina_invoicing_detail_seed.presence
+          panel seed.name do
+            ArbreHelpers.seed_show_section(self, seed)
           end
-          n.column("VAT status id") { |seed| seed.vat_status_id }
-          n.column("Tax ID")        { |seed| seed.tax_id }
-          n.column("Giro")          { |seed| seed.giro }
-          n.column("Ciudad")        { |seed| seed.ciudad }
-          n.column("Comuna")        { |seed| seed.comuna }
-          n.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
+        end
+
+        if seed = issue.chile_invoicing_detail_seed.presence
+          panel seed.name do
+            ArbreHelpers.seed_show_section(self, seed)
           end
-          n.column("") { |seed|
-            link_to("View", chile_invoicing_detail_seed_path(seed))
-          }
-          n.column("") { |seed|
-            link_to("Edit", edit_chile_invoicing_detail_seed_path(seed))
-          }
         end
       end
-    end
 
-    if issue.allowance_seeds.any?
-      panel 'Allowance seeds' do
-        table_for issue.allowance_seeds.includes(:replaces, :attachments) do |q|
-          q.column("ID") do |seed|
-            link_to(seed.id, allowance_seeds_path(seed))
-          end
-          q.column("Weight") { |seed| seed.weight }
-          q.column("Amount") { |seed| seed.amount }
-          q.column("Kind")   { |seed| seed.kind }
-          q.column("Replaces")  { |seed| seed.replaces }
-          q.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          q.column("") { |seed|
-            link_to("View", allowance_seeds_path(seed))
-          }
-          q.column("") { |seed|
-            link_to("Edit", edit_allowance_seed_path(seed))
-          }
+      ArbreHelpers.seed_collection_show_tab(self, "Affinity", :affinity_seeds)
+
+      tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
+        ArbreHelpers.panel_grid(self, resource.phone_seeds) do |d|
+          ArbreHelpers.seed_show_section(self, d)
+        end
+        ArbreHelpers.panel_grid(self, resource.email_seeds) do |d|
+          ArbreHelpers.seed_show_section(self, d)
         end
       end
-    end
 
-    if issue.domicile_seeds.any?
-      panel 'Domicile seed' do
-        table_for issue.domicile_seeds.includes(:replaces, :attachments) do |d|
-          d.column("ID") do |seed|
-            link_to(seed.id, domicile_seed_path(seed))
-          end
-          d.column("Country")         { |seed| seed.country }
-          d.column("State")           { |seed| seed.state }
-          d.column("City")            { |seed| seed.city }
-          d.column("Street Address")  { |seed| seed.street_address }
-          d.column("Street Number")   { |seed| seed.street_number }
-          d.column("Postal Code")     { |seed| seed.postal_code }
-          d.column("Floor")           { |seed| seed.floor}
-          d.column("Apartment")       { |seed| seed.apartment }
-          d.column("Replaces")  { |seed| seed.replaces }
-          d.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          d.column("") { |seed|
-            link_to("View", domicile_seed_path(seed))
-          }
-          d.column("") { |seed|
-            link_to("Edit", edit_domicile_seed_path(seed))
-          }
-        end
-      end
-    end
-
-    if issue.identification_seeds.any?
-      panel 'Identification seed' do
-        table_for issue.identification_seeds.includes(:replaces, :attachments) do |i|
-          i.column("ID") do |seed|
-            link_to(seed.id, identification_seed_path(seed))
-          end
-          i.column("Kind")    { |seed| seed.identification_kind }
-          i.column("Number")  { |seed| seed.number }
-          i.column("Issuer")  { |seed| seed.issuer }
-          i.column("Public Registry Authority")  { |seed| seed.public_registry_authority }
-          i.column("Public Registry Book")  { |seed| seed.public_registry_book }
-          i.column("Public Registry Extra Data")  { |seed| seed.public_registry_extra_data }
-          i.column("Replaces")  { |seed| seed.replaces }
-          i.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          i.column("") { |seed|
-            link_to("View", identification_seed_path(seed))
-          }
-          i.column("") { |seed|
-            link_to("Edit", edit_identification_seed_path(seed))
-          }
-        end
-      end
-    end
-
-    if issue.email_seeds.any?
-      panel 'Email seeds' do
-        table_for issue.email_seeds.includes(:replaces, :attachments) do |i|
-          i.column("ID") do |seed|
-            link_to(seed.id, email_seed_path(seed))
-          end
-          i.column("Kind")    { |seed| seed.email_kind }
-          i.column("Address")  { |seed| seed.address }
-          i.column("Replaces")  { |seed| seed.replaces }
-          i.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          i.column("") { |seed|
-            link_to("View", email_seed_path(seed))
-          }
-          i.column("") { |seed|
-            link_to("Edit", edit_email_seed_path(seed))
-          }
-        end
-      end
-    end
-
-
-    if issue.phone_seeds.any?
-      panel 'Phone seeds' do
-        table_for issue.phone_seeds.includes(:replaces, :attachments) do |i|
-          i.column("ID") do |seed|
-            link_to(seed.id, phone_seed_path(seed))
-          end
-          i.column("Kind")    { |seed| seed.phone_kind }
-          i.column("Number")  { |seed| seed.number }
-          i.column("Country")  { |seed| seed.country }
-          i.column("Has whatsapp")  { |seed| seed.has_whatsapp }
-          i.column("Has telegram")  { |seed| seed.has_telegram }
-          i.column("Note")  { |seed| seed.note }
-          i.column("Replaces")  { |seed| seed.replaces }
-          i.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          i.column("") { |seed|
-            link_to("View", phone_seed_path(seed))
-          }
-          i.column("") { |seed|
-            link_to("Edit", edit_phone_seed_path(seed))
-          }
-        end
-      end
-    end
-
-    if issue.note_seeds.any?
-      panel 'Note seeds' do
-        table_for issue.note_seeds.includes(:replaces, :attachments) do |i|
-          i.column("ID") do |seed|
-            link_to(seed.id, note_seed_path(seed))
-          end
-          i.column("Title") { |seed| seed.title }
-          i.column("Body")  { |seed| seed.body }
-          i.column("Replaces")  { |seed| seed.replaces }
-          i.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          i.column("") { |seed|
-            link_to("View", note_seed_path(seed))
-          }
-          i.column("") { |seed|
-            link_to("Edit", edit_note_seed_path(seed))
-          }
-        end
-      end
-    end
-
-    if issue.affinity_seeds.any?
-      panel 'Affinity seeds' do
-        table_for issue.affinity_seeds.includes(:replaces, :attachments) do |i|
-          i.column("ID") do |seed|
-            link_to(seed.id, affinity_seed_path(seed))
-          end
-          i.column("Kind")    { |seed| seed.affinity_kind }
-          i.column("Related Person")  { |seed| seed.related_person }
-          i.column("Attachments") do |seed|
-            seed.attachments
-              .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-              .join("<br />").html_safe
-          end
-          i.column("") { |seed|
-            link_to("View", affinity_seed_path(seed))
-          }
-          i.column("") { |seed|
-            link_to("Edit", edit_affinity_seed_path(seed))
-          }
-        end
-      end
-    end
-
-    if issue.observations.any?
-      panel 'Observations' do
-        table_for issue.observations.includes(:observation_reason) do |o|
-          o.column("ID") do |obv|
-            link_to(obv.id, observation_path(obv))
-          end
-          o.column("Created at") { |obv| obv.created_at }
-          o.column("Updated at") { |obv| obv.updated_at }
-          o.column("Note")    { |obv| obv.note }
-          o.column("Reply")   { |obv| obv.reply }
-          o.column("Reason")  { |obv|
-            unless obv.observation_reason.nil?
-              obv.observation_reason.subject_en
-            end
-          }
-          o.column("Scope")   { |obv| obv.scope }
-        end
-      end
+      ArbreHelpers.seed_collection_show_tab(self, "Risk Score", :risk_score_seeds)
     end
   end
 end

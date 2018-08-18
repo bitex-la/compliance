@@ -27,7 +27,7 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def person_email
-    emails.first.try(:address)
+    emails.last.try(:address)
   end
 
 	def natural_docket
@@ -74,6 +74,11 @@ class Person < ApplicationRecord
     all_attachments.select do |a|
       a.attached_to_fruit.replaced_by.nil?
     end.compact
+  end
+
+  def all_observations
+    issues.includes(observations: :observation_reason)
+      .map{|o| o.observations.to_a }.flatten
   end
 
   private
