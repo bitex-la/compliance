@@ -43,6 +43,24 @@ class Attachment < ApplicationRecord
     "##{id}: #{document_file_name} #{document_content_type}"
   end
 
+  def attached_to_seed_gid=(gid)
+    self.attached_to_seed = GlobalID::Locator.locate GlobalID.parse(gid)
+  end
+
+  def attached_to_seed_gid
+    return unless attached_to_seed
+    attached_to_seed.to_global_id.to_s
+  end
+
+  def attached_to_fruit_gid=(gid)
+    self.attached_to_fruit = GlobalID::Locator.locate GlobalID.parse(gid)
+  end
+
+  def attached_to_fruit_gid
+    return unless attached_to_fruit
+    attached_to_fruit.to_global_id.to_s
+  end
+
   def attached_to
     attached_to_fruit || attached_to_seed
   end
@@ -54,7 +72,7 @@ class Attachment < ApplicationRecord
   private
   def relate_to_person
     unless destroyed?
-      self.update_column(:person_id, attached_to_seed.issue.person.id) if self.attached_to_seed_type
+      self.update_column(:person_id, attached_to_seed.issue.person.id) if self.attached_to_seed.try(:issue)
     end
   end
 

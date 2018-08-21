@@ -55,16 +55,30 @@ ActiveAdmin.register Attachment do
     redirect_to attachment_path(resource) 
   end
 
-  begin
-    permit_params :id, :document, :person_id
+  permit_params :id, :document, :person_id,
+    :attached_to_seed_gid, :attached_to_fruit_gid
 
-    form do |f|
+  form do |f|
+    if f.object.new_record?
       f.inputs "Upload" do
         f.input :person
         f.input :document, required: true, as: :file
       end
-      f.actions
     end
+
+    f.inputs "Attached to" do
+      if seed = f.object.attached_to_seed
+        f.input :attached_to_seed_gid, as: :select,
+          collection: seed.issue.all_seeds.map{|o| [o.name, o.to_global_id.to_s] },
+          include_blank: true
+      else
+        f.input :attached_to_fruit_gid, as: :select,
+          collection: f.object.person.fruits.map{|o| [o.name, o.to_global_id.to_s] },
+          include_blank: true
+      end
+    end
+
+    f.actions
   end
 
   show do
@@ -77,11 +91,7 @@ ActiveAdmin.register Attachment do
           link_to "Issue #{issue.id}", edit_person_issue_path(issue.person, issue)
         end
       end
-      row :person do
-        if person = attachment.attached_to_fruit.try(:person)
-          link_to "Person #{person.id}", person_path(person)
-        end
-      end
+      row :person
       row :attached_to_seed
       row :attached_to_fruit
       row :document_file_name
