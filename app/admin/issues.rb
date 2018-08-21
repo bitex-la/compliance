@@ -35,6 +35,22 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :dismissed
 
+  collection_action :new_with_fruits, method: :get do
+    @person = Person.find(params[:person_id])
+    render 'new_with_fruits'
+  end
+
+  collection_action :create_from_fruits, method: :post do
+    person = Person.find(params[:person_id])
+    fruits = params[:fruits].map do |pair|
+      cls, id = pair.split("_")
+      Object.const_get(cls).find(id)
+    end
+    issue = person.issues.create
+    issue.add_seeds_replacing(fruits)
+    redirect_to [person, issue]
+  end
+
   %i(complete approve abandon reject dismiss).each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       link_to action.to_s.titleize, [action, :person, :issue], method: :post

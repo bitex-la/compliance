@@ -6,7 +6,7 @@ module ArbreHelpers
           ArbreHelpers.fruit_attribute_table(self, resource)
           if attachments = resource.attachments.presence
             h3 "Attachments"
-            ArbreHelpers.attachments_grid(self, attachments)
+            ArbreHelpers.attachments_list(self, attachments)
           end
         end
 
@@ -14,16 +14,6 @@ module ArbreHelpers
           ArbreHelpers.fruit_relations_panels(self, resource)
         end 
       end  
-    end
-  end
-
-  def self.fields_for_replaces(context, form, assoc)
-    context.instance_eval do
-      if replaceable = context.resource.person.send(assoc).current.presence
-        form.input :replaces, collection: replaceable
-        form.input :copy_attachments,
-          label: "Move attachments of replaced #{assoc} to the new one"
-      end
     end
   end
 
@@ -72,39 +62,12 @@ module ArbreHelpers
     end
   end
 
-  def self.issues_panel(context, issues, title)
+  def self.fields_for_replaces(context, form, assoc)
     context.instance_eval do
-      panel title, class: title.gsub(' ','').underscore do
-        table_for issues do |i|
-          i.column("ID") { |issue|
-            link_to(issue.id, person_issue_path(issue.person, issue))
-          }
-          i.column("Person") { |issue|
-            link_to(issue.person.id, person_path(issue.person))
-          }
-          i.column("Email") { |issue|
-            if issue.person.emails.any?
-              link_to(issue.person.emails.first.address, person_path(issue.person))
-            elsif issue.email_seeds.any?
-              link_to(issue.email_seeds.first.address, person_path(issue.person))
-            end
-          }
-          i.column("Seeds") { |issue|
-            issue.modifications_count
-          }
-          i.column("Observations") { |issue|
-            issue.observations.count
-          }
-          i.column("Created at") { |issue|
-            issue.created_at
-          }
-          i.column("Updated at") { |issue|
-            issue.updated_at
-          }
-          i.column("Actions") { |issue|
-            span link_to("View", person_issue_path(issue.person, issue))
-          }
-        end
+      if replaceable = context.resource.person.send(assoc).current.presence
+        form.input :replaces, collection: replaceable
+        form.input :copy_attachments,
+          label: "Move attachments of replaced #{assoc} to the new one"
       end
     end
   end
@@ -158,80 +121,9 @@ module ArbreHelpers
     end
   end
 
-  def self.attachments_grid(context, attachments, show_attached_to = false)
-    context.instance_eval do
-      attachments.in_groups_of(2).each do |group|
-        columns do
-          group.each_with_index do |a, i|
-            column do
-              ArbreHelpers.attachment_preview(self, a, show_attached_to)
-            end
-          end
-        end
-      end
-    end
-  end
-
-  def self.attachments_panel(context, attachments)
-    context.instance_eval do
-      panel "Attachments" do
-        if attachments.any?
-          table_for attachments.each do |a|
-            a.column do |attachment|
-              context.div(h4 "#{attachment.document_file_name} - #{attachment.document_content_type}")
-              context.div(span "#{attachment.attached_to_fruit.class.name}")
-              context.div(link_to 'View', attachment_path(attachment))
-            end
-          end
-        else 
-          span "0 attachments"
-        end
-      end
-    end
-  end
-
-  def self.orphan_attachments(context, builder)
-    context.instance_eval do
-      if builder.present? && 
-          builder.attachments.where(attached_to_seed: nil).any? &&
-          builder.attachments.where(attached_to_fruit: nil).any?
-        context.instance_eval do
-          panel "Orphan Attachments" do
-            table_for builder.attachments
-              .where("attached_to_seed_id is ? AND attached_to_fruit_id is ?", nil, nil)
-              .each do |a|
-                a.column do |attachment|
-                  h3 "#{attachment.document_file_name} - #{attachment.document_content_type}"
-                  if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type)
-                    context.div(image_tag(attachment.document.url, width: '100%'))
-                    context.div(link_to 'View', attachment_path(attachment))
-                  elsif DOWNLOADABLE_CONTENT_TYPES.include?(attachment.document_content_type)
-                    link_to 'Download file', attachment.document.url, target: "_blank"
-                  end
-                end
-            end
-          end
-        end
-      end
-    end
-  end
-
   def self.has_one_form(context, builder, title, relationship, &fields)
     b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
     builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
-    if b_object.persisted?
-      context.span(context.link_to(
-        "Show",
-        b_object,
-        target: '_blank'))
-
-      unless b_object.class == Attachment
-        context.span(context.link_to("Remove Entity",
-          b_object,
-          method: :delete,
-          data: {confirm: "Are you sure?"}))
-      end
-    end
   end
 
   def self.has_many_form(context, builder, relationship, extra={}, &fields)

@@ -13,7 +13,7 @@ ActiveAdmin.register Person do
   filter :risk
 
   action_item only: %i(show edit) do
-    link_to 'Add Person Information', new_person_issue_path(person)
+    link_to 'Add Person Information', new_with_fruits_person_issues_path(person)
   end
 
   action_item only: %i(show edit) do
@@ -21,13 +21,13 @@ ActiveAdmin.register Person do
   end
 
   action_item "Download Attachments", only: :show do
-    if resource.attachments.any?
+    if resource.all_attachments.any?
       link_to :download_files.to_s.titleize, [:download_files, :person], method: :post
     end
   end
 
   member_action :download_files, method: :post do
-    files = resource.attachments.map { |a| [a.document, a.document_file_name] }
+    files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
     zipline(files, "person_#{resource.id}_kyc_files.zip")
   end
 
@@ -142,7 +142,20 @@ ActiveAdmin.register Person do
         end
       end
 
-      ArbreHelpers.fruit_collection_show_tab(self, "Affinity", :affinities)
+      tab "Affinities" do
+        ArbreHelpers.panel_grid(self, resource.all_affinities) do |d|
+          attributes_table_for d do
+            row(:person)
+            row(:related_person)
+            row(:affinity_kind)
+            row(:created_at)
+            row(:issue)
+          end
+          d.attachments.each do |a|
+            ArbreHelpers.attachment_preview(self, a)
+          end
+        end
+      end
 
       tab "Contact (#{resource.phones.count + resource.emails.count})" do
         ArbreHelpers.panel_grid(self, resource.phones) do |d|
@@ -154,90 +167,24 @@ ActiveAdmin.register Person do
         end
       end
 
+      tab "Fund Deposits" do 
+        panel 'Fund Deposits' , class: 'fund_deposits' do
+          table_for person.fund_deposits do           
+            column :amount
+            column :currency
+            column :deposit_method
+            column :external_id
+          end
+        end
+      end
+
       ArbreHelpers.fruit_collection_show_tab(self, "Risk Score", :risk_scores)
 
-      if person.fund_deposits.any?
-        panel 'Fund Deposits' , class: 'fund_deposits' do
-          table_for person.fund_deposits do |q|
-            q.column("ID") do |deposit|
-              link_to(deposit.id, fund_deposit_path(deposit))
-            end
-            q.column("Amount") { |deposit| deposit.amount }
-            q.column("Currency") { |deposit| deposit.currency }
-            q.column("Deposit Method") { |deposit| deposit.deposit_method }
-            q.column("External ID") { |deposit| deposit.external_id }
-            q.column("Attachments") do |deposit|
-              deposit.attachments
-                .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-                .join("<br />").html_safe
-            end
-            q.column("") { |deposit|
-              link_to("View", fund_deposit_path(deposit))
-            }
-          end
+      if orphans = resource.orphan_attachments.presence
+        tab :orphan_attachments do
+          ArbreHelpers.attachments_list(self, orphans)
         end
       end
-
-      if person.affinities.any?
-        panel 'Affinities' do
-          table_for person.affinities.includes(:attachments) do |i|
-            i.column("ID") do |fruit|
-              link_to(fruit.id, affinity_path(fruit))
-            end
-            i.column("Kind") do |fruit|
-              fruit.affinity_kind
-            end
-            i.column("Related Person")  { |fruit| fruit.related_person }
-            i.column("Attachments") do |fruit|
-              fruit.attachments
-                .map{|a| link_to a.document_file_name, a.document.url, target: '_blank'}
-                .join("<br />").html_safe
-            end
-            i.column("") { |fruit|
-              link_to("View", affinity_path(fruit))
-            }
-          end
-        end
-      end
-
-      if Affinity.where(related_person: person).any?
-        panel 'Affinities with me' do
-          table_for Affinity.where(related_person: person).includes(:attachments) do |i|
-            i.column("Person") do |fruit|
-              link_to fruit.person.person_email, fruit.person
-            end
-            i.column("Kind") do |fruit|
-              fruit.affinity_kind
-            end
-            i.column("") { |fruit|
-              link_to("View", affinity_path(fruit))
-            }
-          end
-        end
-      end
-
-      if person.comments.any?
-        panel 'Comments' , class: 'comments' do
-          table_for person.comments do |q|
-            q.column("ID") do |comment|
-              link_to(comment.id, comment_path(comment))
-            end
-            q.column(:title)
-            q.column(:meta)
-            q.column(:body)
-            q.column("") { |comment|
-              link_to("View", comment_path(comment))
-            }
-            q.column("") { |comment|
-              link_to("Edit", edit_comment_path(comment))
-            }
-          end
-        end
-      end
-    end
-
-    tab :attachments_preview do
-      ArbreHelpers.attachments_grid(self, resource.all_current_attachments, true)
     end
   end
 end

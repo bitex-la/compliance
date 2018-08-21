@@ -4,20 +4,6 @@ class Issue < ApplicationRecord
   belongs_to :person, optional: true
   validates :person, presence: true
 
-  after_create :fill_seeds_if_apply, if: :fill_with_previous_info?
-
-  ORIGINABLE_FRUITS = %i{
-    natural_dockets
-    legal_entity_dockets
-    argentina_invoicing_details
-    chile_invoicing_details
-    domiciles 
-    identifications
-    phones 
-    emails 
-    allowances
-  }
-
   HAS_ONE = %i{
     natural_docket_seed
     legal_entity_docket_seed
@@ -172,37 +158,19 @@ class Issue < ApplicationRecord
     HAS_ONE.each{|assoc| send(assoc).try(:harvest!) }
   end
 
-  def fill_seeds_if_apply
-    ORIGINABLE_FRUITS.each do |assoc|
-      if person.send(assoc).current.any? 
-        fruit = person.send(assoc).current.first
-        seed  = Garden::Naming.new(assoc)
-          .seed.constantize.new (
-            fruit.attributes.except(
-              *%w(id created_at updated_at person_id issue_id replaced_by_id)
-            )
-          )
-        seed.issue = self
-        seed.replaces = fruit if seed.respond_to? :replaces
-        seed.save
-        fruit.attachments.each do |a|
-          begin
-            attachment = Attachment.new(
-              document: a.document,
-              attached_to_seed: seed,
-              person: person
-            )
-            attachment.save
-          rescue Exception => e 
-            
-          end
-        end
-      end
-    end
-  end
+  def add_seeds_replacing(fruits)
+    fruits.each do |fruit|
+      next if fruit.person != self.person
 
-  def fill_with_previous_info?
-    fill_with_previous_info
+      attrs = fruit.attributes.except(
+        *%w(id created_at updated_at person_id issue_id replaced_by_id)
+      )
+      seed = Garden::Naming.new(fruit.class.name).seed.constantize.new(attrs)
+      seed.issue = self
+      seed.replaces = fruit if seed.respond_to? :replaces
+      seed.copy_attachments = true
+      seed.save!
+    end
   end
 
   def has_open_observations?

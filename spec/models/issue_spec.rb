@@ -119,10 +119,11 @@ RSpec.describe Issue, type: :model do
     end
 
     it 'adds some new fruits and replace others on existing person' do
-      person = create :full_natural_person
+      person = create(:full_natural_person).reload
       issue = create :basic_issue, person: person
 
-      create :full_domicile_seed, street_address: 'Cabildo', issue: issue, replaces: person.domiciles.reload.last
+      issue.add_seeds_replacing([person.domiciles.last])
+
       create :salary_allowance_seed, issue: issue
       create :full_natural_docket_seed, issue: issue
 
@@ -131,6 +132,10 @@ RSpec.describe Issue, type: :model do
       issue.should be_new
       issue.approve!
       issue.should be_approved
+      issue.domicile_seeds.count.should == 1
+      issue.allowance_seeds.count.should == 1
+      issue.natural_docket_seed.should_not be_nil
+      issue.legal_entity_docket_seed.should be_nil
       person.reload
       person.domiciles.count.should == 2
       person.domiciles.current.count.should == 1
@@ -148,6 +153,15 @@ RSpec.describe Issue, type: :model do
         d.should == person.natural_dockets.current.last
         d.replaces.should == person.natural_dockets.first
       end
+    end
+
+    it "cannot try to replace a different person's fruit" do
+      person = create(:full_natural_person).reload
+      other_person = create(:full_natural_person).reload
+      issue = create :basic_issue, person: person
+
+      issue.add_seeds_replacing([other_person.domiciles.last])
+      issue.reload.domicile_seeds.should be_empty
     end
   end  
 end

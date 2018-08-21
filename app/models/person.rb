@@ -24,6 +24,20 @@ class Person < ApplicationRecord
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
 
+  def replaceable_fruits
+    %i{
+      natural_dockets
+      legal_entity_dockets
+      argentina_invoicing_details
+      chile_invoicing_details
+      domiciles 
+      identifications
+      phones 
+      emails 
+      allowances
+    }.map{|assoc| send(assoc).current.to_a }.flatten
+  end
+
   enum risk: %i(low medium high)
 
   def person_email
@@ -79,6 +93,14 @@ class Person < ApplicationRecord
   def all_observations
     issues.includes(observations: :observation_reason)
       .map{|o| o.observations.to_a }.flatten
+  end
+
+  def all_affinities
+    Affinity.where("person_id = ? OR related_person_id = ?", id, id)
+  end
+
+  def orphan_attachments
+    attachments.where("attached_to_seed_id IS NULL AND attached_to_fruit_id IS NULL")
   end
 
   private
