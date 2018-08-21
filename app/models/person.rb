@@ -69,7 +69,6 @@ class Person < ApplicationRecord
     identifications.current +
     natural_dockets.current +
     legal_entity_dockets.current +
-    fund_deposits.current +
     allowances.current +
     phones.current + 
     emails.current + 

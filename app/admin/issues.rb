@@ -267,6 +267,12 @@ ActiveAdmin.register Issue do
           end
         end
       end
+
+      if attachments = resource.person.orphan_attachments.presence
+        tab "Orphan Attachments" do
+          ArbreHelpers.attachments_list(self, attachments)
+        end
+      end
     end
 
     f.actions

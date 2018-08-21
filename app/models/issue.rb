@@ -195,6 +195,11 @@ class Issue < ApplicationRecord
     all
   end
 
+  def all_seeds
+    HAS_MANY.map{|a| send(a).try(:to_a) }.compact.flatten +
+      HAS_ONE.map{|a| send(a) }.compact
+  end
+
   def for_person_type
     return person.person_type if person && person.person_type 
 
