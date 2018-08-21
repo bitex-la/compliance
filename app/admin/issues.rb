@@ -42,12 +42,14 @@ ActiveAdmin.register Issue do
 
   collection_action :create_from_fruits, method: :post do
     person = Person.find(params[:person_id])
-    fruits = params[:fruits].map do |pair|
-      cls, id = pair.split("_")
-      Object.const_get(cls).find(id)
+    if !params[:fruits].blank?
+      fruits = params[:fruits].map do |pair|
+        cls, id = pair.split("_")
+        Object.const_get(cls).find(id)
+      end
     end
     issue = person.issues.create
-    issue.add_seeds_replacing(fruits)
+    issue.add_seeds_replacing(fruits) unless params[:fruits].blank?
     redirect_to [person, issue]
   end
 
