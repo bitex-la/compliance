@@ -207,7 +207,7 @@ class Api::IssuesController < Api::ApiController
         :tax_id,
         :tax_id_kind_code,
         :receipt_kind_code,
-        :name,
+        :full_name,
         :country,
         :address,
         :attachments,
