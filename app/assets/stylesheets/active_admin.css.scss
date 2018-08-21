@@ -273,6 +273,14 @@ body.active_admin{
     padding: 0;
   }
 
+  ul.attachment-list{
+    background: #fafafa;
+    padding: 10px;
+    list-style: none;
+    line-height: 22px;
+    margin: 00
+  }
+
 	form {
 		fieldset.actions{
 				input[type=submit]{
@@ -302,7 +310,10 @@ body.active_admin{
     }
 
     fieldset.has_many_fields {
-      margin-top: 10px;
+      float: left;
+      width: 49%;
+      margin-left: 0.15%;
+      margin-right: 0.15%;
 
       &.can_remove {
         padding-top: 20px;
@@ -317,6 +328,7 @@ body.active_admin{
       text-align: center;
       margin-top: 20px;
       padding: 10px;
+      clear: both;
     }
 
     .has_many_remove {
@@ -345,6 +357,7 @@ body.active_admin{
 			padding: 10px;
 
       background: #eee;
+
 			.has_many_remove {
 				top: 9px;
 			}
@@ -370,15 +383,22 @@ body.active_admin{
 			}
 
       fieldset {
+        float: none;
+        width: auto;
         padding: 10px;
 				margin: 5px 0 10px 0;
 				ol li.file.input {
 					padding: 0;
 				}
+
+        .attributes_table.attachment table{
+          margin-bottom: 0;
+        }
       }
 
       li.boolean.input{
         float: right;
+        padding: 0 0 5px 0;
 
 				label {
 					display: block;
@@ -439,9 +459,15 @@ body.active_admin{
     background: #fafafa;
   }
 
-  .panel_contents pre{
-    background: white;
-    padding: 10px;
+  .panel_contents {
+    pre{
+      background: white;
+      padding: 10px;
+    }
+
+    p {
+      font-size: 1.2em;
+    }
   }
 
   .with-bootstrap{

@@ -1,0 +1,17 @@
+- if replaceable = @person.replaceable_fruits
+  %p You can choose existing fruits to pre-populate the new issue
+  = form_tag('create_from_fruits') do
+    - replaceable.group_by(&:class).to_a.in_groups_of(4, false) do |group|
+      .columns
+        - group.each do |cls, fruits|
+          .column(style="width: 24.5%; margin-right: 0.5%;")
+            .panel
+              %h3=cls.name
+              .panel_contents
+                - fruits.each do |fruit|
+                  %label
+                    = check_box_tag("fruits[]", "#{fruit.class.name}_#{fruit.id}")
+                    %span= fruit.name
+                  %br
+    .actions(style="clear: both;")
+      = submit_tag "Create new issue"
