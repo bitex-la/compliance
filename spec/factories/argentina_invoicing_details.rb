@@ -4,7 +4,7 @@ FactoryBot.define_persons_item_and_seed(:argentina_invoicing_detail,
    tax_id '20955754290'
    tax_id_kind_id 80
    receipt_kind_id 1
-   name "Julio Iglesias"
+   full_name "Julio Iglesias"
    address "Jujuy 3421"
    country "AR"
    transient{ add_all_attachments true}

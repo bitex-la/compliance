@@ -163,7 +163,7 @@ ActiveAdmin.register Issue do
               af.input :tax_id
               af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
               af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
-              af.input :name
+              af.input :full_name
               af.input :country
               af.input :address
               ArbreHelpers.fields_for_replaces self, af,
