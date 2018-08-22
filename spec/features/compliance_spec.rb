@@ -921,18 +921,20 @@ describe 'an admin user' do
         from: 'issue_identification_seeds_attributes_0_issuer',
         visible: false
 
-      within(".has_many_container.identification_seeds.has_many_container.attachments") do
-        click_link "Add New Attachment"
-        fill_attachment('identification_seeds', 'jpg')
+      within(".has_many_container.identification_seeds") do
+        within first(".has_many_container.attachments") do
+          click_link "Add New Attachment"
+          fill_attachment('identification_seeds', 'jpg', true, 0, 5)
+        end
       end
 
       click_button 'Update Issue'
       assert_logging(Issue.last, 0, 1)
-      assert_logging(Issue.last, 1, 1) 
+      assert_logging(Issue.last, 1, 0) 
 
       click_link 'Approve'
       issue.reload.should be_approved
-      assert_logging(Issue.last, 1, 2)
+      assert_logging(Issue.last, 1, 1)
 
       within '.row.row-person' do
       	click_link  person.id

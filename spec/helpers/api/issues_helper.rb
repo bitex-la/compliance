@@ -293,7 +293,7 @@ class Api::IssuesHelper
             tax_id: "2022443870",
             tax_id_kind_code: "cuit",
             receipt_kind_code: "a",
-            name: "Jorge Galvan",
+            full_name: "Jorge Galvan",
             country: "AR",
             address: "Bucarelli 2675"
           },
