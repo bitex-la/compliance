@@ -6,6 +6,7 @@ class AffinityKind
     [15, :business_partner],
     [20, :couple],
     [25, :manager]
+    [30, :owner]
   ]
 
   def name
