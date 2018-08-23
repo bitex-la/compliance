@@ -13,7 +13,7 @@ class ArgentinaInvoicingDetail < ApplicationRecord
   belongs_to :receipt_kind
   belongs_to :vat_status, class_name: 'VatStatusKind'
 
-  def name 
-    build_name("#{full_name} #{tax_id_kind} #{receipt_kind} #{vat_status}")
+  def self.name_body(i)
+    "#{i.tax_id_kind} #{i.tax_id}"
   end
 end

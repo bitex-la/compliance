@@ -7,7 +7,7 @@ class Identification < ApplicationRecord
 
   belongs_to :identification_kind
 
-  def name
-    build_name("#{identification_kind} #{number}, #{issuer}")
+  def self.name_body(i)
+    "#{i.identification_kind} #{i.number}, #{i.issuer}"
   end
 end

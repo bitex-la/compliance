@@ -297,4 +297,17 @@ module ActiveAdmin
   class BaseController
     before_action { params.permit! }
   end
+
+  module Filters
+    class ActiveFilter
+      def name
+        c = condition
+        if c.attributes.size > 1
+          "#{c.attributes.map(&:name).join("_#{c.combinator}_")}_#{c.predicate.name}".to_sym
+        else
+          condition_attribute.attr_name
+        end
+      end
+    end
+  end
 end

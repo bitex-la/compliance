@@ -1,7 +1,7 @@
 class Note < ApplicationRecord
  include Garden::Fruit
 
- def name
-   build_name("note")
+ def self.name_body(i)
+   i.title || i.body
  end  
 end

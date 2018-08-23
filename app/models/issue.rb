@@ -50,17 +50,18 @@ class Issue < ApplicationRecord
       *HAS_ONE
     ) 
   }
-  scope :incomplete, -> { 
+  scope :draft, -> { 
     with_relations.where('aasm_state=?', 'draft')
   }
 
-  scope :just_created, -> { 
+  scope :fresh, -> { 
     with_relations.where('aasm_state=?', 'new')
   }
 
   scope :answered, -> { 
     with_relations.where('aasm_state=?', 'answered')
   }
+
   scope :observed, -> { 
     with_relations.where('aasm_state=?', 'observed')
   }
@@ -150,7 +151,7 @@ class Issue < ApplicationRecord
   end
 
   def name
-    "##{id} #{state.titleize} for #{person.name}"
+    "案 #{id} #{state.titleize} for #{person.name}"
   end
 
   def harvest_all!

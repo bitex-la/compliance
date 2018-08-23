@@ -6,6 +6,6 @@ class ObservationReason < ApplicationRecord
   scope :for_robot,  -> { where('scope = ?', 2) }
 
   def name
-    subject_en.truncate(140)
+    subject_en.truncate(40, omission:'…')
   end
 end

@@ -3,6 +3,13 @@ ActiveAdmin.register Person do
 
   controller do
     include Zipline
+
+    def find_resource
+      scoped_collection
+        .includes(*Person.eager_person_entities, {issues: Issue.eager_issue_entities.flatten })
+        .where(id: params[:id])
+        .first!
+    end
   end
 
   actions :all, except: [:destroy]
@@ -179,12 +186,6 @@ ActiveAdmin.register Person do
       end
 
       ArbreHelpers.fruit_collection_show_tab(self, "Risk Score", :risk_scores)
-
-      if orphans = resource.orphan_attachments.presence
-        tab :orphan_attachments do
-          ArbreHelpers.attachments_list(self, orphans)
-        end
-      end
     end
   end
 end

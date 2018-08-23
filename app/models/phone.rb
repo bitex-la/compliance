@@ -8,7 +8,7 @@ class Phone < ApplicationRecord
 
   belongs_to :phone_kind, class_name: "PhoneKind"
 
-  def name
-    build_name("#{number} #{phone_kind}")
+  def self.name_body(i)
+    i.number
   end
 end

@@ -4,7 +4,7 @@ class Allowance < ApplicationRecord
 
   belongs_to :kind, class_name: "Currency"
 
-  def name
-    build_name("#{amount} #{kind}")
+  def self.name_body(i)
+    "#{i.amount} #{i.kind}"
   end
 end

@@ -61,7 +61,7 @@ class Person < ApplicationRecord
   end
 
   def name
-    "##{id}: #{person_email}"
+    "人 #{id}: #{person_email}"
   end
 
   def fruits
@@ -96,10 +96,6 @@ class Person < ApplicationRecord
 
   def all_affinities
     Affinity.where("person_id = ? OR related_person_id = ?", id, id)
-  end
-
-  def orphan_attachments
-    attachments.where("attached_to_seed_id IS NULL AND attached_to_fruit_id IS NULL")
   end
 
   private

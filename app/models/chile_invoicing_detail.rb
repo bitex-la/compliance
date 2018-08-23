@@ -10,7 +10,7 @@ class ChileInvoicingDetail < ApplicationRecord
     [self.class.name, id, vat_status, tax_id, giro, ciudad, comuna].join(",")
   end
 
-  def name
-    build_name("#{tax_id} #{vat_status}")
+  def self.name_body(i)
+    "RUT #{i.tax_id}"
   end
 end

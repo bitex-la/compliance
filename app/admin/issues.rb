@@ -1,4 +1,21 @@
 #encoding: utf-8
+=begin
+
+email
+
+single field for id / tax_id looks in invoicing and ids.
+first_name
+last_name
+
+legal_entity unificar commercial_name legal_name
+
+natural_docket is_pep
+
+address_street
+address_number
+domicile_postal_code
+=end
+
 ActiveAdmin.register Issue do
   belongs_to :person
   actions :all, except: :destroy 
@@ -265,12 +282,6 @@ ActiveAdmin.register Issue do
           if current = context.resource.person.emails.current.presence
             ef.input :replaces, collection: current
           end
-        end
-      end
-
-      if attachments = resource.person.orphan_attachments.presence
-        tab "Orphan Attachments" do
-          ArbreHelpers.attachments_list(self, attachments)
         end
       end
     end

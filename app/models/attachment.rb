@@ -7,6 +7,8 @@ class Attachment < ApplicationRecord
   after_commit :relate_to_person
   before_save :classify_type
 
+  validate :attached_to_something
+
   validates_attachment :document,
     content_type: {
       content_type: [
@@ -29,10 +31,9 @@ class Attachment < ApplicationRecord
     /rar\z/,
   ]
 
-  scope :fruit_orphan, -> { where('attached_to_seed_id is ? AND attached_to_fruit_id is ?', nil, nil).order(updated_at: :asc) }
-
-  def fruit_orphan?
-    attached_to_fruit.nil? && attached_to_seed.nil?
+  def attached_to_something
+    return unless attached_to.nil?
+    errors.add(:base, 'must_be_attached_to_something')
   end
 
   def document_url
@@ -69,10 +70,14 @@ class Attachment < ApplicationRecord
     attached_to.class.name
   end
 
+  def issue
+    attached_to_seed.try(:issue)
+  end
+
   private
   def relate_to_person
     unless destroyed?
-      self.update_column(:person_id, attached_to_seed.issue.person.id) if self.attached_to_seed.try(:issue)
+      self.update_column(:person_id, issue.person_id) if issue
     end
   end
 

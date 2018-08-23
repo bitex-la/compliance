@@ -1,7 +1,12 @@
 class Observation < ApplicationRecord
   include AASM
   include Loggable
-  enum scope: %i(client robot admin)
+
+  def self.scopes
+    %i(client robot admin)
+  end
+
+  enum scope: scopes
   
   belongs_to :issue
   belongs_to :observation_reason, optional: true
@@ -54,7 +59,7 @@ class Observation < ApplicationRecord
   end
 
   def name
-    "##{id} #{state}"
+    "Observation##{id} #{state}: #{observation_reason.try(:name)}"
   end
   
   private

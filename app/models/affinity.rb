@@ -6,7 +6,7 @@ class Affinity < ApplicationRecord
   validates  :affinity_kind, inclusion: { in: AffinityKind.all }
   belongs_to :affinity_kind
 
-  def name
-    build_name("#{affinity_kind} #{related_person.name}")
+  def self.name_body(a)
+    "#{a.affinity_kind} #{a.related_person.name}"
   end
 end

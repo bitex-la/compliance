@@ -4,20 +4,20 @@ ActiveAdmin.register Issue, as: "Dashboard" do
 
   actions :index
 
-  scope :just_created, default: true
+  scope :fresh, default: true
   scope :answered
-  scope :answered
-  scope :incomplete
+  scope :draft
   scope :observed
   scope :abandoned
   scope :dismissed
   scope :all
 
-  filter :aasm_state
   filter :created_at
   filter :updated_at
+  filter :natural_docket_seed_first_name_or_natural_docket_seed_last_name_matches_any,
+    label: "Natural Docket Seed"
 
-  index do
+  index title: '案 Issues Dashboard' do
     column(:id)  do |o|
       link_to o.id, [o.person, o]
     end

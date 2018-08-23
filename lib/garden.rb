@@ -60,7 +60,8 @@ module Garden
       accepts_nested_attributes_for :attachments, :allow_destroy => true
 
       def name
-        "#{self.class.name}##{id}"
+        name_body = self.class.naming.fruit.constantize.name_body(self)
+        "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
       end
     end
 
@@ -138,8 +139,13 @@ module Garden
         seed.try(:issue)
       end
 
-      def build_name(body)
-        "##{id}#{"*" if replaced_by}: #{body}"
+      def self.name_body(instance)
+        ''
+      end
+
+      def name
+        "#{self.class.name}##{id}#{"旧" if replaced_by}: #{self.class.name_body(self)}"
+          .truncate(40, omission:'…')
       end
     end
   end

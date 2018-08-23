@@ -2,7 +2,7 @@ class LegalEntityDocket < ApplicationRecord
   include Garden::Fruit
   validates :country, country: true
 
-  def name
-    build_name("#{commercial_name} #{legal_name}")
+  def self.name_body(i)
+    i.commercial_name || i.legal_name
   end
 end

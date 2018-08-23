@@ -6,7 +6,7 @@ class Email < ApplicationRecord
 
   belongs_to :email_kind
 
-  def name
-    build_name("#{address} #{email_kind}")
+  def self.name_body(i)
+    i.address
   end
 end
