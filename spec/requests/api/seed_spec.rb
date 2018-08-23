@@ -61,7 +61,7 @@ def assert_seed_update(admin_user, issue, seed_name, seed_id, relationship, payl
       issue.legal_entity_docket_seed.commercial_name.should == 'E Crop'
       issue.legal_entity_docket_seed.legal_name.should == 'Evil Corp'
     when 'ArgentinaInvoicingDetailSeed'
-      issue.argentina_invoicing_detail_seed.name.should == 'Nick Ocean'
+      issue.argentina_invoicing_detail_seed.full_name.should == 'Jorge Galvan'
       issue.argentina_invoicing_detail_seed.address.should == 'Fake Street 123'
     when 'ChileInvoicingDetailSeed'
       issue.chile_invoicing_detail_seed.ciudad.should == 'Valparaiso'

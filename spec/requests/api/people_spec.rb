@@ -369,7 +369,7 @@ describe Person do
             tax_id_kind_code: "cuit",
             receipt_kind_code: "a",
             country: "AR",
-            name: "Julio Iglesias",
+            full_name: "Julio Iglesias",
             address: "Jujuy 3421",
             created_at: 1514764800,
             updated_at: 1514764800

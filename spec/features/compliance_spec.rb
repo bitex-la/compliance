@@ -48,7 +48,9 @@ describe 'an admin user' do
     end
 
     click_link 'Add Person Information'
-
+    click_button 'Create new issue'
+    
+    click_link 'ID (0)'
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
@@ -67,6 +69,7 @@ describe 'an admin user' do
       fill_attachment('identification_seeds', 'jpg')
     end
 
+    click_link 'Contact (0)'
     click_link "Add New Email seed"
     fill_seed("email",{
       address: 'tester@rspec.org',
@@ -90,6 +93,7 @@ describe 'an admin user' do
       from: "issue[phone_seeds_attributes][0][country]",
       visible: false
 
+    click_link 'Domicile (0)' 
     click_link "Add New Domicile seed"
     select "Argentina",
       from: "issue[domicile_seeds_attributes][0][country]",
@@ -108,13 +112,13 @@ describe 'an admin user' do
       fill_attachment('domicile_seeds', 'zip')
     end
 
+    click_link 'Allowance (0)' 
     click_link "Add New Allowance seed"
 
     select "us_dollar",
       from: "issue[allowance_seeds_attributes][0][kind_id]",
       visible: false
     fill_seed("allowance", {
-      weight: "100",
       amount: "100"
     })
 
@@ -123,6 +127,7 @@ describe 'an admin user' do
       fill_attachment('allowance_seeds', 'gif')
     end
 
+    click_link 'Docket' 
     fill_seed("natural_docket", {
       first_name: "Lionel",
       last_name: "Higuain",
@@ -160,6 +165,7 @@ describe 'an admin user' do
        fill_attachment('natural_docket_seed', 'png', false)
     end
 
+    click_link "Base"
     click_link "Add New Observation"
 
     select observation_reason.subject_en.truncate(140),
@@ -169,7 +175,7 @@ describe 'an admin user' do
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please check this guy on world check'
 
-    click_button "Create Issue"
+    click_button "Update Issue"
 
     issue = Issue.last
     observation = Observation.last
@@ -194,7 +200,7 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, 1, 3)
+    assert_logging(issue, 1, 4)
     Person.last.should be_enabled
   end
 
@@ -232,23 +238,25 @@ describe 'an admin user' do
     visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
     page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 
-    expect(page).to have_content 'Identification'
-    expect(page).to have_content 'Domicile'
+    click_link 'ID (1)'
+    expect(page).to have_content 'Identification seed'
+    click_link 'Domicile (1)'
+    expect(page).to have_content 'Domicile seed'
+    click_link 'Docket'
     expect(page).to have_content 'Natural Docket'
+    click_link 'Allowance (2)'
     expect(page).to have_content 'Allowance seed'
 
     # Admin verify the attachment(s)
     have_xpath("//li[@class='has_many_container attachments']", count: 4)
     within first "li.has_many_container.attachments" do
       within first "fieldset.inputs.has_many_fields" do
-       click_link 'Show'
+        expect(page).to have_content AllowanceSeed.first.attachments.first.name
       end
     end
 
-    window = page.driver.browser.window_handles
-    page.driver.browser.switch_to.window(window.first)
-
     # Admin sends an observation to customer about their identification (it was blurry)
+    click_link 'Base'
     click_link 'Add New Observation'
     select observation_reason.subject_en.truncate(140),
       from: "issue[observations_attributes][0][observation_reason_id]",
@@ -333,7 +341,9 @@ describe 'an admin user' do
     end
 
     click_link "Add Person Information"
+    click_button "Create new issue"
 
+    click_link "ID (0)"
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
@@ -359,6 +369,7 @@ describe 'an admin user' do
 
     find(:css, '#issue_identification_seeds_attributes_0_copy_attachments').set true
 
+    click_link "Domicile (0)"
     click_link "Add New Domicile seed"
 
     select "Argentina",
@@ -382,12 +393,12 @@ describe 'an admin user' do
       fill_attachment('domicile_seeds', 'zip')
     end
 
+    click_link "Allowance (0)"
     click_link "Add New Allowance seed"
     select "us_dollar",
       from: "issue[allowance_seeds_attributes][0][kind_id]",
       visible: false
     fill_seed("allowance", {
-      weight: "100",
       amount: "100"
     })
 
@@ -399,6 +410,7 @@ describe 'an admin user' do
       fill_attachment('allowance_seeds', 'gif')
     end
 
+    click_link "Docket"
     fill_seed("natural_docket", {
       first_name: "Lionel",
       last_name: "Higuain",
@@ -429,6 +441,7 @@ describe 'an admin user' do
       fill_attachment('natural_docket_seed', 'png', false)
     end
 
+    click_link "Base"
     click_link "Add New Observation"
 
     select observation_reason.subject_en.truncate(140),
@@ -438,7 +451,7 @@ describe 'an admin user' do
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please check this guy on world check'
 
-    click_button "Create Issue"
+    click_button "Update Issue"
     issue = Issue.last
     assert_logging(issue, 0, 1)
     observation = Observation.last
@@ -449,7 +462,7 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
-    assert_logging(issue, 1, 2) 
+    assert_logging(issue, 1, 3) 
     issue.reload.should be_answered
     observation.reload.should be_answered
 
@@ -730,6 +743,7 @@ describe 'an admin user' do
         click_link(issue.id)
       end
 
+      click_link 'Domicile (1)'
       within ".has_many_container.domicile_seeds" do
         select "Argentina",
         from: "issue[domicile_seeds_attributes][0][country]",
@@ -790,6 +804,7 @@ describe 'an admin user' do
         click_link(issue.id)
       end
 
+      click_link "ID (0)"
       click_link "Add New Identification seed"
       fill_seed("identification",{
         number: '123456789'
@@ -808,6 +823,7 @@ describe 'an admin user' do
         fill_attachment('identification_seeds', 'jpg')
       end
 
+      click_link "Domicile (0)"
       click_link "Add New Domicile seed"
 
       select "Argentina",
@@ -875,27 +891,23 @@ describe 'an admin user' do
       visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
       page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
 
-      expect(page).to have_content 'Identification'
-      expect(page).to have_content 'Domicile'
-      expect(page).to have_content 'Natural Docket'
-      expect(page).to have_content 'Allowance seed'
-
+      click_link "ID (1)"
       within '.has_many_container.identification_seeds' do
-        click_link 'Remove Entity'
-        page.driver.browser.switch_to.alert.accept
+        find(:css, '#issue_identification_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
 
+      click_link "Allowance (2)"
       within '.has_many_container.allowance_seeds' do
-        first(:link, 'Remove Entity').click
-        page.driver.browser.switch_to.alert.accept
+        find(:css, '#issue_allowance_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
 
       DomicileSeed.count.should == 1
-      IdentificationSeed.count.should == 0
+      IdentificationSeed.count.should == 1
       NaturalDocketSeed.count.should == 1
 
       visit "/people/#{person.id}/issues/#{Issue.last.id}"
 
+      click_link "ID (1)"
       click_link "Add New Identification seed"
       fill_seed("identification",{
         number: '123456789'
@@ -910,17 +922,19 @@ describe 'an admin user' do
         visible: false
 
       within(".has_many_container.identification_seeds") do
-        click_link "Add New Attachment"
-        fill_attachment('identification_seeds', 'jpg')
+        within first(".has_many_container.attachments") do
+          click_link "Add New Attachment"
+          fill_attachment('identification_seeds', 'jpg', true, 0, 5)
+        end
       end
 
       click_button 'Update Issue'
       assert_logging(Issue.last, 0, 1)
-      assert_logging(Issue.last, 1, 1) 
+      assert_logging(Issue.last, 1, 0) 
 
       click_link 'Approve'
       issue.reload.should be_approved
-      assert_logging(Issue.last, 1, 2)
+      assert_logging(Issue.last, 1, 1)
 
       within '.row.row-person' do
       	click_link  person.id
