@@ -1,26 +1,7 @@
-#encoding: utf-8
-=begin
-
-email
-
-single field for id / tax_id looks in invoicing and ids.
-first_name
-last_name
-
-legal_entity unificar commercial_name legal_name
-
-natural_docket is_pep
-
-address_street
-address_number
-domicile_postal_code
-=end
-
 ActiveAdmin.register Issue do
   belongs_to :person
   actions :all, except: :destroy 
 
-  filter :aasm_state
   filter :created_at
   filter :updated_at
 
@@ -44,10 +25,10 @@ ActiveAdmin.register Issue do
     link_to 'New', new_person_issue_path(person)
   end
 
-  scope :just_created, default: true
+  scope :fresh, default: true
   scope :answered
   scope :answered
-  scope :incomplete
+  scope :draft
   scope :observed
   scope :abandoned
   scope :dismissed
@@ -351,7 +332,7 @@ ActiveAdmin.register Issue do
       tab "Invoicing" do
         if seed = issue.argentina_invoicing_detail_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed)
+            ArbreHelpers.seed_show_section(self, seed, [:tax_id])
           end
         end
 

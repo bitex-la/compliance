@@ -3,8 +3,7 @@ class GenderKind
  
   static_models_sparse [
     [1, :female],
-    [2, :male],
-    [3, :none] 
+    [2, :male]
   ]
 
   def name

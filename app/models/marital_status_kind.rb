@@ -6,7 +6,7 @@ class MaritalStatusKind
     [2, :married],
     [3, :divorced],
     [4, :widowed],
-    [5, :none]
+    [5, :other]
   ]
 
   def name

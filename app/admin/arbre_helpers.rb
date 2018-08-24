@@ -200,9 +200,9 @@ module ArbreHelpers
     end
   end
 
-  def self.seed_show_section(context, seed)
+  def self.seed_show_section(context, seed, others = [])
     context.instance_eval do
-      ArbreHelpers.seed_attributes_table self, seed
+      ArbreHelpers.seed_attributes_table self, seed, others
       attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
       attachments.each do |a|
         ArbreHelpers.attachment_preview(self, a)
@@ -210,11 +210,13 @@ module ArbreHelpers
     end
   end
 
-  def self.seed_attributes_table(context, resource)
-    columns = resource.class.columns.map{|c| c.name.gsub(/_id$/,'') } -
+  def self.seed_attributes_table(context, resource, others = [])
+    columns = resource.class.columns.map(&:name) - others.map(&:to_s)
+    columns = columns.map{|c| c.gsub(/_id$/,'') } -
       %w(id issue fruit created_at updated_at replaces copy_attachments)
+    
     context.instance_eval do
-      attributes_table_for resource, :fruit, *columns
+      attributes_table_for resource, :fruit, *columns, *others
     end
   end
 

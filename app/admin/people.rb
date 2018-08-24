@@ -14,6 +14,16 @@ ActiveAdmin.register Person do
 
   actions :all, except: [:destroy]
 
+  filter :emails_address_cont, label: "Email"
+  filter :identifications_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
+  filter :natural_dockets_first_name_cont, label: "First Name"
+  filter :natural_dockets_last_name_cont,  label: "Last Name"
+  filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
+  filter :notes_title_or_notes_body_cont, label: "Notes"
+  filter :domiciles_street_address_or_argentina_invoicing_details_address_cont, label: "Street Address"
+  filter :domiciles_street_number_or_argentina_invoicing_details_address_cont, label: "Street Number"
+  filter :domiciles_postal_code_or_argentina_invoicing_details_address_cont, label: "Postal Code"
+  filter :natural_dockets_politically_exposed_eq, as: :select, label: "Is PEP"
   filter :created_at
   filter :updated_at
   filter :enabled
