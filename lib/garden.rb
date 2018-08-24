@@ -53,6 +53,12 @@ module Garden
       belongs_to :fruit, class_name: naming.fruit, optional: true
       has_many :attachments, as: :attached_to_seed
 
+      before_validation do 
+        attachments.each do |a|
+          a.attached_to_seed = self if a.attached_to.nil?
+        end
+      end
+
       if column_names.include?('replaces_id')
         belongs_to :replaces, class_name: naming.fruit, optional: true
       end

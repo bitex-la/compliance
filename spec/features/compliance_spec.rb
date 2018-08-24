@@ -168,7 +168,7 @@ describe 'an admin user' do
     click_link "Base"
     click_link "Add New Observation"
 
-    select observation_reason.subject_en.truncate(140),
+    select observation_reason.subject_en.truncate(40, omission:'…'),
       from: "issue[observations_attributes][0][observation_reason_id]",
       visible: false
     select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
@@ -258,7 +258,7 @@ describe 'an admin user' do
     # Admin sends an observation to customer about their identification (it was blurry)
     click_link 'Base'
     click_link 'Add New Observation'
-    select observation_reason.subject_en.truncate(140),
+    select observation_reason.subject_en.truncate(40, omission:'…'),
       from: "issue[observations_attributes][0][observation_reason_id]",
       visible: false
     select 'Client', from: 'issue[observations_attributes][0][scope]', visible: false
@@ -444,7 +444,7 @@ describe 'an admin user' do
     click_link "Base"
     click_link "Add New Observation"
 
-    select observation_reason.subject_en.truncate(140),
+    select observation_reason.subject_en.truncate(40, omission:'…'),
       from: "issue[observations_attributes][0][observation_reason_id]",
       visible: false
     select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
@@ -508,7 +508,7 @@ describe 'an admin user' do
     assert_logging(issue, 0, 1)
     assert_logging(issue, 1, 1)
     login_as admin_user
-    click_on "Just Created"
+    click_on "Fresh"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Dismiss'
 
@@ -738,7 +738,7 @@ describe 'an admin user' do
       issue = api_response.data
 
       login_as admin_user
-      click_on 'Incomplete'
+      click_on 'Draft'
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
       end
@@ -799,7 +799,7 @@ describe 'an admin user' do
       issue = api_response.data
 
       login_as admin_user
-      click_on 'Incomplete'
+      click_on 'Draft'
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
       end
@@ -880,7 +880,7 @@ describe 'an admin user' do
       expect(page).to have_content 'Signed in successfully.'
 
       # Admin sees issue in dashboard.
-      click_on 'Incomplete'
+      click_on 'Draft'
       expect(page).to have_content issue.id
 
       within("#issue_#{issue.id} td.col.col-id") do

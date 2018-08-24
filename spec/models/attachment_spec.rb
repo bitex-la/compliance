@@ -14,4 +14,13 @@ RSpec.describe Attachment, type: :model do
     a.should_not be_valid
     a.errors[:base].should == ['must_be_attached_to_something']
   end
+
+  it 'can creat a new seed with an attachments' do
+    person = create(:empty_person)
+    issue = Issue.new(person: person)
+    domicile_seed = issue.domicile_seeds.build(country: "AR")
+    domicile_seed.attachments.build(attributes_for(:attachment))
+
+    issue.should be_valid
+  end
 end
