@@ -6,6 +6,7 @@ class Attachment < ApplicationRecord
 
   after_commit :relate_to_person
   before_save :classify_type
+  before_validation :classify_type
 
   validate :attached_to_something
 
