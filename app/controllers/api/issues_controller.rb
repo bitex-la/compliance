@@ -244,6 +244,7 @@ class Api::IssuesController < Api::ApiController
         :document,
         :document_file_name,
         :document_content_type,
+        :attached_to_seed,
         person_id: person_id
       ],
       people: [],

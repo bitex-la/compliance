@@ -24,7 +24,7 @@ class Api::SeedsHelper
         }
       },
       included:[
-        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'note_seeds', '@1')
       ]
     }
   end
@@ -52,7 +52,7 @@ class Api::SeedsHelper
         }
       },
       included:[
-        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'allowance_seeds', '@1')
       ]
     }
   end
@@ -80,7 +80,7 @@ class Api::SeedsHelper
         }
       },
       included:[
-        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'identification_seeds', '@1')
       ]
     }
   end
@@ -108,7 +108,7 @@ class Api::SeedsHelper
         }
       },
       included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'email_seeds', '@1'),
       ]
     }
   end
@@ -137,7 +137,7 @@ class Api::SeedsHelper
         }
       },
       included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'risk_score_seeds', '@1'),
       ]
     }
   end
@@ -171,7 +171,7 @@ class Api::SeedsHelper
         }
       },
       included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'domicile_seeds', '@1'),
       ]
     }
   end
@@ -201,7 +201,7 @@ class Api::SeedsHelper
         }
       },
       included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'affinity_seeds', '@1'),
       ]
     }
   end
@@ -233,7 +233,7 @@ class Api::SeedsHelper
         }
       },
       included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'phone_seeds', '@1'),
       ]
     }
   end
@@ -264,7 +264,7 @@ class Api::SeedsHelper
         }
       },
       included:[
-        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'natural_docket_seeds', '@1')
       ]
     }
   end
@@ -294,7 +294,7 @@ class Api::SeedsHelper
         }
       },
       included:[
-        Api::IssuesHelper.attachment_for(attachment_type, '@1')
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'legal_entity_docket_seeds', '@1')
       ]
     }
   end
@@ -327,7 +327,7 @@ class Api::SeedsHelper
         }
       },
       included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'argentina_invoicing_detail_seeds', '@1'),
       ]
     }
   end
@@ -358,7 +358,7 @@ class Api::SeedsHelper
         }
       },
       included: [
-        Api::IssuesHelper.attachment_for(attachment_type, '@1'),
+        Api::IssuesHelper.attachment_for(attachment_type, '@1', 'chile_invoicing_detail_seeds', '@1'),
       ]
     }
   end
