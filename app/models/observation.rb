@@ -21,6 +21,16 @@ class Observation < ApplicationRecord
       .includes(:issue, :observation_reason)
   } 
 
+  scope :robot_pending, -> { 
+    where(scope: 'robot', aasm_state: 'new')
+      .includes(:issue, :observation_reason)
+  } 
+
+  scope :client_pending, -> { 
+    where(scope: 'client', aasm_state: 'new')
+      .includes(:issue, :observation_reason)
+  } 
+
   aasm do
     state :new, initial: true
     state :answered

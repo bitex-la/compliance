@@ -4,6 +4,8 @@ ActiveAdmin.register Observation do
   actions :all, :except => [:destroy]
 
   scope :admin_pending, default: true
+  scope :robot_pending
+  scope :client_pending
   scope :all
 
   filter :observation_reason
