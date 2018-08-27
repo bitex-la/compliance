@@ -2,7 +2,8 @@ class Api::EventLogsController < Api::ApiController
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     events = if !params[:filter].blank?
-      EventLog.where(entity_type: params[:filter][:entity_type])
+      EventLog
+        .where(entity_type: params[:filter][:entity_type], verb: params[:filter][:verb])
         .order(updated_at: :desc)
         .page(page)
         .per(per_page)
