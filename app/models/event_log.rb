@@ -7,5 +7,6 @@ class EventLog < ApplicationRecord
     update_entity 
     delete_entity
     harvest_seed
+    observe_entity
   )
 end
