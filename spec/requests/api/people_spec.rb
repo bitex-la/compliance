@@ -431,9 +431,39 @@ describe Person do
       assert_response 404
     end
 
-    it 'serializes to strict standard JSON' do
-      pending
-      fail
+  end
+
+  describe 'when using filters' do
+    it 'filters by name' do
+      joe_doe = create :full_natural_person
+      pending_joe_doe = create :new_natural_person
+      empty = create :empty_person
+      bob_doe = create(:new_natural_person).reload  
+      bob_doe.issues.last.natural_docket_seed.update(first_name: 'bob')
+      bob_doe.issues.last.approve!
+      bob_doe.reload.natural_docket.first_name.should == 'bob'
+
+      # URL encoded json with ransack filters.
+      filter = 
+        "%7B%22natural_dockets_first_name_or_natural_dockets_last_name_cont%22%3A%22joe%22%7D"
+
+      get "/api/people/?filter=#{filter}",
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      json_response[:data].count.should == 1
+
+      filter = 
+        "%7B%22natural_dockets_first_name_or_natural_dockets_last_name_cont%22%3A%22doe%22%7D"
+
+      get "/api/people/?filter=#{filter}",
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      json_response[:data].count.should == 2
+    end
+
+    it 'Returns 400 form malformed filter' do
+      create :full_natural_person
+      get "/api/people/?filter=nothing",
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      assert_response 400
     end
   end
 end
