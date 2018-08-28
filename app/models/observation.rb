@@ -21,6 +21,16 @@ class Observation < ApplicationRecord
       .includes(:issue, :observation_reason)
   } 
 
+  scope :robot_pending, -> { 
+    where(scope: 'robot', aasm_state: 'new')
+      .includes(:issue, :observation_reason)
+  } 
+
+  scope :client_pending, -> { 
+    where(scope: 'client', aasm_state: 'new')
+      .includes(:issue, :observation_reason)
+  } 
+
   aasm do
     state :new, initial: true
     state :answered
@@ -51,6 +61,13 @@ class Observation < ApplicationRecord
   def update_issue_status
     if !reply.present? && note.present?
       issue.observe! if issue.may_observe?
+      if scope == 'client'
+        Event::EventLogger.call(
+          issue, 
+          AdminUser.current_admin_user,
+          4
+        )
+      end
     end
   end
 
