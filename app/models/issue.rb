@@ -84,10 +84,16 @@ class Issue < ApplicationRecord
       transitions  from: :draft, to: :observed
       transitions from: :new, to: :observed
       transitions from: :answered, to: :observed
+      after do 
+        log_state_change(:observe_issue)
+      end
     end
 
     event :answer do
       transitions from: :observed, to: :answered
+      after do 
+        log_state_change(:answer_issue)
+      end
     end
 
     event :dismiss do
@@ -95,6 +101,9 @@ class Issue < ApplicationRecord
       transitions from: :new, to: :dismissed
       transitions from: :answered, to: :dismissed
       transitions from: :observed, to: :dismissed
+      after do 
+        log_state_change(:dismiss_issue)
+      end
     end
 
     event :reject do
@@ -105,6 +114,9 @@ class Issue < ApplicationRecord
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
       transitions from: :answered, to: :rejected
+      after do 
+        log_state_change(:reject_issue)
+      end
     end
 
     event :approve do
@@ -115,6 +127,9 @@ class Issue < ApplicationRecord
       transitions from: :draft, to: :approved
       transitions from: :new, to: :approved
       transitions from: :answered, to: :approved
+      after do 
+        log_state_change(:approve_issue)
+      end
     end
 
     event :abandon do
@@ -122,6 +137,9 @@ class Issue < ApplicationRecord
       transitions from: :new, to: :abandoned
       transitions from: :observed, to: :abandoned
       transitions from: :answered, to: :abandoned
+      after do 
+        log_state_change(:abandon_issue)
+      end
     end
   end
 
@@ -212,6 +230,10 @@ class Issue < ApplicationRecord
   end
 
   private  
+
+  def log_state_change(verb)
+    Event::EventLogger.call(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+  end
 
   def self.eager_issue_entities
     entities = []

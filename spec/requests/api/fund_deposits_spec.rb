@@ -24,7 +24,7 @@ describe FundDeposit do
       FundDeposit.count.should == 1
       Person.first.fund_deposits.first.should ==  FundDeposit.last
       assert_response 201
-      assert_logging(FundDeposit.last, 0, 1)
+      assert_logging(FundDeposit.last, :create_entity, 1)
     end
   end
 
@@ -41,7 +41,7 @@ describe FundDeposit do
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
       assert_response 200
-      assert_logging(FundDeposit.last, 0, 1)
+      assert_logging(FundDeposit.last, :create_entity, 1)
     end
   end
 end

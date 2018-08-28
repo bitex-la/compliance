@@ -9,7 +9,7 @@ module Loggable
       Event::EventLogger.call(
         self, 
         AdminUser.current_admin_user,
-        verb
+        EventLogKind.send(verb)
       )
     end  
   end
