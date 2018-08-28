@@ -27,10 +27,6 @@ describe 'an admin user' do
         File.absolute_path("./spec/fixtures/files/simple.#{ext}"), wait: 10.seconds)
   end
 
-  #def assert_logging(entity, verb, expected_count)
-  #  EventLog.where(entity: entity, verb: verb).count.should == expected_count
-  #end
-
   it 'creates a new natural person and its issue via admin' do
     observation_reason = create(:human_world_check_reason)
     login_as admin_user
@@ -179,7 +175,7 @@ describe 'an admin user' do
 
     issue = Issue.last
     observation = Observation.last
-    assert_logging(issue, 0, 1)
+    assert_logging(issue, :create_entity, 1)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -200,14 +196,14 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, 1, 4)
+    assert_logging(issue, :update_entity, 4)
     Person.last.should be_enabled
   end
 
   it 'reviews a newly created customer' do
     person = create :new_natural_person
     issue = person.issues.reload.first
-    assert_logging(issue, 0, 1)
+    assert_logging(issue, :create_entity, 1)
     observation_reason = create(:observation_reason)
 
     Issue.count.should == 1
@@ -220,7 +216,7 @@ describe 'an admin user' do
 
     # assume that issue info is complete
     issue.complete!
-    assert_logging(issue, 1, 1)
+    assert_logging(issue, :update_entity, 1)
 
     # Admin does not see it as pending
     login_as admin_user
@@ -266,7 +262,7 @@ describe 'an admin user' do
       with: 'Please re-send your document'
     click_button 'Update Issue'
 
-    assert_logging(issue, 1, 3)
+    assert_logging(issue, :update_entity, 3)
     Observation.where(issue: issue).count.should == 1
     Issue.first.should be_observed
 
@@ -299,7 +295,7 @@ describe 'an admin user' do
     assert_response 200
 
     Issue.first.should be_answered
-    assert_logging(issue, 1, 5)
+    assert_logging(issue, :update_entity, 5)
     Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
@@ -321,7 +317,7 @@ describe 'an admin user' do
     click_link 'Approve'
 
     Issue.last.should be_approved
-    assert_logging(issue, 1, 6)
+    assert_logging(issue, :update_entity, 6)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
@@ -453,7 +449,7 @@ describe 'an admin user' do
 
     click_button "Update Issue"
     issue = Issue.last
-    assert_logging(issue, 0, 1)
+    assert_logging(issue, :create_entity, 1)
     observation = Observation.last
     issue.should be_observed
     observation.should be_new
@@ -462,7 +458,7 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
-    assert_logging(issue, 1, 3) 
+    assert_logging(issue, :update_entity, 3) 
     issue.reload.should be_answered
     observation.reload.should be_answered
 
@@ -505,8 +501,8 @@ describe 'an admin user' do
     person = create :new_natural_person
     issue = person.issues.reload.last
     issue.complete!
-    assert_logging(issue, 0, 1)
-    assert_logging(issue, 1, 1)
+    assert_logging(issue, :create_entity, 1)
+    assert_logging(issue, :update_entity, 1)
     login_as admin_user
     click_on "Fresh"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
@@ -554,7 +550,7 @@ describe 'an admin user' do
 
     issue = api_response.data
     issue.attributes.state.should == 'observed'
-    assert_logging(Issue.last, 0, 1)
+    assert_logging(Issue.last, :create_entity, 1)
     observation = api_response.included.find{|i| i.type == 'observations'}
 
     click_on 'Observed'
@@ -566,7 +562,7 @@ describe 'an admin user' do
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
-    assert_logging(Issue.last, 1, 2)
+    assert_logging(Issue.last, :update_entity, 2)
 
     get "/api/people/#{person.id}/issues/#{issue.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -610,7 +606,7 @@ describe 'an admin user' do
     issue = person.issues.reload.last
     login_as admin_user
     issue.should be_observed
-    assert_logging(Issue.last, 0, 1)
+    assert_logging(Issue.last, :create_entity, 1)
     
     # Admin clicks in the observation to see the issue detail
     click_on 'Observed'
@@ -625,7 +621,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
-    assert_logging(Issue.last, 1, 2)
+    assert_logging(Issue.last, :update_entity, 2)
     Observation.last.should be_answered
   end
 
@@ -652,7 +648,7 @@ describe 'an admin user' do
 
     issue = api_response.data
     issue.attributes.state.should == 'observed'
-    assert_logging(Issue.last, 0, 1)
+    assert_logging(Issue.last, :create_entity, 1)
     observation = api_response.included.find{|i| i.type == 'observations'}
     observation.attributes.scope.should == 'robot'
 
@@ -672,7 +668,7 @@ describe 'an admin user' do
                 "Authorization" => "Token token=#{admin_user.api_token}"}
     assert_response 200
 
-    assert_logging(Issue.last, 1, 3)
+    assert_logging(Issue.last, :update_entity, 3)
 
     api_response.data.attributes.state.should == 'answered'
     api_response.included.find{|i| i.type == 'observations'}
@@ -706,8 +702,8 @@ describe 'an admin user' do
     issue = person.issues.reload.last
     issue.complete!
 
-    assert_logging(Issue.last, 0, 1)
-    assert_logging(Issue.last, 1, 1)
+    assert_logging(Issue.last, :create_entity, 1)
+    assert_logging(Issue.last, :update_entity, 1)
 
     login_as admin_user
     click_on 'Answered'
@@ -770,12 +766,12 @@ describe 'an admin user' do
       issue = Issue.last
       issue.should be_draft
 
-      assert_logging(Issue.last, 0, 1)
-      assert_logging(Issue.last, 1, 1)
+      assert_logging(Issue.last, :create_entity, 1)
+      assert_logging(Issue.last, :update_entity, 1)
 
       click_link "Approve"
       issue.reload.should be_approved
-      assert_logging(Issue.last, 1, 2)
+      assert_logging(Issue.last, :update_entity, 2)
 
       old_domicile = Domicile.first
       new_domicile = Domicile.last
@@ -847,13 +843,13 @@ describe 'an admin user' do
       issue = Issue.last
       issue.should be_draft
 
-      assert_logging(Issue.last, 0, 1)
-      assert_logging(Issue.last, 1, 1)
+      assert_logging(Issue.last, :create_entity, 1)
+      assert_logging(Issue.last, :update_entity, 1)
 
       click_link "Approve"
       issue.reload.should be_approved
 
-      assert_logging(Issue.last, 1, 2)
+      assert_logging(Issue.last, :update_entity, 2)
 
       within ".row.row-person" do
         click_link person.id
@@ -929,12 +925,12 @@ describe 'an admin user' do
       end
 
       click_button 'Update Issue'
-      assert_logging(Issue.last, 0, 1)
-      assert_logging(Issue.last, 1, 0) 
+      assert_logging(Issue.last, :create_entity, 1)
+      assert_logging(Issue.last, :update_entity, 0) 
 
       click_link 'Approve'
       issue.reload.should be_approved
-      assert_logging(Issue.last, 1, 1)
+      assert_logging(Issue.last, :update_entity, 1)
 
       within '.row.row-person' do
       	click_link  person.id
