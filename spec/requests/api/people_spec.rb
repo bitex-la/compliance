@@ -443,27 +443,22 @@ describe Person do
       bob_doe.issues.last.approve!
       bob_doe.reload.natural_docket.first_name.should == 'bob'
 
-      # URL encoded json with ransack filters.
-      filter = 
-        "%7B%22natural_dockets_first_name_or_natural_dockets_last_name_cont%22%3A%22joe%22%7D"
+      get "/api/people/",
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      json_response[:data].count.should == Person.count
 
-      get "/api/people/?filter=#{filter}",
+      # URL encoded json with ransack filters.
+      filter = "filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=joe"
+
+      get "/api/people/?#{filter}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       json_response[:data].count.should == 1
 
-      filter = 
-        "%7B%22natural_dockets_first_name_or_natural_dockets_last_name_cont%22%3A%22doe%22%7D"
+      filter = "filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=doe"
 
-      get "/api/people/?filter=#{filter}",
+      get "/api/people/?#{filter}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       json_response[:data].count.should == 2
-    end
-
-    it 'Returns 400 form malformed filter' do
-      create :full_natural_person
-      get "/api/people/?filter=nothing",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      assert_response 400
     end
   end
 end

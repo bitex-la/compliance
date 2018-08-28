@@ -1,14 +1,6 @@
 class Api::PeopleController < Api::ApiController
   def index
-    scope = Person.all
-
-    if params[:filter]
-      begin
-        scope = scope.ransack(JSON.parse(URI.decode(params[:filter]))).result
-      rescue JSON::ParserError
-        return render plain: "Filter is malformed JSON", status: 400 
-      end
-    end
+    scope = Person.ransack(params[:filter]).result
 
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     people = scope.page(page).per(per_page)
