@@ -1,4 +1,5 @@
 class AddIndexesToNaturalDockets < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
   def change
     %i(natural_dockets natural_docket_seeds).each do |entity|
       add_index entity, [:first_name, :last_name], :algorithm => :copy

@@ -1,4 +1,5 @@
 class AddIndexesToPhone < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
   def change
     %i(phones phone_seeds).each do |entity|
       add_index entity, :number, :algorithm => :copy

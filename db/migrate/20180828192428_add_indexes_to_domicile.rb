@@ -1,4 +1,5 @@
 class AddIndexesToDomicile < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
   def change
     %i(domiciles domicile_seeds).each do |entity|
       add_index entity, :country, :algorithm => :copy

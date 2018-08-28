@@ -1,4 +1,5 @@
 class AddIndexesToObservation < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
   def change
     add_index :observation_reasons, :subject_en, :algorithm => :copy
     add_index :observation_reasons, :subject_es, :algorithm => :copy

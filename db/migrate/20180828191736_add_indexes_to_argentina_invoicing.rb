@@ -1,4 +1,5 @@
 class AddIndexesToArgentinaInvoicing < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
   def change
     %i(argentina_invoicing_details argentina_invoicing_detail_seeds).each do |entity|
       add_index entity, :vat_status_id, :algorithm => :copy

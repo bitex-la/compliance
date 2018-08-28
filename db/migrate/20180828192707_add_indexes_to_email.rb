@@ -1,4 +1,5 @@
 class AddIndexesToEmail < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
   def change
     %i(emails email_seeds).each do |entity|
       add_index entity, :address, :algorithm => :copy
