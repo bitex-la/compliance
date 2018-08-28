@@ -61,6 +61,7 @@ class Observation < ApplicationRecord
   def update_issue_status
     if !reply.present? && note.present?
       issue.observe! if issue.may_observe?
+=begin
       if scope == 'client'
         Event::EventLogger.call(
           issue, 
@@ -68,6 +69,7 @@ class Observation < ApplicationRecord
           4
         )
       end
+=end
     end
   end
 

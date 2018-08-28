@@ -6,7 +6,9 @@ ActiveAdmin.register EventLog do
     column :id
     column :entity_id
     column :entity_type
-    column :verb
+    column :verb do |e|
+      EventLogKind.find(e.verb_id).name
+    end
     column :created_at
     column :updated_at
     actions
