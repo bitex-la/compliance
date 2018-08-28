@@ -6,9 +6,12 @@ default: &default
   timeout: 5000
   username: <%= ENV.fetch("MYSQL_USERNAME") %>
   password: <%= ENV.fetch("MYSQL_PASSWORD") {} %>
-  #host: <%= ENV.fetch("MYSQL_HOST") {} %>
-  #port: <%= ENV.fetch("MYSQL_PORT") {} %>
+<% if ENV.fetch("MYSQL_SOCKET") {} %>
   socket: <%= ENV.fetch("MYSQL_SOCKET") {} %>
+<% else %>
+  host: <%= ENV.fetch("MYSQL_HOST") {} %>
+  port: <%= ENV.fetch("MYSQL_PORT") {} %>
+<% end %>
 
 development:
   <<: *default
