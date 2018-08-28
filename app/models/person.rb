@@ -1,13 +1,11 @@
 class Person < ApplicationRecord
   include Loggable
   
-  HAS_MANY = %i{
-    issues
+  HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
     natural_dockets
     legal_entity_dockets
-    fund_deposits
     allowances
     phones
     emails
@@ -16,10 +14,20 @@ class Person < ApplicationRecord
     chile_invoicing_details
     affinities
     risk_scores
+  }.each do |relationship|
+    has_many relationship, -> { where("replaced_by_id is NULL") }
+    has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
+  end
+
+  HAS_MANY_PLAIN = %i{
+    issues
+    fund_deposits
     attachments
   }.each do |relationship|
     has_many relationship
   end
+
+  HAS_MANY = HAS_MANY_REPLACEABLE + HAS_MANY_PLAIN
 
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
