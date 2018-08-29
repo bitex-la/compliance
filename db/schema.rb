@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180828192834) do
+ActiveRecord::Schema.define(version: 20180828193328) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -355,7 +355,10 @@ ActiveRecord::Schema.define(version: 20180828192834) do
     t.string "public_registry_extra_data"
     t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
+    t.index ["identification_kind_id"], name: "index_identification_seeds_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
+    t.index ["issuer"], name: "index_identification_seeds_on_issuer"
+    t.index ["number"], name: "index_identification_seeds_on_number"
   end
 
   create_table "identifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -492,6 +495,7 @@ ActiveRecord::Schema.define(version: 20180828192834) do
     t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
+    t.index ["title"], name: "index_note_seeds_on_title"
   end
 
   create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -505,6 +509,7 @@ ActiveRecord::Schema.define(version: 20180828192834) do
     t.index ["issue_id"], name: "index_notes_on_issue_id"
     t.index ["person_id"], name: "index_notes_on_person_id"
     t.index ["replaced_by_id"], name: "index_notes_on_replaced_by_id"
+    t.index ["title"], name: "index_notes_on_title"
   end
 
   create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -517,6 +522,10 @@ ActiveRecord::Schema.define(version: 20180828192834) do
     t.text "body_es"
     t.string "subject_pt"
     t.text "body_pt"
+    t.index ["scope"], name: "index_observation_reasons_on_scope"
+    t.index ["subject_en"], name: "index_observation_reasons_on_subject_en"
+    t.index ["subject_es"], name: "index_observation_reasons_on_subject_es"
+    t.index ["subject_pt"], name: "index_observation_reasons_on_subject_pt"
   end
 
   create_table "observations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -528,8 +537,10 @@ ActiveRecord::Schema.define(version: 20180828192834) do
     t.bigint "observation_reason_id"
     t.integer "scope"
     t.string "aasm_state"
+    t.index ["aasm_state"], name: "index_observations_on_aasm_state"
     t.index ["issue_id"], name: "index_observations_on_issue_id"
     t.index ["observation_reason_id"], name: "index_observations_on_observation_reason_id"
+    t.index ["scope"], name: "index_observations_on_scope"
   end
 
   create_table "people", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
