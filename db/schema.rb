@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180828140413) do
+ActiveRecord::Schema.define(version: 20180828193328) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -113,9 +113,16 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.string "full_name", null: false
     t.string "address"
     t.string "country", null: false
+    t.index ["address"], name: "index_argentina_invoicing_detail_seeds_on_address"
+    t.index ["country"], name: "index_argentina_invoicing_detail_seeds_on_country"
     t.index ["fruit_id"], name: "index_argentina_invoicing_detail_seeds_on_fruit_id"
+    t.index ["full_name"], name: "index_argentina_invoicing_detail_seeds_on_full_name"
     t.index ["issue_id"], name: "index_argentina_invoicing_detail_seeds_on_issue_id"
+    t.index ["receipt_kind_id"], name: "index_argentina_invoicing_detail_seeds_on_receipt_kind_id"
     t.index ["replaces_id"], name: "index_argentina_invoicing_detail_seeds_on_replaces_id"
+    t.index ["tax_id"], name: "index_argentina_invoicing_detail_seeds_on_tax_id"
+    t.index ["tax_id_kind_id"], name: "index_argentina_invoicing_detail_seeds_on_tax_id_kind_id"
+    t.index ["vat_status_id"], name: "index_argentina_invoicing_detail_seeds_on_vat_status_id"
   end
 
   create_table "argentina_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -131,9 +138,16 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.string "full_name", null: false
     t.string "address"
     t.string "country", null: false
+    t.index ["address"], name: "index_argentina_invoicing_details_on_address"
+    t.index ["country"], name: "index_argentina_invoicing_details_on_country"
+    t.index ["full_name"], name: "index_argentina_invoicing_details_on_full_name"
     t.index ["issue_id"], name: "index_argentina_invoicing_details_on_issue_id"
     t.index ["person_id"], name: "index_argentina_invoicing_details_on_person_id"
+    t.index ["receipt_kind_id"], name: "index_argentina_invoicing_details_on_receipt_kind_id"
     t.index ["replaced_by_id"], name: "index_argentina_invoicing_details_on_replaced_by_id"
+    t.index ["tax_id"], name: "index_argentina_invoicing_details_on_tax_id"
+    t.index ["tax_id_kind_id"], name: "index_argentina_invoicing_details_on_tax_id_kind_id"
+    t.index ["vat_status_id"], name: "index_argentina_invoicing_details_on_vat_status_id"
   end
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -163,9 +177,13 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
     t.integer "vat_status_id"
+    t.index ["comuna"], name: "index_chile_invoicing_detail_seeds_on_comuna"
     t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
+    t.index ["giro"], name: "index_chile_invoicing_detail_seeds_on_giro"
     t.index ["issue_id"], name: "index_chile_invoicing_detail_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_chile_invoicing_detail_seeds_on_replaces_id"
+    t.index ["tax_id"], name: "index_chile_invoicing_detail_seeds_on_tax_id"
+    t.index ["vat_status_id"], name: "index_chile_invoicing_detail_seeds_on_vat_status_id"
   end
 
   create_table "chile_invoicing_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -179,9 +197,13 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.integer "vat_status_id"
+    t.index ["comuna"], name: "index_chile_invoicing_details_on_comuna"
+    t.index ["giro"], name: "index_chile_invoicing_details_on_giro"
     t.index ["issue_id"], name: "index_chile_invoicing_details_on_issue_id"
     t.index ["person_id"], name: "index_chile_invoicing_details_on_person_id"
     t.index ["replaced_by_id"], name: "index_chile_invoicing_details_on_replaced_by_id"
+    t.index ["tax_id"], name: "index_chile_invoicing_details_on_tax_id"
+    t.index ["vat_status_id"], name: "index_chile_invoicing_details_on_vat_status_id"
   end
 
   create_table "comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -210,8 +232,15 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.bigint "fruit_id"
     t.integer "replaces_id"
     t.boolean "copy_attachments"
+    t.index ["city"], name: "index_domicile_seeds_on_city"
+    t.index ["country"], name: "index_domicile_seeds_on_country"
     t.index ["fruit_id"], name: "index_domicile_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_domicile_seeds_on_issue_id"
+    t.index ["postal_code"], name: "index_domicile_seeds_on_postal_code"
+    t.index ["state"], name: "index_domicile_seeds_on_state"
+    t.index ["street_address", "street_number"], name: "index_domicile_seeds_on_street_address_and_street_number"
+    t.index ["street_address"], name: "index_domicile_seeds_on_street_address"
+    t.index ["street_number"], name: "index_domicile_seeds_on_street_number"
   end
 
   create_table "domiciles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -228,9 +257,16 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.index ["city"], name: "index_domiciles_on_city"
+    t.index ["country"], name: "index_domiciles_on_country"
     t.index ["issue_id"], name: "index_domiciles_on_issue_id"
     t.index ["person_id"], name: "index_domiciles_on_person_id"
+    t.index ["postal_code"], name: "index_domiciles_on_postal_code"
     t.index ["replaced_by_id"], name: "index_domiciles_on_replaced_by_id"
+    t.index ["state"], name: "index_domiciles_on_state"
+    t.index ["street_address", "street_number"], name: "index_domiciles_on_street_address_and_street_number"
+    t.index ["street_address"], name: "index_domiciles_on_street_address"
+    t.index ["street_number"], name: "index_domiciles_on_street_number"
   end
 
   create_table "email_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -242,6 +278,8 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.index ["address"], name: "index_email_seeds_on_address"
+    t.index ["email_kind_id"], name: "index_email_seeds_on_email_kind_id"
     t.index ["fruit_id"], name: "index_email_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_email_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_email_seeds_on_replaces_id"
@@ -255,6 +293,8 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.index ["address"], name: "index_emails_on_address"
+    t.index ["email_kind_id"], name: "index_emails_on_email_kind_id"
     t.index ["issue_id"], name: "index_emails_on_issue_id"
     t.index ["person_id"], name: "index_emails_on_person_id"
     t.index ["replaced_by_id"], name: "index_emails_on_replaced_by_id"
@@ -269,6 +309,10 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "updated_at", null: false
     t.integer "verb_id"
     t.index ["admin_user_id"], name: "index_event_logs_on_admin_user_id"
+    t.index ["entity_id", "entity_type"], name: "index_event_logs_on_entity_id_and_entity_type"
+    t.index ["entity_id"], name: "index_event_logs_on_entity_id"
+    t.index ["entity_type"], name: "index_event_logs_on_entity_type"
+    t.index ["verb_id"], name: "index_event_logs_on_verb_id"
   end
 
   create_table "fund_deposits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -311,7 +355,10 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.string "public_registry_extra_data"
     t.boolean "copy_attachments"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
+    t.index ["identification_kind_id"], name: "index_identification_seeds_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
+    t.index ["issuer"], name: "index_identification_seeds_on_issuer"
+    t.index ["number"], name: "index_identification_seeds_on_number"
   end
 
   create_table "identifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -326,7 +373,10 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.string "public_registry_authority"
     t.string "public_registry_book"
     t.string "public_registry_extra_data"
+    t.index ["identification_kind_id"], name: "index_identifications_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identifications_on_issue_id"
+    t.index ["issuer"], name: "index_identifications_on_issuer"
+    t.index ["number"], name: "index_identifications_on_number"
     t.index ["person_id"], name: "index_identifications_on_person_id"
     t.index ["replaced_by_id"], name: "index_identifications_on_replaced_by_id"
   end
@@ -337,6 +387,7 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "updated_at", null: false
     t.string "aasm_state"
     t.boolean "fill_with_previous_info", default: false
+    t.index ["aasm_state"], name: "index_issues_on_aasm_state"
     t.index ["person_id"], name: "index_issues_on_person_id"
   end
 
@@ -351,8 +402,11 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.index ["commercial_name"], name: "index_legal_entity_docket_seeds_on_commercial_name"
+    t.index ["country"], name: "index_legal_entity_docket_seeds_on_country"
     t.index ["fruit_id"], name: "index_legal_entity_docket_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_legal_entity_docket_seeds_on_issue_id"
+    t.index ["legal_name"], name: "index_legal_entity_docket_seeds_on_legal_name"
   end
 
   create_table "legal_entity_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -366,7 +420,10 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.index ["commercial_name"], name: "index_legal_entity_dockets_on_commercial_name"
+    t.index ["country"], name: "index_legal_entity_dockets_on_country"
     t.index ["issue_id"], name: "index_legal_entity_dockets_on_issue_id"
+    t.index ["legal_name"], name: "index_legal_entity_dockets_on_legal_name"
     t.index ["person_id"], name: "index_legal_entity_dockets_on_person_id"
     t.index ["replaced_by_id"], name: "index_legal_entity_dockets_on_replaced_by_id"
   end
@@ -387,8 +444,15 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.boolean "politically_exposed"
     t.text "politically_exposed_reason"
     t.boolean "copy_attachments"
+    t.index ["birth_date"], name: "index_natural_docket_seeds_on_birth_date"
+    t.index ["first_name", "last_name"], name: "index_natural_docket_seeds_on_first_name_and_last_name"
+    t.index ["first_name"], name: "index_natural_docket_seeds_on_first_name"
     t.index ["fruit_id"], name: "index_natural_docket_seeds_on_fruit_id"
+    t.index ["gender_id"], name: "index_natural_docket_seeds_on_gender_id"
     t.index ["issue_id"], name: "index_natural_docket_seeds_on_issue_id"
+    t.index ["last_name"], name: "index_natural_docket_seeds_on_last_name"
+    t.index ["marital_status_id"], name: "index_natural_docket_seeds_on_marital_status_id"
+    t.index ["nationality"], name: "index_natural_docket_seeds_on_nationality"
   end
 
   create_table "natural_dockets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -407,7 +471,14 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.string "job_description"
     t.boolean "politically_exposed"
     t.text "politically_exposed_reason"
+    t.index ["birth_date"], name: "index_natural_dockets_on_birth_date"
+    t.index ["first_name", "last_name"], name: "index_natural_dockets_on_first_name_and_last_name"
+    t.index ["first_name"], name: "index_natural_dockets_on_first_name"
+    t.index ["gender_id"], name: "index_natural_dockets_on_gender_id"
     t.index ["issue_id"], name: "index_natural_dockets_on_issue_id"
+    t.index ["last_name"], name: "index_natural_dockets_on_last_name"
+    t.index ["marital_status_id"], name: "index_natural_dockets_on_marital_status_id"
+    t.index ["nationality"], name: "index_natural_dockets_on_nationality"
     t.index ["person_id"], name: "index_natural_dockets_on_person_id"
     t.index ["replaced_by_id"], name: "index_natural_dockets_on_replaced_by_id"
   end
@@ -424,6 +495,7 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
+    t.index ["title"], name: "index_note_seeds_on_title"
   end
 
   create_table "notes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -437,6 +509,7 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.index ["issue_id"], name: "index_notes_on_issue_id"
     t.index ["person_id"], name: "index_notes_on_person_id"
     t.index ["replaced_by_id"], name: "index_notes_on_replaced_by_id"
+    t.index ["title"], name: "index_notes_on_title"
   end
 
   create_table "observation_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -449,6 +522,10 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.text "body_es"
     t.string "subject_pt"
     t.text "body_pt"
+    t.index ["scope"], name: "index_observation_reasons_on_scope"
+    t.index ["subject_en"], name: "index_observation_reasons_on_subject_en"
+    t.index ["subject_es"], name: "index_observation_reasons_on_subject_es"
+    t.index ["subject_pt"], name: "index_observation_reasons_on_subject_pt"
   end
 
   create_table "observations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -460,8 +537,10 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.bigint "observation_reason_id"
     t.integer "scope"
     t.string "aasm_state"
+    t.index ["aasm_state"], name: "index_observations_on_aasm_state"
     t.index ["issue_id"], name: "index_observations_on_issue_id"
     t.index ["observation_reason_id"], name: "index_observations_on_observation_reason_id"
+    t.index ["scope"], name: "index_observations_on_scope"
   end
 
   create_table "people", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -484,8 +563,11 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.index ["country"], name: "index_phone_seeds_on_country"
     t.index ["fruit_id"], name: "index_phone_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_phone_seeds_on_issue_id"
+    t.index ["number"], name: "index_phone_seeds_on_number"
+    t.index ["phone_kind_id"], name: "index_phone_seeds_on_phone_kind_id"
     t.index ["replaces_id"], name: "index_phone_seeds_on_replaces_id"
   end
 
@@ -501,8 +583,11 @@ ActiveRecord::Schema.define(version: 20180828140413) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.bigint "issue_id"
+    t.index ["country"], name: "index_phones_on_country"
     t.index ["issue_id"], name: "index_phones_on_issue_id"
+    t.index ["number"], name: "index_phones_on_number"
     t.index ["person_id"], name: "index_phones_on_person_id"
+    t.index ["phone_kind_id"], name: "index_phones_on_phone_kind_id"
     t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
   end
 

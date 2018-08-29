@@ -137,21 +137,15 @@ RSpec.describe Issue, type: :model do
       issue.natural_docket_seed.should_not be_nil
       issue.legal_entity_docket_seed.should be_nil
       person.reload
-      person.domiciles.count.should == 2
+      person.domiciles.count.should == 1
       person.domiciles.current.count.should == 1
-      person.natural_dockets.count.should == 2
+      person.natural_dockets.count.should == 1
       person.natural_dockets.current.count.should == 1
       person.allowances.count.should == 3
       person.allowances.current.count.should == 3
 
-      %w(domiciles natural_dockets).each do |assoc|
-        person.send(assoc).first.replaced_by.should == person.send(assoc).last
-        person.send(assoc).last.replaces.should == person.send(assoc).first
-      end
-
       person.natural_docket.tap do |d|
         d.should == person.natural_dockets.current.last
-        d.replaces.should == person.natural_dockets.first
       end
     end
 
