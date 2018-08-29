@@ -47,11 +47,14 @@ describe Person do
     end
 
     it 'shows all the person info when the person exist' do
-      person = create :full_natural_person
+      person = create(:full_natural_person).reload
       issue = person.issues.first
 
+      # This is an old domiciel, that should not be included in the response.
+      create(:full_domicile, person: person, replaced_by: person.domiciles.last)
+
       get "/api/people/#{person.id}",
-	headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 200
       json_response = JSON.parse(response.body).deep_symbolize_keys
       person.reload
