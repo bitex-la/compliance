@@ -1,6 +1,6 @@
 class Api::EventLogsController < Api::ApiController
   def index
-    page, per_page = Util::PageCalculator.call(params, 0, 10)
+    page, per_page = Util::PageCalculator.call(params, 0, 50)
     events = if !params[:filter].blank?
       EventLog
         .where(entity_type: params[:filter][:entity_type], verb_id: EventLogKind.send(params[:filter][:verb]).id)
