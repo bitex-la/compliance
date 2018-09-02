@@ -457,6 +457,11 @@ describe Person do
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       json_response[:data].count.should == 1
 
+      filter = "filter[identifications_number_or_argentina_invoicing_details_tax_id_eq]=20955754290"
+      get "/api/people/?#{filter}",
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      json_response[:data].count.should == 2 # joe & bob
+
       filter = "filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=doe"
 
       get "/api/people/?#{filter}",

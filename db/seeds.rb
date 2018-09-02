@@ -119,7 +119,7 @@ if Rails.env.demo? || Rails.env.development?
     tax_id:       '20655764290',
     tax_id_kind_code:  'cuit',
     receipt_kind_code: 'a',
-    name:         'Richard Hendricks',
+    full_name:         'Richard Hendricks',
     country:      'AR',
     address:      'Lavalle 456 apto. 5C',
     issue: issue
@@ -258,7 +258,7 @@ if Rails.env.demo? || Rails.env.development?
      tax_id:       '2065437230',
      tax_id_kind_code:  'cuit',
      receipt_kind_code: 'a',
-     name:         'Pied Piper Enterprises',
+     full_name:         'Pied Piper Enterprises',
      country:      'AR',
      address:      'Cabildo 4532',
      issue: issue
@@ -487,7 +487,7 @@ if Rails.env.demo? || Rails.env.development?
      tax_id:       '20875764290',
      tax_id_kind_code:  'cuil',
      receipt_kind_code: 'a',
-     name:         'Bertram Gilfoyle',
+     full_name:         'Bertram Gilfoyle',
      country:      'AR',
      address:      'Lavalle 456 apto. 5C',
      issue: issue
@@ -729,7 +729,7 @@ if Rails.env.demo? || Rails.env.development?
      tax_id:       '20789056430',
      tax_id_kind_code:  'cuit',
      receipt_kind_code: 'b',
-     name:         'Hooli INC',
+     full_name:         'Hooli INC',
      country:      'AR',
      address:      'Ayacucho 235',
      issue: issue
@@ -879,7 +879,7 @@ if Rails.env.demo? || Rails.env.development?
      tax_id:       '20955464310',
      tax_id_kind_code:  'cuil',
      receipt_kind_code: 'a',
-     name:         'Nelson Bighetti',
+     full_name:         'Nelson Bighetti',
      country:      'AR',
      address:      'Federico Lacroze 342 apto 4B',
      issue: issue
