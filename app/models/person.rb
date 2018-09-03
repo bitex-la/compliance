@@ -69,7 +69,15 @@ class Person < ApplicationRecord
   end
 
   def name
-    "人 #{id}: #{person_email}"
+    name = if docket = natural_dockets.last
+      [docket.first_name, docket.last_name].join(" ")
+    elsif docket = legal_entity_dockets.last
+      docket.legal_name || docket.commercial_name
+    else
+      person_email
+    end
+
+    "人 #{id}: #{name}"
   end
 
   def fruits
