@@ -3,7 +3,6 @@ class ArgentinaInvoicingDetailSeed < ApplicationRecord
   include StaticModels::BelongsTo
 
   validates :country, country: true
-  validates :address, presence: true 
   validates :full_name, presence: true
   validates :tax_id_kind, inclusion: { in: TaxIdKind.all }
   validates :receipt_kind, inclusion: { in: ReceiptKind.all }
