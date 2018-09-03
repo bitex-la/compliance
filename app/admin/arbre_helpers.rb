@@ -169,14 +169,18 @@ module ArbreHelpers
     end
   end
 
-  def self.fruit_show_section(context, fruit)
+  def self.fruit_show_section(context, fruit, others = [])
     context.instance_eval do
-      columns = fruit.class.columns.map{|c| c.name.gsub(/_id$/,'') } -
+      columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
+      columns = columns.map{|c| c.gsub(/_id$/,'') } -
         %w(id person issue created_at updated_at replaces)
       attributes_table_for fruit do
         row(:show){|o| link_to o.name, o }
         columns.each do |n|
           row(n)
+        end
+        others.each do |o|
+          row(o)
         end
         if fruit.replaces
           row(:replaces)

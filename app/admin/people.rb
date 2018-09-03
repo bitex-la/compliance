@@ -144,7 +144,7 @@ ActiveAdmin.register Person do
           h3 "Argentina Invoicing details"
           fruits.each do |fruit|
             ArbreHelpers.panel_grid(self, fruits) do |d|
-              ArbreHelpers.fruit_show_section(self, d)
+              ArbreHelpers.fruit_show_section(self, d, [:tax_id])
             end
           end
         end
