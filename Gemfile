@@ -38,10 +38,11 @@ gem 'jsonapi_mapper', github: 'bitex-la/jsonapi-mapper'
 gem 'static_models', github: 'bitex-la/static_models'
 
 gem 'kaminari'
-
 gem 'timecop'
-
 gem 'dotenv-rails'
+
+# exception notifier
+gem 'exception_notification'
 
 group :development, :test do 
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
