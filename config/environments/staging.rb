@@ -115,6 +115,6 @@ Rails.application.configure do
   :email => {
     :email_prefix => "[compliance_bitex.la][staging]",
     :sender_address => %{"notifier" <hola@bitex.la>},
-    :exception_recipients => ['yo+urgent@nubis.im', 'yohan@bitex.la']
+    :exception_recipients => ENV['EXCEPTION_RECIPIENTS'].strip.split(',')
   }
 end
