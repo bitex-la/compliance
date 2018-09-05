@@ -99,6 +99,22 @@ Rails.application.configure do
     bucket: Secrets.s3.attachments_bucket
   }
 
+  config.action_mailer.smtp_settings = {
+    address: "email-smtp.us-east-1.amazonaws.com",
+    port: 587,
+    authentication: "plain",
+    enable_starttls_auto: true,
+    user_name: ENV['AWS_SES_API_KEY'],
+    password: ENV['AWS_SES_API_SECRET']
+  }
+
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  Rails.application.config.middleware.use ExceptionNotification::Rack,
+  :email => {
+    :email_prefix => "[compliance_bitex.la][production]",
+    :sender_address => %{"notifier" <hola@bitex.la>},
+    :exception_recipients => ['yo+urgent@nubis.im', 'yohan@bitex.la']
+  }
 end

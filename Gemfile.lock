@@ -199,6 +199,9 @@ GEM
       activesupport (~> 5.0)
       request_store (~> 1.0)
     erubi (1.7.1)
+    exception_notification (4.2.2)
+      actionmailer (>= 4.0, < 6)
+      activesupport (>= 4.0, < 6)
     execjs (2.7.0)
     factory_bot (4.11.0)
       activesupport (>= 3.0.0)
@@ -428,6 +431,7 @@ DEPENDENCIES
   devise
   dotenv-rails
   draper
+  exception_notification
   factory_bot
   fast_jsonapi!
   font-awesome-rails
