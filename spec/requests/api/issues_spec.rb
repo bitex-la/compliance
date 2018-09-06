@@ -48,7 +48,7 @@ describe Issue do
       assert_logging(Issue.last, :create_entity, 1)
     end
 
-    %i(png gif pdf jpg zip).each do |ext|
+    %i(png gif pdf jpg zip PNG GIF PDF JPG ZIP).each do |ext|
       describe "receives a #{ext} attachment and" do
         it 'creates a new issue with a domicile seed' do
           issue  = Api::IssuesHelper.issue_with_domicile_seed(ext)

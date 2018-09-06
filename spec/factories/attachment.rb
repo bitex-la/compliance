@@ -24,5 +24,11 @@ FactoryBot.define do
         document { File.new("#{Rails.root}/spec/fixtures/files/simple.#{type}") }
       end
     end
+
+    %i(JPG PNG GIF PDF ZIP).each do |type|
+      factory "#{type}_attachment", class: Attachment do
+        document { File.new("#{Rails.root}/spec/fixtures/files/simple_upper.#{type}") }
+      end
+    end
   end
 end
