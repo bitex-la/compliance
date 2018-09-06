@@ -23,8 +23,13 @@ describe 'an admin user' do
     else
       "issue[#{kind}_attributes][attachments_attributes][#{att_index}][document]"
     end
+    filename = if ext == ext.upcase
+      "./spec/fixtures/files/simple_upper.#{ext}"
+    else 
+      "./spec/fixtures/files/simple.#{ext}"
+    end
     attach_file(path,
-        File.absolute_path("./spec/fixtures/files/simple.#{ext}"), wait: 10.seconds)
+        File.absolute_path(filename), wait: 10.seconds)
   end
 
   it 'creates a new natural person and its issue via admin' do
@@ -488,7 +493,7 @@ describe 'an admin user' do
     new_allowance.replaced_by_id.should be_nil
 
     # Here we validate that attachments are copy to the new fruit (when applies)
-    new_identification.attachments.count.should == 6
+    new_identification.attachments.count.should == 10
     new_natural_docket.attachments.count.should == 1
 
     within '.row.row-person' do
@@ -778,7 +783,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 6
+      new_domicile.attachments.count.should == 10
 
       within '.row.row-person' do
       	click_link Person.first.id
@@ -920,7 +925,7 @@ describe 'an admin user' do
       within(".has_many_container.identification_seeds") do
         within first(".has_many_container.attachments") do
           click_link "Add New Attachment"
-          fill_attachment('identification_seeds', 'jpg', true, 0, 5)
+          fill_attachment('identification_seeds', 'jpg', true, 0, 9)
         end
       end
 

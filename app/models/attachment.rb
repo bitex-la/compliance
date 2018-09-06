@@ -23,13 +23,13 @@ class Attachment < ApplicationRecord
     ]}
 
   validates_attachment_file_name :document, matches: [
-    /png\z/,
-    /jpg\z/,
-    /jpeg\z/,
-    /pdf\z/,
-    /gif\z/,
-    /zip\z/,
-    /rar\z/,
+    /png|PNG\z/,
+    /jpg|JPG\z/,
+    /jpeg|JPEG\z/,
+    /pdf|PDF\z/,
+    /gif|GIF\z/,
+    /zip|ZIP\z/,
+    /rar|RAR\z/,
   ]
 
   def attached_to_something

@@ -590,16 +590,22 @@ class Api::IssuesHelper
 
   def self.mime_for(ext)
     case ext
-      when :png, :jpg, :gif then "image/#{ext}"
-      when :pdf, :zip then "application/#{ext}"
-      when :rar then "application/x-rar-compressed"
-      else raise "No fixture for #{ext} files"
+      when :png, :jpg, :gif, :JPG, :PNG, :GIF then "image/#{ext.downcase}"
+      when :pdf, :zip, :PDF, :ZIP then "application/#{ext.downcase}"
+      when :rar, :RAR then "application/x-rar-compressed"
+      else raise "No fixture for #{ext.downcase} files"
     end
   end
 
   def self.bytes_for(ext)
     fixtures = RSpec.configuration.file_fixture_path
-    path = Pathname.new(File.join(fixtures, "simple.#{ext}"))
+    filename = if ext == ext.upcase
+      "simple_upper.#{ext}"
+    else
+      "simple.#{ext}"
+    end
+  
+    path = Pathname.new(File.join(fixtures, filename))
     Base64.encode64(path.read).delete!("\n")
   end
 
