@@ -44,6 +44,9 @@ gem 'dotenv-rails'
 # exception notifier
 gem 'exception_notification'
 
+# monitoring
+gem 'appsignal'
+
 group :development, :test do 
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 end
