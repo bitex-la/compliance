@@ -1,7 +1,9 @@
 class Api::PeopleController < Api::ApiController
+  caches_action :show, expires_in: 10.minutes
+  caches_action :index, expires_in: 1.minute
+
   def index
     scope = Person.ransack(params[:filter]).result
-
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     people = scope.page(page).per(per_page)
     jsonapi_response people,

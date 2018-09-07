@@ -1,4 +1,6 @@
 class Api::IssueJsonApiSyncController < Api::ApiController
+  caches_action :show, expires_in: 30.seconds
+
   def show
     jsonapi_response get_resource(scope), options_for_response
   end

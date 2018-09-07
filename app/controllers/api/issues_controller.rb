@@ -1,4 +1,7 @@
 class Api::IssuesController < Api::ApiController
+  caches_action :index, expires_in: 1.minute
+  caches_action :show, expires_in: 1.minute
+
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 3)
     issues = Person.find(params[:person_id]).issues

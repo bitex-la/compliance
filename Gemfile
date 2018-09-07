@@ -44,6 +44,10 @@ gem 'dotenv-rails'
 # exception notifier
 gem 'exception_notification'
 
+# cache
+gem 'rack-cache'
+gem 'actionpack-action_caching'
+
 group :development, :test do 
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 end

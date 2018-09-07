@@ -43,6 +43,8 @@ GEM
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    actionpack-action_caching (1.2.0)
+      actionpack (>= 4.0.0, < 6)
     actionview (5.1.6)
       activesupport (= 5.1.6)
       builder (~> 3.1)
@@ -288,6 +290,8 @@ GEM
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.5)
+    rack-cache (1.8.0)
+      rack (>= 0.4)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.1.6)
@@ -410,6 +414,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm
+  actionpack-action_caching
   active_model_serializers (~> 0.10.0)
   activeadmin
   aws-sdk (< 2.0)
@@ -444,6 +449,7 @@ DEPENDENCIES
   mysql2
   paperclip (= 4.3.6)
   puma (~> 3.7)
+  rack-cache
   rails (~> 5.1.4)
   rspec-rails
   rspec_junit_formatter (= 0.2.2)

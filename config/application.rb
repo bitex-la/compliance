@@ -30,5 +30,12 @@ module Compliance
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # rack cache configuration
+    config.action_dispatch.rack_cache = {
+      verbose:     true,
+      metastore:   ENV['RACK_CACHE_META_STORE'] || 'file:/tmp/cache/rack/meta',
+      entitystore: ENV['RACK_CACHE_ENTITY_STORE'] || 'file:/tmp/cache/rack/meta'
+    }
   end
 end
