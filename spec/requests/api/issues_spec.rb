@@ -51,7 +51,7 @@ describe Issue do
     %i(png gif pdf jpg zip PNG GIF PDF JPG ZIP).each do |ext|
       describe "receives a #{ext} attachment and" do
         it 'creates a new issue with a domicile seed' do
-          issue  = Api::IssuesHelper.issue_with_domicile_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_domicile_seed(ext, true)
           post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -73,7 +73,7 @@ describe Issue do
         end
 
         it 'creates a new issue with a risk score seed' do
-          issue  = Api::IssuesHelper.issue_with_risk_score_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_risk_score_seed(ext, true)
           post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -95,7 +95,7 @@ describe Issue do
         end
 
         it 'creates a new issue with an email seed' do
-          issue  = Api::IssuesHelper.issue_with_email_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_email_seed(ext, true)
           post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -125,7 +125,7 @@ describe Issue do
         end
 
         it 'creates a new issue with an argentina invoicing seed' do
-          issue  = Api::IssuesHelper.issue_with_argentina_invoicing_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_argentina_invoicing_seed(ext, true)
           post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -149,7 +149,7 @@ describe Issue do
         end
 
         it 'creates a new issue with a natural docket seed' do
-          issue  = Api::IssuesHelper.issue_with_natural_docket_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_natural_docket_seed(ext, true)
           post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -173,7 +173,7 @@ describe Issue do
         end
 
         it 'creates a new issue with a allowance seed' do
-          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext, true)
           post "/api/people/#{person.id}/issues",
             params: issue,
             headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -211,7 +211,7 @@ describe Issue do
 
         it 'creates a new issue with an identification seed who wants to replace the current identification' do
           full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_identification_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_identification_seed(ext, true)
           issue[:included][0][:relationships].merge!({
             replaces: { data: { type: 'identifications', id: Identification.last.id.to_s } }
           })
@@ -249,7 +249,7 @@ describe Issue do
 
         it 'creates a new issue with an allowance seed who wants to replace the current allowance' do
           full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext)
+          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext, true)
           issue[:included][0][:relationships].merge!({
             replaces: { data: { type: 'allowances', id: Allowance.last.id.to_s } }
           })
