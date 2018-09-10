@@ -36,6 +36,7 @@ class Api::IssuesController < Api::ApiController
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
+      expire_action :action => :index
       jsonapi_response mapper.data, {
         include: Issue.included_for
       }, 201
@@ -51,7 +52,10 @@ class Api::IssuesController < Api::ApiController
     mapper = get_issue_jsonapi_mapper(issue.person.id, issue.id)
     return jsonapi_422(nil) unless mapper.data
 
+    debugger
     if mapper.save_all
+      expire_action :action => :index
+      expire_action :action => :show
       jsonapi_response mapper.data, {
         include: Issue.included_for
       }, 200

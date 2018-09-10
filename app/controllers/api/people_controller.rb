@@ -17,6 +17,8 @@ class Api::PeopleController < Api::ApiController
   end
 
   def create
+    expire_action :action => :index
+    expire_action :action => :show
     jsonapi_response Person.create, {}, 201
   end
 end

@@ -6,10 +6,13 @@ class Api::IssueJsonApiSyncController < Api::ApiController
   end
 
   def create
+    expire_action :action => :index
     map_and_save(201)
   end
 
   def update
+    expire_action :action => :index
+    expire_action :action => :show
     get_resource(scope)
     map_and_save(200)
   end
