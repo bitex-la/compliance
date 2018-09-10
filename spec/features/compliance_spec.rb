@@ -16,17 +16,21 @@ describe 'an admin user' do
     end
   end
 
-  def fill_attachment(kind, ext = 'jpg', has_many = true, index = 0, att_index = 0)
+  def fill_attachment(kind, ext = 'jpg', has_many = true, index = 0, att_index = 0, accented = false)
     wait_for_ajax
     path = if has_many
       "issue[#{kind}_attributes][#{index}][attachments_attributes][#{att_index}][document]"
     else
       "issue[#{kind}_attributes][attachments_attributes][#{att_index}][document]"
     end
-    filename = if ext == ext.upcase
-      "./spec/fixtures/files/simple_upper.#{ext}"
-    else 
-      "./spec/fixtures/files/simple.#{ext}"
+    filename = if accented
+      "./spec/fixtures/files/áñ_simple_微信图片.#{ext}"
+    else
+      if ext == ext.upcase
+        "./spec/fixtures/files/simple_upper.#{ext}"
+      else 
+        "./spec/fixtures/files/simple.#{ext}"
+      end
     end
     attach_file(path,
         File.absolute_path(filename), wait: 10.seconds)
@@ -67,7 +71,7 @@ describe 'an admin user' do
 
     within(".has_many_container.identification_seeds") do
       click_link "Add New Attachment"
-      fill_attachment('identification_seeds', 'jpg')
+      fill_attachment('identification_seeds', 'jpg', true, 0, 0, true)
     end
 
     click_link 'Contact (0)'
@@ -110,7 +114,7 @@ describe 'an admin user' do
     })
     within(".has_many_container.domicile_seeds") do
       click_link "Add New Attachment"
-      fill_attachment('domicile_seeds', 'zip')
+      fill_attachment('domicile_seeds', 'zip', true, 0, 0, true)
     end
 
     click_link 'Allowance (0)' 
@@ -125,7 +129,7 @@ describe 'an admin user' do
 
     within(".has_many_container.allowance_seeds") do
       click_link "Add New Attachment"
-      fill_attachment('allowance_seeds', 'gif')
+      fill_attachment('allowance_seeds', 'gif', true, 0, 0, true)
     end
 
     click_link 'Docket' 
@@ -186,6 +190,15 @@ describe 'an admin user' do
       issue.send(seed).count.should == 1
       issue.send(seed).first.attachments.count == 1
     end
+
+    issue.identification_seeds.first.attachments
+      .first.document_file_name.should == 'an_simple_????.jpg'
+
+    issue.domicile_seeds.first.attachments
+      .first.document_file_name.should == 'an_simple_????.zip'
+
+    issue.allowance_seeds.first.attachments
+      .first.document_file_name.should == 'an_simple_????.gif'
 
     issue.natural_docket_seed.should == NaturalDocketSeed.last
     issue.should be_observed
