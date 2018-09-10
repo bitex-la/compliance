@@ -106,7 +106,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_affinity_seed(related_person, attachment_type)
+  def self.issue_with_affinity_seed(person, related_person, attachment_type)
     mime, bytes =
     {
       data: {
@@ -114,6 +114,7 @@ class Api::IssuesHelper
         type: "issues",
         attributes: { },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           affinity_seeds: {
             data: [{ id: "@1", type: "affinity_seeds" }]
           }
@@ -147,7 +148,7 @@ class Api::IssuesHelper
   end
 
 
-  def self.issue_with_domicile_seed(attachment_type, accented = false)
+  def self.issue_with_domicile_seed(person, attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -157,7 +158,8 @@ class Api::IssuesHelper
         relationships: {
           domicile_seeds: {
             data: [{ id: "@1", type: "domicile_seeds" }]
-          }
+          },
+          person: { data: { id: person.id, type: "people" } }
         }
       },
       included: [
@@ -191,7 +193,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_phone_seed(attachment_type, accented = false)
+  def self.issue_with_phone_seed(person, attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -199,6 +201,7 @@ class Api::IssuesHelper
         type: "issues",
         attributes: { },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           phone_seeds: {
             data: [{ id: "@1", type: "phone_seeds" }]
           }
@@ -233,7 +236,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_email_seed(attachment_type, accented = false)
+  def self.issue_with_email_seed(person, attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -241,6 +244,7 @@ class Api::IssuesHelper
         type: "issues",
         attributes: { },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           email_seeds: {
             data: [{ id: "@1", type: "email_seeds" }]
           }
@@ -271,7 +275,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_argentina_invoicing_seed(attachment_type, accented = false)
+  def self.issue_with_argentina_invoicing_seed(person, attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -279,6 +283,7 @@ class Api::IssuesHelper
         type: "issues",
         attributes: { },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           argentina_invoicing_detail_seed: {
             data: { id: "@1", type: "argentina_invoicing_detail_seeds" }
           }
@@ -314,7 +319,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_chile_invoicing_seed(attachment_type, accented = false)
+  def self.issue_with_chile_invoicing_seed(person, attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -322,6 +327,7 @@ class Api::IssuesHelper
         type: "issues",
         attributes: { },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           chile_invoicing_detail_seed: {
             data: { id: "@1", type: "chile_invoicing_detail_seeds" }
           }
@@ -355,7 +361,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_identification_seed(attachment_type, accented = false)
+  def self.issue_with_identification_seed(person, attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -365,7 +371,8 @@ class Api::IssuesHelper
         relationships: {
           identification_seeds: {
             data: [{ id: "@1", type: "identification_seeds" }]
-          }
+          },
+          person: { data: { id: person.id, type: "people" } }
         }
       },
       included:[
@@ -391,7 +398,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_risk_score_seed(attachment_type, accented = false)
+  def self.issue_with_risk_score_seed(person, attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -399,6 +406,7 @@ class Api::IssuesHelper
 
         },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           risk_score_seeds: {
             data: [{ id: "@1", type: "risk_score_seeds" }]
           }
@@ -428,7 +436,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_natural_docket_seed(attachment_type, accented = false)
+  def self.issue_with_natural_docket_seed(person, attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -436,6 +444,7 @@ class Api::IssuesHelper
 
         },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           natural_docket_seed: {
             data:
             {
@@ -471,7 +480,7 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_legal_entity_docket_seed(attachment_type, accented = false)
+  def self.issue_with_legal_entity_docket_seed(person, attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -479,6 +488,7 @@ class Api::IssuesHelper
 
         },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           legal_entity_docket_seed: {
             data:
             {
@@ -513,13 +523,14 @@ class Api::IssuesHelper
     }
   end
 
-  def self.issue_with_allowance_seed(attachment_type, accented = false)
+  def self.issue_with_allowance_seed(person, attachment_type, accented = false)
     {
       data: {
         type: "issues",
         attributes: {
         },
         relationships: {
+          person: { data: { id: person.id, type: "people" } },
           allowance_seeds: {
             data:
              [{

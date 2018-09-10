@@ -31,7 +31,7 @@ describe Issue do
 
   describe 'Creating a new user Issue' do
     it 'responds with an Unprocessable Entity HTTP code (422) when body is empty' do
-      post "/api/people/#{person.id}/issues",
+      post "/api/issues",
         params: {},
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 422
@@ -40,7 +40,7 @@ describe Issue do
     it 'creates a new issue with an observation' do
       reason = create(:human_world_check_reason)
       issue  = Api::IssuesHelper.issue_with_an_observation(person.id, reason, 'test')
-      post "/api/people/#{person.id}/issues",
+      post "/api/issues",
         params: issue,
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
@@ -49,299 +49,283 @@ describe Issue do
     end
 
     %i(png gif pdf jpg zip PNG GIF PDF JPG ZIP).each do |ext|
-      describe "receives a #{ext} attachment and" do
-        it 'creates a new issue with a domicile seed' do
-          issue  = Api::IssuesHelper.issue_with_domicile_seed(ext, true)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      it "creates a new issue with a domicile seed and #{ext} attachment" do
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(person, ext, true)
+        post "/api/issues",
+          params: issue,
+          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          assert_issue_integrity(["DomicileSeed"])
-          assert_response 201
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with an identification seed' do
-          issue  = Api::IssuesHelper.issue_with_identification_seed(ext)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
- 
-          assert_issue_integrity(["IdentificationSeed"])
-          assert_response 201
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a risk score seed' do
-          issue  = Api::IssuesHelper.issue_with_risk_score_seed(ext, true)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["RiskScoreSeed"])
-          assert_response 201
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a phone seed' do
-          issue  = Api::IssuesHelper.issue_with_phone_seed(ext)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["PhoneSeed"])
-          assert_response 201
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with an email seed' do
-          issue  = Api::IssuesHelper.issue_with_email_seed(ext, true)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["EmailSeed"])
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with an affinity seed' do
-          related_person = create(:empty_person)
-          issue  = Api::IssuesHelper.issue_with_affinity_seed(related_person, ext)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          Issue.count.should == 1
-          Person.count.should == 2
-          Issue.first.person.should == person
-          AffinitySeed.count.should == 1
-          AffinitySeed.last.issue.should == Issue.first
-          AffinitySeed.last.attachments.count.should == 1
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with an argentina invoicing seed' do
-          issue  = Api::IssuesHelper.issue_with_argentina_invoicing_seed(ext, true)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["ArgentinaInvoicingDetailSeed"])
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a chile invoicing seed' do
-          issue  = Api::IssuesHelper.issue_with_chile_invoicing_seed(ext)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["ChileInvoicingDetailSeed"])
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a natural docket seed' do
-          issue  = Api::IssuesHelper.issue_with_natural_docket_seed(ext, true)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["NaturalDocketSeed"])
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a legal entity docket seed' do
-          issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(ext)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["LegalEntityDocketSeed"])
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a allowance seed' do
-          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext, true)
-          post "/api/people/#{person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_issue_integrity(["AllowanceSeed"])
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
+        assert_issue_integrity(["DomicileSeed"])
+        assert_response 201
+        assert_logging(Issue.last, :create_entity, 1)
       end
+    end
+
+    it 'creates a new issue with an identification seed' do
+      issue  = Api::IssuesHelper.issue_with_identification_seed(person, :gif)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["IdentificationSeed"])
+      assert_response 201
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a risk score seed' do
+      issue  = Api::IssuesHelper.issue_with_risk_score_seed(person, :gif, true)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["RiskScoreSeed"])
+      assert_response 201
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a phone seed' do
+      issue  = Api::IssuesHelper.issue_with_phone_seed(person, :gif)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["PhoneSeed"])
+      assert_response 201
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with an email seed' do
+      issue  = Api::IssuesHelper.issue_with_email_seed(person, :gif, true)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["EmailSeed"])
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with an affinity seed' do
+      related_person = create(:empty_person)
+      issue  = Api::IssuesHelper.issue_with_affinity_seed(person, related_person, :gif)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      Issue.count.should == 1
+      Person.count.should == 2
+      Issue.first.person.should == person
+      AffinitySeed.count.should == 1
+      AffinitySeed.last.issue.should == Issue.first
+      AffinitySeed.last.attachments.count.should == 1
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with an argentina invoicing seed' do
+      issue  = Api::IssuesHelper.issue_with_argentina_invoicing_seed(person, :gif, true)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["ArgentinaInvoicingDetailSeed"])
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a chile invoicing seed' do
+      issue  = Api::IssuesHelper.issue_with_chile_invoicing_seed(person, :gif)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["ChileInvoicingDetailSeed"])
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a natural docket seed' do
+      issue  = Api::IssuesHelper.issue_with_natural_docket_seed(person, :gif, true)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["NaturalDocketSeed"])
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a legal entity docket seed' do
+      issue  = Api::IssuesHelper.issue_with_legal_entity_docket_seed(person, :gif)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["LegalEntityDocketSeed"])
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a allowance seed' do
+      issue  = Api::IssuesHelper.issue_with_allowance_seed(person, :gif, true)
+      post "/api/issues",
+        params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_issue_integrity(["AllowanceSeed"])
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
     end
   end
 
-  describe 'Updating people info' do
-     %i(png gif pdf jpg zip).each do |ext|
-      describe "receives a #{ext} attachment and" do
-        it 'creates a new issue with a domicile seed who wants to replace the current domicile' do
-          full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_domicile_seed(ext)
-          issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'domiciles', id: Domicile.last.id.to_s } }
-          })
+  describe 'When updating a person via issues' do
+    let(:full_natural_person){ create :full_natural_person }
 
-          post "/api/people/#{full_natural_person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+    %i(png gif pdf jpg zip).each do |ext|
+      it "adds issue to replace domicile, and add #{ext} attachment" do
+        issue  = Api::IssuesHelper.issue_with_domicile_seed(full_natural_person, ext)
+        issue[:included][0][:relationships].merge!({
+          replaces: { data: { type: 'domiciles', id: Domicile.last.id.to_s } }
+        })
 
-          assert_replacement_issue_integrity(["DomicileSeed"])
-          DomicileSeed.last.replaces.should == Domicile.last
-          DomicileSeed.first.replaces.should be_nil
-          assert_response 201
+        post "/api/issues", params: issue,
+          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
-          assert_logging(Issue.last, :create_entity, 1)
-        end
+        assert_replacement_issue_integrity(["DomicileSeed"])
+        DomicileSeed.last.replaces.should == Domicile.last
+        DomicileSeed.first.replaces.should be_nil
+        assert_response 201
 
-        it 'creates a new issue with an identification seed who wants to replace the current identification' do
-          full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_identification_seed(ext, true)
-          issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'identifications', id: Identification.last.id.to_s } }
-          })
-
-          post "/api/people/#{full_natural_person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_replacement_issue_integrity(["IdentificationSeed"])
-          IdentificationSeed.last.replaces.should == Identification.last
-          IdentificationSeed.first.replaces.should be_nil
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a risk score seed who wants to replace the current risk score' do
-          full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_risk_score_seed(ext)
-          issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'risk_scores', id: RiskScore.last.id.to_s } }
-          })
-
-          post "/api/people/#{full_natural_person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          assert_replacement_issue_integrity(["RiskScoreSeed"])
-          RiskScoreSeed.last.replaces.should == RiskScore.last
-          RiskScoreSeed.first.replaces.should be_nil
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with an allowance seed who wants to replace the current allowance' do
-          full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_allowance_seed(ext, true)
-          issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'allowances', id: Allowance.last.id.to_s } }
-          })
-
-          post "/api/people/#{full_natural_person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          Issue.count.should == 2
-          AllowanceSeed.count.should == 3
-          AllowanceSeed.last.issue.should == Issue.last
-          AllowanceSeed.last.attachments.count.should == 1
-          AllowanceSeed.last.replaces.should == Allowance.last
-          AllowanceSeed.first.replaces.should be_nil
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with a phone seed who wants to replace the current phone' do
-          full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_phone_seed(ext)
-          issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'phones', id: Phone.last.id.to_s } }
-          })
-
-          post "/api/people/#{full_natural_person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          Issue.count.should == 2
-          PhoneSeed.count.should == 2
-          PhoneSeed.last.issue.should == Issue.last
-          PhoneSeed.last.attachments.count.should == 1
-          PhoneSeed.last.replaces.should == Phone.last
-          PhoneSeed.first.replaces.should be_nil
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with an email seed who wants to replace the current email' do
-          full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_email_seed(ext)
-          issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'emails', id: Email.last.id.to_s } }
-          })
-
-          post "/api/people/#{full_natural_person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          Issue.count.should == 2
-          EmailSeed.count.should == 2
-          EmailSeed.last.issue.should == Issue.last
-          EmailSeed.last.attachments.count.should == 1
-          EmailSeed.last.replaces.should == Email.last
-          EmailSeed.first.replaces.should be_nil
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
-
-        it 'creates a new issue with an affinity seed who wants to replace the current affinity' do
-          new_partner = create(:empty_person)
-          full_natural_person = create(:full_natural_person)
-          issue  = Api::IssuesHelper.issue_with_affinity_seed(new_partner, ext)
-          issue[:included][0][:relationships].merge!({
-            replaces: { data: { type: 'affinities', id: full_natural_person.affinities.reload.first.id.to_s } }
-          })
-
-          post "/api/people/#{full_natural_person.id}/issues",
-            params: issue,
-            headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-          Issue.count.should == 2
-          AffinitySeed.count.should == 2
-          AffinitySeed.last.issue.should == Issue.last
-          AffinitySeed.last.replaces.should == Person.second.affinities.first
-          AffinitySeed.first.replaces.should be_nil
-          assert_response 201
-
-          assert_logging(Issue.last, :create_entity, 1)
-        end
+        assert_logging(Issue.last, :create_entity, 1)
       end
+    end
+
+    it 'creates a new issue with an identification seed who wants to replace the current identification' do
+      issue  = Api::IssuesHelper.issue_with_identification_seed(person, :gif, true)
+      issue[:included][0][:relationships].merge!({
+        replaces: { data: { type: 'identifications', id: Identification.last.id.to_s } }
+      })
+
+      post "/api/issues", params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_replacement_issue_integrity(["IdentificationSeed"])
+      IdentificationSeed.last.replaces.should == Identification.last
+      IdentificationSeed.first.replaces.should be_nil
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a risk score seed who wants to replace the current risk score' do
+      issue  = Api::IssuesHelper.issue_with_risk_score_seed(person, :gif)
+      issue[:included][0][:relationships].merge!({
+        replaces: { data: { type: 'risk_scores', id: RiskScore.last.id.to_s } }
+      })
+
+      post "/api/issues", params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      assert_replacement_issue_integrity(["RiskScoreSeed"])
+      RiskScoreSeed.last.replaces.should == RiskScore.last
+      RiskScoreSeed.first.replaces.should be_nil
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with an allowance seed who wants to replace the current allowance' do
+      issue  = Api::IssuesHelper.issue_with_allowance_seed(person, :gif, true)
+      issue[:included][0][:relationships].merge!({
+        replaces: { data: { type: 'allowances', id: Allowance.last.id.to_s } }
+      })
+
+      post "/api/issues", params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      Issue.count.should == 2
+      AllowanceSeed.count.should == 3
+      AllowanceSeed.last.issue.should == Issue.last
+      AllowanceSeed.last.attachments.count.should == 1
+      AllowanceSeed.last.replaces.should == Allowance.last
+      AllowanceSeed.first.replaces.should be_nil
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with a phone seed who wants to replace the current phone' do
+      issue  = Api::IssuesHelper.issue_with_phone_seed(person, :gif)
+      issue[:included][0][:relationships].merge!({
+        replaces: { data: { type: 'phones', id: Phone.last.id.to_s } }
+      })
+
+      post "/api/issues", params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      Issue.count.should == 2
+      PhoneSeed.count.should == 2
+      PhoneSeed.last.issue.should == Issue.last
+      PhoneSeed.last.attachments.count.should == 1
+      PhoneSeed.last.replaces.should == Phone.last
+      PhoneSeed.first.replaces.should be_nil
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with an email seed who wants to replace the current email' do
+      issue  = Api::IssuesHelper.issue_with_email_seed(person, full_natural_person, :gif)
+      issue[:included][0][:relationships].merge!({
+        replaces: { data: { type: 'emails', id: Email.last.id.to_s } }
+      })
+
+      post "/api/issues", params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      assert_response 201
+
+      Issue.count.should == 2
+      EmailSeed.count.should == 2
+      EmailSeed.last.issue.should == Issue.last
+      EmailSeed.last.attachments.count.should == 1
+      EmailSeed.last.replaces.should == Email.last
+      EmailSeed.first.replaces.should be_nil
+
+      assert_logging(Issue.last, :create_entity, 1)
+    end
+
+    it 'creates a new issue with an affinity seed who wants to replace the current affinity' do
+      new_partner = create(:empty_person)
+      issue  = Api::IssuesHelper.issue_with_affinity_seed(person, new_partner, :gif)
+      issue[:included][0][:relationships].merge!({
+        replaces: { data: { type: 'affinities', id: full_natural_person.affinities.reload.first.id.to_s } }
+      })
+
+      post "/api/issues", params: issue,
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+      Issue.count.should == 2
+      AffinitySeed.count.should == 2
+      AffinitySeed.last.issue.should == Issue.last
+      AffinitySeed.last.replaces.should == Person.second.affinities.first
+      AffinitySeed.first.replaces.should be_nil
+      assert_response 201
+
+      assert_logging(Issue.last, :create_entity, 1)
     end
   end
 
   describe 'Updating an issue' do
     it 'responds with 404 when issue does not exist' do
       person = create :full_natural_person
-      patch "/api/people/#{person.id}/issues/#{Issue.last.id + 100}",
+      patch "/api/issues/#{Issue.last.id + 100}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 404
     end
@@ -349,14 +333,14 @@ describe Issue do
     it 'responds with 404 when issue belongs to someone else' do
       person = create :full_natural_person
       other = create :full_natural_person
-      patch "/api/people/#{person.id}/issues/#{other.issues.last.id}",
+      patch "/api/issues/#{other.issues.last.id}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
       assert_response 404
     end
 
     it 'responds to an observation changing the domicile' do
-      post "/api/people/#{person.id}/issues",
-        params: Api::IssuesHelper.issue_with_domicile_seed(:png),
+      post "/api/issues",
+        params: Api::IssuesHelper.issue_with_domicile_seed(person, :png),
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
       create(:observation, issue: Issue.last)
@@ -392,7 +376,7 @@ describe Issue do
         }
       }
 
-      patch "/api/people/#{person.id}/issues/#{person.issues.reload.last.id}",
+      patch "/api/issues/#{person.issues.reload.last.id}",
         params: JSON.dump(issue_document),
         headers: {"CONTENT_TYPE" => 'application/json',
                  'Authorization' => "Token token=#{admin_user.api_token}"}
@@ -415,17 +399,36 @@ describe Issue do
     end
 
     it 'responds to an observation changing the phone' do
-      post "/api/people/#{person.id}/issues",
-        params: Api::IssuesHelper.issue_with_phone_seed(:png),
+      post "/api/issues",
+        params: Api::IssuesHelper.issue_for(person),
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      assert_response 200
 
-      create(:observation, issue: Issue.last)
+      post "/api/phone_seeds",
+        params: Api::IssuesHelper.phone_seed_for(issue),
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      phone_seed_document = json_response
+      assert_response 200
 
+      post "/api/attachments", 
+        params: Api::IssuesHelper.attachment_for(PhoneSeed.last),
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      assert_response 200
+
+      issue = Issue.last
+
+      get "/api/issue/#{issue.id}"
       assert_issue_integrity(["PhoneSeed"])
 
-      issue_document = json_response
+      observation = create(:observation, issue: issue)
 
-      issue_document[:included][1][:attributes] = {
+      # Now the user changes the phone seed and replies to the observation
+      post "/api/phone_seeds",
+        params: Api::IssuesHelper.phone_seed_for(issue),
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      assert_response 200
+
+      phone_seed_document[:attributes] = {
         number: "+571165342178",
         kind: "2",
         country: "CO",
@@ -433,25 +436,16 @@ describe Issue do
         has_telegram: false,
         note: "Please use whatsapp"
       }
-      issue_document[:included][2] = {
-        type: 'observations',
-        id: Observation.last.id,
-        attributes: {
-          reply: "Mire, mi nuevo telefono"
-        },
-        relationships: {
-          issue: {data: {id: Issue.last.id, type: "issues"}},
-          observation_reason: {
-            data:
-            {
-              id: Observation.last.observation_reason.id.to_s,
-             type: "observation_reasons"
-            }
-          }
+
+      observation_document = {
+        data: {
+          type: 'observations',
+          id: observation.id,
+          attributes: { reply: "Mire, mi nuevo telefono" },
         }
       }
 
-      patch "/api/people/#{person.id}/issues/#{person.issues.reload.last.id}",
+      patch "/api/issues/#{person.issues.reload.last.id}",
         params: JSON.dump(issue_document),
         headers: {"CONTENT_TYPE" => 'application/json',
                   "Authorization" => "Token token=#{admin_user.api_token}"}
@@ -476,7 +470,7 @@ describe Issue do
       issue = person.issues.reload.last
       create :robot_observation, issue: issue
 
-      get "/api/people/#{person.id}/issues/#{issue.id}",
+      get "/api/issues/#{issue.id}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
       issue_request = json_response
@@ -492,7 +486,7 @@ describe Issue do
 
       issue_request[:included] << observation
 
-      patch "/api/people/#{person.id}/issues/#{issue.id}",
+      patch "/api/issues/#{issue.id}",
         params: issue_request.to_json,
         headers: {"CONTENT_TYPE" => 'application/json',
                   "Authorization" => "Token token=#{admin_user.api_token}"}
@@ -508,15 +502,15 @@ describe Issue do
 
   describe 'Getting an issue' do
     it 'responds with a not found error 404 when the issue does not exist' do
-      get "/api/people/#{person.id}/issues/1",
+      get "/api/issues/1",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
       assert_response 404
     end
 
     it 'shows all the person info when the issue exist' do
-      issue  = Api::IssuesHelper.issue_with_domicile_seed(:png)
-      post "/api/people/#{person.id}/issues",
+      issue  = Api::IssuesHelper.issue_with_domicile_seed(person, :png)
+      post "/api/issues",
         params: issue,
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
@@ -524,11 +518,39 @@ describe Issue do
 
       assert_issue_integrity(["DomicileSeed"])
 
-      get  "/api/people/#{person.id}/issues/#{Issue.first.id}",
+      get  "/api/issues/#{Issue.first.id}",
         headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
       assert_response 200
       response.body.should == response_for_post
+    end
+  end
+
+  describe "when changing state" do
+    { complete: :draft,
+      observe: :new,
+      answer: :observed,
+      dismiss: :new,
+      reject: :new,
+      approve: :new,
+      abandon: :new
+    }.each do |action, initial_state|
+      it "It can #{action} issue" do
+        issue = create(:basic_issue, state: initial_state, person: person)
+
+        post "/api/issues/#{issue.id}/#{action}", 
+          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+        assert_response 200
+      end
+
+      it "It cannot #{action} approved issue" do
+        issue = create(:basic_issue, state: :approved, person: person)
+
+        post "/api/issues/#{issue.id}/#{action}", 
+          headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+        assert_response 422
+      end
     end
   end
 end

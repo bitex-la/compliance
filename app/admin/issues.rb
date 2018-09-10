@@ -51,7 +51,8 @@ ActiveAdmin.register Issue do
     redirect_to [person, issue]
   end
 
-  %i(complete approve abandon reject dismiss).each do |action|
+
+  Issue.aasm.events.map(&:name).each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end

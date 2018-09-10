@@ -428,12 +428,28 @@ describe Person do
 
     end
 
-    it 'responds 404 when the person does not exist' do
-      get "/api/people/1",
-	headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      assert_response 404
+    it 'can update a person attributes' do
+      person = create(:empty_person)
+
+      patch("/api/people/#{person.id}",
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" },
+        params: { data: {
+          type: "people",
+          id: person.id,
+          attributes: {
+            enabled: true
+          }
+        }})
+
+      assert_response 200
+      person.reload.should be_enabled
     end
 
+    it 'responds 404 when the person does not exist' do
+      get "/api/people/1",
+        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+      assert_response 404
+    end
   end
 
   describe 'when using filters' do

@@ -238,7 +238,7 @@ class Issue < ApplicationRecord
   def self.eager_issue_entities
     entities = []
     (HAS_ONE + HAS_MANY).map(&:to_s).each do |seed|
-      entities.push(["#{seed}": eager_seed_entities])
+      entities.push([seed => eager_seed_entities])
     end
     entities
   end
