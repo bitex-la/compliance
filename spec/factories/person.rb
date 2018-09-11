@@ -1,11 +1,11 @@
 FactoryBot.define do
   factory :empty_person, class: Person do
-    enabled false
+    enabled { false }
   end
 
   factory :new_natural_person, class: Person do
-    enabled false
-    risk nil
+    enabled { false }
+    risk { nil }
 
     after(:create) do |person, evaluator|
       create :full_natural_person_issue, person: person
@@ -13,8 +13,8 @@ FactoryBot.define do
   end
 
   factory :full_natural_person, class: Person do
-    enabled true
-    risk :medium
+    enabled { true }
+    risk { :medium }
 
     after(:create) do |person, evaluator|
       # A full natural person should have at least the issue that created it.

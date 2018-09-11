@@ -185,3 +185,19 @@ ALL_SEEDS.each do |seed|
     end
   end
 end
+
+describe "when creating updating and approving" do
+  it "Creates, updates and approves legal_entity_docket_seed" do
+    issue = create(:basic_issue)
+    person = issue.person
+
+    api_create "/natural_docket_seeds", {
+      type: 'natural_docket_seeds',
+      attributes: attributes_for(:full_natural_docket_seed),
+      relationships: {
+        issue: Api::IssuesHelper.link('issue', issue.id),
+      }
+    }
+    debugger
+  end
+end

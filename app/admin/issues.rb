@@ -21,7 +21,7 @@ ActiveAdmin.register Issue do
   end
 
   config.clear_action_items!
-  action_item only: [:index] do
+  action_item :new, only: [:index] do
     link_to 'New', new_person_issue_path(person)
   end
 

@@ -1,9 +1,9 @@
-class Api::IssueJsonApiSyncController < Api::ApiController
+class Api::SeedController < Api::ApiController
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 10)
-    resource = resource_class.order(updated_at: :desc).page(page).per(per_page)
+    collection = resource_class.order(updated_at: :desc).page(page).per(per_page)
 
-    jsonapi_response resource, options_for_response.merge!(
+    jsonapi_response collection, options_for_response.merge!(
       meta: { total_pages: (resource.count.to_f / per_page).ceil })
   end
 
@@ -22,9 +22,6 @@ class Api::IssueJsonApiSyncController < Api::ApiController
 
   protected
 
-  def resource_class
-  end
-
   def resource
     resource_class.find(params[:id])
   end
@@ -42,10 +39,6 @@ class Api::IssueJsonApiSyncController < Api::ApiController
 
   def options_for_response
     {}
-  end
-
-  def issue
-    @issue ||= person.issues.find(params[:issue_id])
   end
 
   def get_mapper

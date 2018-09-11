@@ -1,9 +1,5 @@
-class Api::NotesController < Api::PersonJsonApiController
-  def index
-    scoped_collection{|s| s.notes }
-  end
-
-  def get_resource(scope)
-    scope.notes.find(params[:id])
+class Api::NotesController < Api::FruitController
+  def resource_class
+    Note
   end
 end

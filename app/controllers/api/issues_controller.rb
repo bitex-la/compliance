@@ -15,36 +15,22 @@ class Api::IssuesController < Api::ApiController
   end
 
   def show
-    issue = Issue.preload(
-      [{person: Person::eager_person_entities}], *Issue::eager_issue_entities
-    ).find(params[:id])
-
+    issue = Issue.includes(*build_eager_load_list).find(params[:id])
     jsonapi_response(issue, { include: Issue.included_for }, 200)
   end
 
   def create
-    mapper = get_issue_jsonapi_mapper
+    mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [ :people ],
+      issues: [ :person, id: nil ],
+      people: []
+
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
       jsonapi_response mapper.data, { include: Issue.included_for }, 201
     else
       json_response mapper.all_errors, 422
-    end
-  end
-
-  def update
-    issue = Issue.preload(
-      [{person: Person::eager_person_entities}], *Issue::eager_issue_entities
-    ).find(params[:id])
-
-    mapper = get_issue_jsonapi_mapper(issue.id)
-    return jsonapi_422(nil) unless mapper.data
-
-    if mapper.save_all
-      jsonapi_response(mapper.data, { include: Issue.included_for }, 200)
-    else
-      json_response(mapper.all_errors, 422)
     end
   end
 
@@ -68,11 +54,5 @@ class Api::IssuesController < Api::ApiController
       [observations: [:observation_reason]],
       [person: Person::eager_person_entities]
     ]
-  end
-
-  def get_issue_jsonapi_mapper(issue_id = nil)
-    JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [ :people ],
-      issues: [ :person, id: issue_id ]
   end
 end

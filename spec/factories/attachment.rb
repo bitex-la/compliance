@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :attachment do
     transient do
-      thing nil
+      thing { nil }
     end
 
     attached_to_seed do
