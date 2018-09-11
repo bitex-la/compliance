@@ -1,3 +1,4 @@
+Dir[Rails.root.join("app/serializers/**/*.rb")].each {|f| require f} 
 class AbandonRepeatedIssuesTwo < ActiveRecord::Migration[5.1]
   def up 
     issues_dismissed = 0
