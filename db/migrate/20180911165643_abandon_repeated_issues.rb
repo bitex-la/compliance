@@ -7,7 +7,7 @@ class AbandonRepeatedIssues < ActiveRecord::Migration[5.1]
       issue = seed.issue
       person = issue.person
       person.issues.where('id != ?', issue.id).each do |i|
-        if i.observations.where(note: 'Nuevo score de riesgo desde chainalysis').count > 0
+        if issue.state != 'dismissed' && i.observations.where(note: 'Nuevo score de riesgo desde chainalysis').count > 0
           i.state = 'dismissed'
           if i.save
             issues_dismissed += 1
