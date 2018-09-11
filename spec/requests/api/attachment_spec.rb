@@ -114,3 +114,20 @@ ALL_SEEDS.each do |seed|
   end
 end
 
+%i(png gif pdf jpg zip PNG GIF PDF JPG ZIP).each do |ext|
+  it "creates a domicile seed and adds an #{ext} attachment" do
+    issue = create(:basic_issue)
+
+    api_create('/domicile_seeds', Api::IssuesHelper.domicile_seed_for(
+    )
+    issue  = Api::IssuesHelper.issue_with_domicile_seed(person, ext, true)
+    post "/api/issues",
+      params: issue,
+      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+
+    assert_issue_integrity(["DomicileSeed"])
+    assert_response 201
+    assert_logging(Issue.last, :create_entity, 1)
+  end
+end
+

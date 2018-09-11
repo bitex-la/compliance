@@ -2,63 +2,32 @@ require 'spec_helper'
 class Api::IssuesHelper
   include RSpec::Rails::FixtureFileUploadSupport
 
-  def self.issue_without_person
-    {
-      data: {
-        type: "issue",
-        attributes: {
-        },
-        relationships: {
-        }
-      },
-      included: [
-      ]
-    }
+  def self.base_resource(type, id)
+    base = { type: type, attributes: {}, relationships: {} }
+    base[:id] = id if id
+    base
   end
 
-  def self.issue_with_current_person(person_id)
-    {
-      data: {
-        type: "issues",
-        attributes: {
-
-        },
-        relationships: {
-          person: {
-            data: {
-              id: person_id,
-              type: "people"
-            }
-          }
-        }
-      },
-      included: [
-      ]
-    }
+  def self.link(type, id)
+    { data: { type: type, id: id } }
   end
 
-  def self.issue_with_an_observation(person_id, reason, note)
-    {
-      data: {
-        id: '@1',
-        type: "issues",
-        attributes: {
+  def self.issue_for(issue_id, person_id)
+    base = base_resource("issues", issue_id)
+    base[:relationships][:person] = link('people', person_id) if person_id
+    base 
+  end
 
-        },
-        relationships: {
-          person: {
-            data: {
-              id: person_id,
-              type: "people"
-            }
-          },
-          observations:{data:[{id: "@1", type:"observations"}]},
-        }
-      },
-      included: [
-         observation_for('@1', reason, note)
-      ]
-    }
+  def self.observation_for(observation_id, issue_id, note, scope, reason_id)
+    base = base_resource("observations", observation_id)
+    base[:relationships][:issue] = link('issues', issue_id) if issue_id
+    if reason_id
+      base[:relationships][:observation_reason] =
+        link('observation_reasons', reason_id)
+    end
+    base[:attributes][:note] = note if note
+    base[:attributes][:scope] = scope if scope
+    base
   end
 
   def self.basic_issue
@@ -163,31 +132,6 @@ class Api::IssuesHelper
         }
       },
       included: [
-        {
-          type: "domicile_seeds",
-          id: "@1",
-          attributes: {
-            country: "AR",
-            state: "buenos aires",
-            city: "CABA",
-            street_address: "cullen",
-            street_number: "2345",
-            postal_code: "1234",
-            floor: "4",
-            apartment: "a"
-          },
-          relationships: {
-            issue: {
-              data: {id: "@1", type: 'issues'}
-            },
-            attachments: {
-              data: [{
-                id: "@1",
-                type: "attachments",
-              }]
-            }
-          }
-        },
         attachment_for(attachment_type, '@1', 'domicile_seeds', '@1', accented),
       ]
     }
@@ -585,18 +529,6 @@ class Api::IssuesHelper
       }
     },
     attachment_for(attachment_type, '@2', 'natural_docket_seeds', '@1', accented)]
-  end
-
-  def self.observation_for(issue, reason, note, scope = 'admin')
-    {
-      id: "@1",
-      type: "observations",
-      relationships: {
-        issue: {data: {id: issue, type: "issues"}},
-        observation_reason: {data: {id: reason.id.to_s, type: "observation_reasons"}}
-      },
-      attributes: { note: note, scope: scope }
-    }
   end
 
   def self.mime_for(ext)

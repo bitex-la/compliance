@@ -1,9 +1,5 @@
-class Api::AffinitiesController < Api::PersonJsonApiController
-  def index
-    scoped_collection{|s| s.affinities }
-  end
-
-  def get_resource(scope)
-    scope.affinities.find(params[:id])
+class Api::AffinitiesController < Api::FruitController
+  def resource_class
+    Affinity
   end
 end

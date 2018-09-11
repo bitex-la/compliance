@@ -1,9 +1,5 @@
-class Api::RiskScoresController < Api::PersonJsonApiController
-  def index
-    scoped_collection{|s| s.risk_scores }
-  end
-
-  def get_resource(scope)
-    scope.risk_scores.find(params[:id])
+class Api::RiskScoresController < Api::FruitController
+  def resource_class
+    RiskScore
   end
 end

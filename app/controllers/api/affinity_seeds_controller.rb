@@ -1,9 +1,22 @@
 class Api::AffinitySeedsController < Api::IssueJsonApiSyncController
-  def index
-    scoped_collection{|s| s.affinity_seeds }
+  def resource_class
+    Affinity
   end
 
-  def get_resource(scope)
-    scope.affinity_seeds.find(params[:id])
+  protected
+
+  def get_mapper
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:issues, :affinities, :affinity_seeds],
+      issues: [],
+      affinities: [],
+      affinity_seeds: [
+        :affinity_kind_code,
+        :related_person,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        :issue
+      ]
   end
 end

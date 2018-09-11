@@ -29,15 +29,15 @@ ActiveAdmin.register Person do
   filter :enabled
   filter :risk
 
-  action_item only: %i(show edit) do
+  action_item :add_person_information, only: %i(show edit) do
     link_to 'Add Person Information', new_with_fruits_person_issues_path(person)
   end
 
-  action_item only: %i(show edit) do
+  action_item :view_person_issues, only: %i(show edit) do
     link_to 'View Person Issues', person_issues_path(person)
   end
 
-  action_item "Download Attachments", only: :show do
+  action_item :download_attachments, only: :show do
     if resource.all_attachments.any?
       link_to :download_files.to_s.titleize, [:download_files, :person], method: :post
     end
