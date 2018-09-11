@@ -44,6 +44,8 @@ gem 'dotenv-rails'
 # exception notifier
 gem 'exception_notification'
 
+# cache
+gem 'actionpack-action_caching'
 # monitoring
 gem 'appsignal'
 

@@ -1,5 +1,6 @@
 class ArgentinaInvoicingDetailSeed < ApplicationRecord
   include Garden::Seed
+  include SeedApiExpirable
   include StaticModels::BelongsTo
 
   validates :country, country: true

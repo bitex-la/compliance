@@ -33,6 +33,7 @@ class Api::IssuesController < Api::ApiController
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
+      expire_action :action => :index
       jsonapi_response mapper.data, {
         include: Issue.included_for
       }, 201
@@ -49,6 +50,8 @@ class Api::IssuesController < Api::ApiController
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
+      expire_action :action => :index
+      expire_action :action => :show
       jsonapi_response mapper.data, {
         include: Issue.included_for
       }, 200
@@ -58,7 +61,6 @@ class Api::IssuesController < Api::ApiController
   end
 
   private
-
   def build_eager_load_list
     [
       *Issue::eager_issue_entities,
