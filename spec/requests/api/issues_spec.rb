@@ -9,9 +9,10 @@ describe Issue do
 
   describe 'When fetching issues' do
     it "can filter issues by state" do
-      one = create(:basic_issue)
+      one = create(:basic_issue, updated_at: 2.month.ago)
       two = create(:full_natural_person).reload.issues.first
-      three = create(:full_natural_person_issue, person: two.person)
+      three = create(:full_natural_person_issue,
+        updated_at: 1.months.ago, person: two.person)
       four = create(:basic_issue)
 
       api_get "/issues", { 

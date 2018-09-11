@@ -187,17 +187,72 @@ ALL_SEEDS.each do |seed|
 end
 
 describe "when creating updating and approving" do
-  it "Creates, updates and approves legal_entity_docket_seed" do
+  it "Creates, updates and approves natural_docket_seed" do
     issue = create(:basic_issue)
     person = issue.person
 
+    initial_attrs = attributes_for(:full_natural_docket_seed)
+
     api_create "/natural_docket_seeds", {
       type: 'natural_docket_seeds',
-      attributes: attributes_for(:full_natural_docket_seed),
+      attributes: initial_attrs,
       relationships: {
-        issue: Api::IssuesHelper.link('issue', issue.id),
+        issue: { data: { id: issue.id, type: "issues" } }
       }
     }
-    debugger
+
+    seed_id = api_response.data.id
+
+    api_response.data.attributes.to_h.slice(*initial_attrs.keys)
+      .should == initial_attrs
+
+    later_attrs = attributes_for(:alt_full_natural_docket_seed)
+
+    api_update "/natural_docket_seeds/#{seed_id}", {
+      type: 'natural_docket_seeds',
+      attributes: later_attrs
+    }
+
+    api_response.data.attributes.to_h.slice(*later_attrs.keys)
+      .should == later_attrs
+
+    api_request :post, "/issues/#{issue.id}/approve"
+
+    api_get "/people/#{person.id}"
+
+    api_response.included
+      .find{|i| i.type == 'natural_dockets' }
+      .attributes
+      .to_h
+      .slice(*later_attrs.keys)
+      .should == later_attrs
+  end
+
+  it "Updates natural_docket via issue" do
+    person = create(:full_natural_person).reload
+    issue = create(:basic_issue, person: person)
+    
+    replaced = person.natural_dockets.last
+
+    attrs = attributes_for(:alt_full_natural_docket_seed)
+
+    api_create "/natural_docket_seeds", {
+      type: 'natural_docket_seeds',
+      attributes: attrs.merge(replaces_id: replaced.id),
+      relationships: {
+        issue: { data: { id: issue.id, type: "issues" } }
+      }
+    }
+
+    api_request :post, "/issues/#{issue.id}/approve"
+
+    api_get "/people/#{person.id}"
+
+    docket = api_response.included
+      .find{|i| i.type == 'natural_dockets' }
+
+    replaced.reload.replaced_by_id.should == docket.id.to_i
+
+    docket.attributes.to_h.slice(*attrs.keys).should == attrs
   end
 end

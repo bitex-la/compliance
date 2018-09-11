@@ -1,6 +1,6 @@
-class Api::AllowanceSeedsController < Api::IssueJsonApiSyncController
+class Api::AllowanceSeedsController < Api::SeedController
   def resource_class
-    Allowance
+    AllowanceSeed
   end
 
   protected 

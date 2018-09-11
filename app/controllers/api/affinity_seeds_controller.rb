@@ -1,6 +1,6 @@
-class Api::AffinitySeedsController < Api::IssueJsonApiSyncController
+class Api::AffinitySeedsController < Api::SeedController
   def resource_class
-    Affinity
+    AffinitySeed
   end
 
   protected

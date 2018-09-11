@@ -1,9 +1,26 @@
-class Api::PhoneSeedsController < Api::IssueJsonApiSyncController
-  def index
-    scoped_collection{|s| s.phone_seeds }
+class Api::PhoneSeedsController < Api::SeedController
+  def resource_class
+    PhoneSeed
   end
 
-  def get_resource(scope)
-    scope.phone_seeds.find(params[:id])
+  protected
+
+  def get_mapper
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:issues, :phones, :phone_seeds],
+      issues: [],
+      phones: [],
+      phone_seeds: [
+        :number,
+        :phone_kind_code,
+        :country,
+        :has_whatsapp,
+        :has_telegram,
+        :note,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        :issue
+      ]
   end
 end

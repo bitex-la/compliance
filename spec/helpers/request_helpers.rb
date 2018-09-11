@@ -5,7 +5,7 @@ module RequestHelpers
     assert_response 403
   end
 
-  def api_request(method, path, params, expected_status)
+  def api_request(method, path, params = {}, expected_status = 200)
     admin = AdminUser.last || create(:admin_user)
     send(method, "/api#{path}", params: params,
       headers: { 'Authorization': "Token token=#{admin.api_token}" })

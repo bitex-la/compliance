@@ -1,9 +1,21 @@
-class Api::ObservationsController < Api::IssueJsonApiSyncController
-  def index
-    scoped_collection{|s| s.observations }
+class Api::ObservationsController < Api::SeedController
+  def resource_class
+    Observation
   end
 
-  def get_resource(scope)
-    scope.observations.find(params[:id])
+  protected
+
+  def get_mapper
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:issues, :observation_reasons, :observations],
+      issues: [],
+      observation_reasons: [],
+      observations: [
+        :note,
+        :reply,
+        :scope,
+        :observation_reason,
+        :issue
+      ]
   end
 end

@@ -1,9 +1,22 @@
-class Api::NoteSeedsController < Api::IssueJsonApiSyncController
-  def index
-    scoped_collection{|s| s.note_seeds }
+class Api::NoteSeedsController < Api::SeedController
+  def resource_class
+    NoteSeed
   end
 
-  def get_resource(scope)
-    scope.note_seeds.find(params[:id])
+  protected
+
+  def get_mapper
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:issues, :notes, :note_seeds],
+      issues: [],
+      notes: [],
+      note_seeds: [
+        :title,
+        :body,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        :issue
+      ]
   end
 end
