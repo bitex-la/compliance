@@ -265,6 +265,19 @@ ActiveAdmin.register Issue do
           end
         end
       end
+
+      tab "Risk Score (#{resource.risk_score_seeds.count})" do
+        ArbreHelpers.has_many_form self, f, :risk_score_seeds do |rs, context|
+          rs.input :score
+          rs.input :provider
+          rs.input :extra_info, input_html: {rows: 3}
+          rs.input :external_link
+          if current = context.resource.person.risk_scores.current.presence
+            rs.input :replaces, collection: current
+          end
+          ArbreHelpers.has_many_attachments(context, rs)
+        end
+      end
     end
 
     f.actions

@@ -46,6 +46,8 @@ gem 'exception_notification'
 
 # cache
 gem 'actionpack-action_caching'
+# monitoring
+gem 'appsignal'
 
 group :development, :test do 
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

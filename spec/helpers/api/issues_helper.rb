@@ -147,7 +147,7 @@ class Api::IssuesHelper
   end
 
 
-  def self.issue_with_domicile_seed(attachment_type)
+  def self.issue_with_domicile_seed(attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -186,12 +186,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'domicile_seeds', '@1'),
+        attachment_for(attachment_type, '@1', 'domicile_seeds', '@1', accented),
       ]
     }
   end
 
-  def self.issue_with_phone_seed(attachment_type)
+  def self.issue_with_phone_seed(attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -228,12 +228,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'phone_seeds', '@1'),
+        attachment_for(attachment_type, '@1', 'phone_seeds', '@1', accented),
       ]
     }
   end
 
-  def self.issue_with_email_seed(attachment_type)
+  def self.issue_with_email_seed(attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -266,12 +266,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'email_seeds', '@1'),
+        attachment_for(attachment_type, '@1', 'email_seeds', '@1', accented),
       ]
     }
   end
 
-  def self.issue_with_argentina_invoicing_seed(attachment_type)
+  def self.issue_with_argentina_invoicing_seed(attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -309,12 +309,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'argentina_invoicing_detail_seeds', '@1'),
+        attachment_for(attachment_type, '@1', 'argentina_invoicing_detail_seeds', '@1', accented),
       ]
     }
   end
 
-  def self.issue_with_chile_invoicing_seed(attachment_type)
+  def self.issue_with_chile_invoicing_seed(attachment_type, accented = false)
     mime, bytes =
     {
       data: {
@@ -350,12 +350,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'chile_invoicing_detail_seeds', '@1'),
+        attachment_for(attachment_type, '@1', 'chile_invoicing_detail_seeds', '@1', accented),
       ]
     }
   end
 
-  def self.issue_with_identification_seed(attachment_type)
+  def self.issue_with_identification_seed(attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -386,12 +386,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'identification_seeds', '@1')
+        attachment_for(attachment_type, '@1', 'identification_seeds', '@1', accented)
       ]
     }
   end
 
-  def self.issue_with_risk_score_seed(attachment_type)
+  def self.issue_with_risk_score_seed(attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -423,12 +423,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'risk_score_seeds', '@1')
+        attachment_for(attachment_type, '@1', 'risk_score_seeds', '@1', accented)
       ]
     }
   end
 
-  def self.issue_with_natural_docket_seed(attachment_type)
+  def self.issue_with_natural_docket_seed(attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -466,12 +466,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'natural_docket_seeds', '@1')
+        attachment_for(attachment_type, '@1', 'natural_docket_seeds', '@1', accented)
       ]
     }
   end
 
-  def self.issue_with_legal_entity_docket_seed(attachment_type)
+  def self.issue_with_legal_entity_docket_seed(attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -508,12 +508,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'legal_entity_docket_seeds', '@1')
+        attachment_for(attachment_type, '@1', 'legal_entity_docket_seeds', '@1', accented)
       ]
     }
   end
 
-  def self.issue_with_allowance_seed(attachment_type)
+  def self.issue_with_allowance_seed(attachment_type, accented = false)
     {
       data: {
         type: "issues",
@@ -547,12 +547,12 @@ class Api::IssuesHelper
             }
           }
         },
-        attachment_for(attachment_type, '@1', 'allowance_seeds', '@1')
+        attachment_for(attachment_type, '@1', 'allowance_seeds', '@1', accented)
       ]
     }
   end
 
-  def self.natural_docket_seed(attachment_type)
+  def self.natural_docket_seed(attachment_type, accented = false)
     [{
       type: "natural_docket_seeds",
       id: "@1",
@@ -573,7 +573,7 @@ class Api::IssuesHelper
         }
       }
     },
-    attachment_for(attachment_type, '@2', 'natural_docket_seeds', '@1')]
+    attachment_for(attachment_type, '@2', 'natural_docket_seeds', '@1', accented)]
   end
 
   def self.observation_for(issue, reason, note, scope = 'admin')
@@ -609,7 +609,12 @@ class Api::IssuesHelper
     Base64.encode64(path.read).delete!("\n")
   end
 
-  def self.attachment_for(ext, id, seed_type, seed_id)
+  def self.attachment_for(ext, id, seed_type, seed_id, accented = false)
+    filename = if accented
+      "áñçfile"
+    else
+      "file"
+    end
     {
       type: "attachments",
       id: id,
@@ -623,7 +628,7 @@ class Api::IssuesHelper
       },
       attributes: {
         document: "data:#{mime_for(ext)};base64,#{bytes_for(ext)}",
-        document_file_name: "file.#{ext}",
+        document_file_name: "#{filename}.#{ext}",
         document_content_type: mime_for(ext)
       }
     }

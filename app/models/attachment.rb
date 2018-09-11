@@ -3,6 +3,7 @@ class Attachment < ApplicationRecord
   belongs_to :attached_to_fruit, polymorphic: true, optional: true
   belongs_to :attached_to_seed, polymorphic: true, optional: true
   has_attached_file :document, optional: true
+  before_validation :strip_accents
 
   after_commit :relate_to_person
   before_save :classify_type
@@ -86,5 +87,9 @@ class Attachment < ApplicationRecord
     unless self.attached_to_seed_type.nil?
       self.attached_to_seed_type = self.attached_to_seed_type.camelize.singularize
     end 
+  end
+
+  def strip_accents
+    self.document_file_name = ActiveSupport::Inflector.transliterate(self.document_file_name) unless self.document_file_name.nil?
   end
 end
