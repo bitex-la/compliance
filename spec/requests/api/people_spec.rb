@@ -7,13 +7,8 @@ describe Person do
 
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do
-      expect do
-        post '/api/people',
-                params: { data: nil },
-                headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      end.to change{ Person.count }.by(1)
+      expect{ api_create('/people', nil) }.to change{ Person.count }.by(1)
 
-      response.status.should == 201
       json_response.should == {
         data: {
           type: 'people',
@@ -53,9 +48,7 @@ describe Person do
       # This is an old domiciel, that should not be included in the response.
       create(:full_domicile, person: person, replaced_by: person.domiciles.last)
 
-      get "/api/people/#{person.id}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      assert_response 200
+      api_get "/people/#{person.id}"
       json_response = JSON.parse(response.body).deep_symbolize_keys
       person.reload
 
@@ -380,7 +373,9 @@ describe Person do
           relationships:
           {
             person: {data: { id: person.id.to_s, type:"people"}},
-            seed:   {data: { id: issue.argentina_invoicing_detail_seed.id.to_s,  type: "argentina_invoicing_detail_seeds"}},
+            seed:   {data: {
+              id: issue.argentina_invoicing_detail_seed.id.to_s,
+              type: "argentina_invoicing_detail_seeds"}},
             replaced_by: {data: nil},
             attachments:
             {
@@ -431,24 +426,17 @@ describe Person do
     it 'can update a person attributes' do
       person = create(:empty_person)
 
-      patch("/api/people/#{person.id}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" },
-        params: { data: {
-          type: "people",
-          id: person.id,
-          attributes: {
-            enabled: true
-          }
-        }})
+      api_update "/people/#{person.id}", {
+        type: "people",
+        id: person.id,
+        attributes: { enabled: true }
+      }
 
-      assert_response 200
       person.reload.should be_enabled
     end
 
     it 'responds 404 when the person does not exist' do
-      get "/api/people/1",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      assert_response 404
+      api_get "/people/1", {}, 404
     end
   end
 
@@ -462,27 +450,19 @@ describe Person do
       bob_doe.issues.last.approve!
       bob_doe.reload.natural_docket.first_name.should == 'bob'
 
-      get "/api/people/",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == Person.count
+      api_get "/people"
+      api_response.data.count.should == Person.count
 
       # URL encoded json with ransack filters.
-      filter = "filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=joe"
 
-      get "/api/people/?#{filter}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == 1
+      api_get "/people/?filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=joe"
+      api_response.data.count.should == 1
 
-      filter = "filter[identifications_number_or_argentina_invoicing_details_tax_id_eq]=20955754290"
-      get "/api/people/?#{filter}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == 2 # joe & bob
+      api_get "/people/?filter[identifications_number_or_argentina_invoicing_details_tax_id_eq]=20955754290"
+      api_response.data.count.should == 2 # joe & bob
 
-      filter = "filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=doe"
-
-      get "/api/people/?#{filter}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == 2
+      api_get "/people/?filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=doe"
+      api_response.data.count.should == 2 # joe & bob
     end
   end
 end

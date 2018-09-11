@@ -4,6 +4,8 @@ class Issue < ApplicationRecord
   belongs_to :person, optional: true
   validates :person, presence: true
 
+  ransack_alias :state, :aasm_state
+
   HAS_ONE = %i{
     natural_docket_seed
     legal_entity_docket_seed

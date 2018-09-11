@@ -1,4 +1,4 @@
-class Api::AllowancesController < Api::PersonJsonApiController
+class Api::AllowancesController < Api::FruitController
   def resource_class
     Allowance
   end

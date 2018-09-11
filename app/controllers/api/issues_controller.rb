@@ -1,17 +1,18 @@
 class Api::IssuesController < Api::ApiController
   def index
-    page, per_page = Util::PageCalculator.call(params, 0, 3)
-    issues = Issue
+    scope = Issue
       .includes(*build_eager_load_list)
       .order(updated_at: :desc)
-      .page(page)
-      .per(per_page)
+      .ransack(params[:filter])
+      .result
 
-    options = {
-      meta: { total_pages: (issues.count.to_f / per_page).ceil },
+    page, per_page = Util::PageCalculator.call(params, 0, 3)
+    issues = scope.page(page).per(per_page)
+
+    jsonapi_response issues, {
+      meta: { total_pages: (scope.count.to_f / per_page).ceil },
       include: Issue.included_for
     }
-    jsonapi_response issues, options, 200
   end
 
   def show

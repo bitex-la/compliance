@@ -12,8 +12,8 @@ module RequestHelpers
     assert_response expected_status
   end
 
-  def api_get(path, expected_status = 200)
-    api_request(:get, path, {}, expected_status)
+  def api_get(path, params = {}, expected_status = 200)
+    api_request(:get, path, params, expected_status)
   end
 
   def api_create(path, data, expected_status = 201)
