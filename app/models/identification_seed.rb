@@ -1,5 +1,6 @@
 class IdentificationSeed < ApplicationRecord
   include Garden::Seed
+  include SeedApiExpirable
   include StaticModels::BelongsTo
 
   validates :issuer, country: true

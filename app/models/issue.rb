@@ -1,7 +1,7 @@
 class Issue < ApplicationRecord
   include AASM
   include Loggable
-  include ActionExpirable
+  include IssueApiExpirable
   belongs_to :person, optional: true
   validates :person, presence: true
 

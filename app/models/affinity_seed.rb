@@ -1,5 +1,6 @@
 class AffinitySeed < ApplicationRecord
   include Garden::Seed
+  include SeedApiExpirable
   include StaticModels::BelongsTo
 
   belongs_to :related_person, class_name: 'Person'

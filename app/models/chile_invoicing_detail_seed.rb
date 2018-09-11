@@ -1,5 +1,6 @@
 class ChileInvoicingDetailSeed < ApplicationRecord
   include Garden::Seed
+  include SeedApiExpirable
   include StaticModels::BelongsTo
 
   validates :vat_status, inclusion: { in: VatStatusKind.all }

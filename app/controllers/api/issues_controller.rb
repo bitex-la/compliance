@@ -1,6 +1,6 @@
 class Api::IssuesController < Api::ApiController
-  caches_action :index, expires_in: 1.minute
-  caches_action :show, expires_in: 1.minute
+  caches_action :index, expires_in: 10.minutes, cache_path: :path_for_index
+  caches_action :show, expires_in: 10.minutes, cache_path: :path_for_detail
 
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 3)
@@ -52,7 +52,6 @@ class Api::IssuesController < Api::ApiController
     mapper = get_issue_jsonapi_mapper(issue.person.id, issue.id)
     return jsonapi_422(nil) unless mapper.data
 
-    debugger
     if mapper.save_all
       expire_action :action => :index
       expire_action :action => :show
@@ -65,6 +64,14 @@ class Api::IssuesController < Api::ApiController
   end
 
   private
+
+  def path_for_index
+    "api/people/#{params[:person_id]}/issues"
+  end
+
+  def path_for_detail
+    "api/people/#{params[:person_id]}/issues/#{params[:id]}"
+  end
 
   def build_eager_load_list
     [

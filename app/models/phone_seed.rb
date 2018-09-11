@@ -1,5 +1,6 @@
 class PhoneSeed < ApplicationRecord
   include Garden::Seed
+  include SeedApiExpirable
   include StaticModels::BelongsTo
 
   after_initialize :set_default_values, unless: :persisted?

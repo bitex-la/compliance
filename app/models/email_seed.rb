@@ -1,5 +1,6 @@
 class EmailSeed < ApplicationRecord
   include Garden::Seed
+  include SeedApiExpirable
   include StaticModels::BelongsTo
 
   validates :email_kind, inclusion: { in: EmailKind.all }

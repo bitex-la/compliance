@@ -45,7 +45,6 @@ gem 'dotenv-rails'
 gem 'exception_notification'
 
 # cache
-gem 'rack-cache'
 gem 'actionpack-action_caching'
 
 group :development, :test do 

@@ -1,5 +1,6 @@
 class NaturalDocketSeed < ApplicationRecord
   include Garden::Seed
+  include SeedApiExpirable
   include StaticModels::BelongsTo
 
   belongs_to :marital_status, class_name: 'MaritalStatusKind', required: false
