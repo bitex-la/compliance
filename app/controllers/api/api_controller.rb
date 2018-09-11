@@ -6,16 +6,28 @@ class Api::ApiController < ApplicationController
   caches_action :index, expires_in: 10.minutes, cache_path: :path_for_index
   caches_action :show, expires_in: 10.minutes, cache_path: :path_for_show
 
-  private
+ 
     def path_for_index
-      debugger
-      "api/people/#{params[:person_id]}/issues"
+      path = "#{params[:controller]}/#{params[:action]}"
+      params.select{|x| x.include? "_id"}.keys.each do |k|
+        path = "#{path}/#{k}/#{params[k]}"
+      end
+      unless params[:page].nil?
+        path = "#{path}/page/#{params[:page][:page]}" unless params[:page][:page].nil?
+        path = "#{path}/per_page/#{params[:page][:per_page]}" unless params[:page][:per_page].nil?
+      end 
+      path
     end
 
     def path_for_show
-      "api/people/#{params[:person_id]}/issues/#{params[:id]}"
+      path = "#{params[:controller]}/#{params[:action]}"
+      path = "#{path}/id/#{params[:id]}"
+      params.select{|x| x.include? "_id"}.keys.each do |k|
+        path = "#{path}/#{k}/#{params[k]}"
+      end
     end
     
+  private
     def require_token
       authenticate_token || jsonapi_403
     end
