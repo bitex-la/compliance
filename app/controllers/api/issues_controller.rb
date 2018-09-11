@@ -1,6 +1,6 @@
 class Api::IssuesController < Api::ApiController
   def index
-    page, per_page = Util::PageCalculator.call(params, 0, 3)
+    page, per_page = Util::PageCalculator.call(params, 0, 50)
     issues = Person.find(params[:person_id]).issues
       .includes(*build_eager_load_list)
       .order(updated_at: :desc)
