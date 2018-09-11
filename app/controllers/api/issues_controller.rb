@@ -1,7 +1,4 @@
 class Api::IssuesController < Api::ApiController
-  caches_action :index, expires_in: 10.minutes, cache_path: :path_for_index
-  caches_action :show, expires_in: 10.minutes, cache_path: :path_for_detail
-
   def index
     page, per_page = Util::PageCalculator.call(params, 0, 3)
     issues = Person.find(params[:person_id]).issues
@@ -64,15 +61,6 @@ class Api::IssuesController < Api::ApiController
   end
 
   private
-
-  def path_for_index
-    "api/people/#{params[:person_id]}/issues"
-  end
-
-  def path_for_detail
-    "api/people/#{params[:person_id]}/issues/#{params[:id]}"
-  end
-
   def build_eager_load_list
     [
       *Issue::eager_issue_entities,
