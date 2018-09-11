@@ -18,4 +18,13 @@ class Api::AttachmentsController < Api::IssueJsonApiSyncController
       include: []
     }
   end
+
+  private 
+  def path_for_index
+    "api/people/#{params[:person_id]}/issues/#{params[:issue_id]}/#{params.select{|x| x.include? 'seed_id'}.values.first}/attachments"
+  end
+
+  def path_for_detail
+    "api/people/#{params[:person_id]}/issues/#{params[:issue_id]}/#{params.select{|x| x.include? 'seed_id'}.values.first}/attachments/#{params[:id]}"
+  end
 end
