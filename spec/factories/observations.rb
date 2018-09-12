@@ -16,4 +16,10 @@ FactoryBot.define do
     note "Please perform a worldcheck review against the person"
     scope :admin
   end
+
+  factory :chainalysis_observation, class: 'Observation' do
+    association :observation_reason, factory: :chainalysis_reason
+    note "Please check this new risk score assessment"
+    scope :admin
+  end
 end
