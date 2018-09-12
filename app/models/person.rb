@@ -107,6 +107,7 @@ class Person < ApplicationRecord
 
   def all_observations
     issues.includes(observations: :observation_reason)
+      .where.not(aasm_state: ['dismissed', 'abandoned'])
       .map{|o| o.observations.to_a }.flatten
   end
 
