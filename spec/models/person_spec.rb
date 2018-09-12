@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Person, type: :model do
+  let(:person) { create(:full_natural_person) }
+
   it 'is valid without issues' do
     expect(Person.new).to be_valid
   end
 
   it 'knows which fruits can be replaced' do
-    person = create(:full_natural_person)
-
     new_phone = create :full_phone, person: person
     person.reload.phones.first.update(replaced_by: new_phone)
 
@@ -34,5 +34,22 @@ RSpec.describe Person, type: :model do
       person.update(enabled: false)
     end
     assert_logging(person, :disable_person, 1)
+  end 
+  
+  it 'shows only observations for meaningful issues' do 
+    one = create(:basic_issue, person: person)
+    two = create(:basic_issue, person: person)
+    three = create(:basic_issue, person: person)
+
+    worldcheck_observation = create(:admin_world_check_observation, issue: one)
+    risk_observation = create(:chainalysis_observation, issue: two)
+    robot_observation = create(:robot_observation, issue: three)
+
+    person.all_observations.count.should == 3
+    
+    one.dismiss!
+    two.abandon!
+
+    person.all_observations.to_a.should == [robot_observation]
   end
 end
