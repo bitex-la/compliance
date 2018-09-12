@@ -10,6 +10,8 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   scope :observed
   scope :abandoned
   scope :dismissed
+  scope :approved
+  scope :changed_after_observation
   scope :all
 
   filter :email_seeds_address_cont, label: "Email"

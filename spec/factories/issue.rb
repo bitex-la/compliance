@@ -4,7 +4,6 @@ FactoryBot.define do
   end
 
   factory :full_natural_person_issue, class: Issue do
-
     after(:create) do |issue, evaluator|
       %i(
         full_domicile_seed 

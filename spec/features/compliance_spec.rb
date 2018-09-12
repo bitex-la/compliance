@@ -181,10 +181,10 @@ describe 'an admin user' do
       with: 'Please check this guy on world check'
 
     click_button "Update Issue"
-
     issue = Issue.last
     observation = Observation.last
     assert_logging(issue, :create_entity, 1)
+    assert_logging(issue, :update_entity, 1)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -208,13 +208,14 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
+    assert_logging(issue, :update_entity, 2)
     issue.reload.should be_answered
     observation.reload.should be_answered
 
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 4)
+    assert_logging(issue, :update_entity, 3)
     Person.last.should be_enabled
   end
 
@@ -280,7 +281,8 @@ describe 'an admin user' do
       with: 'Please re-send your document'
     click_button 'Update Issue'
 
-    assert_logging(issue, :update_entity, 3)
+    assert_logging(issue, :update_entity, 2)
+
     Observation.where(issue: issue).count.should == 1
     Issue.first.should be_observed
 
@@ -305,15 +307,18 @@ describe 'an admin user' do
         i[:attributes] = {reply: "Va de vuelta el documento!!!"}
       end
 
+    assert_logging(issue, :update_entity, 2)
+
     patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
       params: JSON.dump(issue_document),
       headers: {"CONTENT_TYPE" => 'application/json',
                 "Authorization" => "Token token=#{admin_user.api_token}"}
 
+    assert_logging(issue, :update_entity, 4)
+
     assert_response 200
 
     Issue.first.should be_answered
-    assert_logging(issue, :update_entity, 5)
     Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
@@ -335,7 +340,7 @@ describe 'an admin user' do
     click_link 'Approve'
 
     Issue.last.should be_approved
-    assert_logging(issue, :update_entity, 6)
+    assert_logging(issue, :update_entity, 5)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
@@ -476,7 +481,7 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
-    assert_logging(issue, :update_entity, 3) 
+    assert_logging(issue, :update_entity, 2) 
     issue.reload.should be_answered
     observation.reload.should be_answered
 
@@ -580,7 +585,7 @@ describe 'an admin user' do
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
-    assert_logging(Issue.last, :update_entity, 2)
+    assert_logging(Issue.last, :update_entity, 1)
 
     get "/api/people/#{person.id}/issues/#{issue.id}",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -639,7 +644,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
-    assert_logging(Issue.last, :update_entity, 2)
+    assert_logging(Issue.last, :update_entity, 1)
     Observation.last.should be_answered
   end
 
@@ -686,7 +691,7 @@ describe 'an admin user' do
                 "Authorization" => "Token token=#{admin_user.api_token}"}
     assert_response 200
 
-    assert_logging(Issue.last, :update_entity, 3)
+    assert_logging(Issue.last, :update_entity, 2)
 
     api_response.data.attributes.state.should == 'answered'
     api_response.included.find{|i| i.type == 'observations'}

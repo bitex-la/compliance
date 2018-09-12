@@ -27,11 +27,12 @@ ActiveAdmin.register Issue do
 
   scope :fresh, default: true
   scope :answered
-  scope :answered
   scope :draft
   scope :observed
-  scope :abandoned
   scope :dismissed
+  scope :abandoned
+  scope :approved
+  scope :changed_after_observation
 
   collection_action :new_with_fruits, method: :get do
     @person = Person.find(params[:person_id])

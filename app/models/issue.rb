@@ -4,6 +4,13 @@ class Issue < ApplicationRecord
   belongs_to :person, optional: true
   validates :person, presence: true
 
+  after_save :sync_observed_status
+
+  def sync_observed_status
+    observe! if may_observe? && has_open_observations?
+    answer! if may_answer? && observations.any? && !has_open_observations?
+  end
+
   HAS_ONE = %i{
     natural_docket_seed
     legal_entity_docket_seed
@@ -51,19 +58,33 @@ class Issue < ApplicationRecord
     ) 
   }
   scope :draft, -> { 
-    with_relations.where('aasm_state=?', 'draft')
+    with_relations.where('issues.aasm_state=?', 'draft')
   }
 
   scope :fresh, -> { 
-    with_relations.where('aasm_state=?', 'new')
+    with_relations.where('issues.aasm_state=?', 'new')
   }
 
   scope :answered, -> { 
-    with_relations.where('aasm_state=?', 'answered')
+    with_relations.where('issues.aasm_state=?', 'answered')
   }
 
   scope :observed, -> { 
-    with_relations.where('aasm_state=?', 'observed')
+    with_relations.where('issues.aasm_state=?', 'observed')
+  }
+
+  scope :changed_after_observation, -> {
+    where = []
+    Issue::HAS_ONE.each do |r|
+      where << "#{r.to_s.pluralize}.created_at > observations.created_at"
+    end
+    Issue::HAS_MANY.each do |r|
+      where << "#{r}.created_at > observations.created_at"
+    end
+
+    observed
+      .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
+      .where(where.join(" OR "))
   }
 
   aasm do
@@ -91,6 +112,11 @@ class Issue < ApplicationRecord
 
     event :answer do
       transitions from: :observed, to: :answered
+      
+      # Admins and migrations may create "already answered" observations.
+      transitions from: :draft, to: :answered
+      transitions from: :new, to: :answered
+
       after do 
         log_state_change(:answer_issue)
       end
