@@ -1,5 +1,7 @@
 class Person < ApplicationRecord
   include Loggable
+
+  after_save :log_if_enabled
   
   HAS_MANY_REPLACEABLE = %i{
     domiciles
@@ -116,6 +118,16 @@ class Person < ApplicationRecord
   end
 
   private
+
+  def log_if_enabled
+    old_state, new_state = self.saved_changes[:enabled]
+    log_state_change(:enable_person) if new_state && !old_state
+    log_state_change(:disable_person) if !new_state && old_state
+  end
+
+  def log_state_change(verb)
+    Event::EventLogger.call(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+  end
 
   def self.eager_person_entities
     entities = []
