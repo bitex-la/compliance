@@ -120,9 +120,9 @@ class Person < ApplicationRecord
   private
 
   def log_if_enabled
-    old_state, new_state = self.saved_changes[:enabled]
-    log_state_change(:enable_person) if new_state && !old_state
-    log_state_change(:disable_person) if !new_state && old_state
+    was, is = saved_changes[:enabled]
+    log_state_change(:enable_person) if !was && is
+    log_state_change(:disable_person) if was && !is
   end
 
   def log_state_change(verb)
