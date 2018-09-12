@@ -17,17 +17,23 @@ class Observation < ApplicationRecord
   validate :validate_scope_integrity
 
   scope :admin_pending, -> { 
-    where(scope: 'admin', aasm_state: 'new')
+    joins(:issue)
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where(scope: 'admin', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :robot_pending, -> { 
-    where(scope: 'robot', aasm_state: 'new')
+    joins(:issue)
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where(scope: 'robot', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :client_pending, -> { 
-    where(scope: 'client', aasm_state: 'new')
+    joins(:issue)
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where(scope: 'client', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
