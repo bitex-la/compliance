@@ -28,4 +28,14 @@ FactoryBot.define do
     body_pt "Run the check!!"
     scope :admin 
   end
+
+  factory :chainalysis_reason, class: 'ObservationReason' do
+    subject_en "Risk score alert"
+    body_en "New score assessment"
+    subject_es "Alerta de score de riesgo"
+    body_es "Nuevo score de riesgo"
+    subject_pt "Alerta de pontuação de risco"
+    body_pt "Nova avaliação de pontuação"
+    scope :admin 
+  end
 end
