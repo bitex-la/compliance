@@ -188,14 +188,35 @@ RSpec.describe Issue, type: :model do
     end
   end
 
-  it 'has a scope for changed_after_observation' do
-    issue = create(:full_natural_person_issue, person: create(:empty_person))
-    create(:observation, issue: issue)
-    issue.reload.should be_observed
+  describe "when looking for people who had problems answering" do
+    it 'has a scope for changed_after_observation' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      create(:observation, issue: issue)
+      issue.reload.should be_observed
 
-    Issue.changed_after_observation.size.should == 0
-    Timecop.travel 10.minutes.from_now
-    create(:full_domicile_seed, issue: issue)
-    Issue.changed_after_observation.count.should == 1
+      Issue.changed_after_observation.size.should == 0
+      Timecop.travel 10.minutes.from_now
+      issue.domicile_seeds.first.update(street_address: "Something")
+      Issue.changed_after_observation.count.should == 1
+    end
+
+    it 'ignores answered issues' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      create(:observation, issue: issue, reply: 'text')
+
+      Issue.changed_after_observation.size.should == 0
+
+      Timecop.travel 10.minutes.from_now
+      issue.domicile_seeds.first.update(street_address: "Something")
+
+      Timecop.travel 10.minutes.from_now
+      create(:observation, issue: issue)
+
+      Issue.changed_after_observation.size.should == 0
+
+      Timecop.travel 10.minutes.from_now
+      issue.domicile_seeds.first.update(street_address: "Something else")
+      Issue.changed_after_observation.size.should == 1
+    end
   end
 end

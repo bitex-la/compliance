@@ -76,15 +76,16 @@ class Issue < ApplicationRecord
   scope :changed_after_observation, -> {
     where = []
     Issue::HAS_ONE.each do |r|
-      where << "#{r.to_s.pluralize}.created_at > observations.created_at"
+      where << "#{r.to_s.pluralize}.updated_at > observations.created_at"
     end
     Issue::HAS_MANY.each do |r|
-      where << "#{r}.created_at > observations.created_at"
+      where << "#{r}.updated_at > observations.created_at"
     end
 
     observed
       .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
       .where(where.join(" OR "))
+      .where("observations.reply IS NULL OR observations.reply = ''")
   }
 
   aasm do
