@@ -8,6 +8,8 @@ class Api::ChileInvoicingDetailSeedsController < Api::SeedController
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [:issues, :chile_invoicing_details, :chile_invoicing_detail_seeds],
+      issues: [],
+      chile_invoicing_details: [],
       chile_invoicing_detail_seeds: [
         :vat_status_code,
         :tax_id,
@@ -16,6 +18,7 @@ class Api::ChileInvoicingDetailSeedsController < Api::SeedController
         :comuna,
         :attachments,
         :copy_attachments,
+        :replaces,
         :issue
       ]
   end

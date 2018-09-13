@@ -20,6 +20,7 @@ class Api::ArgentinaInvoicingDetailSeedsController < Api::SeedController
         :address,
         :attachments,
         :copy_attachments,
+        :replaces,
         :issue
       ]
   end
