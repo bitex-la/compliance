@@ -90,7 +90,8 @@ describe 'All seed and fruit kinds' do
                   :full_legal_entity_docket, :alt_full_legal_entity_docket)
 
   it_behaves_like('seed', :argentina_invoicing_details, true,
-                  :full_argentina_invoicing_detail, :alt_full_argentina_invoicing_detail)
+                  :full_argentina_invoicing_detail,
+                  :alt_full_argentina_invoicing_detail)
 
   it_behaves_like('seed', :chile_invoicing_details, true,
                   :full_chile_invoicing_detail, :alt_full_chile_invoicing_detail)
@@ -101,9 +102,12 @@ describe 'All seed and fruit kinds' do
 
   it_behaves_like('seed', :emails, true, :full_email, :alt_full_email)
 
+  it_behaves_like('seed', :identifications, true,
+                  :full_natural_person_identification,
+                  :alt_full_natural_person_identification)
+
 =begin
   AffinitySeed
-  IdentificationSeed
   AllowanceSeed
   RiskScoreSeed
   NoteSeed
