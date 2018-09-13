@@ -109,10 +109,11 @@ describe 'All seed and fruit kinds' do
   it_behaves_like('seed', :allowances, true, :salary_allowance,
                   :alt_salary_allowance)
 
+  it_behaves_like('seed', :risk_scores, true, :full_risk_score,
+                  :alt_full_risk_score)
+
 =begin
   AffinitySeed
-  AllowanceSeed
-  RiskScoreSeed
   NoteSeed
 =end
 end
