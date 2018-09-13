@@ -147,27 +147,18 @@ describe 'an admin user' do
     select "Argentina",
       from: "issue[natural_docket_seed_attributes][nationality]",
       visible: false
-    select "1985",
-      from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
-      visible: false
-    select "January",
-      from: "issue[natural_docket_seed_attributes][birth_date(2i)]",
-      visible: false
-    select "1",
-      from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
-      visible: false
-
     fill_seed("natural_docket", {
      job_title: "Programmer",
      job_description: "Develop cool software for the real people",
-     politically_exposed_reason: "Nothing I am a legit guy!"
+     politically_exposed_reason: "Nothing I am a legit guy!",
+     birth_date: "1985-01-01"
     }, false)
 
 
     #find("#natural_docket_seed", visible: false).click_link("Add New Attachment")
     within("#natural_docket_seed") do
-       find('.has_many_container.attachments').click_link("Add New Attachment")
-       fill_attachment('natural_docket_seed', 'png', false)
+      find('.has_many_container.attachments').click_link("Add New Attachment")
+      fill_attachment('natural_docket_seed', 'png', false)
     end
 
     click_link "Base"
@@ -435,6 +426,7 @@ describe 'an admin user' do
     fill_seed("natural_docket", {
       first_name: "Lionel",
       last_name: "Higuain",
+      birth_date: "1985-01-01"
     }, false)
 
     select "married",
@@ -445,16 +437,6 @@ describe 'an admin user' do
       visible: false
     select "Argentina",
       from: "issue[natural_docket_seed_attributes][nationality]",
-      visible: false
-
-    select "1985",
-      from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
-      visible: false
-    select "January",
-      from: "issue[natural_docket_seed_attributes][birth_date(2i)]",
-      visible: false
-    select "1",
-      from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
       visible: false
 
     within("#natural_docket_seed") do
