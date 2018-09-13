@@ -11,7 +11,9 @@ class EventLogKind
     [7,  :dismiss_issue],
     [8,  :reject_issue],
     [9,  :approve_issue],
-    [10, :abandon_issue]
+    [10, :abandon_issue],
+    [11, :enable_person],
+    [12, :disable_person]
   ]
 
   def name

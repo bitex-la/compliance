@@ -216,7 +216,8 @@ describe 'an admin user' do
 
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 3)
-    Person.last.should be_enabled
+    issue.person.should be_enabled
+    assert_logging(issue.person, :enable_person, 1)
   end
 
   it 'reviews a newly created customer' do
@@ -284,7 +285,7 @@ describe 'an admin user' do
     assert_logging(issue, :update_entity, 2)
 
     Observation.where(issue: issue).count.should == 1
-    Issue.first.should be_observed
+    issue.reload.should be_observed
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
@@ -318,7 +319,7 @@ describe 'an admin user' do
 
     assert_response 200
 
-    Issue.first.should be_answered
+    issue.reload.should be_answered
     Observation.first.reply.should_not be_nil
 
     IdentificationSeed.first.tap do |seed|
@@ -339,13 +340,14 @@ describe 'an admin user' do
 
     click_link 'Approve'
 
-    Issue.last.should be_approved
+    issue.reload.should be_approved
     assert_logging(issue, :update_entity, 5)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
-    visit "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
-    page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}"
+    visit "/people/#{person.id}/issues/#{issue.id}/edit"
+    page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
+    assert_logging(person, :enable_person, 1)
   end
 
   it "Edits a customer by creating a new issue" do
@@ -488,6 +490,7 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
+    assert_logging(person, :enable_person, 1)
 
     old_domicile = Domicile.first
     new_domicile = Domicile.last
@@ -547,6 +550,7 @@ describe 'an admin user' do
 
     issue.reload.should be_rejected
     person.reload.should_not be_enabled
+    assert_logging(person, :disable_person, 1)
   end
 
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
@@ -608,6 +612,7 @@ describe 'an admin user' do
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
+    assert_logging(Person.find(person.id), :enable_person, 1)
   end
 
   it 'Reviews and disable a user with hits on worldcheck' do
@@ -718,6 +723,7 @@ describe 'an admin user' do
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
+    assert_logging(Person.find(person.id), :enable_person, 1)
   end
 
   it "Abandons a new person issue that was inactive" do

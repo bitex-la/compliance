@@ -427,7 +427,6 @@ describe Person do
         json_response[:included].find{|x| x[:type] == fruit}[:attributes].should ==
         expected_included.find{|x| x[:type] == fruit}[:attributes]
       end
-
     end
 
     it 'responds 404 when the person does not exist' do

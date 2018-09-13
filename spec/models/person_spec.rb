@@ -23,6 +23,19 @@ RSpec.describe Person, type: :model do
     ]
   end
 
+  it 'Add state changes to event log when enable/disable' do 
+    person = create(:empty_person)
+    assert_logging(person, :enable_person, 0)
+    2.times do
+      person.update(enabled: true)
+    end
+    assert_logging(person, :enable_person, 1)
+    2.times do
+      person.update(enabled: false)
+    end
+    assert_logging(person, :disable_person, 1)
+  end 
+  
   it 'shows only observations for meaningful issues' do 
     one = create(:basic_issue, person: person)
     two = create(:basic_issue, person: person)
