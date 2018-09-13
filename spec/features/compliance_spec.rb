@@ -423,21 +423,22 @@ describe 'an admin user' do
     end
 
     click_link "Docket"
-    fill_seed("natural_docket", {
-      first_name: "Lionel",
-      last_name: "Higuain",
-      birth_date: "1985-01-01"
-    }, false)
 
     select "married",
-      from: "issue[natural_docket_seed_attributes][marital_status_id]",
-      visible: false
+    from: "issue[natural_docket_seed_attributes][marital_status_id]",
+    visible: false
     select "male",
       from: "issue[natural_docket_seed_attributes][gender_id]",
       visible: false
     select "Argentina",
       from: "issue[natural_docket_seed_attributes][nationality]",
       visible: false
+
+    fill_seed("natural_docket", {
+      first_name: "Lionel",
+      last_name: "Higuain",
+      birth_date: "1985-01-01"
+    }, false)
 
     within("#natural_docket_seed") do
       click_link "Add New Attachment"
