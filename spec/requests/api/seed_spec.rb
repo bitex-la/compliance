@@ -98,9 +98,10 @@ describe 'All seed and fruit kinds' do
 
   it_behaves_like('seed', :phones, true, :full_phone, :alt_full_phone)
 
+  it_behaves_like('seed', :domiciles, true, :full_domicile, :alt_full_domicile)
+
 =begin
   AffinitySeed
-  DomicileSeed
   EmailSeed
   IdentificationSeed
   AllowanceSeed
