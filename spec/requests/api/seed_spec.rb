@@ -18,14 +18,14 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory|
       type: seed_type,
       attributes: initial_attrs,
       relationships: {
-        issue: { data: { id: issue.id, type: "issues" } }
+        issue: { data: { id: issue.id, type: 'issues' } }
       }
     }
 
     seed_id = api_response.data.id
 
     api_response.data.attributes.to_h.slice(*initial_attrs.keys)
-      .should eq(initial_attrs)
+                .should eq(initial_attrs)
 
     later_attrs = attributes_for(later_seed)
 
@@ -37,18 +37,18 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory|
     # Puts an attachment in it too.
 
     api_response.data.attributes.to_h.slice(*later_attrs.keys)
-      .should eq(later_attrs)
+                .should eq(later_attrs)
 
     api_request :post, "/issues/#{issue.id}/approve"
 
     api_get "/people/#{person.id}"
 
     api_response.included
-      .find{|i| i.type == type.to_s }
-      .attributes
-      .to_h
-      .slice(*later_attrs.keys)
-      .should == later_attrs
+                .find { |i| i.type == type.to_s }
+                .attributes
+                .to_h
+                .slice(*later_attrs.keys)
+                .should == later_attrs
   end
 
   it "Updates #{type} via issue" do
@@ -57,10 +57,9 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory|
     replaced = create(initial_factory, person: person)
 
     issue = create(:basic_issue, person: person)
-    
     attrs = attributes_for(initial_seed)
 
-    relationships = { issue: { data: { id: issue.id, type: "issues" } } }
+    relationships = { issue: { data: { id: issue.id, type: 'issues' } } }
     if has_many
       relationships[:replaces] = { data: { id: replaced.id, type: type } }
     end
@@ -75,9 +74,9 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory|
 
     api_get "/people/#{person.id}"
 
-    docket = api_response.included.find{|i| i.type == type.to_s }
+    docket = api_response.included.find { |i| i.type == type.to_s }
 
-    replaced.reload.replaced_by_id.should == docket.id.to_i
+    replaced.reload.replaced_by_id.should eq(docket.id.to_i)
 
     docket.attributes.to_h.slice(*attrs.keys).should == attrs
   end
@@ -85,16 +84,16 @@ end
 
 describe 'All seed and fruit kinds' do
   it_behaves_like('seed', :natural_dockets, false,
-    :full_natural_docket, :alt_full_natural_docket)
+                  :full_natural_docket, :alt_full_natural_docket)
 
   it_behaves_like('seed', :legal_entity_dockets, false,
-    :full_legal_entity_docket, :alt_full_legal_entity_docket)
+                  :full_legal_entity_docket, :alt_full_legal_entity_docket)
 
   it_behaves_like('seed', :argentina_invoicing_details, true,
-    :full_argentina_invoicing_detail, :alt_full_argentina_invoicing_detail)
+                  :full_argentina_invoicing_detail, :alt_full_argentina_invoicing_detail)
 
   it_behaves_like('seed', :chile_invoicing_details, true,
-    :full_chile_invoicing_detail, :alt_full_chile_invoicing_detail)
+                  :full_chile_invoicing_detail, :alt_full_chile_invoicing_detail)
 
   it_behaves_like('seed', :phones, true, :full_phone, :alt_full_phone)
 
