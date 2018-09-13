@@ -112,9 +112,10 @@ describe 'All seed and fruit kinds' do
   it_behaves_like('seed', :risk_scores, true, :full_risk_score,
                   :alt_full_risk_score)
 
+  it_behaves_like('seed', :notes, true, :full_note, :alt_full_note)
+
 =begin
   AffinitySeed
-  NoteSeed
 =end
 end
 
