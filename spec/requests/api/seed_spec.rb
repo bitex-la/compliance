@@ -106,6 +106,9 @@ describe 'All seed and fruit kinds' do
                   :full_natural_person_identification,
                   :alt_full_natural_person_identification)
 
+  it_behaves_like('seed', :allowances, true, :salary_allowance,
+                  :alt_salary_allowance)
+
 =begin
   AffinitySeed
   AllowanceSeed
