@@ -25,7 +25,7 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory|
     seed_id = api_response.data.id
 
     api_response.data.attributes.to_h.slice(*initial_attrs.keys)
-      .should == initial_attrs
+      .should eq(initial_attrs)
 
     later_attrs = attributes_for(later_seed)
 
@@ -37,7 +37,7 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory|
     # Puts an attachment in it too.
 
     api_response.data.attributes.to_h.slice(*later_attrs.keys)
-      .should == later_attrs
+      .should eq(later_attrs)
 
     api_request :post, "/issues/#{issue.id}/approve"
 
@@ -100,9 +100,10 @@ describe 'All seed and fruit kinds' do
 
   it_behaves_like('seed', :domiciles, true, :full_domicile, :alt_full_domicile)
 
+  it_behaves_like('seed', :emails, true, :full_email, :alt_full_email)
+
 =begin
   AffinitySeed
-  EmailSeed
   IdentificationSeed
   AllowanceSeed
   RiskScoreSeed
