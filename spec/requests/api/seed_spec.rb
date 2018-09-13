@@ -96,12 +96,10 @@ describe 'All seed and fruit kinds' do
   it_behaves_like('seed', :chile_invoicing_details, true,
     :full_chile_invoicing_detail, :alt_full_chile_invoicing_detail)
 
+  it_behaves_like('seed', :phones, true, :full_phone, :alt_full_phone)
 
 =begin
-  ArgentinaInvoicingDetailSeed
-  ChileInvoicingDetailSeed
   AffinitySeed
-  PhoneSeed
   DomicileSeed
   EmailSeed
   IdentificationSeed
