@@ -215,13 +215,13 @@ describe Person do
             first_name: "Joe",
             last_name: "Doe",
             nationality: "AR",
-            gender_code: "female",
+            gender_code: "male",
             marital_status_code: "single",
             job_title: 'Sr. Software developer',
             job_description: 'Build cool open source software',
             politically_exposed: false,
             politically_exposed_reason: nil,
-            birth_date: person.natural_dockets.first.birth_date.to_time.to_i,
+            birth_date: person.natural_dockets.first.birth_date.to_formatted_s,
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -318,7 +318,7 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "email_seeds",
+              type: "email_seeds",
               id: issue.email_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -360,7 +360,7 @@ describe Person do
           type: "argentina_invoicing_details",
           attributes:
           {
-            vat_status_code: "consumidor_final",
+            vat_status_code: "monotributo",
             tax_id: "20955754290",
             tax_id_kind_code: "cuit",
             receipt_kind_code: "a",
@@ -395,7 +395,7 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "note_seeds",
+              type: "note_seeds",
               id: issue.note_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},

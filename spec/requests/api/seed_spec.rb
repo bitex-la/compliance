@@ -185,8 +185,6 @@ shared_examples "docket" do |type, initial_factory|
   end
 end
 
-#specs for people#show
-
 shared_examples "has_many fruit" do |type, one_factory, two_factory, relations_proc = nil|
   initial_seed = "#{one_factory}_seed"
   later_seed = "#{two_factory}_seed"
