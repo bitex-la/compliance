@@ -3,7 +3,7 @@ require 'helpers/api/issues_helper'
 require 'helpers/api/api_helper'
 require 'json'
 
-shared_examples 'seed' do |type, has_many, initial_factory, later_factory, relations_proc = nil|
+shared_examples 'seed' do |type, initial_factory, later_factory, relations_proc = nil|
   initial_seed = "#{initial_factory}_seed"
   later_seed = "#{later_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
@@ -23,9 +23,9 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory, relat
     issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
 
     server_sent_relations = {
-        person: { data: { id: person.id.to_s, type: 'people' } },
-        attachments: { data: [] },
-        fruit: { data: nil }
+      person: { data: { id: person.id.to_s, type: 'people' } },
+      attachments: { data: [] },
+      fruit: { data: nil },
     }
 
     api_create "/#{seed_type}", {
@@ -35,13 +35,9 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory, relat
     }
 
     seed = api_response.data
+    seed.attributes.to_h.should >= initial_attrs
 
-    seed
-      .attributes.to_h
-      .slice(*initial_attrs.keys)
-      .should eq(initial_attrs)
-
-    json_response[:data][:relationships].should == issue_relation
+    json_response[:data][:relationships].should >= issue_relation
       .merge(initial_relations)
       .merge(server_sent_relations)
 
@@ -53,11 +49,9 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory, relat
       relationships: later_relations
     }
 
-    api_response
-      .data.attributes.to_h.slice(*later_attrs.keys)
-      .should eq(later_attrs)
+    api_response.data.attributes.should >= later_attrs
 
-    json_response[:data][:relationships].should == issue_relation
+    json_response[:data][:relationships].should >= issue_relation
       .merge(later_relations)
       .merge(server_sent_relations)
 
@@ -66,7 +60,7 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory, relat
     api_get "/people/#{person.id}"
 
     fruit = json_response[:included].find { |i| i[:type] == type.to_s }
-    fruit[:attributes].slice(*later_attrs.keys).should == later_attrs
+    fruit[:attributes].should >= later_attrs
     fruit[:relationships].should == later_relations.merge({
       person: { data: { id: person.id.to_s, type: 'people' } },
       attachments: { data: [] },
@@ -74,66 +68,23 @@ shared_examples 'seed' do |type, has_many, initial_factory, later_factory, relat
       seed: { data: { id: seed.id, type: seed_type.to_s } }
     })
   end
-end
 
-shared_examples 'has_many_seed' do |type, has_many, initial_factory, later_factory, relations_proc = nil|
-  initial_seed = "#{initial_factory}_seed"
-  later_seed = "#{later_factory}_seed"
-  seed_type = Garden::Naming.new(type).seed_plural
-
-  it "Adds several new #{type}" do
-    fruit = create(initial_factory)
-
-    issue = create(:basic_issue)
-    person = issue.person
-
-    api_get "/#{seed_type}/#{seed.id}"
-    api_response
-      .data.attributes.to_h.slice(*later_attrs.keys)
-      .should eq(later_attrs)
-    json_response[:data][:relationships].should == all_later_seed_relations
-
-    api_get "/#{seed_type}/#{seed.id}"
-    json_response[:data][:relationships][:fruit].should ==
-      { data: { id: fruit[:id], type: type.to_s } }
-
-    api_get "/#{type}/#{fruit[:id]}"
-    json_response[:data][:relationships][:seed].should ==
-      { data: { id: seed.id, type: seed_type.to_s } }
-
-
-    ####
-
-    person = create(:empty_person).reload
-    create(:basic_issue, person: person, aasm_state: 'approved')
-    replaced = create(initial_factory, person: person)
-
-    issue = create(:basic_issue, person: person)
-    attrs = attributes_for(initial_seed)
-
-    relationships = { issue: { data: { id: issue.id, type: 'issues' } } }
-    if has_many
-      relationships[:replaces] = { data: { id: replaced.id, type: type } }
-    end
-
-    api_create "/#{seed_type}", {
-      type: seed_type,
-      attributes: attrs,
-      relationships: relationships
-    }
-
-    api_request :post, "/issues/#{issue.id}/approve"
-
-    api_get "/people/#{person.id}"
-
-    docket = api_response.included.find { |i| i.type == type.to_s }
-
-    replaced.reload.replaced_by_id.should eq(docket.id.to_i)
-
-    docket.attributes.to_h.slice(*attrs.keys).should == attrs
+  it "Can't edit #{seed_type} once issue is closed" do
+    pending
+    fail
   end
 
-  it "Replaces existing #{type}" do
+  it "Can't add attachments to #{seed_type} once issue is closed" do
+    pending
+    fail
+  end
+
+  it "Allows filters on #{type} index" do
+    pending
+    fail
+  end
+
+  it "Allows filters on #{seed_type} index" do
     pending
     fail
   end
@@ -143,118 +94,155 @@ shared_examples 'docket' do |type, initial_factory|
   initial_seed = "#{initial_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
 
-  it "Replaces a #{type}" do
+  it "Replaces a #{type}, showing all resources involved" do
     person = create(:empty_person).reload
     # We need to create an issue for this person, so that the factory
     # for the fruit that follows it can create it's original seed and add
     # it to the existing issue.
     create(:basic_issue, person: person, aasm_state: 'approved')
-    replaced = create(initial_factory, person: person)
+    old_attrs = attributes_for(initial_factory)
+    old_fruit = create(initial_factory, person: person).reload
 
     issue = create(:basic_issue, person: person)
-    seed = create(initial_seed, issue: issue)
+    seed = create(initial_seed, issue: issue, copy_attachments: true,
+      add_all_attachments: false)
 
-    # El fruto 'replaced' todavía no tiene replaced_by
-    # El seed todavía no tiene fruit
-    # La persona incluye el viejo fruto
-    #
-    # approve!
-    #
-    # El fruto 'replaced' ahora apunta a su reemplazo
-    # El seed apunta a su fruto
-    # El fruto nuevo apunta a su seed y su reemplazado
-    # La persona incluye el nuevo fruto
-    # La persona no incluye el viejo fruto
-    api_request :post, "/issues/#{issue.id}/approve"
+    # The fruit has not been replaced yet
+    api_get "/#{type}/#{old_fruit.id}"
+    api_response
+      .data.attributes.to_h.slice(*old_attrs.keys)
+      .should eq(old_attrs)
 
+    json_response[:data][:relationships].should == {
+      person: { data: { id: person.id.to_s, type: 'people' } },
+      replaced_by: { data: nil },
+      seed: { data: { type: seed_type, id: old_fruit.seed.id.to_s } },
+      attachments: { data:
+        old_fruit.attachments.map{|a| { type: 'attachments', id: a.id.to_s } }
+      }
+    }
+
+    # The seed does not have a fruit yet.
+    api_get "/#{seed_type}/#{seed.id}"
+    api_response
+      .data.attributes.to_h.slice(*old_attrs.keys)
+      .should eq(old_attrs)
+
+    json_response[:data][:relationships].should == {
+      issue: { data: { id: issue.id.to_s, type: 'issues' } },
+      person: { data: { id: person.id.to_s, type: 'people' } },
+      fruit: { data: nil },
+      attachments: { data: [] }
+    }
+    new_fruit_id = api_response.data.id
+
+    # The person still has the old fruit
+    api_get "/people/#{person.id}"
+    json_response[:data][:relationships]
+      .map { |k, v| v[:data] }.flatten.compact
+      .select { |d| d[:type] == type.to_s }
+      .map{|i| i[:id] }
+      .should == [old_fruit.id.to_s]
+
+    issue.approve!
+
+    api_get "/#{type}/#{old_fruit.id}"
+    json_response[:data][:relationships].should == {
+      person: { data: { id: person.id.to_s, type: 'people' } },
+      replaced_by: { data: { id: new_fruit_id, type: type.to_s } },
+      seed: { data: { id: old_fruit.seed.id.to_s, type: seed_type.to_s } },
+      attachments: { data: [] }
+    }
+
+    api_get "/#{type}/#{new_fruit_id}"
+    json_response[:data][:relationships].should == {
+      person: { data: { id: person.id.to_s, type: 'people' } },
+      replaced_by: { data: nil },
+      seed: { data: { id: seed.id.to_s, type: seed_type.to_s } },
+      attachments: { data:
+        old_fruit.attachments.map{|a| { type: 'attachments', id: a.id.to_s } }
+      }
+    }
+
+    api_get "/#{seed_type}/#{seed.id}"
+    json_response[:data][:relationships].should == {
+      issue: { data: { id: issue.id.to_s, type: 'issues' } },
+      person: { data: { id: person.id.to_s, type: 'people' } },
+      fruit: { data: { id: new_fruit_id, type: type.to_s } },
+      attachments: { data: [] }
+    }
+
+    # The person now has the new fruit
     api_get "/people/#{person.id}"
 
-    docket = api_response.included.find { |i| i.type == type.to_s }
+    json_response[:data][:relationships]
+      .map { |k, v| v[:data] }.flatten.compact
+      .select { |d| d[:type] == type.to_s }
+      .map{|i| i[:id] }
+      .should == [new_fruit_id]
+  end
 
-    replaced.reload.replaced_by_id.should eq(docket.id.to_i)
+  it "can choose to copy attachments when replacing #{type}" do
+    pending
+    fail
+  end
+end
 
-    docket.attributes.to_h.slice(*attrs.keys).should == attrs
+shared_examples 'has_many fruit' do |type, one_factory, two_factory|
+  initial_seed = "#{initial_factory}_seed"
+  seed_type = Garden::Naming.new(type).seed_plural
+
+  it "Adds multiple #{type}, explicitly replaces one of them" do
+    pending
+    fail
+  end
+
+  it "can choose to copy attachments when replacing #{type}" do
+    pending
+    fail
   end
 end
   
-
 describe 'All seed and fruit kinds' do
-  it_behaves_like('seed', :natural_dockets, false,
+  it_behaves_like('seed', :natural_dockets,
                   :full_natural_docket, :alt_full_natural_docket)
 
   it_behaves_like('docket', :natural_dockets, :full_natural_docket)
 
-  it_behaves_like('seed', :legal_entity_dockets, false,
+  it_behaves_like('seed', :legal_entity_dockets,
                   :full_legal_entity_docket, :alt_full_legal_entity_docket)
 
   it_behaves_like('docket', :legal_entity_dockets, :full_legal_entity_docket)
 
-  it_behaves_like('seed', :argentina_invoicing_details, true,
+  it_behaves_like('seed', :argentina_invoicing_details,
                   :full_argentina_invoicing_detail,
                   :alt_full_argentina_invoicing_detail)
 
-  it_behaves_like('seed', :chile_invoicing_details, true,
+  it_behaves_like('seed', :chile_invoicing_details,
                   :full_chile_invoicing_detail, :alt_full_chile_invoicing_detail)
 
-  it_behaves_like('seed', :phones, true, :full_phone, :alt_full_phone)
+  it_behaves_like('seed', :phones, :full_phone, :alt_full_phone)
 
-  it_behaves_like('seed', :domiciles, true, :full_domicile, :alt_full_domicile)
+  it_behaves_like('seed', :domiciles, :full_domicile, :alt_full_domicile)
 
-  it_behaves_like('seed', :emails, true, :full_email, :alt_full_email)
+  it_behaves_like('seed', :emails, :full_email, :alt_full_email)
 
-  it_behaves_like('seed', :identifications, true,
+  it_behaves_like('seed', :identifications,
                   :full_natural_person_identification,
                   :alt_full_natural_person_identification)
 
-  it_behaves_like('seed', :allowances, true, :salary_allowance,
-                  :alt_salary_allowance)
+  it_behaves_like('seed', :allowances, :salary_allowance, :alt_salary_allowance)
 
-  it_behaves_like('seed', :risk_scores, true, :full_risk_score,
-                  :alt_full_risk_score)
+  it_behaves_like('seed', :risk_scores, :full_risk_score, :alt_full_risk_score)
 
-  it_behaves_like('seed', :notes, true, :full_note, :alt_full_note)
+  it_behaves_like('seed', :notes, :full_note, :alt_full_note)
 
-  it_behaves_like('seed', :affinities, true, :full_affinity, :alt_full_affinity, -> {
+  it_behaves_like('seed', :affinities, :full_affinity, :alt_full_affinity, -> {
     [
-      { related_person: { data: { id: create(:empty_person).id, type: 'people' } } },
-      { related_person: { data: { id: create(:empty_person).id, type: 'people' } } },
+      { related_person:
+        { data: { id: create(:empty_person).id.to_s, type: 'people' } } },
+      { related_person:
+        { data: { id: create(:empty_person).id.to_s, type: 'people' } } },
     ]
   })
-end
-
-describe "when creating updating and approving" do
-  it "Can create more than one" do
-    pending
-    fail
-  end
-
-  it "Cannot create more than one" do
-    pending
-    fail
-  end
-
-  it "Can add attachments" do
-    pending
-    fail
-  end
-
-  it "Can't add attachments once issue is closed" do
-    pending
-    fail
-  end
-
-  it "Can't edit once issue is closed" do
-    pending
-    fail
-  end
-
-  it "Allows filtering and showing fruit" do
-    pending
-    fail
-  end
-
-  it "Allows filtering and showing seed" do
-    pending
-    fail
-  end
 end

@@ -32,7 +32,14 @@ module FastJsonapiCandy
       set_type naming.seed_plural
       build_belongs_to :issue
       build_has_one :person
-      belongs_to :fruit, record_type: naming.plural, serializer: naming.serializer
+
+      if naming.seed.constantize.column_names.include?('replaces_id')
+        belongs_to :replaces, record_type: naming.plural,
+          serializer: naming.serializer
+      end
+
+      belongs_to :fruit, record_type: naming.plural,
+        serializer: naming.serializer
       build_has_many :attachments
 
       if attrs = naming.serializer.constantize.attributes_to_serialize

@@ -7,9 +7,10 @@ class Api::AffinitySeedsController < Api::SeedController
 
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [:issues, :affinities, :affinity_seeds],
+      [:issues, :people, :affinities, :affinity_seeds],
       issues: [],
       affinities: [],
+      people: [],
       affinity_seeds: [
         :affinity_kind_code,
         :related_person,
