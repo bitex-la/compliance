@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180911183024) do
+ActiveRecord::Schema.define(version: 20180914162032) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -162,6 +162,10 @@ ActiveRecord::Schema.define(version: 20180911183024) do
     t.datetime "document_updated_at"
     t.integer "attached_to_fruit_id"
     t.string "attached_to_fruit_type"
+    t.index ["attached_to_fruit_type", "attached_to_fruit_id"], name: "attached_to_fruit"
+    t.index ["attached_to_fruit_type"], name: "index_attachments_on_attached_to_fruit_type"
+    t.index ["attached_to_seed_type", "attached_to_seed_id"], name: "attached_to_seed"
+    t.index ["attached_to_seed_type"], name: "index_attachments_on_attached_to_seed_type"
     t.index ["person_id"], name: "index_attachments_on_person_id"
   end
 
