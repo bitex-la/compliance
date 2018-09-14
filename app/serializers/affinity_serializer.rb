@@ -3,11 +3,14 @@ class AffinitySerializer
   set_type 'affinities'
   attributes :affinity_kind_code
   build_timestamps
-  belongs_to :related_person, record_type: :people
+  belongs_to :related_person,
+    record_type: :people,
+    serializer: 'PersonSerializer'
   derive_seed_serializer!
 end
 
 class AffinitySeedSerializer
-  belongs_to :related_person, record_type: :people,
+  belongs_to :related_person,
+    record_type: :people,
     serializer: 'PersonSerializer'
 end

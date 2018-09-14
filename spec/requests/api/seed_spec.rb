@@ -218,13 +218,22 @@ shared_examples "has_many fruit" do |type, one_factory, two_factory, relations_p
     issue2 = create(:basic_issue, person: person)
     issue_relation2 = { issue: { data: { id: issue2.id.to_s, type: 'issues' } } }
 
-    replacing_fruit = issue.send("#{type.to_s.singularize}_seed").fruit
+    fruit = -> (issue) {
+      if issue.respond_to?("#{type.to_s.singularize}_seed")
+        title = "#{type.to_s.singularize}_seed"
+        issue.send(title).fruit
+      else
+        title = "#{type.to_s.singularize}_seeds"
+        issue.send(title).first.fruit
+      end
+    }
+
     replacing_fruit_relations =
       case type
       when :natural_dockets, :legal_entity_dockets
         {}
       else
-        { replaces: { data: { id: replacing_fruit.id, type: type.to_s } } }
+        { replaces: { data: { id: fruit.call(issue).id, type: type.to_s } } }
       end
 
     api_create "/#{seed_type}", {
@@ -239,13 +248,13 @@ shared_examples "has_many fruit" do |type, one_factory, two_factory, relations_p
 
     person.reload
 
-    api_get "/#{type}/#{issue.send("#{type.to_s.singularize}_seed").fruit.id}"
+    api_get "/#{type}/#{fruit.call(issue).id}"
     db_record =
       person
       .send("#{type}_history")
       .find_by(
         replaced_by_id:
-          issue2.send("#{type.to_s.singularize}_seed").fruit.id
+          fruit.call(issue2).id
       )
 
     JSON.parse(
@@ -314,4 +323,30 @@ describe 'All seed and fruit kinds' do
   it_behaves_like('has_many fruit', :argentina_invoicing_details,
                   :full_argentina_invoicing_detail,
                   :alt_full_argentina_invoicing_detail)
+
+  it_behaves_like('has_many fruit', :chile_invoicing_details,
+                  :full_chile_invoicing_detail, :alt_full_chile_invoicing_detail)
+
+  it_behaves_like('has_many fruit', :phones, :full_phone, :alt_full_phone)
+
+  it_behaves_like('has_many fruit', :domiciles, :full_domicile, :alt_full_domicile)
+
+  it_behaves_like('has_many fruit', :emails, :full_email, :alt_full_email)
+
+  it_behaves_like('has_many fruit', :identifications,
+                  :full_natural_person_identification,
+                  :alt_full_natural_person_identification)
+
+  it_behaves_like('has_many fruit', :allowances, :salary_allowance, :alt_salary_allowance)
+
+  it_behaves_like('has_many fruit', :risk_scores, :full_risk_score, :alt_full_risk_score)
+
+  it_behaves_like('has_many fruit', :notes, :full_note, :alt_full_note)
+
+  it_behaves_like('has_many fruit', :affinities, :full_affinity, :alt_full_affinity, -> {
+    [
+      {related_person: {data: {id: create(:empty_person).id.to_s, type: 'people'}}},
+      {related_person: {data: {id: create(:empty_person).id.to_s, type: 'people'}}},
+    ]
+  })
 end
