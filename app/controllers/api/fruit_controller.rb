@@ -1,6 +1,5 @@
 class Api::FruitController < Api::ApiController
   def index
-    debugger
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     collection = resource_class.all
       .order(updated_at: :desc)

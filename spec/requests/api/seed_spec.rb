@@ -211,7 +211,6 @@ shared_examples "has_many fruit" do |type, one_factory, two_factory, relations_p
       attributes: initial_attrs,
       relationships: issue_relation.merge(initial_relations)
     }
-    old_fruit_id = api_response.data.id
 
     issue.reload
     issue.approve!
@@ -219,10 +218,21 @@ shared_examples "has_many fruit" do |type, one_factory, two_factory, relations_p
     issue2 = create(:basic_issue, person: person)
     issue_relation2 = { issue: { data: { id: issue2.id.to_s, type: 'issues' } } }
 
+    replacing_fruit = issue.send("#{type.to_s.singularize}_seed").fruit
+    replacing_fruit_relations =
+      case type
+      when :natural_dockets, :legal_entity_dockets
+        {}
+      else
+        { replaces: { data: { id: replacing_fruit.id, type: type.to_s } } }
+      end
+
     api_create "/#{seed_type}", {
       type: seed_type,
-      attributes: initial_attrs,
-      relationships: issue_relation2.merge(later_relations)
+      attributes: later_attrs,
+      relationships: issue_relation2
+        .merge(later_relations)
+        .merge(replacing_fruit_relations)
     }
     issue2.reload
     issue2.approve!
@@ -230,17 +240,18 @@ shared_examples "has_many fruit" do |type, one_factory, two_factory, relations_p
     person.reload
 
     api_get "/#{type}/#{issue.send("#{type.to_s.singularize}_seed").fruit.id}"
-    nat_docket =
+    db_record =
       person
-      .natural_dockets_history
+      .send("#{type}_history")
       .find_by(
         replaced_by_id:
           issue2.send("#{type.to_s.singularize}_seed").fruit.id
       )
 
     JSON.parse(
-      NaturalDocketSerializer
-        .new(nat_docket)
+      "#{type.to_s.camelcase.singularize}Serializer"
+        .constantize
+        .new(db_record)
         .serialized_json
     )['data']
         .deep_symbolize_keys
@@ -253,47 +264,54 @@ shared_examples "has_many fruit" do |type, one_factory, two_factory, relations_p
   end
 end
 
-describe "All seed and fruit kinds" do
-  it_behaves_like("seed", :natural_dockets,
+describe 'All seed and fruit kinds' do
+  it_behaves_like('seed', :natural_dockets,
                   :full_natural_docket, :alt_full_natural_docket)
 
-  it_behaves_like("docket", :natural_dockets, :full_natural_docket)
+  it_behaves_like('docket', :natural_dockets, :full_natural_docket)
 
-  it_behaves_like("seed", :legal_entity_dockets,
+  it_behaves_like('seed', :legal_entity_dockets,
                   :full_legal_entity_docket, :alt_full_legal_entity_docket)
 
-  it_behaves_like("docket", :legal_entity_dockets, :full_legal_entity_docket)
+  it_behaves_like('docket', :legal_entity_dockets, :full_legal_entity_docket)
 
-  it_behaves_like("seed", :argentina_invoicing_details,
+  it_behaves_like('seed', :argentina_invoicing_details,
                   :full_argentina_invoicing_detail,
                   :alt_full_argentina_invoicing_detail)
 
-  it_behaves_like("seed", :chile_invoicing_details,
+  it_behaves_like('seed', :chile_invoicing_details,
                   :full_chile_invoicing_detail, :alt_full_chile_invoicing_detail)
 
-  it_behaves_like("seed", :phones, :full_phone, :alt_full_phone)
+  it_behaves_like('seed', :phones, :full_phone, :alt_full_phone)
 
-  it_behaves_like("seed", :domiciles, :full_domicile, :alt_full_domicile)
+  it_behaves_like('seed', :domiciles, :full_domicile, :alt_full_domicile)
 
-  it_behaves_like("seed", :emails, :full_email, :alt_full_email)
+  it_behaves_like('seed', :emails, :full_email, :alt_full_email)
 
-  it_behaves_like("seed", :identifications,
+  it_behaves_like('seed', :identifications,
                   :full_natural_person_identification,
                   :alt_full_natural_person_identification)
 
-  it_behaves_like("seed", :allowances, :salary_allowance, :alt_salary_allowance)
+  it_behaves_like('seed', :allowances, :salary_allowance, :alt_salary_allowance)
 
-  it_behaves_like("seed", :risk_scores, :full_risk_score, :alt_full_risk_score)
+  it_behaves_like('seed', :risk_scores, :full_risk_score, :alt_full_risk_score)
 
-  it_behaves_like("seed", :notes, :full_note, :alt_full_note)
+  it_behaves_like('seed', :notes, :full_note, :alt_full_note)
 
-  it_behaves_like("seed", :affinities, :full_affinity, :alt_full_affinity, -> {
+  it_behaves_like('seed', :affinities, :full_affinity, :alt_full_affinity, -> {
     [
-      {related_person: {data: {id: create(:empty_person).id.to_s, type: "people"}}},
-      {related_person: {data: {id: create(:empty_person).id.to_s, type: "people"}}},
+      {related_person: {data: {id: create(:empty_person).id.to_s, type: 'people'}}},
+      {related_person: {data: {id: create(:empty_person).id.to_s, type: 'people'}}},
     ]
   })
 
-  it_behaves_like("has_many fruit", :natural_dockets,
+  it_behaves_like('has_many fruit', :natural_dockets,
                   :full_natural_docket, :alt_full_natural_docket)
+
+  it_behaves_like('has_many fruit', :legal_entity_dockets,
+                  :full_legal_entity_docket, :alt_full_legal_entity_docket)
+
+  it_behaves_like('has_many fruit', :argentina_invoicing_details,
+                  :full_argentina_invoicing_detail,
+                  :alt_full_argentina_invoicing_detail)
 end

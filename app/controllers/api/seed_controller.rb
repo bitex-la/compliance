@@ -19,8 +19,8 @@ class Api::SeedController < Api::ApiController
     # Force json-api ID to match the route id.
     begin
       params[:data][:id] = resource.id
-    rescue NoMethodError => e
-      return jsonapi_422(nil)  
+    rescue NoMethodError
+      return jsonapi_422(nil)
     end
 
     map_and_save(200)
