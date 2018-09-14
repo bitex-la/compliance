@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180914162032) do
+ActiveRecord::Schema.define(version: 20180914165846) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "namespace"
@@ -67,8 +67,10 @@ ActiveRecord::Schema.define(version: 20180914162032) do
     t.integer "replaces_id"
     t.integer "fruit_id"
     t.boolean "copy_attachments"
+    t.index ["fruit_id"], name: "index_affinity_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_affinity_seeds_on_issue_id"
     t.index ["related_person_id"], name: "index_affinity_seeds_on_related_person_id"
+    t.index ["replaces_id"], name: "index_affinity_seeds_on_replaces_id"
   end
 
   create_table "allowance_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -83,6 +85,7 @@ ActiveRecord::Schema.define(version: 20180914162032) do
     t.integer "kind_id"
     t.index ["fruit_id"], name: "index_allowance_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_allowance_seeds_on_replaces_id"
   end
 
   create_table "allowances", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -241,6 +244,7 @@ ActiveRecord::Schema.define(version: 20180914162032) do
     t.index ["fruit_id"], name: "index_domicile_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_domicile_seeds_on_issue_id"
     t.index ["postal_code"], name: "index_domicile_seeds_on_postal_code"
+    t.index ["replaces_id"], name: "index_domicile_seeds_on_replaces_id"
     t.index ["state"], name: "index_domicile_seeds_on_state"
     t.index ["street_address", "street_number"], name: "index_domicile_seeds_on_street_address_and_street_number"
     t.index ["street_address"], name: "index_domicile_seeds_on_street_address"
@@ -363,6 +367,7 @@ ActiveRecord::Schema.define(version: 20180914162032) do
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
     t.index ["issuer"], name: "index_identification_seeds_on_issuer"
     t.index ["number"], name: "index_identification_seeds_on_number"
+    t.index ["replaces_id"], name: "index_identification_seeds_on_replaces_id"
   end
 
   create_table "identifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -608,6 +613,7 @@ ActiveRecord::Schema.define(version: 20180914162032) do
     t.bigint "issue_id"
     t.index ["fruit_id"], name: "index_risk_score_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_risk_score_seeds_on_issue_id"
+    t.index ["replaces_id"], name: "index_risk_score_seeds_on_replaces_id"
   end
 
   create_table "risk_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
