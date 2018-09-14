@@ -32,7 +32,7 @@ shared_examples "seed" do |type, initial_factory, later_factory, relations_proc 
     api_create "/#{seed_type}", {
       type: seed_type,
       attributes: initial_attrs,
-      relationships: issue_relation.merge(initial_relations),
+      relationships: issue_relation.merge(initial_relations)
     }
 
     seed = api_response.data
@@ -48,7 +48,7 @@ shared_examples "seed" do |type, initial_factory, later_factory, relations_proc 
     api_update "/#{seed_type}/#{seed.id}", {
       type: seed_type,
       attributes: later_attrs,
-      relationships: later_relations,
+      relationships: later_relations
     }
 
     api_response.data.attributes.should >= later_attrs
@@ -60,21 +60,44 @@ shared_examples "seed" do |type, initial_factory, later_factory, relations_proc 
 
     api_request :post, "/issues/#{issue.id}/approve"
 
-    api_get "/people/#{person.id}"
+    person.reload
 
-    fruit = json_response[:included].find { |i| i[:type] == type.to_s }
-    fruit[:attributes].should >= later_attrs
-    fruit[:relationships].should == later_relations.merge({
-      person: {data: {id: person.id.to_s, type: "people"}},
-      attachments: {data: []},
-      replaced_by: {data: nil},
-      seed: {data: {id: seed.id, type: seed_type.to_s}},
-    })
+    issue =
+      person
+        .issues
+        .first
+
+    if issue.respond_to?("#{type.to_s.singularize}_seeds")
+      issue
+        .send("#{type.to_s.singularize}_seeds")
+        .first.id.to_s.should eq(seed.id)
+    else
+      issue
+        .send("#{type.to_s.singularize}_seed")
+        .id.to_s.should eq(seed.id)
+    end
   end
 
   it "Can't edit #{seed_type} once issue is closed" do
-    pending
-    fail
+    later_attrs = attributes_for(later_seed)
+    issue = create(:basic_issue)
+    seed = create(initial_seed, issue: issue, copy_attachments: true,
+                                add_all_attachments: false)
+
+    issue.approve!
+
+    initial_relations, later_relations =
+      if relations_proc
+        instance_exec(&relations_proc)
+      else
+        [{}, {}]
+      end
+
+    api_update "/#{seed_type}/#{seed.id}", {
+      type: seed_type,
+      attributes: later_attrs,
+      relationships: later_relations
+    }, 422
   end
 
   it "Can't add attachments to #{seed_type} once issue is closed" do
@@ -136,12 +159,7 @@ shared_examples "docket" do |type, initial_factory|
     new_fruit_id = api_response.data.id
 
     # The person still has the old fruit
-    api_get "/people/#{person.id}"
-    json_response[:data][:relationships]
-      .map { |k, v| v[:data] }.flatten.compact
-      .select { |d| d[:type] == type.to_s }
-      .map { |i| i[:id] }
-      .should == [old_fruit.id.to_s]
+    person.issues.first.send("#{type.to_s.singularize}_seed").fruit.id.should eq(old_fruit.id)
 
     issue.approve!
 
@@ -170,13 +188,13 @@ shared_examples "docket" do |type, initial_factory|
     }
 
     # The person now has the new fruit
-    api_get "/people/#{person.id}"
-
-    json_response[:data][:relationships]
-      .map { |k, v| v[:data] }.flatten.compact
-      .select { |d| d[:type] == type.to_s }
-      .map { |i| i[:id] }
-      .should == [new_fruit_id]
+    person.reload
+    person
+      .issues
+      .find(
+        api_response.data.relationships.issue.data.id
+      ).send("#{type.to_s.singularize}_seed")
+       .fruit.id.to_s.should eq(new_fruit_id)
   end
 
   it "can choose to copy attachments when replacing #{type}" do
