@@ -11,10 +11,20 @@ module ApiResponse
   end
 
   def jsonapi_response(it, options = {}, status = 200)
+    options = params
+      .permit!.to_h
+      .deep_symbolize_keys
+      .slice(:fields, :include)
+      .merge(options)
+
     payload = it.is_a?(Array) ? it.first : it
     serializer = "#{payload.try(:klass) || payload.class}Serializer".constantize
-    unless serializer.relationships_to_serialize.nil?
-      options[:include] ||= serializer.relationships_to_serialize.keys
+    possible_relations = serializer.relationships_to_serialize
+    if possible_relations && !options.has_key?(:include)
+      if options[:fields].presence
+        possible_relations = possible_relations.slice(*options[:fields].keys)
+      end
+      options[:include] = possible_relations.keys
     end
 
     ser = serializer.new(it, options)

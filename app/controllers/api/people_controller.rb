@@ -3,18 +3,13 @@ class Api::PeopleController < Api::ApiController
     scope = Person.ransack(params[:filter]).result
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     people = scope.page(page).per(per_page)
-    jsonapi_response(
-      people,
-      meta:
-        {
-          total_pages:
-           (scope.count.to_f / per_page).ceil
-        }
+    jsonapi_response( people,
+      meta: { total_pages: (scope.count.to_f / per_page).ceil }
     )
   end
 
   def show
-    json_response SimplePersonSerializer.new(Person.find(params[:id])).serialized_json
+    jsonapi_response Person.find(params[:id]), {}
   end
 
   def create
@@ -22,9 +17,8 @@ class Api::PeopleController < Api::ApiController
   end
 
   def update
-    mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
-                                       [:people],
-                                       people: %I[enabled risk]
+    mapper = JsonapiMapper.doc_unsafe!(
+      params.permit!.to_h, [:people], people: %I[enabled risk])
 
     return jsonapi_422(nil) unless mapper.data
 
@@ -36,8 +30,10 @@ class Api::PeopleController < Api::ApiController
   end
 
   def simple_jsonapi_response(type, attributes)
-    { data: { id: attributes['id'],
-              type: type,
-              attributes: attributes.except('id') } }
+    { data: { 
+        id: attributes['id'],
+        type: type,
+        attributes: attributes.except('id') } 
+    }
   end
 end
