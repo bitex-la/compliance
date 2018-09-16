@@ -577,6 +577,18 @@ class Api::IssuesHelper
     }
   end
 
+  def self.attachment(seed_type, seed_id, ext = :jpg)
+    {
+      type: "attachments",
+      relationships: {attached_to_seed: {data: {id: seed_id, type: seed_type}}},
+      attributes: {
+        document: "data:#{mime_for(ext)};base64,#{bytes_for(ext)}",
+        document_file_name: "áñçfile.#{ext}",
+        document_content_type: mime_for(ext)
+      }
+    }
+  end
+
   def self.seed_attachment_payload(ext, id, person_id, seed_id, type)
     {
       data: {

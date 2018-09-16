@@ -1,16 +1,4 @@
-class Api::SeedController < Api::ApiController
-  def index
-    page, per_page = Util::PageCalculator.call(params, 0, 10)
-    collection = resource_class.order(updated_at: :desc).page(page).per(per_page)
-
-    jsonapi_response collection, options_for_response.merge!(
-      meta: { total_pages: (resource.count.to_f / per_page).ceil })
-  end
-
-  def show
-    jsonapi_response resource, options_for_response
-  end
-
+class Api::SeedController < Api::FruitController
   def create
     map_and_save(201)
   end
@@ -28,10 +16,6 @@ class Api::SeedController < Api::ApiController
 
   protected
 
-  def resource
-    resource_class.find(params[:id])
-  end
-
   def map_and_save(success_code)
     mapper = get_mapper
     return jsonapi_422(nil) unless mapper.data
@@ -41,9 +25,5 @@ class Api::SeedController < Api::ApiController
     else
       json_response mapper.all_errors, 422
     end
-  end
-
-  def options_for_response
-    {}
   end
 end

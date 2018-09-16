@@ -1,6 +1,12 @@
 FactoryBot.define do
   factory :empty_person, class: Person do
     enabled { false }
+    
+    trait :with_issue do
+      after(:create) do |person, evaluator|
+        create :basic_issue, person: person
+      end
+    end
   end
 
   factory :new_natural_person, class: Person do

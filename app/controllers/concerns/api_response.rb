@@ -17,6 +17,15 @@ module ApiResponse
       .slice(:fields, :include)
       .merge(options)
 
+    if options[:fields]
+      options[:fields].each do |k,v|
+        options[:fields][k] = v.split(',')
+      end
+    end
+    if options[:include]
+      options[:include] = options[:include].split(',')
+    end
+
     payload = it.is_a?(Array) ? it.first : it
     serializer = "#{payload.try(:klass) || payload.class}Serializer".constantize
     possible_relations = serializer.relationships_to_serialize
