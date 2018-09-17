@@ -22,7 +22,8 @@ module ApiResponse
         options[:fields][k] = v.split(',')
       end
     end
-    if options[:include]
+
+    if options[:include] && options[:include].is_a?(String)
       options[:include] = options[:include].split(',')
     end
 

@@ -7,7 +7,8 @@ FactoryBot.define_persons_item_and_seed(:phone,
     has_telegram { false }
     note { 'please do not call on Sundays' }
     transient{ add_all_attachments { true } }
-  }, alt_full_phone: proc {
+  },
+  alt_full_phone: proc {
     number { '+5804128632187' }
     phone_kind_code { 'alternative' }
     country { 'VE' }

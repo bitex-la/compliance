@@ -1,4 +1,3 @@
-class LegalEntityDocketSeed < ApplicationRecord
+class LegalEntityDocketSeed < LegalEntityDocketBase
   include Garden::Seed
-  validates :country, country: true
 end

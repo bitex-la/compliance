@@ -18,4 +18,9 @@ RSpec.describe FundDeposit, type: :model do
   it 'is valid with a person, currency and deposit method' do
     expect(valid_fund_deposit).to be_valid
   end
+
+  it 'logs creation of fund deposits' do
+    object = create(:full_fund_deposit)
+    assert_logging(object, :create_entity, 1)
+  end
 end

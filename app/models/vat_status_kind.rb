@@ -1,5 +1,6 @@
 class VatStatusKind
   include StaticModels::Model
+  cattr_accessor :table_name
   
   static_models_sparse [
    [1, :inscripto],

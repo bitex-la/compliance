@@ -5,46 +5,16 @@ require 'json'
 
 describe Issue do
   let(:person) { create(:empty_person) }
-  let(:admin_user) { create(:admin_user) }
+
+  it_behaves_like 'jsonapi show and index',
+    :issues,
+    :basic_issue,
+    :full_approved_natural_person_issue,
+    {state_eq: 'approved'},
+    'domicile_seeds,person',
+    'identification_seeds,domicile_seeds'
 
   describe 'When fetching issues' do
-    it "can filter issues by state" do
-      one = create(:basic_issue, updated_at: 2.month.ago)
-      two = create(:full_natural_person).reload.issues.first
-      three = create(:full_natural_person_issue,
-        updated_at: 1.months.ago, person: two.person)
-      four = create(:basic_issue)
-
-      api_get "/issues", { 
-        filter: { state_eq: 'draft' },
-        page: { per_page: 2, page: 1 }
-      }
-      api_response.meta.total_pages.should == 2
-
-      api_response.data.size.should == 2
-      api_response.data.first.id.should == four.id.to_s
-      api_response.data.last.id.should == three.id.to_s
-
-      api_get "/issues", { 
-        filter: { state_eq: 'draft' },
-        page: { per_page: 2, page: 2 }
-      }
-      api_response.data.size.should == 1
-      api_response.data.first.id.should == one.id.to_s
-    end
-
-    it "can filter issues by person_id" do
-      one = create(:basic_issue)
-      two = create(:full_natural_person).reload.issues.first
-      three = create(:basic_issue)
-
-      api_get "/issues", { filter: { person_id_eq: two.person_id } }
-
-      api_response.meta.total_pages.should == 1
-      api_response.data.size.should == 1
-      api_response.data.first.id.should == two.id.to_s
-    end
-
     it 'includes relationships for all issues' do
       one = create(:full_natural_person).reload.issues.first
       two = create(:basic_issue)
@@ -108,16 +78,11 @@ describe Issue do
       expect do
         api_create('/observations', {
           type: 'observations',
-          attributes: {
-            note: 'Observation Note',
-            scope: 'admin',
-          },
+          attributes: {note: 'Observation Note', scope: 'admin'},
           relationships: {
-            issue: {
-              data: { type: 'issues', id: issue_id }
-            },
+            issue: {data: {type: 'issues', id: issue_id }},
             observation_reason: {
-              data: { type: 'observation_reasons', id: reason.id }
+              data: {type: 'observation_reasons', id: reason.id}
             }
           }
         })
@@ -133,17 +98,6 @@ describe Issue do
       r = api_response.data.relationships
       assert_resource("people", person.id, r.person.data)
       assert_resource("observations", observation_id, r.observations.data.first)
-    end
-  end
-
-  describe 'Getting an issue' do
-    it 'responds with a not found error 404 when the issue does not exist' do
-      api_get "/issues/12121221", {}, 404
-    end
-
-    it 'shows all the person info when the issue exist' do
-      issue = create(:full_natural_person_issue, person: create(:empty_person))
-      api_get "/issues/#{issue.id}"
     end
   end
 

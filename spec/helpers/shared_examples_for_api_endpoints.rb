@@ -76,16 +76,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       seed: {data: {id: seed.id, type: seed_type.to_s}},
     })
   end
-
-  it "Can't edit #{seed_type} once issue is closed" do
-    pending
-    fail
-  end
-
-  it "Can't add attachments to #{seed_type} once issue is closed" do
-    pending
-    fail
-  end
 end
 
 shared_examples "docket" do |type, initial_factory|

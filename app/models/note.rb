@@ -1,4 +1,4 @@
-class Note < ApplicationRecord
+class Note < NoteBase
  include Garden::Fruit
 
  def self.name_body(i)

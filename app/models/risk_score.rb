@@ -1,4 +1,4 @@
-class RiskScore < ApplicationRecord
+class RiskScore < RiskScoreBase
   include Garden::Fruit
   
   def self.name_body(i)

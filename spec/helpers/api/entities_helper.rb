@@ -20,5 +20,4 @@ class Api::EntitiesHelper
       }
     }
   end
-
 end

@@ -10,14 +10,14 @@ class Api::IssuesController < Api::ApiController
     issues = scope.page(page).per(per_page)
 
     jsonapi_response issues, {
-      meta: { total_pages: (scope.count.to_f / per_page).ceil },
-      include: Issue.included_for
+      meta: {total_pages: (scope.count.to_f / per_page).ceil},
+      include: params[:include] || Issue.included_for
     }
   end
 
   def show
     issue = Issue.includes(*build_eager_load_list).find(params[:id])
-    jsonapi_response(issue, { include: Issue.included_for }, 200)
+    jsonapi_response issue, {include: params[:include] || Issue.included_for}
   end
 
   def create
@@ -29,7 +29,8 @@ class Api::IssuesController < Api::ApiController
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
-      jsonapi_response mapper.data, { include: Issue.included_for }, 201
+      jsonapi_response mapper.data,
+        {include: params[:include] || Issue.included_for}, 201
     else
       json_response mapper.all_errors, 422
     end

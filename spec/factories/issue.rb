@@ -4,7 +4,6 @@ FactoryBot.define do
   end
 
   factory :full_natural_person_issue, class: Issue do
-
     after(:create) do |issue, evaluator|
       %i(
         full_domicile_seed 
@@ -21,6 +20,11 @@ FactoryBot.define do
       ).each do |name|
         create name, issue: issue
       end
+    end
+
+    factory :full_approved_natural_person_issue do
+      association :person, factory: :empty_person
+      aasm_state { 'approved' }
     end
   end
 end
