@@ -20,7 +20,7 @@ RSpec.describe FundDeposit, type: :model do
   end
 
   it 'logs creation of fund deposits' do
-    object = create(:full_fund_deposit)
+    object = create(:full_fund_deposit, person: person)
     assert_logging(object, :create_entity, 1)
   end
 end

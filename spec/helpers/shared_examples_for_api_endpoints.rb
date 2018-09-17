@@ -381,7 +381,8 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
   it "Can customize fields on #{type} index" do
     api_get "/#{type}", {fields: { type => fields_definition}}
     json_response[:data].map do |d|
-      d[:attributes].keys.map(&:to_s) + d[:relationships].keys.map(&:to_s)
+      d[:attributes].keys.map(&:to_s) + 
+      (d[:relationships] || {}).keys.map(&:to_s)
     end.flatten.uniq.should == fields_definition.split(',')
   end
 
@@ -394,14 +395,14 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
       end
     end.flatten
 
-    json_response[:included].map{|i| i.slice(:id, :type) }.to_set.should ==
-      expected.to_set
+    json_response.fetch(:included, [])
+      .map{|i| i.slice(:id, :type) }.to_set.should == expected.to_set
   end
 
   it "Can customize fields on #{type} show" do
     api_get "/#{type}/#{@one.id}", {fields: { type => fields_definition}}
     json_response[:data]
-      .values_at(:attributes, :relationships)
+      .values_at(:attributes, :relationships).compact
       .map{|i| i.keys.map(&:to_s) }.flatten
       .to_set.should == fields_definition.split(',').to_set
   end
@@ -413,7 +414,7 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
       json_response[:data][:relationships][i.to_sym][:data]
     end.flatten.to_set
 
-    json_response[:included].map{|i| i.slice(:id, :type) }.to_set.should ==
-      expected
+    json_response.fetch(:included, [])
+      .map{|i| i.slice(:id, :type) }.to_set.should == expected
   end
 end

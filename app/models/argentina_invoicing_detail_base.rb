@@ -10,5 +10,8 @@ class ArgentinaInvoicingDetailBase < ApplicationRecord
   ransackable_static_belongs_to :tax_id_kind
   ransackable_static_belongs_to :receipt_kind
   ransackable_static_belongs_to :vat_status, class_name: "VatStatusKind"
-end
 
+  def name_body
+    "#{tax_id_kind} #{tax_id}"
+  end
+end

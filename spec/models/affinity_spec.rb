@@ -1,5 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe Affinity, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+describe Affinity do
+  it 'has a custom name_body' do
+    person = create(:basic_issue).reload.person
+    create(:full_affinity, person: person)
+      .name.should =~ /Affinity#[0-9]*?: business_partner/
+  end
 end
