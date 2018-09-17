@@ -2,8 +2,11 @@ require 'rails_helper'
 require 'helpers/api/people_helper'
 
 describe Person do
-  Timecop.freeze Date.new(2018,01,01)
   let(:admin_user) { create(:admin_user) }
+
+  before :each do
+    Timecop.freeze Date.new(2018,01,01)
+  end
 
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do

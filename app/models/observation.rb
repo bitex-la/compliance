@@ -7,6 +7,10 @@ class Observation < ApplicationRecord
   end
 
   enum scope: scopes
+
+  ransacker(:scope, formatter: proc { |v| scopes[v.to_s] }) do |parent|
+    parent.table["scope"]
+  end
   
   belongs_to :issue
   belongs_to :observation_reason, optional: true
@@ -81,9 +85,6 @@ class Observation < ApplicationRecord
   end
 
   def self.included_for
-    [
-      :issue,
-      :observation_reason
-    ]
+    [:issue, :observation_reason]
   end
 end

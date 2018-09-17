@@ -85,6 +85,7 @@ RSpec.configure do |config|
     DatabaseCleaner.start
   end
   config.after(:each) do
+    Timecop.return
     DatabaseCleaner.clean
   end
 end
