@@ -1,7 +1,4 @@
 # These shared examples exercise features common to all json-api endpoints
-require "helpers/api/issues_helper"
-require "helpers/api/api_helper"
-
 shared_examples "seed" do |type, initial_factory, later_factory,
   relations_proc = -> { {} }|
 
@@ -56,8 +53,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         .merge(server_sent_relations)
 
     file_one, file_two = %i(gif png).map do |ext|
-      api_create "/attachments",
-        Api::IssuesHelper::attachment(seed_type, seed_id, ext)
+      api_create "/attachments", jsonapi_attachment(seed_type, seed_id, ext)
       api_response.data
     end
 
@@ -200,7 +196,7 @@ shared_examples "docket" do |type, initial_factory|
     }
     seed_id = api_response.data.id
 
-    api_create "/attachments", Api::IssuesHelper::attachment(seed_type, seed_id)
+    api_create "/attachments", jsonapi_attachment(seed_type, seed_id)
     attachment = api_response.data
 
     api_request :post, "/issues/#{issue.id}/approve"
@@ -335,7 +331,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }|
     }
     seed_id = api_response.data.id
 
-    api_create "/attachments", Api::IssuesHelper::attachment(seed_type, seed_id)
+    api_create "/attachments", jsonapi_attachment(seed_type, seed_id)
     attachment = api_response.data
 
     api_request :post, "/issues/#{issue.id}/approve"

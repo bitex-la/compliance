@@ -1,7 +1,4 @@
 require 'rails_helper'
-require 'helpers/api/issues_helper'
-require 'helpers/api/api_helper'
-require 'json'
 
 describe Issue do
   let(:person) { create(:empty_person) }
@@ -56,8 +53,10 @@ describe Issue do
 
   describe 'Creating a new user Issue' do
     it 'requires a valid api key' do
-      forbidden_api_request(:post, "/issues",
-        Api::IssuesHelper.issue_for(nil, person.id))
+      forbidden_api_request(:post, "/issues", {
+        type: 'issues',
+        relationships: { person: {data: {id: person.id, type: 'people'}}}
+      })
     end
 
     it 'responds with an Unprocessable Entity when body is empty' do
@@ -68,7 +67,10 @@ describe Issue do
       reason = create(:human_world_check_reason)
 
       expect do
-        api_create('/issues', Api::IssuesHelper.issue_for(nil, person.id))
+        api_create('/issues', {
+          type: 'issues',
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
       end.to change{ Issue.count }.by(1)
 
       issue_id = api_response.data.id
