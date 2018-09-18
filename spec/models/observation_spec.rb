@@ -17,6 +17,6 @@ RSpec.describe Observation, type: :model do
 
   it 'create an observation with long accented text' do
     issue = create(:basic_issue)
-    strange_observation = create(:strange_observation, issue: issue)
+    create(:strange_observation, issue: issue)
   end
 end
