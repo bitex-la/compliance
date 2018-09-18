@@ -2,6 +2,7 @@ class Person < ApplicationRecord
   include Loggable
 
   after_save :log_if_enabled
+  after_save :expire_action_cache
   
   HAS_MANY_REPLACEABLE = %i{
     domiciles
@@ -118,6 +119,10 @@ class Person < ApplicationRecord
   end
 
   private
+
+  def expire_action_cache
+    ActionController::Base.new.expire_fragment("api/people/show/#{self.id}")
+  end
 
   def log_if_enabled
     was, is = saved_changes[:enabled]
