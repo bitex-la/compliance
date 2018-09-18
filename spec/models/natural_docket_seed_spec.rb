@@ -17,4 +17,10 @@ RSpec.describe NaturalDocketSeed, type: :model do
   it 'is valid with an issue' do
     expect(valid_seed).to be_valid
   end
+
+  it 'create a natural docket with long accented text in job_description' do
+    person = create(:empty_person)
+    issue = Issue.new(person: person)
+    create(:strange_natural_docket_seed, issue: issue)
+  end
 end

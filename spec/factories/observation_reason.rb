@@ -38,4 +38,14 @@ FactoryBot.define do
     body_pt "Nova avaliação de pontuação"
     scope :admin 
   end
+
+  factory :incomplete_info_reason, class: 'ObservationReason' do
+    subject_en "Incomplete info"
+    body_en "Please give us some info"
+    subject_es "Información incompleta"
+    body_es "Proveer información extra"
+    subject_pt "Informação incompleta"
+    body_pt "Por favor, nos dê algumas informações"
+    scope :client
+  end
 end
