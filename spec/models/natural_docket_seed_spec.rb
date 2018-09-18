@@ -18,7 +18,7 @@ RSpec.describe NaturalDocketSeed, type: :model do
     expect(valid_seed).to be_valid
   end
 
-  it 'create a natural docker with long accented text in job_description' do
+  it 'create a natural docket with long accented text in job_description' do
     person = create(:empty_person)
     issue = Issue.new(person: person)
     long_seed = create(:strange_natural_docket_seed, issue: issue)
