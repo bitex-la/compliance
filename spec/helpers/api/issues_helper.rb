@@ -590,7 +590,7 @@ class Api::IssuesHelper
 
   def self.mime_for(ext)
     case ext
-      when :png, :jpg, :gif, :JPG, :PNG, :GIF then "image/#{ext.downcase}"
+      when :bmp, :png, :jpg, :gif, :BMP, :JPG, :PNG, :GIF then "image/#{ext.downcase}"
       when :pdf, :zip, :PDF, :ZIP then "application/#{ext.downcase}"
       when :rar, :RAR then "application/x-rar-compressed"
       else raise "No fixture for #{ext.downcase} files"

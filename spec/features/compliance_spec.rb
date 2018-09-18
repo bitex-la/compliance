@@ -497,7 +497,7 @@ describe 'an admin user' do
     new_allowance.replaced_by_id.should be_nil
 
     # Here we validate that attachments are copy to the new fruit (when applies)
-    new_identification.attachments.count.should == 10
+    new_identification.attachments.count.should == 12
     new_natural_docket.attachments.count.should == 1
 
     within '.row.row-person' do
@@ -790,7 +790,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 10
+      new_domicile.attachments.count.should == 12
 
       within '.row.row-person' do
       	click_link Person.first.id
@@ -932,7 +932,7 @@ describe 'an admin user' do
       within(".has_many_container.identification_seeds") do
         within first(".has_many_container.attachments") do
           click_link "Add New Attachment"
-          fill_attachment('identification_seeds', 'jpg', true, 0, 9)
+          fill_attachment('identification_seeds', 'jpg', true, 0, 11)
         end
       end
 
@@ -969,8 +969,6 @@ describe 'an admin user' do
     find(:css, "#person_enabled").set(false)
     select 'low', from: 'person_risk', visible: false
     click_button 'Update Person'
-
-    page.current_path.should == "/people/#{person.id}"
 
     person.reload.should_not be_enabled
     person.risk.should == 'low'
