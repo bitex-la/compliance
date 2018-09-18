@@ -970,8 +970,6 @@ describe 'an admin user' do
     select 'low', from: 'person_risk', visible: false
     click_button 'Update Person'
 
-    page.current_path.should == "/people/#{person.id}"
-
     person.reload.should_not be_enabled
     person.risk.should == 'low'
   end
