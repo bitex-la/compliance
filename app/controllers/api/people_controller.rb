@@ -20,6 +20,7 @@ class Api::PeopleController < Api::ApiController
     jsonapi_response Person.create, {}, 201
   end
 
+  protected
   def path_for_show
     "#{params[:controller]}/#{params[:action]}/#{params[:id]}"
   end
