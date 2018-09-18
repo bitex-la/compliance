@@ -22,4 +22,11 @@ FactoryBot.define do
     note "Please check this new risk score assessment"
     scope :admin
   end
+
+  factory :strange_observation, class: 'Observation' do
+    association :observation_reason, factory: :incomplete_info_reason
+    note {"Please mr Jáné 微信图片" * 1000}
+    reply {"微信图片" * 1000}
+    scope :client
+  end
 end

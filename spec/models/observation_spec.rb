@@ -14,4 +14,9 @@ RSpec.describe Observation, type: :model do
       Observation.admin_pending.first.note.should == worldcheck_observation.note
     end
   end
+
+  it 'create an observation with long accented text' do
+    issue = create(:basic_issue)
+    strange_observation = create(:strange_observation, issue: issue)
+  end
 end
