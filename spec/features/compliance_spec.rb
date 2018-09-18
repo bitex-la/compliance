@@ -497,7 +497,7 @@ describe 'an admin user' do
     new_allowance.replaced_by_id.should be_nil
 
     # Here we validate that attachments are copy to the new fruit (when applies)
-    new_identification.attachments.count.should == 10
+    new_identification.attachments.count.should == 12
     new_natural_docket.attachments.count.should == 1
 
     within '.row.row-person' do
@@ -790,7 +790,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 10
+      new_domicile.attachments.count.should == 12
 
       within '.row.row-person' do
       	click_link Person.first.id
