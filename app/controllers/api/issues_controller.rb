@@ -10,8 +10,11 @@ class Api::IssuesController < Api::ApiController
     issues = scope.page(page).per(per_page)
 
     jsonapi_response issues, {
-      meta: {total_pages: (scope.count.to_f / per_page).ceil},
-      include: params[:include] || Issue.included_for
+      include: params[:include] || Issue.included_for,
+      meta: {
+        total_pages: (scope.count.to_f / per_page).ceil,
+        total_items: scope.count
+      }
     }
   end
 

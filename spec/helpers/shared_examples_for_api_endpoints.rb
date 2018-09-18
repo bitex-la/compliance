@@ -370,6 +370,8 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
 
   it "Can paginate on #{type} index" do
     api_get "/#{type}", {page: {page: 3, per_page: 1}}
+    api_response.meta.total_pages.should == 3
+    api_response.meta.total_items.should == 3
     api_response.data.map(&:id).should == [@one.id.to_s]
   end
 

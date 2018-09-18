@@ -9,7 +9,10 @@ class Api::FruitController < Api::ApiController
     paginated = collection.page(page).per(per_page)
 
     jsonapi_response paginated, options_for_response.merge!(
-      meta: { total_pages: (collection.count.to_f / per_page).ceil })
+      meta: {
+        total_pages: (collection.count.to_f / per_page).ceil,
+        total_items: collection.count
+      })
   end
 
   def show
