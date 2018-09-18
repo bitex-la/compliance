@@ -932,7 +932,7 @@ describe 'an admin user' do
       within(".has_many_container.identification_seeds") do
         within first(".has_many_container.attachments") do
           click_link "Add New Attachment"
-          fill_attachment('identification_seeds', 'jpg', true, 0, 9)
+          fill_attachment('identification_seeds', 'jpg', true, 0, 11)
         end
       end
 
