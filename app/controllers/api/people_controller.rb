@@ -1,4 +1,6 @@
 class Api::PeopleController < Api::ApiController
+  caches_action :show, expires_in: 2.minutes, cache_path: :path_for_show
+
   def index
     scope = Person.ransack(params[:filter]).result
 
@@ -16,5 +18,9 @@ class Api::PeopleController < Api::ApiController
 
   def create
     jsonapi_response Person.create, {}, 201
+  end
+
+  def path_for_show
+    "#{params[:controller]}/#{params[:action]}/#{params[:id]}"
   end
 end
