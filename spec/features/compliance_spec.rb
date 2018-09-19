@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'helpers/api/issues_helper'
 
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }

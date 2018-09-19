@@ -1,5 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe AdminUser, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+describe AdminUser do
+  it "auto-generates an api_token" do
+    AdminUser.create(
+      email: 'example@example.com',
+      password: 'something',
+      password_confirmation: 'something'
+    ).api_token.should be_a(String)
+  end
 end
