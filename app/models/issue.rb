@@ -68,6 +68,15 @@ class Issue < ApplicationRecord
     with_relations.where('aasm_state=?', 'observed')
   }
 
+  scope :active, ->(yes=true){
+    where("aasm_state #{'NOT' unless yes} IN (?)",
+      %i(draft new observed answered))
+  }
+
+	def self.ransackable_scopes(auth_object = nil)
+	  %i(active)
+  end
+
   aasm do
     state :draft, initial: true
     state :new
@@ -122,16 +131,14 @@ class Issue < ApplicationRecord
     end
 
     event :approve do
+      before{ harvest_all! }
       after do
         person.update(enabled: true)
-        harvest_all!
+        log_state_change(:approve_issue)
       end
       transitions from: :draft, to: :approved
       transitions from: :new, to: :approved
       transitions from: :answered, to: :approved
-      after do 
-        log_state_change(:approve_issue)
-      end
     end
 
     event :abandon do

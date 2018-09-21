@@ -59,6 +59,13 @@ module Garden
         end
       end
 
+      validate do
+        next if issue.nil?
+        state = issue.changes[:aasm_state].try(:first) || issue.state
+        next if %w(draft new observed answered).include?(state)
+        errors.add(:base, 'no_more_updates_allowed')
+      end
+
       if column_names.include?('replaces_id')
         belongs_to :replaces, class_name: naming.fruit, optional: true
       end

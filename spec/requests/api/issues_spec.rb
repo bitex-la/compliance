@@ -123,4 +123,26 @@ describe Issue do
       end
     end
   end
+
+  describe 'when using filters' do
+    it 'filters by name' do
+      person = create(:empty_person)
+      one, two, three, four, five, six = 6.times.map do 
+        create(:full_natural_person_issue, person: person)
+      end
+      [one, two, three].each{|i| i.approve! }
+
+      api_get "/issues/?filter[active]=true"
+      api_response.data.map{|i| i.id.to_i}.to_set.should ==
+				[four.id, five.id, six.id].to_set
+
+      api_get "/issues/?filter[active]=false"
+      api_response.data.map{|i| i.id.to_i}.to_set.should ==
+				[one.id, two.id, three.id].to_set
+
+      api_get "/issues/?filter[state_eq]=approved"
+      api_response.data.map{|i| i.id.to_i}.to_set.should ==
+				[one.id, two.id, three.id].to_set
+    end
+  end
 end
