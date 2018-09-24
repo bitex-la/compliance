@@ -146,27 +146,18 @@ describe 'an admin user' do
     select "Argentina",
       from: "issue[natural_docket_seed_attributes][nationality]",
       visible: false
-    select "1985",
-      from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
-      visible: false
-    select "January",
-      from: "issue[natural_docket_seed_attributes][birth_date(2i)]",
-      visible: false
-    select "1",
-      from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
-      visible: false
-
     fill_seed("natural_docket", {
      job_title: "Programmer",
      job_description: "Develop cool software for the real people",
-     politically_exposed_reason: "Nothing I am a legit guy!"
+     politically_exposed_reason: "Nothing I am a legit guy!",
+     birth_date: "1985-01-01"
     }, false)
 
 
     #find("#natural_docket_seed", visible: false).click_link("Add New Attachment")
     within("#natural_docket_seed") do
-       find('.has_many_container.attachments').click_link("Add New Attachment")
-       fill_attachment('natural_docket_seed', 'png', false)
+      find('.has_many_container.attachments').click_link("Add New Attachment")
+      fill_attachment('natural_docket_seed', 'png', false)
     end
 
     click_link "Base"
@@ -180,10 +171,10 @@ describe 'an admin user' do
       with: 'Please check this guy on world check'
 
     click_button "Update Issue"
-
     issue = Issue.last
     observation = Observation.last
     assert_logging(issue, :create_entity, 1)
+    assert_logging(issue, :update_entity, 1)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -207,14 +198,16 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
+    assert_logging(issue, :update_entity, 2)
     issue.reload.should be_answered
     observation.reload.should be_answered
 
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 4)
-    Person.last.should be_enabled
+    assert_logging(issue, :update_entity, 3)
+    issue.person.should be_enabled
+    assert_logging(issue.person, :enable_person, 1)
   end
 
   it 'reviews a newly created customer' do
@@ -279,9 +272,10 @@ describe 'an admin user' do
       with: 'Please re-send your document'
     click_button 'Update Issue'
 
-    assert_logging(issue, :update_entity, 3)
+    assert_logging(issue, :update_entity, 2)
+
     Observation.where(issue: issue).count.should == 1
-    Issue.first.should be_observed
+    issue.reload.should be_observed
 
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
@@ -300,6 +294,8 @@ describe 'an admin user' do
       id: observation.id,
       attributes: {reply: 'Va de vuelta el documento!!!'}
     }
+
+    assert_logging(issue, :update_entity, 4)
 
     assert_response 200
 
@@ -320,14 +316,14 @@ describe 'an admin user' do
 
     click_link 'Approve'
 
-    Issue.last.should be_approved
+    issue.reload.should be_approved
+    assert_logging(issue, :update_entity, 5)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
-    visit "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
-    page.current_path.should ==
-      "/people/#{Person.first.id}/issues/#{Issue.last.id}"
-    page.should have_content 'Approved'
+    visit "/people/#{person.id}/issues/#{issue.id}/edit"
+    page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
+    assert_logging(person, :enable_person, 1)
   end
 
   it "Edits a customer by creating a new issue" do
@@ -412,14 +408,10 @@ describe 'an admin user' do
     end
 
     click_link "Docket"
-    fill_seed("natural_docket", {
-      first_name: "Lionel",
-      last_name: "Higuain",
-    }, false)
 
     select "married",
-      from: "issue[natural_docket_seed_attributes][marital_status_id]",
-      visible: false
+    from: "issue[natural_docket_seed_attributes][marital_status_id]",
+    visible: false
     select "male",
       from: "issue[natural_docket_seed_attributes][gender_id]",
       visible: false
@@ -427,15 +419,11 @@ describe 'an admin user' do
       from: "issue[natural_docket_seed_attributes][nationality]",
       visible: false
 
-    select "1985",
-      from: "issue[natural_docket_seed_attributes][birth_date(1i)]",
-      visible: false
-    select "January",
-      from: "issue[natural_docket_seed_attributes][birth_date(2i)]",
-      visible: false
-    select "1",
-      from: "issue[natural_docket_seed_attributes][birth_date(3i)]",
-      visible: false
+    fill_seed("natural_docket", {
+      first_name: "Lionel",
+      last_name: "Higuain",
+      birth_date: "1985-01-01"
+    }, false)
 
     within("#natural_docket_seed") do
       click_link "Add New Attachment"
@@ -463,13 +451,14 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
-    assert_logging(issue, :update_entity, 3) 
+    assert_logging(issue, :update_entity, 2) 
     issue.reload.should be_answered
     observation.reload.should be_answered
 
     click_link "Approve"
 
     issue.reload.should be_approved
+    assert_logging(person, :enable_person, 1)
 
     old_domicile = Domicile.first
     new_domicile = Domicile.last
@@ -493,7 +482,7 @@ describe 'an admin user' do
     new_allowance.replaced_by_id.should be_nil
 
     # Here we validate that attachments are copy to the new fruit (when applies)
-    new_identification.attachments.count.should == 10
+    new_identification.attachments.count.should == 12
     new_natural_docket.attachments.count.should == 1
 
     within '.row.row-person' do
@@ -529,6 +518,7 @@ describe 'an admin user' do
 
     issue.reload.should be_rejected
     person.reload.should_not be_enabled
+    assert_logging(person, :disable_person, 1)
   end
 
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
@@ -582,7 +572,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
-    assert_logging(Issue.last, :update_entity, 2)
+    assert_logging(Issue.last, :update_entity, 1)
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should_not be_enabled
@@ -659,7 +649,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 9
+      new_domicile.attachments.count.should == 12
 
       within '.row.row-person' do
       	click_link Person.first.id
@@ -795,7 +785,7 @@ describe 'an admin user' do
       within(".has_many_container.identification_seeds") do
         within first(".has_many_container.attachments") do
           click_link "Add New Attachment"
-          fill_attachment('identification_seeds', 'jpg', true, 0, 9)
+          fill_attachment('identification_seeds', 'jpg', true, 0, 11)
         end
       end
 
@@ -832,8 +822,6 @@ describe 'an admin user' do
     find(:css, "#person_enabled").set(false)
     select 'low', from: 'person_risk', visible: false
     click_button 'Update Person'
-
-    page.current_path.should == "/people/#{person.id}"
 
     person.reload.should_not be_enabled
     person.risk.should == 'low'

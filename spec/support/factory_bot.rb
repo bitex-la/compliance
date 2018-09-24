@@ -19,8 +19,8 @@ module FactoryBot
             instance_eval(&block)
 
             after(:create) do |thing, evaluator|
-              next unless evaluator.try(:add_all_attachments)
-              %i(jpg png gif pdf zip JPG PNG GIF PDF).each do |name|
+              next unless evaluator.add_all_attachments
+              %i(bmp jpg png gif pdf zip BMP JPG PNG GIF PDF).each do |name|
                 create "#{name}_attachment", thing: thing
               end
             end

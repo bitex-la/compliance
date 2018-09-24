@@ -14,6 +14,7 @@ class Attachment < ApplicationRecord
   validates_attachment :document,
     content_type: {
       content_type: [
+        'image/bmp',
         'image/jpeg',
         'image/jpg',
         'image/gif',
@@ -24,6 +25,7 @@ class Attachment < ApplicationRecord
     ]}
 
   validates_attachment_file_name :document, matches: [
+    /bmp|BMP\z/,
     /png|PNG\z/,
     /jpg|JPG\z/,
     /jpeg|JPEG\z/,

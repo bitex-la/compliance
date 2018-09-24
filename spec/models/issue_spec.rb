@@ -158,4 +158,65 @@ RSpec.describe Issue, type: :model do
       issue.reload.domicile_seeds.should be_empty
     end
   end  
+
+  describe "when snapping in and out of observed state" do
+    it 'can snap into observed state' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      obs = create(:observation, issue: issue)
+      issue.reload.should be_observed
+      issue.update_column(:aasm_state, 'new')
+      issue.reload.should be_new
+      issue.save
+      issue.reload.should be_observed
+      obs.update(reply: 'replied')
+      issue.reload.should be_answered
+    end
+
+    it 'can snap out of faulty observed state' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      create(:observation, issue: issue, reply: "replied")
+      issue.update_column(:aasm_state, 'observed')
+      issue.reload.should be_observed
+      issue.save
+      issue.should be_answered
+    end
+
+    it 'can go directly into answered state from draft' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      create(:observation, issue: issue, reply: "replied")
+      issue.reload.should be_answered
+    end
+  end
+
+  describe "when looking for people who had problems answering" do
+    it 'has a scope for changed_after_observation' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      create(:observation, issue: issue)
+      issue.reload.should be_observed
+
+      Issue.changed_after_observation.size.should == 0
+      Timecop.travel 10.minutes.from_now
+      issue.domicile_seeds.first.update(street_address: "Something")
+      Issue.changed_after_observation.count.should == 1
+    end
+
+    it 'ignores answered issues' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      create(:observation, issue: issue, reply: 'text')
+
+      Issue.changed_after_observation.size.should == 0
+
+      Timecop.travel 10.minutes.from_now
+      issue.domicile_seeds.first.update(street_address: "Something")
+
+      Timecop.travel 10.minutes.from_now
+      create(:observation, issue: issue)
+
+      Issue.changed_after_observation.size.should == 0
+
+      Timecop.travel 10.minutes.from_now
+      issue.domicile_seeds.first.update(street_address: "Something else")
+      Issue.changed_after_observation.size.should == 1
+    end
+  end
 end

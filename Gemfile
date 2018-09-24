@@ -41,6 +41,9 @@ gem 'kaminari'
 gem 'timecop'
 gem 'dotenv-rails'
 
+# cache
+gem 'actionpack-action_caching'
+
 # exception notifier
 gem 'exception_notification'
 

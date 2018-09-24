@@ -1,5 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe NoteSeed, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it 'create a note seed with long accented text' do
+    person = create(:empty_person)
+    issue = Issue.new(person: person)
+    create(:strange_note_seed, issue: issue)
+  end
 end
+

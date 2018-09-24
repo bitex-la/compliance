@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'helpers/api/api_helper'
 require 'json'
 
 describe Observation do 

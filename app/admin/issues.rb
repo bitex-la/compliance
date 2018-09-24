@@ -27,11 +27,12 @@ ActiveAdmin.register Issue do
 
   scope :fresh, default: true
   scope :answered
-  scope :answered
   scope :draft
   scope :observed
-  scope :abandoned
   scope :dismissed
+  scope :abandoned
+  scope :approved
+  scope :changed_after_observation
 
   collection_action :new_with_fruits, method: :get do
     @person = Person.find(params[:person_id])
@@ -152,7 +153,11 @@ ActiveAdmin.register Issue do
           ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
             sf.input :first_name
             sf.input :last_name
-            sf.input :birth_date, start_year: 1900
+            sf.input :birth_date, as: :datepicker,
+              datepicker_options: {
+                change_year: true,
+                change_month: true
+              }
             sf.input :nationality, as: :country
             sf.input :gender_id, as: :select, collection: GenderKind.all
             sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all

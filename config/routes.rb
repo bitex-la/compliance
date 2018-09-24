@@ -18,12 +18,12 @@ Rails.application.routes.draw do
       chile_invoicing_details
       domiciles
       allowances
-      fund_deposits
       identifications
       phones
       emails
       notes
       affinities
+      event_logs
     ).each do |entities|
       resources entities, only: [:show, :index]
     end
@@ -41,15 +41,13 @@ Rails.application.routes.draw do
       email_seeds
       note_seeds
       affinity_seeds
+      observation_reasons
+      fund_deposits
+      observations
+      attachments
     ).each do |entities|
       resources entities, only: [:show, :index, :create, :update]
     end
-
-    resources :fund_deposits, only: [:show, :index, :create, :update]
-    resources :observation_reasons, only: [:show, :index]
-    resources :event_logs, only: [:show, :index]
-    resources :observations, only: [:create, :show, :index, :update]
-    resources :attachments, only: [:create, :update, :show, :index]
 
     resource :system do
       post :truncate

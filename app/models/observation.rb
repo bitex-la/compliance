@@ -16,22 +16,28 @@ class Observation < ApplicationRecord
   belongs_to :observation_reason, optional: true
 
   before_save  :check_for_answer
-  after_commit :update_issue_status
+  after_commit :sync_issue_observed_status
 
   validate :validate_scope_integrity
 
   scope :admin_pending, -> { 
-    where(scope: 'admin', aasm_state: 'new')
+    joins(:issue)
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where(scope: 'admin', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :robot_pending, -> { 
-    where(scope: 'robot', aasm_state: 'new')
+    joins(:issue)
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where(scope: 'robot', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :client_pending, -> { 
-    where(scope: 'client', aasm_state: 'new')
+    joins(:issue)
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where(scope: 'client', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
@@ -41,9 +47,6 @@ class Observation < ApplicationRecord
   
     event :answer do
       transitions from: :new, to: :answered
-      after do
-        issue.answer! if issue.may_answer? && !issue.has_open_observations?
-      end
     end
 
     event :reset do 
@@ -56,16 +59,9 @@ class Observation < ApplicationRecord
     reset! if !reply.present? && answered?
   end
 
-  def observe_issue
-    if issue.may_observe?
-      issue.observe! 
-    end
-  end
-
-  def update_issue_status
-    if !reply.present? && note.present?
-      issue.observe! if issue.may_observe?
-    end
+  def sync_issue_observed_status
+    issue.reload
+    issue.sync_observed_status
   end
 
   def state

@@ -33,4 +33,10 @@ RSpec.describe NaturalDocketSeed, type: :model do
     seed.should_not be_valid
     seed.errors[:base].should == ['no_more_updates_allowed']
   end
+
+  it 'create a natural docket with long accented text in job_description' do
+    person = create(:empty_person)
+    issue = Issue.new(person: person)
+    create(:strange_natural_docket_seed, issue: issue)
+  end
 end

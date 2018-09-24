@@ -26,4 +26,17 @@ FactoryBot.define do
       association :issue, factory: :basic_issue
     end
   end
+
+  factory :chainalysis_observation, class: 'Observation' do
+    association :observation_reason, factory: :chainalysis_reason
+    note "Please check this new risk score assessment"
+    scope :admin
+  end
+
+  factory :strange_observation, class: 'Observation' do
+    association :observation_reason, factory: :incomplete_info_reason
+    note {"Please mr Jáné 微信图片" * 1000}
+    reply {"微信图片" * 1000}
+    scope :client
+  end
 end

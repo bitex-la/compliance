@@ -31,29 +31,6 @@ module RequestHelpers
   def api_response
     JSON.parse(response.body, object_class: OpenStruct)
   end
-
-  def assert_logging(entity, verb, expected_count)
-    EventLog.where(entity: entity, verb_id: EventLogKind.send(verb).id).count.should == expected_count
-  end
-
-  def jsonapi_attachment(seed_type, seed_id, ext = :jpg)
-    {
-      type: "attachments",
-      relationships: {attached_to_seed: {data: {id: seed_id, type: seed_type}}},
-      attributes: {
-        document: "data:#{mime_for(ext)};base64,#{bytes_for(ext)}",
-        document_file_name: "áñçfile微信图片.#{ext}",
-        document_content_type: mime_for(ext)
-      }
-    }
-  end
-
-  def assert_resource(type, id, val)
-    val[:type].to_s.should == type.to_s
-    val[:id].to_s.should == id.to_s
-  rescue TypeError => e
-    raise "TypeError on: assert_resource(#{type}, #{id}, #{val.class})"
-  end
 end
 
 RSpec.configuration.include RequestHelpers, type: :request
