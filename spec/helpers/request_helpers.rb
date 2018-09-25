@@ -24,6 +24,10 @@ module RequestHelpers
     api_request(:patch, path, {data: data}, expected_status)
   end
 
+  def api_destroy(path, expected_status = 204)
+    api_request(:destroy, path, {}, expected_status)
+  end
+
   def json_response
     JSON.parse(response.body).deep_symbolize_keys
   end

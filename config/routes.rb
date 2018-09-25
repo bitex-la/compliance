@@ -46,6 +46,15 @@ Rails.application.routes.draw do
       observations
       attachments
     ).each do |entities|
+      resources entities, except: [:new, :edit]
+    end
+
+    %i(
+      fund_deposits
+      attachments
+      observation_reasons
+      observations
+    ).each do |entities|
       resources entities, only: [:show, :index, :create, :update]
     end
 

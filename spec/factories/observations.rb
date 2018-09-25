@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :observation do
     observation_reason
     note { "Si puede ser, sinó no se moleste." }
-    scope { :client }
+    scope { 'client' }
   end
 
   factory :robot_observation, class: 'Observation' do
@@ -29,14 +29,14 @@ FactoryBot.define do
 
   factory :chainalysis_observation, class: 'Observation' do
     association :observation_reason, factory: :chainalysis_reason
-    note "Please check this new risk score assessment"
-    scope :admin
+    note {"Please check this new risk score assessment"}
+    scope{ 'admin' }
   end
 
   factory :strange_observation, class: 'Observation' do
     association :observation_reason, factory: :incomplete_info_reason
     note {"Please mr Jáné 微信图片" * 1000}
     reply {"微信图片" * 1000}
-    scope :client
+    scope { 'client' }
   end
 end

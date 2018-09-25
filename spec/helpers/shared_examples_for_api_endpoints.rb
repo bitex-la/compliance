@@ -6,6 +6,15 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   later_seed = "#{later_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
 
+  it "Destroy a #{seed_type}" do
+    seed = create(initial_seed)
+    api_destroy "/#{seed_type}/#{seed.id}"
+    
+    response.body.should be_blank
+
+    api_get "/#{seed_type}/#{seed.id}", {}, 404
+  end
+   
   it "Creates, updates and approves #{seed_type}" do
     issue = create(:basic_issue)
     person = issue.person
