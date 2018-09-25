@@ -16,33 +16,6 @@ module Garden
     end
   end
 
-  module Kindify
-   extend ActiveSupport::Concern
-
-   class_methods do
-     def kind_mask_for(kind, custom_model = nil)
-        kind_model = custom_model.nil? ? "#{kind.to_s.classify}Kind" : custom_model
-
-        define_method kind do
-       	  return nil if self.send("#{kind}_id").nil?
-          kind_model.constantize.all
-            .select{|x| x.id == self.send("#{kind}_id").to_i}.first.code
-        end
-
-        define_method "#{kind}=" do |code|
-          candidate = kind_model.constantize.all.
-	    select{|x| x.code == code.to_sym}
-
-          if candidate.blank?
-            self.errors.add(kind, "#{kind} not found")
-          else
-            self.send("#{kind}_id=", candidate.first.id)
-          end
-        end
-      end
-    end
-  end
-
   module Seed
     extend ActiveSupport::Concern
 

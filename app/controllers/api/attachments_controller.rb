@@ -17,7 +17,7 @@ class Api::AttachmentsController < Api::SeedController
     )
     
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      ([:attachments] + can_attach_to),
+      ([:people, :attachments] + can_attach_to),
       can_attach_to.map{|a| [a, []]}.to_h.merge(
         attachments: [
           :document,

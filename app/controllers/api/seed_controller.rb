@@ -20,7 +20,7 @@ class Api::SeedController < Api::FruitController
     mapper = get_mapper
     return jsonapi_422(nil) unless mapper.data
 
-    if mapper.save_all
+    if mapper.data.save
       jsonapi_response mapper.data, options_for_response, success_code
     else
       json_response mapper.all_errors, 422
