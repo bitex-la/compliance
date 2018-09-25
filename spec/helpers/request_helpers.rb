@@ -25,7 +25,7 @@ module RequestHelpers
   end
 
   def api_destroy(path, expected_status = 204)
-    api_request(:destroy, path, {}, expected_status)
+    api_request(:delete, path, {}, expected_status)
   end
 
   def json_response
@@ -34,6 +34,39 @@ module RequestHelpers
 
   def api_response
     JSON.parse(response.body, object_class: OpenStruct)
+  end
+
+  def mime_for(ext)
+    case ext
+      when :bmp, :png, :jpg, :gif, :BMP, :JPG, :PNG, :GIF then "image/#{ext.downcase}"
+      when :pdf, :zip, :PDF, :ZIP then "application/#{ext.downcase}"
+      when :rar, :RAR then "application/x-rar-compressed"
+      else raise "No fixture for #{ext.downcase} files"
+    end
+  end
+  
+  def bytes_for(ext)
+    fixtures = RSpec.configuration.file_fixture_path
+    filename = if ext == ext.upcase
+      "simple_upper.#{ext}"
+    else
+      "simple.#{ext}"
+    end
+  
+    path = Pathname.new(File.join(fixtures, filename))
+    Base64.encode64(path.read).delete!("\n")
+  end
+
+  def jsonapi_attachment(seed_type, seed_id, ext = :jpg)
+    {
+      type: "attachments",
+      relationships: {attached_to_seed: {data: {id: seed_id, type: seed_type}}},
+      attributes: {
+        document: "data:#{mime_for(ext)};base64,#{bytes_for(ext)}",
+        document_file_name: "áñçfile微信图片.#{ext}",
+        document_content_type: mime_for(ext)
+      }
+    }
   end
 end
 

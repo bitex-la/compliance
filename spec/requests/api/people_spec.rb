@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'helpers/api/people_helper'
 
 describe Person do
   let(:admin_user) { create(:admin_user) }
@@ -424,7 +423,6 @@ describe Person do
         json_response[:included].find{|x| x[:type] == fruit}[:attributes]
           .should == expected_included.find{|x| x[:type] == fruit}[:attributes]
       end
-<<<<<<< HEAD
     end
 
     it 'can fetch simple person with attributes only' do
@@ -450,8 +448,6 @@ describe Person do
       }
 
       person.reload.should be_enabled
-=======
->>>>>>> master
     end
 
     it 'responds 404 when the person does not exist' do

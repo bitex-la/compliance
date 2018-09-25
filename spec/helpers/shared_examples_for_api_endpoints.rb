@@ -7,7 +7,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   seed_type = Garden::Naming.new(type).seed_plural
 
   it "Destroy a #{seed_type}" do
-    seed = create(initial_seed)
+    seed = create(initial_seed, issue: create(:basic_issue))
     api_destroy "/#{seed_type}/#{seed.id}"
     
     response.body.should be_blank
@@ -250,12 +250,6 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }|
     json_response[:data][:relationships][type.to_sym][:data]
       .map{|a| a[:id] }
       .should == [existing_fruit.id.to_s, replaceable_fruit_id]
-
-    api_create "/#{seed_type}", {
-      type: seed_type,
-      attributes: attrs,
-      relationships: issue_relation.merge(extra_relations)
-    }
 
     replacing_issue = create(:basic_issue, person: person)
     replacing_issue_relation =
