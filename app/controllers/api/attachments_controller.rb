@@ -1,6 +1,6 @@
 class Api::AttachmentsController < Api::SeedController
   def resource_class
-    Attachments
+    Attachment
   end
 
   def options_for_response
