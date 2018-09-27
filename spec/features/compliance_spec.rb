@@ -295,7 +295,7 @@ describe 'an admin user' do
       attributes: {reply: 'Va de vuelta el documento!!!'}
     }
 
-    assert_logging(issue, :update_entity, 4)
+    assert_logging(issue, :update_entity, 3)
 
     assert_response 200
 
@@ -317,7 +317,7 @@ describe 'an admin user' do
     click_link 'Approve'
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 5)
+    assert_logging(issue, :update_entity, 4)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
@@ -572,7 +572,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
-    assert_logging(Issue.last, :update_entity, 1)
+    assert_logging(Issue.last, :update_entity, 2)
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should_not be_enabled
@@ -630,7 +630,7 @@ describe 'an admin user' do
 
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
         click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'gif', true, 0, 9)
+        fill_attachment('domicile_seeds', 'gif', true, 0, 11)
       end
 
       click_button "Update Issue"
@@ -649,7 +649,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 12
+      new_domicile.attachments.count.should == 11
 
       within '.row.row-person' do
       	click_link Person.first.id
