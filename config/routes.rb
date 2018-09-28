@@ -41,10 +41,6 @@ Rails.application.routes.draw do
       email_seeds
       note_seeds
       affinity_seeds
-      observation_reasons
-      fund_deposits
-      observations
-      attachments
     ).each do |entities|
       resources entities, except: [:new, :edit]
     end

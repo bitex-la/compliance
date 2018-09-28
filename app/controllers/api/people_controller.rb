@@ -6,7 +6,10 @@ class Api::PeopleController < Api::ApiController
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     people = scope.page(page).per(per_page)
     jsonapi_response( people,
-      meta: { total_pages: (scope.count.to_f / per_page).ceil }
+      meta: {
+        total_pages: (scope.count.to_f / per_page).ceil,
+        total_items: scope.count
+      }
     )
   end
 

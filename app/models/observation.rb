@@ -11,6 +11,8 @@ class Observation < ApplicationRecord
   ransacker(:scope, formatter: proc { |v| scopes[v.to_s] }) do |parent|
     parent.table["scope"]
   end
+
+  ransack_alias :state, :aasm_state
   
   belongs_to :issue
   belongs_to :observation_reason, optional: true

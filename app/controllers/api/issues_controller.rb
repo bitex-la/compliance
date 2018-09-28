@@ -46,7 +46,7 @@ class Api::IssuesController < Api::ApiController
         issue.aasm.fire!(action)
         jsonapi_response(issue, {}, 200)
       rescue AASM::InvalidTransition => e
-        json_response({errors: ["invalid transition"]}, 422)
+				jsonapi_error(422, "invalid transition")
       end
     end
   end

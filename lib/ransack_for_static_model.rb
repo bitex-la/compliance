@@ -14,7 +14,9 @@ module RansackForStaticModel
 
       belongs_to(association, opts)
 
-  	  validates association, inclusion: { in: association_class.all } 
+  	  validates association,
+        inclusion: { in: association_class.all, allow_nil: true }
+
       ransacker("#{association}_code",
         formatter: proc { |v| association_class.find_by_code(v).try(:id) }
       ) do |parent|
