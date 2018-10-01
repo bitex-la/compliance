@@ -21,8 +21,7 @@ class Api::AttachmentsController < Api::SeedController
           :document_file_size,
           :document_content_type,
           :attached_to_seed,
-          :attached_to_seed_id,
-          :attached_to_seed_type,
+          :attached_to_fruit,
           :person
         ]
       )
