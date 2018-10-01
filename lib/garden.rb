@@ -3,6 +3,16 @@
 # which become associated to the Person.
 # Each Fruit remembers its seed, and each Seed knows its fruit.
 # Other than that, Seeds belong to Issues and Fruits belong to People.
+module FastJsonapi
+  class Relationship
+    def id_hash_from_record(record, record_types)
+      associated_record_type = record_types[record.class] ||=
+        run_key_transform(record.class.name.demodulize.underscore.pluralize)
+      id_hash(record.id, associated_record_type)
+    end
+  end
+end
+
 module Garden
   module SelfHarvestable
     extend ActiveSupport::Concern
