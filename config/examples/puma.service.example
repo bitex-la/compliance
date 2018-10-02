@@ -1,0 +1,42 @@
+# Sample file for puma systemd configuration
+# Basic usage
+# 0. To enable puma service
+#     systemctl enable puma
+
+# 1. To check puma service status
+#    systemctl status puma.service
+
+# 2. To stop puma service
+#    systemctl stop puma.service
+
+# 3. To start puma service
+#    systemctl start puma.service
+
+# 4. To reload changes on puma.service file
+#    systemctl daemon-reload     
+
+[Unit]
+Description=Compliance Puma Server
+After=network.target
+
+[Service]
+Type=simple
+# User who owns code folder
+User=<user>
+
+# Assuming that you use capistrano this folder must
+# point to current foldr 
+WorkingDirectory=<absolute_compliance_path>/current
+
+# If you use rbenv as ruby version manager
+# bundle commands must be executed like this:
+# /home/<user>/.rbenv/bin/rbenv exec bundle exec
+ExecStart=/home/<user>/.rbenv/bin/rbenv exec bundle exec pumactl -S <absolute_compliance_path>/shared/tmp/pids/puma.state -F <absolute_compliance_path>/shared/puma.rb start
+ExecStop=/home/<user>/.rbenv/bin/rbenv exec bundle exec pumactl -S  <absolute_compliance_path>/shared/tmp/pids/puma.state stop
+
+TimeoutSec=5
+Restart=always
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
