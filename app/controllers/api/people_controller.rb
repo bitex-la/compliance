@@ -37,6 +37,6 @@ class Api::PeopleController < Api::ApiController
   protected
 
   def path_for_show
-    "#{params[:controller]}/#{params[:action]}/#{params[:id]}"
+    "person/show/#{params[:id]}?#{params.to_query}"
   end
 end
