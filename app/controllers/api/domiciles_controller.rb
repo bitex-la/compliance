@@ -1,9 +1,5 @@
-class Api::DomicilesController < Api::PersonJsonApiController
-  def index
-    scoped_collection{|s| s.domiciles }
-  end
-
-  def get_resource(scope)
-    scope.domiciles.find(params[:id])
+class Api::DomicilesController < Api::FruitController
+  def resource_class
+    Domicile
   end
 end

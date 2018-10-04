@@ -4,6 +4,8 @@ class Issue < ApplicationRecord
   belongs_to :person, optional: true
   validates :person, presence: true
 
+  ransack_alias :state, :aasm_state
+
   after_save :sync_observed_status
 
   def sync_observed_status
@@ -88,6 +90,15 @@ class Issue < ApplicationRecord
       .where("observations.reply IS NULL OR observations.reply = ''")
   }
 
+  scope :active, ->(yes=true){
+    where("aasm_state #{'NOT' unless yes} IN (?)",
+      %i(draft new observed answered))
+  }
+
+	def self.ransackable_scopes(auth_object = nil)
+	  %i(active)
+  end
+
   aasm do
     state :draft, initial: true
     state :new
@@ -147,16 +158,14 @@ class Issue < ApplicationRecord
     end
 
     event :approve do
+      before{ harvest_all! }
       after do
         person.update(enabled: true)
-        harvest_all!
+        log_state_change(:approve_issue)
       end
       transitions from: :draft, to: :approved
       transitions from: :new, to: :approved
       transitions from: :answered, to: :approved
-      after do 
-        log_state_change(:approve_issue)
-      end
     end
 
     event :abandon do
@@ -265,7 +274,7 @@ class Issue < ApplicationRecord
   def self.eager_issue_entities
     entities = []
     (HAS_ONE + HAS_MANY).map(&:to_s).each do |seed|
-      entities.push(["#{seed}": eager_seed_entities])
+      entities.push([seed => eager_seed_entities])
     end
     entities
   end

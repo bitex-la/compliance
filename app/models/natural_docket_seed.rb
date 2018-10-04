@@ -1,7 +1,11 @@
-class NaturalDocketSeed < ApplicationRecord
+class NaturalDocketSeed < NaturalDocketBase
   include Garden::Seed
-  include StaticModels::BelongsTo
 
-  belongs_to :marital_status, class_name: 'MaritalStatusKind', required: false
-  belongs_to :gender, class_name: 'GenderKind', required: false
+  validate do
+    next unless issue
+    next unless issue.natural_docket_seed
+    current = NaturalDocketSeed.where(issue_id: issue.id).first
+    next unless current && current != self
+    errors.add(:base, "cannot_create_more_than_one_per_issue")
+  end
 end

@@ -36,17 +36,17 @@ class Person < ApplicationRecord
   accepts_nested_attributes_for :comments, allow_destroy: true
 
   def replaceable_fruits
-    %i{
+    %i[
       natural_dockets
       legal_entity_dockets
       argentina_invoicing_details
       chile_invoicing_details
-      domiciles 
+      domiciles
       identifications
-      phones 
-      emails 
+      phones
+      emails
       allowances
-    }.map{|assoc| send(assoc).current.to_a }.flatten
+    ].map { |assoc| send(assoc).current.to_a }.flatten
   end
 
   enum risk: %i(low medium high)
@@ -55,13 +55,13 @@ class Person < ApplicationRecord
     emails.last.try(:address)
   end
 
-	def natural_docket
-		natural_dockets.last
-	end
+  def natural_docket
+    natural_dockets.last
+  end
 
-	def legal_entity_docket
-		legal_entity_dockets.last
-	end
+  def legal_entity_docket
+    legal_entity_dockets.last
+  end
 
   def person_type
     if natural_dockets.any?
@@ -72,29 +72,30 @@ class Person < ApplicationRecord
   end
 
   def name
-    name = if docket = natural_dockets.last
-      [docket.first_name, docket.last_name].join(" ")
-    elsif docket = legal_entity_dockets.last
-      docket.legal_name || docket.commercial_name
-    else
-      person_email
-    end
+    name =
+      if (docket = natural_dockets.last)
+        [docket.first_name, docket.last_name].join(' ')
+      elsif (docket = legal_entity_dockets.last)
+        docket.legal_name || docket.commercial_name
+      else
+        person_email
+      end
 
     "人 #{id}: #{name}"
   end
 
   def fruits
     domiciles.current +
-    identifications.current +
-    natural_dockets.current +
-    legal_entity_dockets.current +
-    allowances.current +
-    phones.current + 
-    emails.current + 
-    affinities.current +
-    argentina_invoicing_details.current + 
-    chile_invoicing_details.current +
-    notes.current
+      identifications.current +
+      natural_dockets.current +
+      legal_entity_dockets.current +
+      allowances.current +
+      phones.current +
+      emails.current +
+      affinities.current +
+      argentina_invoicing_details.current +
+      chile_invoicing_details.current +
+      notes.current
   end
 
   def all_attachments
@@ -121,7 +122,7 @@ class Person < ApplicationRecord
   private
 
   def expire_action_cache
-    ActionController::Base.new.expire_fragment("api/people/show/#{self.id}")
+    ActionController::Base.new.expire_fragment(%r{person/show/#{self.id}})
   end
 
   def log_if_enabled

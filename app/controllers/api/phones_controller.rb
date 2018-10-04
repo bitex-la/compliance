@@ -1,9 +1,5 @@
-class Api::PhonesController < Api::PersonJsonApiController
-  def index
-    scoped_collection{|s| s.phones }
-  end
-
-  def get_resource(scope)
-    scope.phones.find(params[:id])
+class Api::PhonesController < Api::FruitController
+  def resource_class
+    Phone
   end
 end

@@ -22,5 +22,7 @@ RSpec.describe Attachment, type: :model do
     domicile_seed.attachments.build(attributes_for(:attachment))
 
     issue.should be_valid
+    issue.save
+    assert_logging(issue, :create_entity, 1)
   end
 end

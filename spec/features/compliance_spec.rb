@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'helpers/api/issues_helper'
 
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
@@ -281,40 +280,26 @@ describe 'an admin user' do
     # The issue goes away from the dashboard.
     click_link 'Dashboard'
 
-    get "/api/people/#{person.id}/issues/#{Issue.first.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+    identification_seed = issue.reload.identification_seeds.first
 
-    issue_document = JSON.parse(response.body).deep_symbolize_keys
+    api_update "/identification_seeds/#{identification_seed.id}", {
+      type: 'identification_seeds',
+      id: identification_seed.id,
+      attributes: { number: '1234567890', issuer: 'CO' }
+    }
 
-    # Customer re-submit his identification, via API
-    issue_document[:included]
-      .find{|x| x[:type] == 'identification_seeds' }
-      .tap do |i|
-        i[:attributes][:number] = '1234567890'
-        i[:attributes][:issuer] = 'CO'
-      end
-    issue_document[:included]
-      .find{|x| x[:type] == 'observations' }
-      .tap do |i|
-        i[:attributes] = {reply: "Va de vuelta el documento!!!"}
-      end
+    observation = issue.observations.last
+    api_update "/observations/#{observation.id}", {
+      type: 'observations',
+      id: observation.id,
+      attributes: {reply: 'Va de vuelta el documento!!!'}
+    }
 
-    assert_logging(issue, :update_entity, 2)
-
-    patch "/api/people/#{person.id}/issues/#{Issue.first.id}",
-      params: JSON.dump(issue_document),
-      headers: {"CONTENT_TYPE" => 'application/json',
-                "Authorization" => "Token token=#{admin_user.api_token}"}
-
-    assert_logging(issue, :update_entity, 4)
+    assert_logging(issue, :update_entity, 3)
 
     assert_response 200
 
-    issue.reload.should be_answered
-    Observation.first.reply.should_not be_nil
-
-    IdentificationSeed.first.tap do |seed|
-      seed.reload
+    identification_seed.reload.tap do |seed|
       seed.issuer.should == "CO"
       seed.number.should == "1234567890"
     end
@@ -332,7 +317,7 @@ describe 'an admin user' do
     click_link 'Approve'
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 5)
+    assert_logging(issue, :update_entity, 4)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
@@ -538,93 +523,48 @@ describe 'an admin user' do
 
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
     reason = create :human_world_check_reason
-
-    post "/api/people/",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    person = api_response.data
-
-    issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
-    issue_request[:data][:relationships][:observations] = {
-      data: [{type: 'observations', id: '@1'}]
-    }
-    issue_request[:included] << Api::IssuesHelper.observation_for(
-      '@1', reason, "Please run worldcheck for them")
-    issue_request[:data][:id] = "@1"
-
-    post "/api/people/#{person.id}/issues",
-      params: issue_request,
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
+    person = create(:empty_person)
+    issue = create(:full_natural_person_issue, person: person)
+    observation = create(:robot_observation, issue: issue)
 
     login_as admin_user
-
-    issue = api_response.data
-    issue.attributes.state.should == 'observed'
-    assert_logging(Issue.last, :create_entity, 1)
-    observation = api_response.included.find{|i| i.type == 'observations'}
+    assert_logging(issue, :create_entity, 1)
 
     click_on 'Observed'
     within("#issue_#{issue.id} td.col.col-id") do
       click_link(issue.id)
     end
-    page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit"
+    page.current_path.should ==
+      "/people/#{person.id}/issues/#{issue.id}/edit"
 
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
-    assert_logging(Issue.last, :update_entity, 1)
-
-    get "/api/people/#{person.id}/issues/#{issue.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    api_response.data.attributes.state.should == 'answered'
-    api_response.included.find{|i| i.type == 'observations'}
-      .attributes.state.should == 'answered'
+    assert_logging(issue, :update_entity, 2)
 
     click_link 'Approve'
 
-    get "/api/people/#{person.id}/issues/#{issue.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    api_response.data.attributes.state.should == 'approved'
-
-    get "/api/people/#{person.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    api_response.data.attributes.enabled.should be_truthy
-
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
-    assert_logging(Person.find(person.id), :enable_person, 1)
+    page.should have_content 'Approved'
   end
 
   it 'Reviews and disable a user with hits on worldcheck' do
     person = create :full_natural_person
     person.should be_enabled
     reason = create(:human_world_check_reason)
+    issue = create(:basic_issue, person: person)
+    observation = create(:robot_observation, issue: issue)
+    issue.reload.should be_observed
 
-    issue_payload = Api::IssuesHelper.issue_with_an_observation(person.id,
-      reason,
-      "Please run worldcheck over this guy")
-
-    post "/api/people/#{person.id}/issues",
-      params: JSON.dump(issue_payload),
-      headers: {"CONTENT_TYPE" => 'application/json',
-                "Authorization" => "Token token=#{admin_user.api_token}"}
-
-    assert_response 201
-
-    issue = person.issues.reload.last
     login_as admin_user
-    issue.should be_observed
-    assert_logging(Issue.last, :create_entity, 1)
     
     # Admin clicks in the observation to see the issue detail
     click_on 'Observed'
     within("#issue_#{issue.id} td.col.col-id") do
       click_link(issue.id)
     end
-    page.current_path.should == "/people/#{person.id}/issues/#{Issue.last.id}/edit"
+    page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]',
@@ -632,81 +572,10 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
-    assert_logging(Issue.last, :update_entity, 1)
-    Observation.last.should be_answered
-  end
-
-  it 'Creates a user via API, asking for robot worldcheck run' do
-    reason = create :world_check_reason
-
-    post "/api/people/",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    person = api_response.data
-
-    issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
-    issue_request[:data][:relationships][:observations] = {
-      data: [{type: 'observations', id: '@1'}]
-    }
-    issue_request[:included] << Api::IssuesHelper.observation_for(
-      '@1', reason, "robot-worldcheck", 'robot')
-    issue_request[:data][:id] = "@1"
-
-    post "/api/people/#{person.id}/issues",
-      params: issue_request.to_json,
-      headers: {"CONTENT_TYPE" => 'application/json',
-                "Authorization" => "Token token=#{admin_user.api_token}"}
-
-    issue = api_response.data
-    issue.attributes.state.should == 'observed'
-    assert_logging(Issue.last, :create_entity, 1)
-    observation = api_response.included.find{|i| i.type == 'observations'}
-    observation.attributes.scope.should == 'robot'
-
-    login_as admin_user
-
-    # Simulate that robot perform check and notify to compliance
-    get "/api/people/#{person.id}/issues/#{issue.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    issue_request = json_response
-    issue_request[:included]
-      .find{|x| x[:type] == 'observations' }[:attributes] = {reply: "No hits"}
-
-    patch "/api/people/#{person.id}/issues/#{issue.id}",
-      params: issue_request.to_json,
-      headers: {"CONTENT_TYPE" => 'application/json',
-                "Authorization" => "Token token=#{admin_user.api_token}"}
-    assert_response 200
-
     assert_logging(Issue.last, :update_entity, 2)
-
-    api_response.data.attributes.state.should == 'answered'
-    api_response.included.find{|i| i.type == 'observations'}
-      .attributes.state.should == 'answered'
-
-    visit '/'
-    click_on 'Answered'
-    within("#issue_#{issue.id} td.col.col-id") do
-      click_link(issue.id)
-    end
-    page.current_path.should == "/people/#{Person.last.id}/issues/#{issue.id}/edit"
-
-    click_link 'Approve'
-
-    get "/api/people/#{person.id}/issues/#{issue.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    api_response.data.attributes.state.should == 'approved'
-
-    get "/api/people/#{person.id}",
-      headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-
-    api_response.data.attributes.enabled.should be_truthy
-
-    visit "/people/#{person.id}/issues/#{issue.id}/edit"
-    page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
-    assert_logging(Person.find(person.id), :enable_person, 1)
+    Observation.last.should be_answered
+    click_link 'Reject'
+    person.reload.should_not be_enabled
   end
 
   it "Abandons a new person issue that was inactive" do
@@ -732,18 +601,8 @@ describe 'an admin user' do
 
   describe 'when admin edits an issue' do
     it 'can edit a particular seed' do
-      issue_request = Api::IssuesHelper.issue_with_domicile_seed(:png)
-      issue_request[:data][:relationships][:natural_docket_seed] = {
-        data: {id: '@1', type: 'natural_docket_seeds'}}
-      issue_request[:included] += Api::IssuesHelper.natural_docket_seed(:jpg)
-      issue_request[:included][0][:attributes][:copy_attachments] = true
-
-      post api_person_issues_path(create(:full_natural_person).id),
-        params: issue_request.to_json,
-        headers: {"CONTENT-TYPE": 'application/json',
-                  "Authorization": "Token token=#{admin_user.api_token}"}
-
-      issue = api_response.data
+      person = create(:full_natural_person).reload
+      issue = create(:full_natural_person_issue, person: person)
 
       login_as admin_user
       click_on 'Draft'
@@ -771,7 +630,7 @@ describe 'an admin user' do
 
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
         click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'gif', true, 0, 1)
+        fill_attachment('domicile_seeds', 'gif', true, 0, 11)
       end
 
       click_button "Update Issue"
@@ -790,7 +649,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 12
+      new_domicile.attachments.count.should == 11
 
       within '.row.row-person' do
       	click_link Person.first.id
@@ -799,12 +658,7 @@ describe 'an admin user' do
 
     it 'can add new seeds' do
       person = create(:full_natural_person)
-      issue_request = Api::IssuesHelper.issue_with_current_person(person.id)
-      post api_person_issues_path(person.id),
-        params: issue_request.to_json,
-        headers: {"CONTENT-TYPE": 'application/json',
-                  "Authorization": "Token token=#{admin_user.api_token}"}
-      issue = api_response.data
+      issue = create(:basic_issue, person: person)
 
       login_as admin_user
       click_on 'Draft'
@@ -852,7 +706,6 @@ describe 'an admin user' do
       end
 
       click_button "Update Issue"
-      issue = Issue.last
       issue.should be_draft
 
       assert_logging(Issue.last, :create_entity, 1)

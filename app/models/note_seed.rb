@@ -1,3 +1,3 @@
-class NoteSeed < ApplicationRecord
- include Garden::Seed
+class NoteSeed < NoteBase
+  include Garden::Seed
 end

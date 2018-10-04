@@ -1,9 +1,23 @@
-class Api::AllowanceSeedsController < Api::IssueJsonApiSyncController
-  def index
-    scoped_collection{|s| s.allowance_seeds }
+class Api::AllowanceSeedsController < Api::SeedController
+  def resource_class
+    AllowanceSeed
   end
 
-  def get_resource(scope)
-    scope.allowance_seeds.find(params[:id])
+  protected 
+  
+  def get_mapper
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:issues, :allowance_seeds, :allowances],
+      issues: [],
+      allowances: [],
+      allowance_seeds: [
+        :weight,
+        :amount,
+        :kind_code,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        :issue
+      ]
   end
 end

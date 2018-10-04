@@ -1,9 +1,24 @@
-class Api::RiskScoreSeedsController < Api::IssueJsonApiSyncController
-  def index
-    scoped_collection{|s| s.risk_score_seeds }
+class Api::RiskScoreSeedsController < Api::SeedController
+  def resource_class
+    RiskScoreSeed
   end
 
-  def get_resource(scope)
-    scope.risk_score_seeds.find(params[:id])
+  protected
+
+  def get_mapper
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:issues, :risk_scores, :risk_score_seeds],
+      issues: [],
+      risk_scores: [],
+      risk_score_seeds: [
+        :score,
+        :provider,
+        :extra_info,
+        :external_link,
+        :attachments,
+        :copy_attachments,
+        :replaces,
+        :issue
+      ]
   end
 end

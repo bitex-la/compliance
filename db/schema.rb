@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180918202519) do
+ActiveRecord::Schema.define(version: 20180925180938) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -563,8 +563,8 @@ ActiveRecord::Schema.define(version: 20180918202519) do
     t.string "number"
     t.integer "phone_kind_id"
     t.string "country"
-    t.boolean "has_whatsapp", null: false
-    t.boolean "has_telegram", null: false
+    t.boolean "has_whatsapp", default: false, null: false
+    t.boolean "has_telegram", default: false, null: false
     t.text "note", limit: 16777215
     t.bigint "issue_id"
     t.datetime "created_at", null: false
@@ -584,8 +584,8 @@ ActiveRecord::Schema.define(version: 20180918202519) do
     t.string "number"
     t.integer "phone_kind_id"
     t.string "country"
-    t.boolean "has_whatsapp", null: false
-    t.boolean "has_telegram", null: false
+    t.boolean "has_whatsapp", default: false, null: false
+    t.boolean "has_telegram", default: false, null: false
     t.text "note", limit: 16777215
     t.bigint "person_id"
     t.datetime "created_at", null: false

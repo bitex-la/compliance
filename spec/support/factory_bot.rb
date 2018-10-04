@@ -19,19 +19,28 @@ module FactoryBot
             instance_eval(&block)
 
             after(:create) do |thing, evaluator|
-              next unless evaluator.add_all_attachments
+              next unless evaluator.try(:add_all_attachments)
               %i(bmp jpg png gif pdf zip BMP JPG PNG GIF PDF).each do |name|
                 create "#{name}_attachment", thing: thing
               end
             end
 
-            factory("#{factory_name}_seed", class: seed_class)
+            factory("#{factory_name}_seed", class: seed_class) do
+              factory "#{factory_name}_seed_with_issue" do
+                association :issue, factory: :basic_issue
+              end
+            end
             
             factory factory_name do 
               after(:create) do |resource, evaluator|
-                create("#{factory_name}_seed",
+                build("#{factory_name}_seed",
                   issue: resource.person.issues.reload.first,
-                  fruit: resource)
+                  fruit: resource
+                ).save(validate: false)
+              end
+
+              factory "#{factory_name}_with_person" do
+                association :person, factory: [:empty_person, :with_issue]
               end
             end
           end

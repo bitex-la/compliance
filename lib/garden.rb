@@ -3,6 +3,16 @@
 # which become associated to the Person.
 # Each Fruit remembers its seed, and each Seed knows its fruit.
 # Other than that, Seeds belong to Issues and Fruits belong to People.
+module FastJsonapi
+  class Relationship
+    def id_hash_from_record(record, record_types)
+      associated_record_type = record_types[record.class] ||=
+        run_key_transform(record.class.name.demodulize.underscore.pluralize)
+      id_hash(record.id, associated_record_type)
+    end
+  end
+end
+
 module Garden
   module SelfHarvestable
     extend ActiveSupport::Concern
@@ -13,33 +23,6 @@ module Garden
 
     def self_harvest!
       issue.approve! if issue.may_approve?
-    end
-  end
-
-  module Kindify
-   extend ActiveSupport::Concern
-
-   class_methods do
-     def kind_mask_for(kind, custom_model = nil)
-        kind_model = custom_model.nil? ? "#{kind.to_s.classify}Kind" : custom_model
-
-        define_method kind do
-       	  return nil if self.send("#{kind}_id").nil?
-          kind_model.constantize.all
-            .select{|x| x.id == self.send("#{kind}_id").to_i}.first.code
-        end
-
-        define_method "#{kind}=" do |code|
-          candidate = kind_model.constantize.all.
-	    select{|x| x.code == code.to_sym}
-
-          if candidate.blank?
-            self.errors.add(kind, "#{kind} not found")
-          else
-            self.send("#{kind}_id=", candidate.first.id)
-          end
-        end
-      end
     end
   end
 
@@ -59,6 +42,13 @@ module Garden
         end
       end
 
+      validate do
+        next if issue.nil?
+        state = issue.changes[:aasm_state].try(:first) || issue.state
+        next if %w(draft new observed answered).include?(state)
+        errors.add(:base, 'no_more_updates_allowed')
+      end
+
       if column_names.include?('replaces_id')
         belongs_to :replaces, class_name: naming.fruit, optional: true
       end
@@ -66,7 +56,6 @@ module Garden
       accepts_nested_attributes_for :attachments, :allow_destroy => true
 
       def name
-        name_body = self.class.naming.fruit.constantize.name_body(self)
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
       end
     end
@@ -145,12 +134,8 @@ module Garden
         seed.try(:issue)
       end
 
-      def self.name_body(instance)
-        ''
-      end
-
       def name
-        "#{self.class.name}##{id}#{"旧" if replaced_by}: #{self.class.name_body(self)}"
+        "#{self.class.name}##{id}#{"旧" if replaced_by}: #{name_body}"
           .truncate(40, omission:'…')
       end
     end

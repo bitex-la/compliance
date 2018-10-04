@@ -52,14 +52,11 @@ gem 'appsignal'
 
 group :development, :test do 
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'rubocop'
+  gem 'rubocop-rspec'
 end
 
 group :test do 
-  gem 'rspec-rails'
-  gem 'capybara'
-  gem 'selenium-webdriver'
-  gem 'geckodriver-helper'
-  gem 'factory_bot'
   gem 'rspec-rails'
   gem 'capybara'
   gem 'selenium-webdriver'

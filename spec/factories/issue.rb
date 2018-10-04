@@ -21,5 +21,12 @@ FactoryBot.define do
         create name, issue: issue
       end
     end
+
+    factory :full_approved_natural_person_issue do
+      association :person, factory: :empty_person
+      after(:create) do |issue|
+        issue.approve!
+      end
+    end
   end
 end

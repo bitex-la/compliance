@@ -1,4 +1,3 @@
-class DomicileSeed < ApplicationRecord
+class DomicileSeed < DomicileBase
   include Garden::Seed
-  validates :country, country: true
 end

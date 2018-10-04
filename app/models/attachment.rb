@@ -11,6 +11,22 @@ class Attachment < ApplicationRecord
 
   validate :attached_to_something
 
+  def self.attachable_to_fruits
+   %w(domicile phone email note
+     affinity identification natural_docket
+     risk_score legal_entity_docket allowance
+     argentina_invoicing_detail chile_invoicing_detail
+   )
+  end
+
+  def self.attachable_to
+    all = []
+    self.attachable_to_fruits.each do |a|
+      all += [a.pluralize, "#{a}_seeds"]
+    end
+    all << 'fund_deposits'
+  end
+
   validates_attachment :document,
     content_type: {
       content_type: [

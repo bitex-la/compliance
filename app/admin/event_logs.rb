@@ -1,5 +1,5 @@
 ActiveAdmin.register EventLog do
-  actions :all, except: [:destroy, :edit]
+  actions :show, :index
 
   index do
     selectable_column

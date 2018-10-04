@@ -21,7 +21,7 @@ ActiveAdmin.register Issue do
   end
 
   config.clear_action_items!
-  action_item only: [:index] do
+  action_item :new, only: [:index] do
     link_to 'New', new_person_issue_path(person)
   end
 
@@ -52,7 +52,8 @@ ActiveAdmin.register Issue do
     redirect_to [person, issue]
   end
 
-  %i(complete approve abandon reject dismiss).each do |action|
+
+  Issue.aasm.events.map(&:name).each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end

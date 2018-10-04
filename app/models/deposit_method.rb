@@ -3,7 +3,8 @@ class DepositMethod
 
   static_models_sparse [
     [1, :bank],
-    [2, :debin]
+    [2, :debin],
+    [3, :btc_tx]
   ]
  
   def name

@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'helpers/api/people_helper'
 
 describe Person do
   let(:admin_user) { create(:admin_user) }
@@ -7,15 +6,14 @@ describe Person do
     Timecop.freeze Date.new(2018,01,01)
   end
 
+  before :each do
+    Timecop.freeze Date.new(2018,01,01)
+  end
+
   describe 'getting a person' do
     it 'creates a new empty user and their initial issue' do
-      expect do
-        post '/api/people',
-                params: { data: nil },
-                headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      end.to change{ Person.count }.by(1)
+      expect{ api_create('/people', nil) }.to change{ Person.count }.by(1)
 
-      response.status.should == 201
       json_response.should == {
         data: {
           type: 'people',
@@ -52,13 +50,10 @@ describe Person do
       person = create(:full_natural_person).reload
       issue = person.issues.first
 
-      # This is an old domiciel, that should not be included in the response.
+      # This is an old domicile, that should not be included in the response.
       create(:full_domicile, person: person, replaced_by: person.domiciles.last)
 
-      get "/api/people/#{person.id}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      assert_response 200
-      json_response = JSON.parse(response.body).deep_symbolize_keys
+      api_get "/people/#{person.id}"
       person.reload
 
       json_response[:data].should == {
@@ -119,7 +114,6 @@ describe Person do
       }
 
       related_person = person.affinities.first.related_person
-
       expected_included = [
         { type: 'issues',
           id: issue.id.to_s,
@@ -224,13 +218,13 @@ describe Person do
             first_name: "Joe",
             last_name: "Doe",
             nationality: "AR",
-            gender_code: "female",
+            gender_code: "male",
             marital_status_code: "single",
             job_title: 'Sr. Software developer',
             job_description: 'Build cool open source software',
             politically_exposed: false,
             politically_exposed_reason: nil,
-            birth_date: person.natural_dockets.first.birth_date.to_time.to_i,
+            birth_date: person.natural_dockets.first.birth_date.to_formatted_s,
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -327,7 +321,7 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "email_seeds",
+              type: "email_seeds",
               id: issue.email_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -369,7 +363,7 @@ describe Person do
           type: "argentina_invoicing_details",
           attributes:
           {
-            vat_status_code: "consumidor_final",
+            vat_status_code: "monotributo",
             tax_id: "20955754290",
             tax_id_kind_code: "cuit",
             receipt_kind_code: "a",
@@ -382,7 +376,9 @@ describe Person do
           relationships:
           {
             person: {data: { id: person.id.to_s, type:"people"}},
-            seed:   {data: { id: issue.argentina_invoicing_detail_seed.id.to_s,  type: "argentina_invoicing_detail_seeds"}},
+            seed:   {data: {
+              id: issue.argentina_invoicing_detail_seed.id.to_s,
+              type: "argentina_invoicing_detail_seeds"}},
             replaced_by: {data: nil},
             attachments:
             {
@@ -402,7 +398,7 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "note_seeds",
+              type: "note_seeds",
               id: issue.note_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -424,17 +420,39 @@ describe Person do
         identifications
         domiciles
       ).each do |fruit|
-        json_response[:included].find{|x| x[:type] == fruit}[:attributes].should ==
-        expected_included.find{|x| x[:type] == fruit}[:attributes]
+        json_response[:included].find{|x| x[:type] == fruit}[:attributes]
+          .should == expected_included.find{|x| x[:type] == fruit}[:attributes]
       end
     end
 
-    it 'responds 404 when the person does not exist' do
-      get "/api/people/1",
-	headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      assert_response 404
+    it 'can fetch simple person with attributes only' do
+      person = create(:full_natural_person).reload
+      api_get "/people/#{person.id}/?fields[people]=enabled"
+      json_response.should == {
+        data: {
+          type: 'people',
+          id: person.id.to_s,
+          relationships: {},
+          attributes: { enabled: true }
+        }
+      }
     end
 
+    it 'can update a person attributes' do
+      person = create(:empty_person)
+
+      api_update "/people/#{person.id}", {
+        type: "people",
+        id: person.id,
+        attributes: { enabled: true }
+      }
+
+      person.reload.should be_enabled
+    end
+
+    it 'responds 404 when the person does not exist' do
+      api_get "/people/1", {}, 404
+    end
   end
 
   describe 'when using filters' do
@@ -447,27 +465,54 @@ describe Person do
       bob_doe.issues.last.approve!
       bob_doe.reload.natural_docket.first_name.should == 'bob'
 
-      get "/api/people/",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == Person.count
+      api_get "/people"
+      api_response.data.count.should == Person.count
 
       # URL encoded json with ransack filters.
-      filter = "filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=joe"
 
-      get "/api/people/?#{filter}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == 1
+      api_get "/people/?filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=joe"
+      api_response.data.count.should == 1
 
-      filter = "filter[identifications_number_or_argentina_invoicing_details_tax_id_eq]=20955754290"
-      get "/api/people/?#{filter}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == 2 # joe & bob
+      api_get "/people/?filter[identifications_number_or_argentina_invoicing_details_tax_id_eq]=20955754290"
+      api_response.data.count.should == 2 # joe & bob
 
-      filter = "filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=doe"
+      api_get "/people/?filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=doe"
+      api_response.data.count.should == 2 # joe & bob
+    end
+  end
 
-      get "/api/people/?#{filter}",
-        headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
-      json_response[:data].count.should == 2
+  describe 'when caching' do
+    it 'caches the person but does not clash if fields or includes differ' do
+      # Caching in tests is cumbersome, so there's all this boilerplate and
+      # we need to redefine the caching action.
+      # Focus on testing our cache path generation and regex based sweeping.
+      Rails.application.config.cache_store = :file_store
+      Api::PeopleController.caches_action :show, expires_in: 2.minutes,
+        cache_path: :path_for_show
+
+      person = create(:full_natural_person).reload
+
+      # These requests will cache each endpoint independently.
+      api_get "/people/#{person.id}/?fields[people]=enabled"
+      api_response.data.attributes.risk.should be_nil
+
+      api_get "/people/#{person.id}"
+      api_response.data.attributes.risk.should == 'medium'
+
+      # After a raw non-callback calling update, results remain cached.
+      person.update_column(:enabled, false)
+      api_get "/people/#{person.id}/?fields[people]=enabled"
+      api_response.data.attributes.enabled.should be_truthy
+      api_get "/people/#{person.id}"
+      api_response.data.attributes.enabled.should be_truthy 
+
+      # After a regular callback-calling update both caches are expired
+      person.update_attribute(:enabled, false)
+      api_get "/people/#{person.id}/?fields[people]=enabled"
+      api_response.data.attributes.enabled.should be_falsey
+      api_get "/people/#{person.id}"
+      api_response.data.attributes.enabled.should be_falsey
+      Rails.application.config.cache_store = :null_store
     end
   end
 end
