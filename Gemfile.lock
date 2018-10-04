@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/bitex-la/static_models.git
-  revision: e3439ee9a2a49f9b9ed9976e708fbf3b5ba4d707
+  revision: 2564eee9e71bcc3abc8b1d5a318940708c4e04c9
   specs:
-    static_models (0.4.6)
+    static_models (0.4.7)
       activemodel (~> 5.1, >= 5.1.4)
       activesupport (~> 5.1, >= 5.1.4)
 
