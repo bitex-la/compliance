@@ -480,4 +480,39 @@ describe Person do
       api_response.data.count.should == 2 # joe & bob
     end
   end
+
+  describe 'when caching' do
+    it 'caches the person but does not clash if fields or includes differ' do
+      # Caching in tests is cumbersome, so there's all this boilerplate and
+      # we need to redefine the caching action.
+      # Focus on testing our cache path generation and regex based sweeping.
+      Rails.application.config.cache_store = :file_store
+      Api::PeopleController.caches_action :show, expires_in: 2.minutes,
+        cache_path: :path_for_show
+
+      person = create(:full_natural_person).reload
+
+      # These requests will cache each endpoint independently.
+      api_get "/people/#{person.id}/?fields[people]=enabled"
+      api_response.data.attributes.risk.should be_nil
+
+      api_get "/people/#{person.id}"
+      api_response.data.attributes.risk.should == 'medium'
+
+      # After a raw non-callback calling update, results remain cached.
+      person.update_column(:enabled, false)
+      api_get "/people/#{person.id}/?fields[people]=enabled"
+      api_response.data.attributes.enabled.should be_truthy
+      api_get "/people/#{person.id}"
+      api_response.data.attributes.enabled.should be_truthy 
+
+      # After a regular callback-calling update both caches are expired
+      person.update_attribute(:enabled, false)
+      api_get "/people/#{person.id}/?fields[people]=enabled"
+      api_response.data.attributes.enabled.should be_falsey
+      api_get "/people/#{person.id}"
+      api_response.data.attributes.enabled.should be_falsey
+      Rails.application.config.cache_store = :null_store
+    end
+  end
 end
