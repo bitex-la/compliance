@@ -14,7 +14,7 @@ module RansackForStaticModel
 
       belongs_to(association, opts)
 
-  	  validates "#{association}_code",
+      validates "#{association}_code",
         inclusion: { in: association_class.codes, allow_nil: true }
 
       ransacker("#{association}_code",
