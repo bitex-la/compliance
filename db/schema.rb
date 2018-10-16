@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180925180938) do
+ActiveRecord::Schema.define(version: 20181016134711) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -600,11 +600,18 @@ ActiveRecord::Schema.define(version: 20180925180938) do
     t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
   end
 
+  create_table "risk_keywords", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "word_es"
+    t.string "word_en"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "risk_score_seeds", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "score"
     t.string "provider"
     t.text "extra_info"
-    t.string "external_link"
+    t.text "external_link", limit: 4294967295
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "replaces_id"
@@ -620,7 +627,7 @@ ActiveRecord::Schema.define(version: 20180925180938) do
     t.string "score"
     t.string "provider"
     t.text "extra_info"
-    t.string "external_link"
+    t.text "external_link", limit: 4294967295
     t.bigint "issue_id"
     t.bigint "person_id"
     t.datetime "created_at", null: false
