@@ -277,7 +277,13 @@ ActiveAdmin.register Issue do
           rs.input :score
           rs.input :provider
           rs.input :extra_info, input_html: {rows: 3}
-          rs.input :external_link
+          seed = rs.object
+          if seed.persisted?
+            ArbreHelpers.has_many_links(context, 
+              rs, seed.external_link.split(',').compact, 'External links')
+          else 
+            rs.input :external_link
+          end
           if current = context.resource.person.risk_scores.current.presence
             rs.input :replaces, collection: current
           end
@@ -373,7 +379,23 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers.seed_collection_show_tab(self, "Risk Score", :risk_score_seeds)
+      tab "Risk Score (#{resource.risk_score_seeds.count})" do
+        ArbreHelpers.panel_grid(self, resource.risk_score_seeds) do |d|
+          attributes_table_for d do  
+            row(:show){|o| link_to o.name, o }
+            row(:score)
+            row(:provider)
+            row(:extra_info)
+            row(:external_links) do |f|
+              ArbreHelpers.show_links(self, f.external_link.split(',').compact)
+            end
+            if d.replaces
+              row(:replaces)
+            end
+            row(:created_at)
+          end
+        end
+      end
     end
   end
 end

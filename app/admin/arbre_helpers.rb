@@ -142,6 +142,36 @@ module ArbreHelpers
     end
   end
 
+  def self.show_links(context, links)
+    context.instance_eval do 
+      div do
+        links.each_with_index do |link, index|
+          span link_to("Link ##{index + 1}",
+            link,
+            target: '_blank'
+          )
+        end
+      end
+    end
+  end
+
+  def self.has_many_links(context, builder, links, title)
+    context.instance_eval do
+      builder.template.concat('<li>'.html_safe) 
+      builder.template.concat("<label>#{title}</label><br />".html_safe)
+      links.each_with_index do |link, index|
+        builder.template.concat( 
+          context.link_to("Link ##{index + 1}",
+            link,
+            target: '_blank'
+          )
+        )
+        builder.template.concat('<br/>'.html_safe)
+      end
+      builder.template.concat('</li>'.html_safe) 
+    end
+  end
+
   def self.has_many_attachments(context, form)
     ArbreHelpers.has_many_form context, form, :attachments do |af, ctx|
       a = af.object
