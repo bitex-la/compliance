@@ -195,25 +195,7 @@ ActiveAdmin.register Person do
         end
       end
 
-      tab "Risk Scores (#{resource.risk_scores.count})" do 
-        all = resource.risk_scores.current.order('created_at DESC')
-        ArbreHelpers.panel_grid(self, all) do |d|
-          attributes_table_for d do  
-            row(:show){|o| link_to o.name, o }
-            row(:score)
-            row(:provider)
-            row(:extra_info)
-            row(:external_links) do |f|
-              ArbreHelpers.show_links(self, f.external_link.split(',').compact)
-            end
-            if d.replaces
-              row(:replaces)
-            end
-            row(:created_at)
-            row(:issue)
-          end
-        end
-      end
+      ArbreHelpers.fruit_collection_show_tab(self, "Risk Score", :risk_scores)
     end
   end
 end

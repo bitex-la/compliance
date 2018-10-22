@@ -4,6 +4,10 @@ module ArbreHelpers
       columns do
         column span: 2 do
           ArbreHelpers.fruit_attribute_table(self, resource)
+          if resource.respond_to? :external_link
+            h4 "External links"
+            ArbreHelpers.show_links(self, resource.external_link.split(',').compact)
+          end 
           if attachments = resource.attachments.presence
             h3 "Attachments"
             ArbreHelpers.attachments_list(self, attachments)
@@ -218,6 +222,10 @@ module ArbreHelpers
         row(:created_at)
         row(:issue)
       end
+      if fruit.respond_to? :external_link
+        h4 "External links"
+        ArbreHelpers.show_links(self, fruit.external_link.split(',').compact)
+      end
       fruit.attachments.each do |a|
         ArbreHelpers.attachment_preview(self, a)
       end
@@ -237,6 +245,10 @@ module ArbreHelpers
   def self.seed_show_section(context, seed, others = [])
     context.instance_eval do
       ArbreHelpers.seed_attributes_table self, seed, others
+      if seed.respond_to? :external_link
+        h4 "External links"
+        ArbreHelpers.show_links(self, seed.external_link.split(',').compact)
+      end
       attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
       attachments.each do |a|
         ArbreHelpers.attachment_preview(self, a)
