@@ -278,6 +278,10 @@ ActiveAdmin.register Issue do
           rs.input :provider
           rs.input :extra_info, input_html: {rows: 3}
           rs.input :external_link
+          seed = rs.object
+          if seed.persisted?          
+            ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
+          end
           if current = context.resource.person.risk_scores.current.presence
             rs.input :replaces, collection: current
           end
