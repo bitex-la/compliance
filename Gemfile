@@ -43,6 +43,7 @@ gem 'dotenv-rails'
 
 # cache
 gem 'actionpack-action_caching'
+gem 'redis-rails'
 
 # exception notifier
 gem 'exception_notification'
