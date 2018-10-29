@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'helpers/shared_examples_for_models'
 
 RSpec.describe NaturalDocketSeed, type: :model do
   let(:invalid_seed) { described_class.new }
@@ -9,6 +10,20 @@ RSpec.describe NaturalDocketSeed, type: :model do
       gender: GenderKind.find_by_code('female'),
       marital_status: MaritalStatusKind.find_by_code('single')
   )}
+
+  %i(first_name last_name nationality
+    job_title job_description
+  ).each do |attr|
+    it { is_expected.to strip_attribute attr }
+  end
+
+  it_behaves_like 'whitespaced_seed', described_class.new, {
+    first_name: ' Mr Joe ',
+    last_name: '  Whitspace  ', 
+    nationality: 'AR ',
+    job_title: ' Developer ',
+    job_description: '  I use a lot of spaces '
+  }
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid

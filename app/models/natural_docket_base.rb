@@ -1,4 +1,5 @@
 class NaturalDocketBase < ApplicationRecord
+  strip_attributes
   self.abstract_class = true
   ransackable_static_belongs_to :marital_status,
     class_name: 'MaritalStatusKind', required: false

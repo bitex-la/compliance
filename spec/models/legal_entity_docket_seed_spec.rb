@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'helpers/shared_examples_for_models'
 
 RSpec.describe LegalEntityDocketSeed, type: :model do
   let(:invalid_seed) { described_class.new }
@@ -7,6 +8,20 @@ RSpec.describe LegalEntityDocketSeed, type: :model do
       issue: create(:basic_issue),
       country: 'CO'
   )}
+
+  %i(industry business_description country
+    commercial_name legal_name
+  ).each do |attr|
+    it { is_expected.to strip_attribute attr }
+  end
+
+  it_behaves_like 'whitespaced_seed', described_class.new, {
+    industry: 'Fintech  ',
+    business_description: ' World domination', 
+    country: ' CL',
+    commercial_name: ' Crypto Soccer',
+    legal_name: 'Crypto Sports Holdings  '
+  }
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
