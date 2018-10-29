@@ -6,6 +6,6 @@ RSpec.describe EmailSeed, type: :model do
 
   it_behaves_like 'whitespaced_seed', described_class.new, {
     address: ' lazy@copypaste.com ',
-    email_kind_code: 'invoicing'
+    email_kind_code: :invoicing
   }
 end
