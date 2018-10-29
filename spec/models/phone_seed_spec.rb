@@ -8,7 +8,7 @@ RSpec.describe PhoneSeed, type: :model do
 
   it_behaves_like 'whitespaced_seed', described_class.new, {
     number: ' +5491125410470 ',
-    phone_kind_code: 'main',
+    phone_kind_code: :main,
     country: 'AR ',
     note:  'please do not call on Sundays ',
   }
