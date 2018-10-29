@@ -22,18 +22,6 @@ class Issue < ApplicationRecord
     has_one relationship, required: false
   end
 
-  accepts_nested_attributes_for :legal_entity_docket_seed, allow_destroy: true,
-    reject_if: proc { |attr| attr['commercial_name'].blank? || attr['legal_name'].blank? }
-
-  accepts_nested_attributes_for :argentina_invoicing_detail_seed, allow_destroy: true,
-    reject_if: proc { |attr| attr['tax_id'].blank? }
-
-  accepts_nested_attributes_for :chile_invoicing_detail_seed, allow_destroy: true,
-    reject_if: proc { |attr| attr['tax_id'].blank? }
-
-  accepts_nested_attributes_for :natural_docket_seed, allow_destroy: true,
-    reject_if: proc { |attr| attr['first_name'].blank? || attr['last_name'].blank? }
-
   HAS_MANY = %i{
     allowance_seeds
     domicile_seeds
