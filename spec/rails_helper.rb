@@ -3,6 +3,7 @@ require 'support/factory_bot'
 require 'spec_helper'
 require 'capybara/rspec'
 require 'aasm/rspec'
+require 'strip_attributes/matchers'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
@@ -76,6 +77,8 @@ RSpec.configure do |config|
     config.default_driver = :firefox
   end
   Capybara.default_max_wait_time = 5 
+
+  config.include StripAttributes::Matchers
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)

@@ -1,4 +1,5 @@
 class LegalEntityDocketBase < ApplicationRecord
+  strip_attributes
   self.abstract_class = true
   validates :country, country: true
 

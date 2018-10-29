@@ -41,6 +41,9 @@ gem 'kaminari'
 gem 'timecop'
 gem 'dotenv-rails'
 
+# field sanitization
+gem 'strip_attributes'
+
 # cache
 gem 'actionpack-action_caching'
 

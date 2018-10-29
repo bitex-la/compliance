@@ -1,6 +1,7 @@
 class Observation < ApplicationRecord
   include AASM
   include Loggable
+  strip_attributes
 
   def self.scopes
     %i(client robot admin)

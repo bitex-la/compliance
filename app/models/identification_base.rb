@@ -1,4 +1,5 @@
 class IdentificationBase < ApplicationRecord
+  strip_attributes
   self.abstract_class = true
   validates :issuer, country: true
   ransackable_static_belongs_to :identification_kind

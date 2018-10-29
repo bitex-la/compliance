@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'helpers/shared_examples_for_models'
 
 RSpec.describe Observation, type: :model do
   %i(abandon dismiss).each do |event|
@@ -14,6 +15,15 @@ RSpec.describe Observation, type: :model do
       Observation.admin_pending.first.note.should == worldcheck_observation.note
     end
   end
+
+  %i(note reply).each do |attr|
+    it { is_expected.to strip_attribute attr }
+  end
+
+  it_behaves_like 'whitespaced_seed', described_class.new, {
+    note: '  The note',
+    reply: 'The reply  '
+  }
 
   it 'create an observation with long accented text' do
     issue = create(:basic_issue)
