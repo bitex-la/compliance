@@ -15,7 +15,10 @@ class NaturalDocketBase < ApplicationRecord
 
   private
     def sanitize_birth_date
-      self.birth_date = StripAttributes
-        .strip(self.birth_date.strftime('%Y-%m-%d'), regex: /^-+|-+$/)
+      unless !self.birth_date
+        self.birth_date = StripAttributes
+          .strip(self.birth_date.strftime('%Y-%m-%d'), regex: /^-+|-+$/)
+    
+      end
     end
 end
