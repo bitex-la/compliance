@@ -132,6 +132,7 @@ shared_examples "docket" do |type, initial_factory|
       .should == [old_fruit.id.to_s]
 
     issue.approve!
+    issue.person.update_attributes!(enabled: true)
 
     api_get "/#{type}/#{old_fruit.id}"
     json_response[:data][:relationships].should >= {
@@ -244,6 +245,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }|
     }
 
     api_request :post, "/issues/#{issue.id}/approve"
+    issue.person.update_attributes!(enabled: true)
     replaceable_fruit_id = fruit_class.last.id.to_s
 
     api_get "/people/#{person.id}"
@@ -270,6 +272,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }|
       replaceable_fruit_id
 
     api_request :post, "/issues/#{replacing_issue.id}/approve"
+    replacing_issue.person.update_attributes!(enabled: true)
     replacement_fruit_id = fruit_class.last.id.to_s
 
     api_get "/people/#{person.id}"
