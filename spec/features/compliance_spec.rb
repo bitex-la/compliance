@@ -153,8 +153,6 @@ describe 'an admin user' do
      birth_date: "1985-01-01"
     }, false)
 
-
-    #find("#natural_docket_seed", visible: false).click_link("Add New Attachment")
     within("#natural_docket_seed") do
       find('.has_many_container.attachments').click_link("Add New Attachment")
       fill_attachment('natural_docket_seed', 'png', false)
@@ -173,6 +171,7 @@ describe 'an admin user' do
     click_button "Update Issue"
     issue = Issue.last
     observation = Observation.last
+    expect(issue.person).to have_state(:must_wait)
     assert_logging(issue, :create_entity, 1)
     assert_logging(issue, :update_entity, 1)
 
@@ -198,6 +197,8 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
+    expect(issue.person.reload).to have_state(:must_wait)
+
     assert_logging(issue, :update_entity, 2)
     issue.reload.should be_answered
     observation.reload.should be_answered
@@ -205,6 +206,7 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
+    expect(issue.person.reload).to have_state(:all_clear)
     assert_logging(issue, :update_entity, 3)
   end
 
@@ -225,6 +227,7 @@ describe 'an admin user' do
     # assume that issue info is complete
     issue.complete!
     assert_logging(issue, :update_entity, 1)
+    expect(issue.person).to have_state(:must_wait)
 
     # Admin does not see it as pending
     login_as admin_user
@@ -270,6 +273,7 @@ describe 'an admin user' do
       with: 'Please re-send your document'
     click_button 'Update Issue'
 
+    expect(issue.person.reload).to have_state(:must_reply)
     assert_logging(issue, :update_entity, 2)
 
     Observation.where(issue: issue).count.should == 1
@@ -296,6 +300,7 @@ describe 'an admin user' do
     assert_logging(issue, :update_entity, 3)
 
     assert_response 200
+    expect(issue.person.reload).to have_state(:must_wait)
 
     identification_seed.reload.tap do |seed|
       seed.issuer.should == "CO"
@@ -316,6 +321,7 @@ describe 'an admin user' do
 
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 4)
+    expect(issue.person.reload).to have_state(:all_clear)
     Observation.last.should be_answered
     click_link 'Dashboard' 
 

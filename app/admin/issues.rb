@@ -60,6 +60,7 @@ ActiveAdmin.register Issue do
 
     member_action action, method: :post do
       resource.send("#{action}!")
+      resource.person.update(enabled: true) if action == :approve
       redirect_to action: :show
     end
   end

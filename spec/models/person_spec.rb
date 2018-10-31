@@ -56,22 +56,4 @@ RSpec.describe Person, type: :model do
 
     person.all_observations.to_a.should == [robot_observation]
   end
-
-  describe 'when transitioning happens' do
-    it 'defaults to new after create' do 
-      expect(empty_person).to have_state(:new) 
-    end
-
-    %i(unknown new must_wait can_reply).each do |state|
-      it "goes from #{state} to all_clear on enable" do
-        expect(empty_person).to transition_from(state).to(:all_clear).on_event(:enable)
-      end
-    end
-
-    %i(all_clear must_reply can_reply new).each do |state|
-      it "goes from #{state} to must_wait on disable" do
-        expect(empty_person).to transition_from(state).to(:must_wait).on_event(:disable)
-      end
-    end
-  end
 end

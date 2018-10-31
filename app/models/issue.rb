@@ -11,6 +11,7 @@ class Issue < ApplicationRecord
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
     answer! if may_answer? && observations.any? && !has_open_observations?
+    person.sync_status!
   end
 
   HAS_ONE = %i{
@@ -142,14 +143,12 @@ class Issue < ApplicationRecord
     end
 
     event :reject do
-      after do
-        person.update(enabled: false) unless person.nil?
-      end
       transitions from:  :draft, to: :rejected
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
       transitions from: :answered, to: :rejected
       after do 
+        person.update(enabled: false) unless person.nil?
         log_state_change(:reject_issue)
       end
     end
@@ -227,6 +226,10 @@ class Issue < ApplicationRecord
 
   def has_open_observations?
     observations.where(aasm_state: 'new').any?
+  end
+
+  def has_open_client_observations?
+    observations.where(aasm_state: 'new', scope: 'client').any?
   end
 
   def all_attachments

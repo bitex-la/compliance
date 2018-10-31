@@ -5,7 +5,7 @@ class Person < ApplicationRecord
   after_save :log_if_enabled
   after_save :expire_action_cache
   after_create_commit do 
-    set_to_new! if may_set_to_new?
+    mark_as_new! if may_mark_as_new?
   end
   
   HAS_MANY_REPLACEABLE = %i{
@@ -87,22 +87,67 @@ class Person < ApplicationRecord
     state :must_wait
     state :all_clear
 
-    event :set_to_new do
-      transitions from: :unknown, to: :new
+
+    event :reply_as_enabled do
+      transitions from: :unknown, to: :can_reply
+      transitions from: :new, to: :can_reply
+      transitions from: :must_reply, to: :can_reply
+      transitions from: :must_wait, to: :can_reply
     end
 
-    event :enable do
-      transitions from: :unknown, to: :all_clear
-      transitions from: :new, to: :all_clear
-      transitions from: :must_wait, to: :all_clear
-      transitions from: :can_reply, to: :all_clear
+    event :reply_as_disabled do
+      transitions from: :unknown, to: :must_reply
+      transitions from: :new, to: :must_reply
+      transitions from: :all_clear, to: :must_reply
+      transitions from: :must_wait, to: :must_reply
     end
-  
-    event :disable do
+
+    event :wait_for_approval do 
+      transitions from: :unknown, to: :must_wait
+      transitions from: :new, to: :must_wait
       transitions from: :all_clear, to: :must_wait
       transitions from: :must_reply, to: :must_wait
       transitions from: :can_reply, to: :must_wait
-      transitions from: :new, to: :must_wait
+    end
+
+    event :operate do
+      transitions from: :unknown, to: :all_clear
+      transitions from: :new, to: :all_clear
+      transitions from: :can_reply, to: :all_clear
+      transitions from: :must_reply, to: :all_clear
+      transitions from: :must_wait, to: :all_clear
+    end
+
+    event :mark_as_new do
+      transitions from: :unknown, to: :new
+    end
+  end
+
+  def sync_status!
+    is_observed = Observation
+      .ransack(issue_person_id_eq: id, scope_eq: 'client', state_eq: 'new')
+      .result
+      .select('aasm_state').count > 0
+    
+    if enabled
+      if is_observed
+        reply_as_enabled! if may_reply_as_enabled?
+      else 
+        operate! if may_operate?
+      end
+    else
+      has_issues = Issue
+        .ransack(person_id_eq: id, state_not_eq: 'draft')
+        .result
+        .select('aasm_state').count > 0
+
+      if !has_issues
+        mark_as_new! if may_mark_as_new?
+      elsif is_observed
+        reply_as_disabled! if may_reply_as_disabled?
+      else
+        wait_for_approval! if may_wait_for_approval?
+      end
     end
   end
 
@@ -187,11 +232,11 @@ class Person < ApplicationRecord
   def log_if_enabled
     was, is = saved_changes[:enabled]
     if !was && is
-      enable!
+      operate!
       log_state_change(:enable_person) 
     end
     if was && !is
-      disable!
+      wait_for_approval!
       log_state_change(:disable_person)
     end
   end

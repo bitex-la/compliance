@@ -21,6 +21,7 @@ describe Person do
           attributes: {
             enabled: false,
             risk: nil,
+            state: 'new',
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -62,6 +63,7 @@ describe Person do
         attributes: {
           enabled: true,
           risk: 'medium',
+          state: 'all_clear',
           created_at: 1514764800,
           updated_at: 1514764800
         },

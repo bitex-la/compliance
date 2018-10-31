@@ -101,6 +101,8 @@ describe Issue do
         .data.first.id.should == observation_id
       api_response.included.select{|o| o.type == 'observations'}
         .map(&:id).should == [observation_id]
+      api_response.included.find{|o| o.type == 'people'}
+        .attributes.state.should == 'must_wait'
     end
   end
 
@@ -116,6 +118,9 @@ describe Issue do
       it "It can #{action} issue" do
         issue = create(:basic_issue, state: initial_state, person: person)
         api_request :post, "/issues/#{issue.id}/#{action}", {}, 200
+
+        api_response.included.find{|o| o.type == 'people'}
+          .attributes.state.should == 'must_wait'
       end
 
       it "It cannot #{action} approved issue" do

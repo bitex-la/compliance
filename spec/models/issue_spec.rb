@@ -88,7 +88,7 @@ RSpec.describe Issue, type: :model do
       end
       expect(person).to have_state(:new)
       issue.approve!
-      person.enable!
+      person.operate!
       person.reload
       issue.reload
       expect(person).to have_state(:all_clear)
@@ -161,12 +161,15 @@ RSpec.describe Issue, type: :model do
       issue = create(:full_natural_person_issue, person: create(:empty_person))
       obs = create(:observation, issue: issue)
       issue.reload.should be_observed
+      expect(issue.person).to have_state(:must_reply)
       issue.update_column(:aasm_state, 'new')
       issue.reload.should be_new
       issue.save
       issue.reload.should be_observed
+      expect(issue.person).to have_state(:must_reply)
       obs.update(reply: 'replied')
       issue.reload.should be_answered
+      expect(issue.person.reload).to have_state(:must_wait)
     end
 
     it 'can snap out of faulty observed state' do
@@ -176,12 +179,14 @@ RSpec.describe Issue, type: :model do
       issue.reload.should be_observed
       issue.save
       issue.should be_answered
+      expect(issue.person.reload).to have_state(:must_wait)
     end
 
     it 'can go directly into answered state from draft' do
       issue = create(:full_natural_person_issue, person: create(:empty_person))
       create(:observation, issue: issue, reply: "replied")
       issue.reload.should be_answered
+      expect(issue.person).to have_state(:must_wait)
     end
   end
 
