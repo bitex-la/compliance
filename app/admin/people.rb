@@ -63,6 +63,14 @@ ActiveAdmin.register Person do
     f.actions
   end
 
+  scope :all, default: true
+  scope :all_clear
+  scope :fresh 
+  scope :must_reply
+  scope :can_reply 
+  scope :must_wait
+  scope :unknown
+
   index do
     column :id
     column :person_email

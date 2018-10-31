@@ -65,6 +65,7 @@ RSpec.describe Issue, type: :model do
       expect do
         issue.reject!
       end.to change{ person.enabled }.to(false)
+      expect(person).to have_state(:must_wait)
     end
 
     it 'does nothing on dismiss' do
@@ -74,6 +75,7 @@ RSpec.describe Issue, type: :model do
       expect do
         issue.dismiss!
       end.not_to change{ person.enabled }
+      expect(person).to have_state(:all_clear)
     end
   end
 
@@ -84,9 +86,12 @@ RSpec.describe Issue, type: :model do
       %i(domiciles natural_dockets allowances identifications).each do |assoc|
         person.send(assoc).should be_empty
       end
+      expect(person).to have_state(:new)
       issue.approve!
+      person.enable!
       person.reload
       issue.reload
+      expect(person).to have_state(:all_clear)
 
       %w(domicile natural_docket allowance identification).each do |assoc|
         person.send(assoc.pluralize).should_not be_empty

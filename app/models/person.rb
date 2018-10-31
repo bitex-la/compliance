@@ -4,6 +4,9 @@ class Person < ApplicationRecord
 
   after_save :log_if_enabled
   after_save :expire_action_cache
+  after_create_commit do 
+    set_to_new! if may_set_to_new?
+  end
   
   HAS_MANY_REPLACEABLE = %i{
     domiciles
@@ -52,25 +55,55 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
+  scope :unknown, -> {
+    where("aasm_state IS NULL OR aasm_state='unknown'")
+  }
+
+  scope :all_clear, -> {
+    where("aasm_state = 'all_clear'")
+  }
+
+  scope :fresh, -> {
+    where("aasm_state = 'new'")
+  }
+
+  scope :must_reply, -> {
+    where("aasm_state = 'must_reply'")
+  }
+
+  scope :must_wait, -> {
+    where("aasm_state = 'must_wait'")
+  }
+
+  scope :can_reply, -> {
+    where("aasm_state = 'can_reply'")
+  }
+
   aasm do 
-    state :new, initial: true
+    state :unknown, initial: true
+    state :new
     state :must_reply
     state :can_reply 
     state :must_wait
     state :all_clear
-  end
 
-  event :enable do
-    transition from: :new, to: :all_clear
-    transition from: :must_wait, to: :all_clear
-    transition from: :can_reply, to: :all_clear
-  end
+    event :set_to_new do
+      transitions from: :unknown, to: :new
+    end
 
-  event :disable do
-    transition from: :all_clear, to: :must_wait
-    transition from: :must_reply, to: :must_wait
-    transition from: :can_reply, to: :must_wait
-    transition from: :new, to: :must_wait
+    event :enable do
+      transitions from: :unknown, to: :all_clear
+      transitions from: :new, to: :all_clear
+      transitions from: :must_wait, to: :all_clear
+      transitions from: :can_reply, to: :all_clear
+    end
+  
+    event :disable do
+      transitions from: :all_clear, to: :must_wait
+      transitions from: :must_reply, to: :must_wait
+      transitions from: :can_reply, to: :must_wait
+      transitions from: :new, to: :must_wait
+    end
   end
 
   def state
@@ -153,8 +186,14 @@ class Person < ApplicationRecord
 
   def log_if_enabled
     was, is = saved_changes[:enabled]
-    log_state_change(:enable_person) if !was && is
-    log_state_change(:disable_person) if was && !is
+    if !was && is
+      enable!
+      log_state_change(:enable_person) 
+    end
+    if was && !is
+      disable!
+      log_state_change(:disable_person)
+    end
   end
 
   def log_state_change(verb)
