@@ -206,8 +206,6 @@ describe 'an admin user' do
 
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 3)
-    issue.person.should be_enabled
-    assert_logging(issue.person, :enable_person, 1)
   end
 
   it 'reviews a newly created customer' do
@@ -323,7 +321,6 @@ describe 'an admin user' do
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
-    assert_logging(person, :enable_person, 1)
   end
 
   it "Edits a customer by creating a new issue" do

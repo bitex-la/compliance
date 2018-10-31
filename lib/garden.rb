@@ -44,7 +44,7 @@ module Garden
 
       validate do
         next if issue.nil?
-        state = issue.changes[:aasm_state].try(:first) || issue.state
+        state = issue.changes_to_save[:aasm_state].try(:first) || issue.state
         next if %w(draft new observed answered).include?(state)
         errors.add(:base, 'no_more_updates_allowed')
       end

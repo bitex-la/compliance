@@ -67,6 +67,7 @@ ActiveAdmin.register Person do
     column :id
     column :person_email
     column :enabled
+    column :state
     column :risk
     column :person_type
     column :created_at

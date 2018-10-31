@@ -1,4 +1,5 @@
 class Person < ApplicationRecord
+  include AASM
   include Loggable
 
   after_save :log_if_enabled
@@ -50,6 +51,31 @@ class Person < ApplicationRecord
   end
 
   enum risk: %i(low medium high)
+
+  aasm do 
+    state :new, initial: true
+    state :must_reply
+    state :can_reply 
+    state :must_wait
+    state :all_clear
+  end
+
+  event :enable do
+    transition from: :new, to: :all_clear
+    transition from: :must_wait, to: :all_clear
+    transition from: :can_reply, to: :all_clear
+  end
+
+  event :disable do
+    transition from: :all_clear, to: :must_wait
+    transition from: :must_reply, to: :must_wait
+    transition from: :can_reply, to: :must_wait
+    transition from: :new, to: :must_wait
+  end
+
+  def state
+    aasm_state
+  end
 
   def person_email
     emails.last.try(:address)
