@@ -274,4 +274,37 @@ module ArbreHelpers
       end
     end
   end
+
+  def self.affinity_card(context, affinity)
+    context.instance_eval do
+      from = if affinity.person == self.resource
+        affinity.person.name 
+      else
+        affinity.related_person.name 
+      end 
+
+      to = if affinity.person == self.resource
+        affinity.related_person.name 
+      else
+        affinity.person.name 
+      end 
+
+      row(:person) do
+        link_to from
+      end
+      row(:related_person) do
+        link_to to 
+      end
+
+      row(:affinity_kind) do
+        if affinity.person == self.resource
+          span affinity.affinity_kind
+        else
+          span affinity.affinity_kind.inverse_of
+        end
+      end
+      row(:created_at)
+      row(:issue)
+    end
+  end
 end

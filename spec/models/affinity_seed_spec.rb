@@ -15,4 +15,6 @@ RSpec.describe AffinitySeed, type: :model do
   it 'is valid with an issue' do
     expect(valid_seed).to be_valid
   end
+
+  
 end
