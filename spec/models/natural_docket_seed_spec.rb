@@ -33,6 +33,21 @@ RSpec.describe NaturalDocketSeed, type: :model do
     expect(valid_seed).to be_valid
   end
 
+  it 'trims special characters at the beginning of a birthdate' do
+    seed = described_class.new(
+      first_name: 'Mr Joe',
+      last_name:  'Black', 
+      nationality: 'AR',
+      job_title: ' Developer',
+      job_description: 'code for food',
+      issue: create(:basic_issue)
+    )
+    seed.update_attributes!(birth_date: '-1985-10-08-')
+    expect(seed.birth_date.strftime("%Y-%m-%d")).to eq '1985-10-08'
+    seed.update_attributes!(birth_date: '-1985/10/08-')
+    expect(seed.birth_date.strftime("%Y-%m-%d")).to eq '1985-10-08'
+  end
+
   it 'does not allow assigning to an issue that already has one' do
     seed = create(:full_natural_docket_seed_with_issue).reload
 
