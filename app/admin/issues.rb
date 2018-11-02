@@ -242,11 +242,25 @@ ActiveAdmin.register Issue do
       end
 
       tab "Affinity (#{resource.affinity_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
-          rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
-          rf.input :related_person_id
-          ArbreHelpers.fields_for_replaces context, rf, :affinities
-          ArbreHelpers.has_many_attachments(context, rf)
+        columns do
+          column span: 2 do
+            ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
+              rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
+              rf.input :related_person_id
+              ArbreHelpers.fields_for_replaces context, rf, :affinities
+              ArbreHelpers.has_many_attachments(context, rf)
+            end
+          end
+          column do 
+            h3 "Current affinities"
+            resource.person.all_affinities.each do |d|
+              panel d.name do
+                attributes_table_for d do
+                  ArbreHelpers.affinity_card(self, d)
+                end
+              end
+            end
+          end
         end
       end
 
