@@ -7,23 +7,64 @@ describe Affinity do
       .name.should =~ /Affinity#[0-9]*?: business_partner/
   end
 
+  it 'validates that affinity kind cannot be repeated between two people' do 
+    person = create(:basic_issue).reload.person
+      create(:full_affinity, person: person)
+
+    related_person = person.affinities.first.related_person
+
+    repeated_one = Affinity.new(
+      person: person,
+      related_person: related_person,
+      affinity_kind_code: :business_partner
+    )
+
+    expect(repeated_one).to_not be_valid
+    expect(repeated_one.errors[:base]).to eq ['affinity_already_exists']
+  end
+
+  it 'allows to have more than one relationship between two persons with a different kind' do
+    person = create(:basic_issue).reload.person
+      create(:full_affinity, person: person)
+
+    related_person = person.affinities.first.related_person
+
+    couple_affinity = Affinity.new(
+      person: person,
+      related_person: related_person,
+      affinity_kind_code: :couple
+    )
+
+    expect(couple_affinity).to be_valid
+    couple_affinity.save
+
+    repeated_one = Affinity.new(
+      person: person,
+      related_person: related_person,
+      affinity_kind_code: :couple
+    )
+
+    expect(repeated_one).to_not be_valid
+    expect(repeated_one.errors[:base]).to eq ['affinity_already_exists']
+  end
+
   describe 'when calculate inverse of relationships' do
     it 'returns the inverse kind of a person that is the related on' do 
       person = create(:basic_issue).reload.person
       create(:full_affinity, person: person)
 
       related_person = person.affinities.first.related_person
-      affinity = related_person.inbound_affinities.first
+      affinity = related_person.all_affinities.first
       expect(
         affinity.affinity_kind.inverse_of
-      ).to eq :business_partner
+      ).to eq :business_partner_of
     end
 
     it 'get inverse affinity of payee' do
       person = create(:basic_issue).reload.person
       create(:full_affinity, person: person, affinity_kind_code: :payee)
 
-      affinity = person.outbound_affinities.first
+      affinity = person.all_affinities.first
       expect(
         affinity.affinity_kind.inverse_of
       ).to eq :payer

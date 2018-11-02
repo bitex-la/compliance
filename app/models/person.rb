@@ -119,14 +119,6 @@ class Person < ApplicationRecord
     Affinity.where("person_id = ? OR related_person_id = ?", id, id)
   end
 
-  def inbound_affinities
-    Affinity.where("related_person_id = ?", id)
-  end
-
-  def outbound_affinities
-    Affinity.where("person_id = ?", id)
-  end
-
   private
 
   def expire_action_cache
