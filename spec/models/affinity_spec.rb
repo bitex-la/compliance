@@ -13,7 +13,7 @@ describe Affinity do
 
     related_person = person.affinities.first.related_person
 
-    repeated_one = Affinity.new(
+    repeated_one = described_class.new(
       person: person,
       related_person: related_person,
       affinity_kind_code: :business_partner
@@ -29,7 +29,7 @@ describe Affinity do
 
     related_person = person.affinities.first.related_person
 
-    couple_affinity = Affinity.new(
+    couple_affinity = described_class.new(
       person: person,
       related_person: related_person,
       affinity_kind_code: :couple
@@ -38,7 +38,7 @@ describe Affinity do
     expect(couple_affinity).to be_valid
     couple_affinity.save
 
-    repeated_one = Affinity.new(
+    repeated_one = described_class.new(
       person: person,
       related_person: related_person,
       affinity_kind_code: :couple
@@ -46,6 +46,19 @@ describe Affinity do
 
     expect(repeated_one).to_not be_valid
     expect(repeated_one.errors[:base]).to eq ['affinity_already_exists']
+  end
+
+  it 'validate that cannot link to itself' do 
+    person = create(:empty_person)
+    related_person = create(:empty_person)
+    fruit = described_class.new(
+      person: person,
+      related_person: person,
+      affinity_kind_code: :business_partner
+    )
+
+    expect(fruit.save).to be false
+    expect(fruit.errors[:base]).to eq ['cannot_link_to_itself']
   end
 
   describe 'when calculate inverse of relationships' do
