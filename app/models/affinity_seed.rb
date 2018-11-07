@@ -31,4 +31,14 @@ class AffinitySeed < AffinityBase
       affinity_kind_id: kind.try(:id))
       .where.not(id: id).count > 0
   end
+
+  def get_label(current_issue)
+    return affinity_kind  if person == current_issue.person
+    return affinity_kind.inverse  if related_person == current_issue.person
+  end
+
+  def related_one(current_issue)
+    return related_person if person == current_person
+    return current_issue.person if related_person == current_issue.person
+  end
 end

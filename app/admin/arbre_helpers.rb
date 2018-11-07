@@ -277,17 +277,10 @@ module ArbreHelpers
 
   def self.affinity_card(context, affinity)
     context.instance_eval do
-      from = if affinity.person == self.resource
-        affinity.person.name 
-      else
-        affinity.related_person.name 
-      end 
-
-      to = if affinity.person == self.resource
-        affinity.related_person.name 
-      else
-        affinity.person.name 
-      end 
+      source = self.resource.try(:person) || self.resource
+      from = source.name
+      to = affinity.related_one(source).name
+      affinity_kind_label = affinity.get_label(source)
 
       row(:person) do
         link_to from
@@ -297,11 +290,7 @@ module ArbreHelpers
       end
 
       row(:affinity_kind) do
-        if affinity.person == self.resource
-          span affinity.affinity_kind
-        else
-          span affinity.affinity_kind.inverse_of
-        end
+        affinity.get_label(self.resource)
       end
       row(:created_at)
       row(:issue)

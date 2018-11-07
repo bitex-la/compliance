@@ -69,18 +69,35 @@ describe Affinity do
       related_person = person.affinities.first.related_person
       affinity = related_person.all_affinities.first
       expect(
-        affinity.affinity_kind.inverse_of
+        affinity.affinity_kind.inverse
       ).to eq :business_partner_of
     end
 
-    it 'get inverse affinity of payee' do
-      person = create(:basic_issue).reload.person
-      create(:full_affinity, person: person, affinity_kind_code: :payee)
+    %i(spouse business_partner couple manager immediate_family 
+      extended_family other partner 
+    ).each do |kind|
+      it "get symmetrical affinity for #{kind} with _of suffix" do
+        person = create(:basic_issue).reload.person
+        create(:full_affinity, person: person, affinity_kind_code: kind)
 
-      affinity = person.all_affinities.first
-      expect(
-        affinity.affinity_kind.inverse_of
-      ).to eq :payer
+        related_person = person.affinities.first.related_person
+        affinity = related_person.all_affinities.first
+        expect(
+          affinity.affinity_kind.inverse
+        ).to eq "#{kind}_of".to_sym
+      end
+    end
+
+    %i(payee owner customer stakeholder payer provider).each do |kind|
+      it "get non-symmetrical affinity of #{kind}" do
+        person = create(:basic_issue).reload.person
+        create(:full_affinity, person: person, affinity_kind_code: kind)
+
+        affinity = person.all_affinities.first
+        expect(
+          affinity.affinity_kind.inverse
+        ).to eq AffinityKind.send(kind).inverse
+      end
     end
   end
 end

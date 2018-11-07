@@ -11,4 +11,14 @@ class Affinity < AffinityBase
       errors.add(:base, 'affinity_already_exists')
     end
   end
+
+  def get_label(current_person)
+    return affinity_kind  if person == current_person
+    return affinity_kind.inverse  if related_person == current_person
+  end
+
+  def related_one(current_person)
+    return related_person if person == current_person
+    return person if related_person == current_person
+  end
 end
