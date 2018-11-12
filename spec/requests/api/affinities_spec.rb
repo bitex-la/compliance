@@ -28,5 +28,5 @@ describe Affinity do
     {related_person: {
       data: {id: create(:empty_person).id.to_s, type: 'people'}
     }}
-  }
+  }, {affinity_kind_code: 'stakeholder'}
 end

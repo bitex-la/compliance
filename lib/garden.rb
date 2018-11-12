@@ -65,8 +65,8 @@ module Garden
         *%w(id created_at updated_at issue_id fruit_id replaces_id copy_attachments)
       ))
       fruit.person = issue.person
-      fruit.save!
       update!(fruit: fruit)
+      fruit.save!
       attachments.each{|a| a.update!(
         attached_to_fruit: fruit,
         attached_to_seed: nil,

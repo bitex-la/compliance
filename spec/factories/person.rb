@@ -46,6 +46,33 @@ FactoryBot.define do
     end
   end
 
+  factory :full_legal_entity_person, class: Person do
+    enabled { true }
+    risk { :medium }
+
+    after(:create) do |person, evaluator|
+      # A full natural person should have at least the issue that created it.
+      # Here we start with a basic issue for this person, then the full
+      # factories inject their seeds into the basic_issue in their after :create
+      create :basic_issue, person: person, aasm_state: 'approved'
+      %i(
+        full_domicile
+        full_risk_score
+        full_legal_entity_identification
+        full_legal_entity_docket
+        company_full_argentina_invoicing_detail
+        full_phone
+        full_email
+        full_note
+        full_affinity
+        full_fund_deposit
+        heavy_allowance
+      ).each do |name|
+        create name, person: person
+      end
+    end
+  end
+
   factory :another_person, class: Person do
   end
 end

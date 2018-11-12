@@ -218,7 +218,7 @@ shared_examples "docket" do |type, initial_factory|
   end
 end
 
-shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }|
+shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, new_attrs = {}|
   seed_factory = "#{factory}_seed"
   fruit_class =  Garden::Naming.new(type).fruit.constantize
   seed_type = Garden::Naming.new(type).seed_plural
@@ -260,7 +260,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }|
 
     api_create "/#{seed_type}", {
       type: seed_type,
-      attributes: attrs,
+      attributes: attrs.merge!(new_attrs),
       relationships: replacing_issue_relation
         .merge(replacing_fruit_relations)
         .merge(extra_relations)

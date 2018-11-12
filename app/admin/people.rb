@@ -162,11 +162,7 @@ ActiveAdmin.register Person do
       tab "Affinities" do
         ArbreHelpers.panel_grid(self, resource.all_affinities) do |d|
           attributes_table_for d do
-            row(:person)
-            row(:related_person)
-            row(:affinity_kind)
-            row(:created_at)
-            row(:issue)
+            ArbreHelpers.affinity_card(self, d)
           end
           d.attachments.each do |a|
             ArbreHelpers.attachment_preview(self, a)
