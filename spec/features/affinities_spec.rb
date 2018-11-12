@@ -54,7 +54,6 @@ describe 'an admin handling affinities' do
     visit "/people/#{owner_one.id}"
     click_link 'Affinities'
 
-    debugger
     within("#attributes_table_affinity_6 .row.row-affinity_kind") do
       expect(page).to have_content 'owns'
     end
