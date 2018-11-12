@@ -12,13 +12,10 @@ describe 'an admin handling affinities' do
     payee_one = create(:full_natural_person)
     payee_two = create(:full_natural_person)
 
-    click_link 'People'
-    click_link 'New Person'
-    click_button 'Create Person'
-
+    person = create(:full_legal_entity_person)
     visit '/'
     click_link 'People'
-    within "tr[id='person_#{Person.last.id}'] td[class='col col-actions']" do
+    within "tr[id='person_#{person.id}'] td[class='col col-actions']" do
       click_link 'View'
     end
 
@@ -27,96 +24,6 @@ describe 'an admin handling affinities' do
 
     issue = Issue.last
     person = issue.person
-
-    click_link 'Docket'
-
-    fill_seed('legal_entity_docket', {
-      commercial_name: 'Crypto soccer',
-      legal_name: 'Crypto sports LLC',
-      industry: 'World domination',
-      business_description: 'Sell electronics'
-    }, false)
-
-    within("#legal_entity_docket_seed") do
-      find('.has_many_container.attachments').click_link("Add New Attachment")
-      fill_attachment('legal_entity_docket_seed', 'png', false)
-    end
-
-    click_link 'Domicile (0)' 
-    click_link "Add New Domicile seed"
-    select "Argentina",
-      from: "issue[domicile_seeds_attributes][0][country]",
-      visible: false
-    fill_seed('domicile', {
-       state: 'Buenos Aires',
-       city: 'C.A.B.A',
-       street_address: 'Manuel Ugarte',
-       street_number: '1567',
-       postal_code: '2657',
-       floor: '7',
-    })
-    within(".has_many_container.domicile_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('domicile_seeds', 'zip', true, 0, 0, true)
-    end
-
-    click_link 'ID (0)'
-    click_link "Add New Identification seed"
-    fill_seed("identification",{
-      number: '20955794280',
-    })
-
-    select "tax_id",
-      from: "issue_identification_seeds_attributes_0_identification_kind_id",
-      visible: false
-
-    select "Argentina",
-      from: "issue_identification_seeds_attributes_0_issuer",
-      visible: false
-
-    within(".has_many_container.identification_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('identification_seeds', 'jpg', true, 0, 0, true)
-    end
-
-    click_link 'Allowance (0)' 
-    click_link "Add New Allowance seed"
-
-    select "us_dollar",
-      from: "issue[allowance_seeds_attributes][0][kind_id]",
-      visible: false
-    fill_seed("allowance", {
-      amount: "1000000"
-    })
-
-    within(".has_many_container.allowance_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('allowance_seeds', 'gif', true, 0, 0, true)
-    end
-
-    click_link 'Contact (0)'
-    click_link "Add New Email seed"
-    fill_seed("email",{
-      address: 'sales@evilcorp.com',
-    })
-
-    select "work",
-      from: "issue_email_seeds_attributes_0_email_kind_id",
-      visible: false
-
-    click_link "Add New Phone seed"
-    fill_seed("phone",{
-      number: '+541145230470',
-      note: 'Only in office hours'
-    })
-
-    select "main",
-      from: "issue_phone_seeds_attributes_0_phone_kind_id",
-      visible: false
-
-    select "Argentina",
-      from: "issue[phone_seeds_attributes][0][country]",
-      visible: false
 
     click_link 'Affinity'
     add_affinities([owner_one, owner_two], 'owner', 0)
@@ -147,8 +54,9 @@ describe 'an admin handling affinities' do
     visit "/people/#{owner_one.id}"
     click_link 'Affinities'
 
-    within("#attributes_table_affinity_5 .row.row-affinity_kind") do
-      expect(page).to have_content 'own'
+    debugger
+    within("#attributes_table_affinity_6 .row.row-affinity_kind") do
+      expect(page).to have_content 'owns'
     end
   end
 
@@ -172,10 +80,8 @@ describe 'an admin handling affinities' do
 
     click_button 'Update Issue'
 
-    within('.validation_errors') do
-      expect(page).to have_content 'Affinity seeds base affinity_already_exists'
-    end
-
+    expect(page).to have_selector('.validation_errors', visible: true)
+  
     click_link 'Affinity'
     select 'payee',
       from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
