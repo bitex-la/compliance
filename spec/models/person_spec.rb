@@ -56,4 +56,58 @@ RSpec.describe Person, type: :model do
 
     person.all_observations.to_a.should == [robot_observation]
   end
+
+  describe 'when transitioning' do 
+    it 'defaults to new' do 
+      expect(empty_person).to have_state(:new)
+    end
+  end
+
+  describe 'when calculate status from unknown state' do 
+    it 'goes from unknown to can reply if applies' do 
+      person.update_column('aasm_state', 'unknown')
+      issue = create(:basic_issue, person: person)
+      observation = create(:observation, issue: issue)
+      person.reload.sync_status!
+      
+      expect(person).to have_state(:can_reply)
+    end
+
+    it 'goes from unknown to all_clear if applies' do 
+      person.update_column('aasm_state', 'unknown')
+      person.reload.sync_status!
+      
+      expect(person).to have_state(:all_clear)
+    end
+
+    it 'goes from unknown to new if applies' do 
+      person = create(:empty_person)
+      person.update_column('aasm_state', 'unknown')
+      person.reload.sync_status!
+
+      expect(person).to have_state(:new)
+    end
+
+    it 'goes from unknown to must_reply if applies' do
+      person = create(:empty_person)
+      person.update_column('aasm_state', 'unknown')
+      issue = create(:full_natural_person_issue, person: person)
+      create(:observation, issue: issue)
+      person.reload.sync_status!
+
+      expect(person).to have_state(:must_reply)
+    end
+
+    it 'goes from unknown to must_wait if applies' do
+      person = create(:empty_person)
+      person.update_column('aasm_state', 'unknown')
+      issue = create(:full_natural_person_issue, person: person)
+      create(:observation, issue: issue, reply: 'Please check!!')
+      person.reload.sync_status!
+
+      expect(person).to have_state(:must_wait)
+    end
+
+    
+  end
 end

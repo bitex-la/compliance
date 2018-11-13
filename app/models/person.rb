@@ -93,6 +93,7 @@ class Person < ApplicationRecord
       transitions from: :new, to: :can_reply
       transitions from: :must_reply, to: :can_reply
       transitions from: :must_wait, to: :can_reply
+      transitions from: :all_clear, to: :can_reply
     end
 
     event :reply_as_disabled do
@@ -110,7 +111,7 @@ class Person < ApplicationRecord
       transitions from: :can_reply, to: :must_wait
     end
 
-    event :operate do
+    event :promote do
       transitions from: :unknown, to: :all_clear
       transitions from: :new, to: :all_clear
       transitions from: :can_reply, to: :all_clear
@@ -133,7 +134,7 @@ class Person < ApplicationRecord
       if is_observed
         reply_as_enabled! if may_reply_as_enabled?
       else 
-        operate! if may_operate?
+        promote! if may_promote?
       end
     else
       has_issues = Issue
@@ -232,7 +233,7 @@ class Person < ApplicationRecord
   def log_if_enabled
     was, is = saved_changes[:enabled]
     if !was && is
-      operate!
+      promote! if may_promote?
       log_state_change(:enable_person) 
     end
     if was && !is

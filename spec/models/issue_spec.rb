@@ -88,7 +88,7 @@ RSpec.describe Issue, type: :model do
       end
       expect(person).to have_state(:new)
       issue.approve!
-      person.operate!
+      person.promote!
       person.reload
       issue.reload
       expect(person).to have_state(:all_clear)
