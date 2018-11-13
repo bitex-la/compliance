@@ -11,12 +11,14 @@ describe 'an admin user' do
     click_link 'New Person'
     click_button 'Create Person'
 
-    expect(issue.person.reload).to have_state(:new)
+    person = Person.first
+
+    expect(person.reload).to have_state(:new)
     Person.count.should == 1
 
     visit '/'
     click_link 'People'
-    within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
+    within "tr[id='person_#{person.id}'] td[class='col col-actions']" do
       click_link 'View'
     end
 
