@@ -18,5 +18,15 @@ FactoryBot.define_persons_item_and_seed(:argentina_invoicing_detail,
    address { 'Jujuy 1234, CABA' }
    country { 'ES' }
    transient{ add_all_attachments { true }}
+  },
+  company_full_argentina_invoicing_detail: proc {
+    vat_status_code { 'inscripto' }
+    tax_id { '95575429' }
+    tax_id_kind_code { 'dni' }
+    receipt_kind_code { 'b' }
+    full_name { 'Julio Iglesias Jr' }
+    address { 'Jujuy 1234, CABA' }
+    country { 'ES' }
+    transient{ add_all_attachments { true }}
   }
 )
