@@ -51,7 +51,8 @@ describe 'an admin handling affinities' do
     expect(page).to have_content "RELATED PERSON 人 #{payee_one.id}: Joe Doe"
     expect(page).to have_content "RELATED PERSON 人 #{payee_two.id}: Joe Doe" 
 
-    visit "/people/#{owner_one.id}"
+    
+    click_link "人 #{owner_one.id}: Joe Doe"
     click_link 'Affinities'
 
     within("#attributes_table_affinity_6 .row.row-affinity_kind") do
