@@ -162,7 +162,6 @@ RSpec.describe Person, type: :model do
       create(:admin_world_check_observation, issue: issue)
       create(:chainalysis_observation, issue: issue)
       issue.reload.update_column('aasm_state', 'answered')
-
       person.reload.sync_status!
 
       expect(person).to have_state(:must_reply)

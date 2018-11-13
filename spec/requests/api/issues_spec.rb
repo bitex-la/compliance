@@ -72,6 +72,7 @@ describe Issue do
           relationships: { person: {data: {id: person.id, type: 'people'}}}
         })
       end.to change{ Issue.count }.by(1)
+      expect(person.reload).to have_state(:new)
 
       issue_id = api_response.data.id
 
@@ -89,6 +90,7 @@ describe Issue do
           }
         })
       end.to change{ Observation.count }.by(1)
+      expect(person.reload).to have_state(:must_wait)
 
       observation_id = api_response.data.id
 

@@ -450,6 +450,7 @@ describe Person do
       }
 
       person.reload.should be_enabled
+      expect(person).to have_state(:all_clear)
     end
 
     it 'responds 404 when the person does not exist' do

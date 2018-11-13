@@ -43,6 +43,7 @@ describe 'an admin user' do
     click_link 'New Person'
     click_button 'Create Person'
 
+    expect(issue.person.reload).to have_state(:new)
     Person.count.should == 1
 
     visit '/'
@@ -340,6 +341,8 @@ describe 'an admin user' do
       click_link('View')
     end
 
+    expect(person.reload).to have_state(:all_clear)
+
     click_link "Add Person Information"
     click_button "Create new issue"
 
@@ -449,6 +452,7 @@ describe 'an admin user' do
     observation = Observation.last
     issue.should be_observed
     observation.should be_new
+    expect(issue.person.reload).to have_state(:all_clear)
 
     fill_in 'issue[observations_attributes][0][reply]',
       with: '0 hits go ahead!!!'
@@ -507,6 +511,7 @@ describe 'an admin user' do
 
     issue.reload.should be_dismissed
     person.reload.should_not be_enabled
+    expect(person).to have_state(:must_wait)
   end
 
   it "Rejects an issue because an observation went unanswered" do
@@ -522,6 +527,7 @@ describe 'an admin user' do
     issue.reload.should be_rejected
     person.reload.should_not be_enabled
     assert_logging(person, :disable_person, 1)
+    expect(person.reload).to have_state(:must_wait)
   end
 
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
@@ -544,12 +550,14 @@ describe 'an admin user' do
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
     assert_logging(issue, :update_entity, 2)
+    expect(issue.person.reload).to have_state(:must_wait)
 
     click_link 'Approve'
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
     page.should have_content 'Approved'
+    expect(person.reload).to have_state(:all_clear)
   end
 
   it 'Reviews and disable a user with hits on worldcheck' do
@@ -579,6 +587,7 @@ describe 'an admin user' do
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should_not be_enabled
+    expect(person).to have_state(:must_wait)
   end
 
   it "Abandons a new person issue that was inactive" do
@@ -600,6 +609,7 @@ describe 'an admin user' do
     visit '/'
     click_on "Abandoned"
     expect(page).to have_content(issue.id)
+    expect(person.reload).to have_state(:must_wait)
   end
 
   describe 'when admin edits an issue' do
@@ -828,6 +838,7 @@ describe 'an admin user' do
 
     person.reload.should_not be_enabled
     person.risk.should == 'low'
+    expect(person).to have_state(:must_wait)
   end
 
   it 'keeps track of usage allowances' do
