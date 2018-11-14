@@ -14,6 +14,20 @@ ActiveAdmin.register Person do
 
   actions :all, except: [:destroy]
 
+  collection_action :search_person, method: :get do 
+    keyword = params[:q][:groupings]['0'][:address_contains]
+
+    collection = Email
+      .order(updated_at: :desc)
+      .ransack(address_cont: keyword)
+      .result
+
+    page, per_page = Util::PageCalculator.call(params, 0, 10)
+    paginated = collection.page(page).per(per_page)
+
+    render json: paginated
+  end
+
   filter :emails_address_cont, label: "Email"
   filter :identifications_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
   filter :natural_dockets_first_name_cont, label: "First Name"
