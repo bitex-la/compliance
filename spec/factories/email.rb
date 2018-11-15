@@ -6,7 +6,7 @@ FactoryBot.define_persons_item_and_seed(:email,
   },
   alt_full_email: proc {
     address { Faker::Internet.email }
-    email_kind_code { 'authentication' }
+    email_kind_code { 'invoicing' }
     transient{ add_all_attachments { true } }
   }
 )
