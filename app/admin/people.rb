@@ -19,15 +19,11 @@ ActiveAdmin.register Person do
 
     collection = Email
       .order(updated_at: :desc)
+      .page(1).per(20)
       .ransack(address_cont: keyword)
       .result
 
-    page, per_page = Util::PageCalculator.call(params, 0, 10)
-    paginated = collection.page(page).per(per_page)
-
-    paginated.map{|x| x[:id] = x[:person_id]}
-
-    render json: paginated
+    render json: collection.each{|x| x[:id] = x[:person_id]}
   end
 
   filter :emails_address_cont, label: "Email"

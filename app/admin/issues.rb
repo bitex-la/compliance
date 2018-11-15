@@ -248,7 +248,7 @@ ActiveAdmin.register Issue do
               rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
               if rf.object.related_person_id.nil?
                 rf.input :related_person_id, as: :search_select, url: proc{ search_person_people_path },
-                  fields: ['address'], display_name: 'address', minimum_input_length: 2
+                  fields: ['address'], display_name: 'address', minimum_input_length: 3
               else
                 rf.template.concat('<li>'.html_safe) 
                 rf.template.concat("<label>Related person</label>".html_safe)
