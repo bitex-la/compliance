@@ -28,13 +28,15 @@ describe 'an admin user' do
       number: '123456789',
     })
 
-    select "national_id",
-      from: "issue_identification_seeds_attributes_0_identification_kind_id",
-      visible: false
+    select_with_search(
+      '#issue_identification_seeds_attributes_0_identification_kind_id_input',
+      'national_id'
+    )
 
-    select "Argentina",
-      from: "issue_identification_seeds_attributes_0_issuer",
-      visible: false
+    select_with_search(
+      '#issue_identification_seeds_attributes_0_issuer_input',
+      'Argentina'
+    )
 
     within(".has_many_container.identification_seeds") do
       click_link "Add New Attachment"
@@ -47,9 +49,10 @@ describe 'an admin user' do
       address: 'tester@rspec.org',
     })
 
-    select "work",
-      from: "issue_email_seeds_attributes_0_email_kind_id",
-      visible: false
+    select_with_search(
+      '#issue_email_seeds_attributes_0_email_kind_id_input',
+      'work'
+    )
 
     click_link "Add New Phone seed"
     fill_seed("phone",{
@@ -57,19 +60,24 @@ describe 'an admin user' do
       note: 'Only in office hours'
     })
 
-    select "main",
-      from: "issue_phone_seeds_attributes_0_phone_kind_id",
-      visible: false
+    select_with_search(
+      '#issue_phone_seeds_attributes_0_phone_kind_id_input',
+      'main'
+    )
 
-    select "Argentina",
-      from: "issue[phone_seeds_attributes][0][country]",
-      visible: false
+    select_with_search(
+      '#issue_phone_seeds_attributes_0_country_input',
+      'Argentina'
+    )
 
     click_link 'Domicile (0)' 
     click_link "Add New Domicile seed"
-    select "Argentina",
-      from: "issue[domicile_seeds_attributes][0][country]",
-      visible: false
+   
+    select_with_search(
+      '#issue_domicile_seeds_attributes_0_country_input',
+      'Argentina'
+    )
+
     fill_seed('domicile', {
        state: 'Buenos Aires',
        city: 'C.A.B.A',
@@ -87,9 +95,11 @@ describe 'an admin user' do
     click_link 'Allowance (0)' 
     click_link "Add New Allowance seed"
 
-    select "us_dollar",
-      from: "issue[allowance_seeds_attributes][0][kind_id]",
-      visible: false
+    select_with_search(
+      '#issue_allowance_seeds_attributes_0_kind_id_input',
+      'us_dollar'
+    )
+   
     fill_seed("allowance", {
       amount: "100"
     })
@@ -105,15 +115,19 @@ describe 'an admin user' do
       last_name: "Higuain",
     }, false)
 
-    select "married",
-      from: "issue[natural_docket_seed_attributes][marital_status_id]",
-      visible: false
-    select "male",
-      from: "issue[natural_docket_seed_attributes][gender_id]",
-      visible: false
-    select "Argentina",
-      from: "issue[natural_docket_seed_attributes][nationality]",
-      visible: false
+    select_with_search(
+      '#issue_natural_docket_seed_attributes_marital_status_id_input',
+      'married'
+    )  
+    select_with_search(
+      '#issue_natural_docket_seed_attributes_gender_id_input',
+      'male'
+    )
+    select_with_search(
+      '#issue_natural_docket_seed_attributes_nationality_input',
+      'Argentina'
+    )
+
     fill_seed("natural_docket", {
      job_title: "Programmer",
      job_description: "Develop cool software for the real people",
@@ -131,10 +145,15 @@ describe 'an admin user' do
     click_link "Base"
     click_link "Add New Observation"
 
-    select observation_reason.subject_en.truncate(40, omission:'…'),
-      from: "issue[observations_attributes][0][observation_reason_id]",
-      visible: false
-    select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
+    select_with_search(
+      '#issue_observations_attributes_0_observation_reason_input',
+      observation_reason.subject_en.truncate(40, omission:'…')
+    )
+    select_with_search(  
+      '#issue_observations_attributes_0_scope_input',
+      'Admin'
+    )
+
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please check this guy on world check'
 
@@ -184,14 +203,6 @@ describe 'an admin user' do
     assert_logging(issue, :create_entity, 1)
     observation_reason = create(:observation_reason)
 
-    Issue.count.should == 1
-    Person.count.should == 2
-    DomicileSeed.count.should == 1
-    IdentificationSeed.count.should == 1
-    NaturalDocketSeed.count.should == 1
-    AllowanceSeed.count.should == 2
-    PhoneSeed.count.should == 1
-
     # assume that issue info is complete
     issue.complete!
     assert_logging(issue, :update_entity, 1)
@@ -232,10 +243,15 @@ describe 'an admin user' do
     # Admin sends an observation to customer about their identification (it was blurry)
     click_link 'Base'
     click_link 'Add New Observation'
-    select observation_reason.subject_en.truncate(40, omission:'…'),
-      from: "issue[observations_attributes][0][observation_reason_id]",
-      visible: false
-    select 'Client', from: 'issue[observations_attributes][0][scope]', visible: false
+    select_with_search(
+      '#issue_observations_attributes_0_observation_reason_input',
+      observation_reason.subject_en.truncate(40, omission:'…')
+    )
+    select_with_search(  
+      '#issue_observations_attributes_0_scope_input',
+      'Client'
+    ) 
+    
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please re-send your document'
     click_button 'Update Issue'
@@ -314,18 +330,21 @@ describe 'an admin user' do
       number: '123456789',
     })
 
-    select 'national_id',
-      from: 'issue_identification_seeds_attributes_0_identification_kind_id',
-      visible: false
-
-    select 'Argentina',
-      from: 'issue_identification_seeds_attributes_0_issuer',
-      visible: false
+    select_with_search(
+      '#issue_identification_seeds_attributes_0_identification_kind_id_input',
+      'national_id'
+    )
+    select_with_search(
+      '#issue_identification_seeds_attributes_0_issuer_input',
+      'Argentina'
+    )
 
     person.identifications.reload
 
-    select person.identifications.first.id,
-      from: "issue[identification_seeds_attributes][0][replaces_id]"
+    select_with_search(
+      '#issue_identification_seeds_attributes_0_replaces_input',
+      person.identifications.first.name
+    )
 
     within(".has_many_container.identification_seeds") do
       click_link "Add New Attachment"
@@ -337,9 +356,11 @@ describe 'an admin user' do
     click_link "Domicile (0)"
     click_link "Add New Domicile seed"
 
-    select "Argentina",
-      from: "issue[domicile_seeds_attributes][0][country]",
-      visible: false
+    select_with_search(
+      '#issue_domicile_seeds_attributes_0_country_input',
+      'Argentina'
+    )
+    
     fill_seed('domicile', {
        state: 'Buenos Aires',
        city: 'C.A.B.A',
@@ -351,7 +372,11 @@ describe 'an admin user' do
     })
 
     person.domiciles.reload
-    select person.domiciles.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]"
+
+    select_with_search(
+      '#issue_domicile_seeds_attributes_0_replaces_input',
+      person.domiciles.first.name
+    )
 
     within(".has_many_container.domicile_seeds") do
       click_link "Add New Attachment"
@@ -360,15 +385,20 @@ describe 'an admin user' do
 
     click_link "Allowance (0)"
     click_link "Add New Allowance seed"
-    select "us_dollar",
-      from: "issue[allowance_seeds_attributes][0][kind_id]",
-      visible: false
+
+    select_with_search(
+      '#issue_allowance_seeds_attributes_0_kind_id_input',
+      'us_dollar'
+    )
     fill_seed("allowance", {
       amount: "100"
     })
 
-   person.allowances.reload  
-   select person.allowances.first.name, from: "issue[allowance_seeds_attributes][0][replaces_id]"
+    person.allowances.reload  
+    select_with_search(
+      '#issue_allowance_seeds_attributes_0_replaces_input',
+      person.allowances.first.name
+    )
 
     within(".has_many_container.allowance_seeds") do
       click_link "Add New Attachment"
@@ -377,15 +407,18 @@ describe 'an admin user' do
 
     click_link "Docket"
 
-    select "married",
-    from: "issue[natural_docket_seed_attributes][marital_status_id]",
-    visible: false
-    select "male",
-      from: "issue[natural_docket_seed_attributes][gender_id]",
-      visible: false
-    select "Argentina",
-      from: "issue[natural_docket_seed_attributes][nationality]",
-      visible: false
+    select_with_search(
+      '#issue_natural_docket_seed_attributes_marital_status_id_input',
+      'married'
+    )  
+    select_with_search(
+      '#issue_natural_docket_seed_attributes_gender_id_input',
+      'male'
+    )
+    select_with_search(
+      '#issue_natural_docket_seed_attributes_nationality_input',
+      'Argentina'
+    )
 
     fill_seed("natural_docket", {
       first_name: "Lionel",
@@ -401,10 +434,15 @@ describe 'an admin user' do
     click_link "Base"
     click_link "Add New Observation"
 
-    select observation_reason.subject_en.truncate(40, omission:'…'),
-      from: "issue[observations_attributes][0][observation_reason_id]",
-      visible: false
-    select 'Admin', from: 'issue[observations_attributes][0][scope]', visible: false
+    select_with_search(
+      '#issue_observations_attributes_0_observation_reason_input',
+      observation_reason.subject_en.truncate(40, omission:'…')
+    )
+    select_with_search(  
+      '#issue_observations_attributes_0_scope_input',
+      'Admin'
+    )  
+   
     fill_in 'issue[observations_attributes][0][note]',
       with: 'Please check this guy on world check'
 
@@ -579,11 +617,18 @@ describe 'an admin user' do
       end
 
       click_link 'Domicile (1)'
-      within ".has_many_container.domicile_seeds" do
-        select "Argentina",
-        from: "issue[domicile_seeds_attributes][0][country]",
-        visible: false
 
+      select_with_search(
+        '#issue_domicile_seeds_attributes_0_country_input',
+        'Argentina'
+      )
+
+      select_with_search(
+        '#issue_domicile_seeds_attributes_0_replaces_input',
+        Domicile.first.name
+      )
+
+      within ".has_many_container.domicile_seeds" do
         fill_seed('domicile', {
           state: 'Buenos Aires',
           city: 'C.A.B.A',
@@ -593,8 +638,6 @@ describe 'an admin user' do
           floor: '1',
           apartment: 'C'
         })
-
-        select Domicile.first.id, from: "issue[domicile_seeds_attributes][0][replaces_id]"
 
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
         click_link "Add New Attachment"
@@ -640,13 +683,14 @@ describe 'an admin user' do
         number: '123456789'
       })
 
-      select 'national_id',
-        from: 'issue_identification_seeds_attributes_0_identification_kind_id',
-        visible: false
-
-      select 'Argentina',
-        from: 'issue_identification_seeds_attributes_0_issuer',
-        visible: false
+      select_with_search(
+        '#issue_identification_seeds_attributes_0_identification_kind_id_input',
+        'national_id'
+      )
+      select_with_search(
+        '#issue_identification_seeds_attributes_0_issuer_input',
+        'Argentina'
+      )
 
       within(".has_many_container.identification_seeds") do
         click_link "Add New Attachment"
@@ -656,9 +700,11 @@ describe 'an admin user' do
       click_link "Domicile (0)"
       click_link "Add New Domicile seed"
 
-      select "Argentina",
-       from: "issue[domicile_seeds_attributes][0][country]",
-       visible: false
+      select_with_search(
+        '#issue_domicile_seeds_attributes_0_country_input',
+        'Argentina'
+      )
+
       fill_seed('domicile', {
         state: 'Buenos Aires',
         city: 'C.A.B.A',
@@ -696,13 +742,6 @@ describe 'an admin user' do
       person = create :new_natural_person
       issue = person.issues.reload.first
 
-      Issue.count.should == 1
-      Person.count.should == 2
-      DomicileSeed.count.should == 1
-      IdentificationSeed.count.should == 1
-      NaturalDocketSeed.count.should == 1
-      AllowanceSeed.count.should == 2
-
       # Admin does not see it as pending
       login_as admin_user
 
@@ -730,10 +769,6 @@ describe 'an admin user' do
         find(:css, '#issue_allowance_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
 
-      DomicileSeed.count.should == 1
-      IdentificationSeed.count.should == 1
-      NaturalDocketSeed.count.should == 1
-
       visit "/people/#{person.id}/issues/#{Issue.last.id}"
 
       click_link "ID (1)"
@@ -742,13 +777,14 @@ describe 'an admin user' do
         number: '123456789'
       })
 
-      select 'national_id',
-        from: 'issue_identification_seeds_attributes_0_identification_kind_id',
-        visible: false
-
-      select 'Argentina',
-        from: 'issue_identification_seeds_attributes_0_issuer',
-        visible: false
+      select_with_search(
+        '#issue_identification_seeds_attributes_0_identification_kind_id_input',
+        'national_id'
+      )
+      select_with_search(
+        '#issue_identification_seeds_attributes_0_issuer_input',
+        'Argentina'
+      )
 
       within(".has_many_container.identification_seeds") do
         within first(".has_many_container.attachments") do
@@ -788,7 +824,7 @@ describe 'an admin user' do
     page.current_path.should == "/people/#{person.id}/edit"
 
     find(:css, "#person_enabled").set(false)
-    select 'low', from: 'person_risk', visible: false
+    select_with_search('#person_risk_input', 'low')
     click_button 'Update Person'
 
     person.reload.should_not be_enabled

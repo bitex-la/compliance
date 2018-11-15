@@ -124,7 +124,10 @@ describe 'an admin handling affinities' do
     click_link 'Affinity'
 
     add_affinities([related_person], 'stakeholder', 0)
-    set_replacement("Affinity##{Affinity.last.id}: business_partner 人 #{related_person.id}", 0)
+
+    select_with_search(
+      "#issue_affinity_seeds_attributes_0_replaces_input", 
+      "Affinity##{Affinity.last.id}: business_partner 人 #{related_person.id}")
 
     click_button 'Update Issue'
 
@@ -138,42 +141,6 @@ describe 'an admin handling affinities' do
       expect(page).to have_content 'stakeholder'
       expect(page).to have_content '人 1: Joe Doe'
       expect(page).to have_content '人 2:'
-    end
-  end
-end
-
-def add_affinities(related_ones, kind, start_index)
-  related_ones.each_with_index do |related, index|
-    click_link "Add New Affinity seed"
-    address = related.reload.emails.first.address
-
-    within "#issue_affinity_seeds_attributes_#{start_index + index}_affinity_kind_id_input" do
-      find('.select2.select2-container.select2-container--default', 
-        match: :first).click
-    end
-    find(".select2-search__field").set(kind)
-    within ".select2-results" do
-      find("li", text: kind).click
-    end
-
-    within "#issue_affinity_seeds_attributes_#{start_index + index}_related_person_id_input" do 
-      find_all('.select2.select2-container.select2-container--default')
-        .to_a.first.click
-    end
-    find(".select2-search__field").set(address)
-    within ".select2-results" do
-      find_all("li", text: address).first.click
-    end
-  end
-
-  def set_replacement(keyword, index)
-    within "#issue_affinity_seeds_attributes_#{index}_replaces_input" do 
-      find_all('.select2.select2-container.select2-container--default')
-        .to_a.first.click
-    end
-    find(".select2-search__field").set(keyword)
-    within ".select2-results" do
-      find_all("li", text: keyword).first.click
     end
   end
 end

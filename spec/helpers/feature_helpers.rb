@@ -37,6 +37,32 @@ module FeatureHelpers
     attach_file(path,
         File.absolute_path(filename), wait: 10.seconds)
   end
+
+  def add_affinities(related_ones, kind, start_index)
+    related_ones.each_with_index do |related, index|
+      click_link "Add New Affinity seed"
+      address = related.reload.emails.first.address
+
+      select_with_search(
+        "#issue_affinity_seeds_attributes_#{start_index + index}_affinity_kind_id_input",
+        kind)
+
+      select_with_search(
+        "#issue_affinity_seeds_attributes_#{start_index + index}_related_person_id_input", 
+        address)
+    end
+  end
+
+  def select_with_search(selector, value)
+    within selector do 
+      find_all('.select2.select2-container.select2-container--default')
+        .to_a.first.click
+    end
+    find(".select2-search__field").set(value)
+    within ".select2-results" do
+      find_all("li", text: value).first.click
+    end
+  end
 end
 
 RSpec.configuration.include FeatureHelpers, type: :feature
