@@ -218,6 +218,8 @@ GEM
     execjs (2.7.0)
     factory_bot (4.11.1)
       activesupport (>= 3.0.0)
+    faker (1.9.1)
+      i18n (>= 0.7)
     ffi (1.9.25)
     font-awesome-rails (4.7.0.4)
       railties (>= 3.2, < 6.0)
@@ -475,6 +477,7 @@ DEPENDENCIES
   draper
   exception_notification
   factory_bot
+  faker
   fast_jsonapi!
   font-awesome-rails
   geckodriver-helper

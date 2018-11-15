@@ -66,6 +66,7 @@ group :test do
   gem 'selenium-webdriver'
   gem 'geckodriver-helper'
   gem 'factory_bot'
+  gem 'faker'
   gem 'database_cleaner'
   gem 'rspec_junit_formatter', '0.2.2'
 end

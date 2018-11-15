@@ -64,6 +64,7 @@ describe 'an admin handling affinities' do
     person = create(:full_natural_person)
 
     related_person = person.reload.affinities.first.related_person
+    related_person.update!(enabled: true)
     login_as admin_user
 
     click_link 'People'
@@ -83,19 +84,11 @@ describe 'an admin handling affinities' do
     expect(page).to have_selector('.validation_errors', visible: true)
   
     click_link 'Affinity'
-    select 'payee',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false
-    
-    click_button 'Update Issue'
+    click_link 'Remove'
+    add_affinities([related_person], 'payee', 0)
 
-    click_link 'Affinity'
-    select 'couple',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false
-    
     click_button 'Update Issue'
-
+    
     within '.flash.flash_notice' do 
       expect(page).to have_content 'Issue was successfully updated.'
     end
@@ -107,7 +100,7 @@ describe 'an admin handling affinities' do
     click_link 'Affinities'
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
-      expect(page).to have_content 'couple'
+      expect(page).to have_content 'payee'
       expect(page).to have_content '人 1: Joe Doe'
       expect(page).to have_content '人 2:'
     end
@@ -130,26 +123,8 @@ describe 'an admin handling affinities' do
 
     click_link 'Affinity'
 
-    click_link "Add New Affinity seed"
-    select 'business_partner',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false  
-    
-    select "Affinity##{Affinity.last.id}: business_partner 人 #{related_person.id}",
-      from: "issue_affinity_seeds_attributes_0_replaces_id",
-      visible: false
-
-    fill_seed("affinity",{
-      related_person_id: related_person.id
-    }, true, 0)
-
-    click_button 'Update Issue'
-
-    click_link 'Affinity'
-
-    select 'stakeholder',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false  
+    add_affinities([related_person], 'stakeholder', 0)
+    set_replacement("Affinity##{Affinity.last.id}: business_partner 人 #{related_person.id}", 0)
 
     click_button 'Update Issue'
 
@@ -170,12 +145,35 @@ end
 def add_affinities(related_ones, kind, start_index)
   related_ones.each_with_index do |related, index|
     click_link "Add New Affinity seed"
-    select kind,
-      from: "issue_affinity_seeds_attributes_#{start_index + index}_affinity_kind_id",
-      visible: false
+    address = related.reload.emails.first.address
 
-    fill_seed("affinity",{
-      related_person_id: related.id
-    }, true, start_index + index)
+    within "#issue_affinity_seeds_attributes_#{start_index + index}_affinity_kind_id_input" do
+      find('.select2.select2-container.select2-container--default', 
+        match: :first).click
+    end
+    find(".select2-search__field").set(kind)
+    within ".select2-results" do
+      find("li", text: kind).click
+    end
+
+    within "#issue_affinity_seeds_attributes_#{start_index + index}_related_person_id_input" do 
+      find_all('.select2.select2-container.select2-container--default')
+        .to_a.first.click
+    end
+    find(".select2-search__field").set(address)
+    within ".select2-results" do
+      find_all("li", text: address).first.click
+    end
+  end
+
+  def set_replacement(keyword, index)
+    within "#issue_affinity_seeds_attributes_#{index}_replaces_input" do 
+      find_all('.select2.select2-container.select2-container--default')
+        .to_a.first.click
+    end
+    find(".select2-search__field").set(keyword)
+    within ".select2-results" do
+      find_all("li", text: keyword).first.click
+    end
   end
 end

@@ -13,7 +13,7 @@ class Affinity < AffinityBase
   end
 
   def get_label(current_person)
-    return affinity_kind  if person == current_person
+    return affinity_kind.code  if person == current_person
     return affinity_kind.inverse  if related_person == current_person
   end
 

@@ -25,6 +25,8 @@ ActiveAdmin.register Person do
     page, per_page = Util::PageCalculator.call(params, 0, 10)
     paginated = collection.page(page).per(per_page)
 
+    paginated.map{|x| x[:id] = x[:person_id]}
+
     render json: paginated
   end
 
