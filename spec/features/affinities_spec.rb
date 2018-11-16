@@ -7,9 +7,9 @@ describe 'an admin handling affinities' do
     login_as admin_user
 
     # We set the already approved people
-    owner_one = create(:full_natural_person)
+    owner_one = create(:new_natural_person)
     owner_two = create(:full_legal_entity_person)
-    payee_one = create(:full_natural_person)
+    payee_one = create(:new_natural_person)
     payee_two = create(:full_natural_person)
 
     person = create(:full_legal_entity_person)
@@ -46,16 +46,16 @@ describe 'an admin handling affinities' do
 
     click_link 'Affinities'
 
-    expect(page).to have_content "RELATED PERSON 人 #{owner_one.id}: Joe Doe"
+    expect(page).to have_content "RELATED PERSON 人 #{owner_one.id}:"
     expect(page).to have_content "RELATED PERSON 人 #{owner_two.id}: E Corp"
-    expect(page).to have_content "RELATED PERSON 人 #{payee_one.id}: Joe Doe"
+    expect(page).to have_content "RELATED PERSON 人 #{payee_one.id}:"
     expect(page).to have_content "RELATED PERSON 人 #{payee_two.id}: Joe Doe" 
 
     
-    click_link "人 #{owner_one.id}: Joe Doe"
+    click_link "人 #{owner_one.id}:"
     click_link 'Affinities'
 
-    within("#attributes_table_affinity_6 .row.row-affinity_kind") do
+    within("#attributes_table_affinity_4 .row.row-affinity_kind") do
       expect(page).to have_content 'owns'
     end
   end

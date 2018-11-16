@@ -17,13 +17,21 @@ ActiveAdmin.register Person do
   collection_action :search_person, method: :get do 
     keyword = params[:q][:groupings]['0'][:address_contains]
 
-    collection = Email
+    by_seed = EmailSeed
       .order(updated_at: :desc)
       .page(1).per(20)
       .ransack(address_cont: keyword)
-      .result
+      .result.map{|x| {id: x.issue.person_id, address: x.address}}
 
-    render json: collection.each{|x| x[:id] = x[:person_id]}
+    by_fruit = Email
+      .order(updated_at: :desc)
+      .page(1).per(20)
+      .ransack(address_cont: keyword)
+      .result.map{|x| {id: x.person_id, address: x.address}}
+
+    collection = (by_fruit + by_seed).uniq[0..20]
+    
+    render json: collection
   end
 
   filter :emails_address_cont, label: "Email"
