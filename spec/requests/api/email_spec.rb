@@ -6,7 +6,7 @@ describe Email do
     :emails,
     :full_email_with_person,
     :alt_full_email_with_person,
-    {email_kind_code_eq: 'personal'},
+    {email_kind_code_eq: 'invoicing'},
     'address,person',
     'person,seed'
 
@@ -14,7 +14,7 @@ describe Email do
     :email_seeds,
     :full_email_seed_with_issue,
     :alt_full_email_seed_with_issue,
-    {email_kind_code_eq: 'personal'},
+    {email_kind_code_eq: 'invoicing'},
     'address,issue',
     'issue,attachments'
 

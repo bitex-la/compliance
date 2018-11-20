@@ -18,6 +18,20 @@ FactoryBot.define do
     end
   end
 
+  factory :light_natural_person, class: Person do
+    enabled { true }
+    risk { :medium }
+    after(:create) do |person, evaluator|
+      %i(
+        full_natural_person_identification
+        full_natural_docket
+        full_email
+      ).each do |name|
+        create name, person: person
+      end
+    end
+  end
+
   factory :full_natural_person, class: Person do
     enabled { true }
     risk { :medium }

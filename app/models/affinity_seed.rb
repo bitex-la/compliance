@@ -33,7 +33,7 @@ class AffinitySeed < AffinityBase
   end
 
   def get_label(current_issue)
-    return affinity_kind  if person == current_issue.person
+    return affinity_kind.code  if person == current_issue.person
     return affinity_kind.inverse  if related_person == current_issue.person
   end
 

@@ -22,6 +22,7 @@ gem 'jbuilder', '~> 2.5'
 
 gem 'settingslogic'
 gem 'activeadmin'
+gem 'activeadmin_addons'
 gem 'haml'
 gem 'devise'
 gem 'cancancan'
@@ -65,6 +66,7 @@ group :test do
   gem 'selenium-webdriver'
   gem 'geckodriver-helper'
   gem 'factory_bot'
+  gem 'faker'
   gem 'database_cleaner'
   gem 'rspec_junit_formatter', '0.2.2'
 end

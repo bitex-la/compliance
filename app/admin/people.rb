@@ -14,6 +14,26 @@ ActiveAdmin.register Person do
 
   actions :all, except: [:destroy]
 
+  collection_action :search_person, method: :get do 
+    keyword = params[:q][:groupings]['0'][:address_contains]
+
+    by_seed = EmailSeed
+      .order(updated_at: :desc)
+      .page(1).per(20)
+      .ransack(address_cont: keyword)
+      .result.map{|x| {id: x.issue.person_id, address: x.address}}
+
+    by_fruit = Email
+      .order(updated_at: :desc)
+      .page(1).per(20)
+      .ransack(address_cont: keyword)
+      .result.map{|x| {id: x.person_id, address: x.address}}
+
+    collection = (by_fruit + by_seed).uniq[0..20]
+    
+    render json: collection
+  end
+
   filter :emails_address_cont, label: "Email"
   filter :identifications_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
   filter :natural_dockets_first_name_cont, label: "First Name"

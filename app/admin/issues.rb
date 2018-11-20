@@ -246,7 +246,17 @@ ActiveAdmin.register Issue do
           column span: 2 do
             ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
               rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
-              rf.input :related_person_id
+              if rf.object.related_person_id.nil?
+                rf.input :related_person_id, as: :search_select, url: proc{ search_person_people_path },
+                  fields: ['address'], display_name: 'address', minimum_input_length: 3
+              else
+                rf.template.concat('<li>'.html_safe) 
+                rf.template.concat("<label>Related person</label>".html_safe)
+                rf.template.concat(
+                  context.link_to rf.object.related_person.name, rf.object.related_person
+                )
+                rf.template.concat('</li>'.html_safe) 
+              end
               ArbreHelpers.fields_for_replaces context, rf, :affinities
               ArbreHelpers.has_many_attachments(context, rf)
             end

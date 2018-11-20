@@ -7,9 +7,9 @@ describe 'an admin handling affinities' do
     login_as admin_user
 
     # We set the already approved people
-    owner_one = create(:full_natural_person)
+    owner_one = create(:new_natural_person)
     owner_two = create(:full_legal_entity_person)
-    payee_one = create(:full_natural_person)
+    payee_one = create(:new_natural_person)
     payee_two = create(:full_natural_person)
 
     person = create(:full_legal_entity_person)
@@ -46,16 +46,16 @@ describe 'an admin handling affinities' do
 
     click_link 'Affinities'
 
-    expect(page).to have_content "RELATED PERSON 人 #{owner_one.id}: Joe Doe"
+    expect(page).to have_content "RELATED PERSON 人 #{owner_one.id}:"
     expect(page).to have_content "RELATED PERSON 人 #{owner_two.id}: E Corp"
-    expect(page).to have_content "RELATED PERSON 人 #{payee_one.id}: Joe Doe"
+    expect(page).to have_content "RELATED PERSON 人 #{payee_one.id}:"
     expect(page).to have_content "RELATED PERSON 人 #{payee_two.id}: Joe Doe" 
 
     
-    click_link "人 #{owner_one.id}: Joe Doe"
+    click_link "人 #{owner_one.id}:"
     click_link 'Affinities'
 
-    within("#attributes_table_affinity_6 .row.row-affinity_kind") do
+    within("#attributes_table_affinity_4 .row.row-affinity_kind") do
       expect(page).to have_content 'owns'
     end
   end
@@ -64,6 +64,7 @@ describe 'an admin handling affinities' do
     person = create(:full_natural_person)
 
     related_person = person.reload.affinities.first.related_person
+    related_person.update!(enabled: true)
     login_as admin_user
 
     click_link 'People'
@@ -83,19 +84,11 @@ describe 'an admin handling affinities' do
     expect(page).to have_selector('.validation_errors', visible: true)
   
     click_link 'Affinity'
-    select 'payee',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false
-    
-    click_button 'Update Issue'
+    click_link 'Remove'
+    add_affinities([related_person], 'payee', 0)
 
-    click_link 'Affinity'
-    select 'couple',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false
-    
     click_button 'Update Issue'
-
+    
     within '.flash.flash_notice' do 
       expect(page).to have_content 'Issue was successfully updated.'
     end
@@ -107,7 +100,7 @@ describe 'an admin handling affinities' do
     click_link 'Affinities'
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
-      expect(page).to have_content 'couple'
+      expect(page).to have_content 'payee'
       expect(page).to have_content '人 1: Joe Doe'
       expect(page).to have_content '人 2:'
     end
@@ -130,26 +123,11 @@ describe 'an admin handling affinities' do
 
     click_link 'Affinity'
 
-    click_link "Add New Affinity seed"
-    select 'business_partner',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false  
-    
-    select "Affinity##{Affinity.last.id}: business_partner 人 #{related_person.id}",
-      from: "issue_affinity_seeds_attributes_0_replaces_id",
-      visible: false
+    add_affinities([related_person], 'stakeholder', 0)
 
-    fill_seed("affinity",{
-      related_person_id: related_person.id
-    }, true, 0)
-
-    click_button 'Update Issue'
-
-    click_link 'Affinity'
-
-    select 'stakeholder',
-      from: "issue_affinity_seeds_attributes_0_affinity_kind_id",
-      visible: false  
+    select_with_search(
+      "#issue_affinity_seeds_attributes_0_replaces_input", 
+      "Affinity##{Affinity.last.id}: business_partner 人 #{related_person.id}")
 
     click_button 'Update Issue'
 
@@ -164,18 +142,5 @@ describe 'an admin handling affinities' do
       expect(page).to have_content '人 1: Joe Doe'
       expect(page).to have_content '人 2:'
     end
-  end
-end
-
-def add_affinities(related_ones, kind, start_index)
-  related_ones.each_with_index do |related, index|
-    click_link "Add New Affinity seed"
-    select kind,
-      from: "issue_affinity_seeds_attributes_#{start_index + index}_affinity_kind_id",
-      visible: false
-
-    fill_seed("affinity",{
-      related_person_id: related.id
-    }, true, start_index + index)
   end
 end
