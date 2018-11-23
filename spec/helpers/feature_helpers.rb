@@ -41,19 +41,14 @@ module FeatureHelpers
   def add_affinities(related_ones, kind, start_index)
     related_ones.each_with_index do |related, index|
       click_link "Add New Affinity seed"
-      address =  if related.reload.enabled
-        related.emails.first.address
-      else
-        related.issues.first.email_seeds.first.address
-      end 
 
       select_with_search(
         "#issue_affinity_seeds_attributes_#{start_index + index}_affinity_kind_id_input",
         kind)
 
-      select_with_search(
-        "#issue_affinity_seeds_attributes_#{start_index + index}_related_person_id_input", 
-        address)
+      fill_seed("affinity",{
+        related_person_id: related.id
+      }, true, start_index + index)
     end
   end
 
