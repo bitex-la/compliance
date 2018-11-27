@@ -18,35 +18,20 @@ describe Issue do
 
       api_get "/issues"
 
-      api_response.data.size.should == 2
+      api_response.data.size.should == 3
 
       by_type = api_response.included
         .group_by{|i| i.type }
         .map{|a,b| [a, b.count ] }.to_h
         .should == {
-          "people"=>2,
-          "affinity_seeds"=>1,
-          "attachments"=>121,
-          "allowance_seeds"=>2,
-          "argentina_invoicing_detail_seeds"=>1,
-          "domicile_seeds"=>1,
-          "email_seeds"=>1,
-          "identification_seeds"=>1,
-          "natural_docket_seeds"=>1,
-          "note_seeds"=>1,
-          "affinities"=>1,
-          "allowances"=>2,
-          "argentina_invoicing_details"=>1,
-          "domiciles"=>1,
-          "emails"=>1,
-          "fund_deposits"=>1,
-          "identifications"=>1,
-          "natural_dockets"=>1,
-          "notes"=>1,
-          "phones"=>1,
-          "risk_scores"=>1,
-          "phone_seeds"=>1,
-          "risk_score_seeds"=>1
+          "attachments"=>66, 
+          "email_seeds"=>2, 
+          "emails"=>2, 
+          "identification_seeds"=>2, 
+          "identifications"=>2, 
+          "natural_docket_seeds"=>2, 
+          "natural_dockets"=>2, 
+          "people"=>3
         }
     end
   end

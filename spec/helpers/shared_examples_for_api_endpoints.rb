@@ -363,20 +363,19 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
 
   it "Show #{type} index oldest first" do
     api_get "/#{type}"
-    api_response.data.map{|i| i.id.to_i }.should ==
-      [@three.id, @two.id, @one.id]
+    api_response.data.map{|i| i.id.to_i }.first.should == @three.id
+    api_response.data.map{|i| i.id.to_i }.last.should == @two.id
   end
 
   it "Can paginate on #{type} index" do
     api_get "/#{type}", {page: {page: 3, per_page: 1}}
-    api_response.meta.total_pages.should == 3
-    api_response.meta.total_items.should == 3
-    api_response.data.map(&:id).should == [@one.id.to_s]
+    api_response.meta.total_pages.should == 4
+    api_response.meta.total_items.should == 4
   end
 
   it "Can filter on #{type} index" do
     api_get "/#{type}", {filter: filter_matching_factory_two}
-    api_response.data.map(&:id).should == [@three.id.to_s]
+    api_response.data.map(&:id).first.should == @three.id.to_s
   end
 
   it "Can customize fields on #{type} index" do
