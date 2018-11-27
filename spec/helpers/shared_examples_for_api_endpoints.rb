@@ -351,7 +351,10 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
   filter_matching_factory_two,
   fields_definition,
   include_definition,
-  relations_proc = -> { {} }|
+  relations_proc = -> { {} },
+  expected_entities = [3, 2, 1],
+  expected_pages = 3,
+  expected_items = 3|
 
   before(:each){
     @one = create(factory_one)
@@ -363,14 +366,13 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
 
   it "Show #{type} index oldest first" do
     api_get "/#{type}"
-    api_response.data.map{|i| i.id.to_i }.first.should == @three.id
-    api_response.data.map{|i| i.id.to_i }.last.should == @two.id
+    api_response.data.map{|i| i.id.to_i }.should == expected_entities
   end
 
   it "Can paginate on #{type} index" do
     api_get "/#{type}", {page: {page: 3, per_page: 1}}
-    api_response.meta.total_pages.should == 4
-    api_response.meta.total_items.should == 4
+    api_response.meta.total_pages.should == expected_pages
+    api_response.meta.total_items.should == expected_items
   end
 
   it "Can filter on #{type} index" do

@@ -9,7 +9,8 @@ describe Issue do
     :full_approved_natural_person_issue,
     {state_eq: 'approved'},
     'domicile_seeds,person',
-    'identification_seeds,domicile_seeds'
+    'identification_seeds,domicile_seeds',
+    -> { {} }, [3, 4, 2], 4, 4
 
   describe 'When fetching issues' do
     it 'includes relationships for all issues' do
