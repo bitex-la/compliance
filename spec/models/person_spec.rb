@@ -52,4 +52,32 @@ RSpec.describe Person, type: :model do
 
     person.all_observations.to_a.should == [robot_observation]
   end
+
+  describe 'looking for suggestions' do
+    it 'search a person by id, first name, last name, email, phone and identification' do
+      person
+
+      expect(Person.suggest('3').first)
+        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 3"})
+
+      expect(Person.suggest('Joe').first)
+        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - Joe - Doe"})
+
+      expect(Person.suggest('Johnny')).to be_empty
+      
+      email_to_search = Email.first.address  
+      expect(Person.suggest(email_to_search).first)
+        .to include({:id=>1, :suggestion=>"人 1: Joe Doe - #{email_to_search}"})
+      
+      expect(Person.suggest('not_a_faker_email@test.com')).to be_empty
+
+      expect(Person.suggest('1125410470').first)
+        .to include({:id=>1, :suggestion=>"人 1: Joe Doe - +5491125410470"})
+
+      expect(Person.suggest('2545566').first)
+        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 2545566"})
+
+      expect(Person.suggest('80932388')).to be_empty
+    end
+  end
 end

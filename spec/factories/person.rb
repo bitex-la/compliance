@@ -22,6 +22,7 @@ FactoryBot.define do
     enabled { true }
     risk { :medium }
     after(:create) do |person, evaluator|
+      create :basic_issue, person: person, aasm_state: 'approved'
       %i(
         full_natural_person_identification
         full_natural_docket

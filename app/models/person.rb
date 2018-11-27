@@ -137,7 +137,7 @@ class Person < ApplicationRecord
       result = result.concat(d[:entity].constantize
         .order(updated_at: :desc)
         .page(page).per(per_page)
-        .send(:ransack, "#{d[:field]}_#{d[:matcher]}" => keyword)
+        .send(:ransack, {"#{d[:field]}_#{d[:matcher]}" => keyword})
         .result.map{|x| {
           id: x.instance_eval(d[:id]), 
           suggestion: d[:suggestion].map{|e| x.instance_eval(e)}.join(' - ')
