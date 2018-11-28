@@ -8,7 +8,7 @@ describe System do
 
     AdminUser.count.should == 1
     Person.count.should == 5
-    Issue.count.should == 2
+    Issue.count.should == 5
 
     post "/api/system/truncate",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
@@ -27,14 +27,14 @@ describe System do
 
     AdminUser.count.should == 1
     Person.count.should == 5
-    Issue.count.should == 2
+    Issue.count.should == 5
 
     post "/api/system/truncate",
       headers: { 'Authorization': "Token token=#{admin_user.api_token}" }
 
     AdminUser.count.should == 1
     Person.count.should == 5
-    Issue.count.should == 2
+    Issue.count.should == 5
 
     Rails.unstub(:env)
   end
