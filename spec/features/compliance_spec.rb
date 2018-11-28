@@ -220,8 +220,8 @@ describe 'an admin user' do
       click_link(issue.id)
     end
 
-    visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
-    page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
+    visit "/people/#{Person.first.id}/issues/#{issue.id}"
+    page.current_path.should == "/people/#{Person.first.id}/issues/#{issue.id}/edit"
 
     click_link 'ID (1)'
     expect(page).to have_content 'Identification seed'
@@ -589,8 +589,8 @@ describe 'an admin user' do
     issue = person.issues.reload.last
     issue.complete!
 
-    assert_logging(Issue.last, :create_entity, 1)
-    assert_logging(Issue.last, :update_entity, 1)
+    assert_logging(issue, :create_entity, 1)
+    assert_logging(issue, :update_entity, 1)
 
     login_as admin_user
     click_on 'Answered'
@@ -645,15 +645,15 @@ describe 'an admin user' do
       end
 
       click_button "Update Issue"
-      issue = Issue.last
+      issue = person.issues.last
       issue.should be_draft
 
-      assert_logging(Issue.last, :create_entity, 1)
-      assert_logging(Issue.last, :update_entity, 1)
+      assert_logging(issue, :create_entity, 1)
+      assert_logging(issue, :update_entity, 1)
 
       click_link "Approve"
       issue.reload.should be_approved
-      assert_logging(Issue.last, :update_entity, 2)
+      assert_logging(issue, :update_entity, 2)
 
       old_domicile = Domicile.first
       new_domicile = Domicile.last
@@ -754,10 +754,10 @@ describe 'an admin user' do
       within("#issue_#{issue.id} td.col.col-id") do
         click_link(issue.id)
       end
-      page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
+      page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
-      visit "/people/#{Person.first.id}/issues/#{Issue.last.id}"
-      page.current_path.should == "/people/#{Person.first.id}/issues/#{Issue.last.id}/edit"
+      visit "/people/#{person.id}/issues/#{issue.reload.id}"
+      page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
       click_link "ID (1)"
       within '.has_many_container.identification_seeds' do
@@ -769,7 +769,7 @@ describe 'an admin user' do
         find(:css, '#issue_allowance_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
 
-      visit "/people/#{person.id}/issues/#{Issue.last.id}"
+      visit "/people/#{person.id}/issues/#{issue.id}"
 
       click_link "ID (1)"
       click_link "Add New Identification seed"
@@ -794,12 +794,12 @@ describe 'an admin user' do
       end
 
       click_button 'Update Issue'
-      assert_logging(Issue.last, :create_entity, 1)
-      assert_logging(Issue.last, :update_entity, 0) 
+      assert_logging(issue, :create_entity, 1)
+      assert_logging(issue, :update_entity, 0) 
 
       click_link 'Approve'
       issue.reload.should be_approved
-      assert_logging(Issue.last, :update_entity, 1)
+      assert_logging(issue, :update_entity, 1)
 
       within '.row.row-person' do
       	click_link  person.id

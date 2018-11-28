@@ -119,6 +119,33 @@ class Person < ApplicationRecord
     Affinity.where("person_id = ? OR related_person_id = ?", id, id)
   end
 
+  def self.suggest(keyword, page = 1, per_page = 20)
+    result = Array.new
+    [
+      {entity: 'Person', field: 'id', matcher: 'eq', id: 'id', suggestion: ['name', 'id']},
+      {entity: 'Email', field: 'address', matcher: 'cont', id: 'person_id', suggestion: ['person.name', 'address']},
+      {entity: 'EmailSeed', field: 'address', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'address']},
+      {entity: 'Phone', field: 'number', matcher: 'cont', id: 'person_id', suggestion: ['person.name', 'number']},
+      {entity: 'PhoneSeed', field: 'number', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'number']},
+      {entity: 'Identification', field: 'number', matcher: 'cont', id: 'person_id', suggestion: ['person.name', 'number']},
+      {entity: 'IdentificationSeed', field: 'number', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'number']},
+      {entity: 'NaturalDocket', field: 'first_name', matcher: 'cont', id: 'person_id', suggestion: ['person.name', 'first_name', 'last_name']},
+      {entity: 'NaturalDocket', field: 'last_name', matcher: 'cont', id: 'person_id', suggestion: ['person.name', 'first_name', 'last_name']},
+      {entity: 'NaturalDocketSeed', field: 'first_name', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'first_name', 'last_name']},
+      {entity: 'NaturalDocketSeed', field: 'last_name', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'first_name', 'last_name']}
+    ].each do |d|
+      result = result.concat(d[:entity].constantize
+        .order(updated_at: :desc)
+        .page(page).per(per_page)
+        .send(:ransack, {"#{d[:field]}_#{d[:matcher]}" => keyword})
+        .result.map{|x| {
+          id: x.instance_eval(d[:id]), 
+          suggestion: d[:suggestion].map{|e| x.instance_eval(e)}.join(' - ')
+        }})
+    end
+    result.uniq[0..per_page]
+  end
+
   private
 
   def expire_action_cache
