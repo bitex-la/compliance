@@ -4,4 +4,8 @@ class RiskScoreBase < ApplicationRecord
   def name_body
     "#{provider} #{score}"
   end
+
+  def extra_info_hash
+    JSON.parse(extra_info)
+  end
 end

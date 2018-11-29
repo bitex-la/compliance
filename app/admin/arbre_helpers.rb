@@ -296,4 +296,73 @@ module ArbreHelpers
       row(:issue)
     end
   end
+
+  def self.json_renderer(context, builder, data)
+    level = Array.new
+    builder.template.concat('<li>'.html_safe) 
+    ArbreHelpers.render_list(context, builder, data, level)
+    builder.template.concat('</li>'.html_safe)
+  end
+
+  def self.render_list(context, builder, data, level)
+    if data.is_a?(Array)
+      ArbreHelpers.render_array(context, builder, data, level)
+    else 
+      ArbreHelpers.render_hash(context, builder, data, level)
+    end
+  end
+
+  def self.is_a_list?(data)
+    data.is_a?(Array) || data.is_a?(Hash)
+  end
+
+  def self.render_array(context, builder, data, level)
+    context.instance_eval do
+      builder.template.concat('<ul>'.html_safe) 
+      data.each do |value|
+        level.push(value)
+        if ArbreHelpers.is_a_list?(value)
+          value = ArbreHelpers.render_list(context, builder, value, level)
+          builder.template.concat('<hr/>'.html_safe)
+        else
+          builder.template.concat('<li>'.html_safe) 
+          ArbreHelpers.render_text_or_link(builder, nil, value)
+          builder.template.concat('</li>'.html_safe)
+        end
+        level.pop
+      end
+      builder.template.concat('</ul>'.html_safe) 
+    end
+  end
+
+  def self.render_hash(context, builder, data, level)
+    context.instance_eval do
+      builder.template.concat('<li>'.html_safe) 
+      data.keys.each do |key|
+        level.push(key)
+        label = key
+        value = data[key]
+        if ArbreHelpers.is_a_list?(value)  
+          ArbreHelpers.render_list(context, builder, value, level) if ArbreHelpers.is_a_list?(value)
+        else
+          ArbreHelpers.render_text_or_link(builder, label, value)
+        end
+        level.pop
+      end
+      builder.template.concat('</li>'.html_safe) 
+    end
+  end
+
+  def self.render_text_or_link(builder, key, text)
+    builder.template.concat("<strong>#{key}: </strong>".html_safe) if key
+    if ArbreHelpers.url_regex.match(text.to_s)
+      builder.template.concat("<a href='#{text}' target='_blank'>#{text}</a><br/>".html_safe) 
+    else
+      builder.template.concat("#{text}<br/>".html_safe) 
+    end
+  end
+
+  def self.url_regex
+    /((http(s)?(\:\/\/))+(www\.)?([\w\-\.\/])*(\.[a-zA-Z]{2,3}\/?))[^\s\b\n|]*[^.,;:\?\!\@\^\$ -]/
+  end
 end

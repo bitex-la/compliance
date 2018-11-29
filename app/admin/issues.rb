@@ -300,11 +300,12 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :risk_score_seeds do |rs, context|
           rs.input :score
           rs.input :provider
-          rs.input :extra_info, input_html: {rows: 3}
           rs.input :external_link
           seed = rs.object
-          if seed.persisted?          
+          if seed.persisted?     
             ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
+            ArbreHelpers.json_renderer(context, rs, seed.extra_info_hash) 
+            rs.input :extra_info 
           end
           if current = context.resource.person.risk_scores.current.presence
             rs.input :replaces, collection: current
