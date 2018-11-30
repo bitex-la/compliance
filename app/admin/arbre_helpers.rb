@@ -249,6 +249,15 @@ module ArbreHelpers
         h4 "External links"
         ArbreHelpers.show_links(self, seed.external_link.split(',').compact)
       end
+      if seed.respond_to? :extra_info 
+        h4 "Extra info"
+        if  ArbreHelpers.is_a_valid_json?(seed.extra_info)
+          #span seed.extra_info_hash
+          ArbreHelpers.json_renderer(self, seed.extra_info_hash)
+        else
+          span seed.extra_info
+        end
+      end
       attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
       attachments.each do |a|
         ArbreHelpers.attachment_preview(self, a)
@@ -259,7 +268,7 @@ module ArbreHelpers
   def self.seed_attributes_table(context, resource, others = [])
     columns = resource.class.columns.map(&:name) - others.map(&:to_s)
     columns = columns.map{|c| c.gsub(/_id$/,'') } -
-      %w(id issue fruit created_at updated_at replaces copy_attachments)
+      %w(id issue fruit created_at updated_at replaces copy_attachments extra_info)
     
     context.instance_eval do
       attributes_table_for resource, :fruit, *columns, *others
@@ -297,18 +306,22 @@ module ArbreHelpers
     end
   end
 
-  def self.json_renderer(context, builder, data)
-    level = Array.new
-    builder.template.concat('<li>'.html_safe) 
-    ArbreHelpers.render_list(context, builder, data, level)
-    builder.template.concat('</li>'.html_safe)
+  def self.json_renderer(context, data)
+    context.instance_eval do
+      level = Array.new
+      context.concat('<li>'.html_safe) 
+      ArbreHelpers.render_list(context, data, level)
+      context.concat('</li>'.html_safe)
+    end
   end
 
-  def self.render_list(context, builder, data, level)
-    if data.is_a?(Array)
-      ArbreHelpers.render_array(context, builder, data, level)
-    else 
-      ArbreHelpers.render_hash(context, builder, data, level)
+  def self.render_list(context, data, level)
+    context.instance_eval do
+      if data.is_a?(Array)
+        ArbreHelpers.render_array(context, data, level)
+      else 
+        ArbreHelpers.render_hash(context, data, level)
+      end
     end
   end
 
@@ -316,53 +329,59 @@ module ArbreHelpers
     data.is_a?(Array) || data.is_a?(Hash)
   end
 
-  def self.render_array(context, builder, data, level)
+  def self.render_array(context, data, level)
     context.instance_eval do
-      builder.template.concat('<ul>'.html_safe) 
+      context.concat('<ul>'.html_safe)
       data.each do |value|
         level.push(value)
         if ArbreHelpers.is_a_list?(value)
-          value = ArbreHelpers.render_list(context, builder, value, level)
-          builder.template.concat('<hr/>'.html_safe)
+          context.concat('<hr/>'.html_safe)
+          value = ArbreHelpers.render_list(context, value, level)
         else
-          builder.template.concat('<li>'.html_safe) 
-          ArbreHelpers.render_text_or_link(builder, nil, value)
-          builder.template.concat('</li>'.html_safe)
+          context.concat('<li>'.html_safe) 
+          ArbreHelpers.render_text_or_link(context, nil, value)
+          context.concat('</li>'.html_safe)
         end
         level.pop
       end
-      builder.template.concat('</ul>'.html_safe) 
+      context.concat('</ul>'.html_safe) 
     end
   end
 
-  def self.render_hash(context, builder, data, level)
-    context.instance_eval do
-      builder.template.concat('<li>'.html_safe) 
+  def self.render_hash(context, data, level)
+    context.instance_eval do 
+      context.concat('<li>'.html_safe) 
       data.keys.each do |key|
         level.push(key)
         label = key
         value = data[key]
         if ArbreHelpers.is_a_list?(value)  
-          ArbreHelpers.render_list(context, builder, value, level) if ArbreHelpers.is_a_list?(value)
+          ArbreHelpers.render_list(context, value, level) if ArbreHelpers.is_a_list?(value)
         else
-          ArbreHelpers.render_text_or_link(builder, label, value)
+          ArbreHelpers.render_text_or_link(context, label, value)
         end
         level.pop
       end
-      builder.template.concat('</li>'.html_safe) 
+      context.concat('</li>'.html_safe) 
     end
   end
 
-  def self.render_text_or_link(builder, key, text)
-    builder.template.concat("<strong>#{key}: </strong>".html_safe) if key
+  def self.render_text_or_link(context, key, text)
+    context.concat("<strong>#{key}: </strong>".html_safe) if key
     if ArbreHelpers.url_regex.match(text.to_s)
-      builder.template.concat("<a href='#{text}' target='_blank'>#{text}</a><br/>".html_safe) 
+      context.concat("<a href='#{text}' target='_blank'>#{text}</a><br/>".html_safe) 
     else
-      builder.template.concat("#{text}<br/>".html_safe) 
+      context.concat("#{text}<br/>".html_safe) 
     end
   end
 
   def self.url_regex
     /((http(s)?(\:\/\/))+(www\.)?([\w\-\.\/])*(\.[a-zA-Z]{2,3}\/?))[^\s\b\n|]*[^.,;:\?\!\@\^\$ -]/
+  end
+
+  def self.is_a_valid_json?(data)
+    !!JSON.parse(data)
+  rescue JSON::ParserError
+    false  
   end
 end
