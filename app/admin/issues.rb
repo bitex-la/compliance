@@ -301,18 +301,17 @@ ActiveAdmin.register Issue do
           rs.input :score
           rs.input :provider
           rs.input :external_link
+          if current = context.resource.person.risk_scores.current.presence
+            rs.input :replaces, collection: current
+          end
           seed = rs.object
           if seed.persisted?     
             ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
             if  ArbreHelpers.is_a_valid_json?(seed.extra_info)
               ArbreHelpers.json_renderer(context, seed.extra_info_hash)
-            #else
-            #  rs.input :extra_info 
+            else
+              rs.input :extra_info 
             end
-          end
-          rs.input :extra_info 
-          if current = context.resource.person.risk_scores.current.presence
-            rs.input :replaces, collection: current
           end
           ArbreHelpers.has_many_attachments(context, rs)
         end
