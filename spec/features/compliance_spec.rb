@@ -142,6 +142,21 @@ describe 'an admin user' do
       fill_attachment('natural_docket_seed', 'png', false)
     end
 
+    click_link 'Risk Score (0)' 
+    click_link "Add New Risk score seed"
+
+    fill_seed('risk_score', {
+      score: 'green',
+      provider: 'bing',
+      external_link: 'https://goo.gl/vVvoK5,https://goo.gl/YpV5CZ',
+      extra_info: File.read('spec/fixtures/risk_score/serp_api_with_hits.json')
+    })
+
+    within(".has_many_container.risk_score_seeds") do
+      click_link "Add New Attachment"
+      fill_attachment('risk_score_seeds', 'gif', true, 0, 0, true)
+    end
+
     click_link "Base"
     click_link "Add New Observation"
 
@@ -185,6 +200,18 @@ describe 'an admin user' do
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
 
+    click_link 'Risk Score (1)'
+
+    within '.external_links' do
+      expect(page).to have_content 'Link #1'
+      expect(page).to have_content 'Link #2'
+    end
+
+    within '.extra_info' do
+      expect(page).to have_content 'title: https://www.clarin.com/deportes/futbol-internacional/copa ...'
+      expect(page).to have_content 'title: 20 Octubre, 2010 by unomásuno - issuu'
+    end
+
     assert_logging(issue, :update_entity, 2)
     issue.reload.should be_answered
     observation.reload.should be_answered
@@ -195,6 +222,18 @@ describe 'an admin user' do
     assert_logging(issue, :update_entity, 3)
     issue.person.should be_enabled
     assert_logging(issue.person, :enable_person, 1)
+
+    click_link 'Risk Score (1)'
+
+    within '.external_links' do
+      expect(page).to have_content 'Link #1'
+      expect(page).to have_content 'Link #2'
+    end
+
+    within '.extra_info' do
+      expect(page).to have_content 'title: https://www.clarin.com/deportes/futbol-internacional/copa ...'
+      expect(page).to have_content 'title: 20 Octubre, 2010 by unomásuno - issuu'
+    end
   end
 
   it 'reviews a newly created customer' do
@@ -229,6 +268,11 @@ describe 'an admin user' do
     expect(page).to have_content 'Domicile seed'
     click_link 'Docket'
     expect(page).to have_content 'Natural Docket'
+    click_link 'Risk Score (1)'
+    within '.has_many_container.risk_score_seeds' do
+      expect(page).to have_content 'userId: 5'
+      expect(page).to have_content 'score: green'
+    end
     click_link 'Allowance (2)'
     expect(page).to have_content 'Allowance seed'
 
