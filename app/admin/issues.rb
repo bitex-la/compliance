@@ -310,9 +310,12 @@ ActiveAdmin.register Issue do
             if  ArbreHelpers.is_a_valid_json?(seed.extra_info)
               ArbreHelpers.json_renderer(context, seed.extra_info_hash)
             else
-              rs.input :extra_info 
+              rs.input :extra_info, input_html: { readonly: true, disabled: true }
             end
+          else
+            rs.input :extra_info 
           end
+
           ArbreHelpers.has_many_attachments(context, rs)
         end
       end

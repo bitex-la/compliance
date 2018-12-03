@@ -156,12 +156,13 @@ module ArbreHelpers
 
   def self.show_links(context, links)
     context.instance_eval do 
-      div do
+      div class: 'external_links' do
         links.each_with_index do |link, index|
           span link_to("Link ##{index + 1}",
             link,
             target: '_blank'
           )
+          br
         end
       end
     end
@@ -170,7 +171,7 @@ module ArbreHelpers
   def self.has_many_links(context, builder, links, title)
     context.instance_eval do
       unless links.blank?
-        builder.template.concat('<li>'.html_safe) 
+        builder.template.concat("<li class='external_links'>".html_safe) 
         builder.template.concat("<label>#{title}</label><br />".html_safe)
         links.each_with_index do |link, index|
           builder.template.concat( 
@@ -326,7 +327,7 @@ module ArbreHelpers
   def self.extra_info_renderer(context, data)
     context.instance_eval do 
       level = Array.new
-      div do 
+      div class: 'extra_info' do 
         ArbreHelpers.render_extra_info_list(context, data, level)
       end
     end
@@ -377,7 +378,7 @@ module ArbreHelpers
   def self.json_renderer(context, data)
     context.instance_eval do
       level = Array.new
-      context.concat('<li>'.html_safe) 
+      context.concat("<li class='extra_info'>".html_safe) 
       context.concat('<h4>Extra info</h4>'.html_safe) 
       ArbreHelpers.render_list(context, data, level)
       context.concat('</li>'.html_safe)
@@ -459,10 +460,11 @@ module ArbreHelpers
   end
 
   def self.url_regex
-    /((http(s)?(\:\/\/))+(www\.)?([\w\-\.\/])*(\.[a-zA-Z]{2,3}\/?))[^\s\b\n|]*[^.,;:\?\!\@\^\$ -]/
+    /^((http(s)?(\:\/\/))+(www\.)?([\w\-\.\/])*(\.[a-zA-Z]{2,3}\/?))[^\s\b\n|]*[^.,;:\?\!\@\^\$ -]/
   end
 
   def self.is_a_valid_json?(data)
+    return false if data.blank?
     !!JSON.parse(data)
   rescue JSON::ParserError
     false  
