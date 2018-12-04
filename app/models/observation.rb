@@ -19,10 +19,6 @@ class Observation < ApplicationRecord
   belongs_to :observation_reason, optional: true
 
   before_save  :check_for_answer
-  after_create do 
-    Event::EventLogger
-      .call(self.issue, AdminUser.current_admin_user, EventLogKind.send(:observe_issue))
-  end
   after_commit :sync_issue_observed_status
 
   validate :validate_scope_integrity

@@ -187,18 +187,27 @@ RSpec.describe Issue, type: :model do
       issue.reload.should be_answered
     end
 
-    it 'creates an observe_issue event log anytime that issue gets new observations' do
+    it 'creates an observe_issue event anytime that issue gets new observations' do
       issue = create(:full_natural_person_issue, person: create(:empty_person))
       obs = create(:observation, issue: issue)
       issue.reload.should be_observed
       assert_logging(issue, :observe_issue, 1)
-      obs.update(reply: 'replied')
-      issue.reload.should be_answered
 
-      create(:observation, issue: issue)
+      Timecop.travel 1.minutes.from_now
+      3.times do
+        create(:observation, issue: issue)
+      end
       issue.reload.should be_observed
-      assert_logging(issue, :observe_issue, 2)
+      issue.save
+      assert_logging(issue.reload, :observe_issue, 2)
 
+      obs = issue.observations.last
+      obs.update(reply: 'check out the reply')
+      issue.reload.should be_observed
+      issue.save
+      assert_logging(issue.reload, :observe_issue, 2)
+
+      Timecop.travel 1.minutes.from_now
       issue.update_column(:aasm_state, 'answered')
       create(:observation, issue: issue)
       issue.reload.should be_observed

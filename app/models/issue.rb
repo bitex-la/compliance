@@ -7,10 +7,26 @@ class Issue < ApplicationRecord
   ransack_alias :state, :aasm_state
 
   after_save :sync_observed_status
+  after_save :log_if_needed
 
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
     answer! if may_answer? && observations.any? && !has_open_observations?
+  end
+
+  def log_if_needed
+    last_logged = EventLog
+      .where(entity: self, verb_id: EventLogKind.send(:observe_issue).id)
+      .last
+
+    if has_open_observations? 
+      last_obv = observations.where(aasm_state: 'new').last
+      if !last_logged
+        log_state_change(:observe_issue)
+      elsif last_logged.updated_at < last_obv.updated_at
+        log_state_change(:observe_issue)
+      end
+    end
   end
 
   HAS_ONE = %i{
