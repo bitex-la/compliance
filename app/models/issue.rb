@@ -114,9 +114,6 @@ class Issue < ApplicationRecord
       transitions  from: :draft, to: :observed
       transitions from: :new, to: :observed
       transitions from: :answered, to: :observed
-      after do 
-        log_state_change(:observe_issue)
-      end
     end
 
     event :answer do

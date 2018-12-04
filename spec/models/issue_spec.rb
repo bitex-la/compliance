@@ -186,6 +186,24 @@ RSpec.describe Issue, type: :model do
       create(:observation, issue: issue, reply: "replied")
       issue.reload.should be_answered
     end
+
+    it 'creates an observe_issue event log anytime that issue gets new observations' do
+      issue = create(:full_natural_person_issue, person: create(:empty_person))
+      obs = create(:observation, issue: issue)
+      issue.reload.should be_observed
+      assert_logging(issue, :observe_issue, 1)
+      obs.update(reply: 'replied')
+      issue.reload.should be_answered
+
+      create(:observation, issue: issue)
+      issue.reload.should be_observed
+      assert_logging(issue, :observe_issue, 2)
+
+      issue.update_column(:aasm_state, 'answered')
+      create(:observation, issue: issue)
+      issue.reload.should be_observed
+      assert_logging(issue, :observe_issue, 3)
+    end
   end
 
   describe "when looking for people who had problems answering" do
