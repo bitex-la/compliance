@@ -80,7 +80,7 @@ describe Issue do
       assert_logging(issue.observations.last, :create_entity, 1)
       assert_logging(issue.reload, :observe_issue, 1)
 
-      api_get("/issues/#{issue_id}")
+      api_get("/issues/#{issue.id}")
 
       api_response.data.attributes.state.should == 'observed'
       api_response.data.relationships.observations
