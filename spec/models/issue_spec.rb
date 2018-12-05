@@ -193,7 +193,7 @@ RSpec.describe Issue, type: :model do
       issue.reload.should be_observed
       assert_logging(issue, :observe_issue, 1)
 
-      Timecop.travel 1.minutes.from_now
+      Timecop.travel 1.second.from_now
       3.times do
         create(:observation, issue: issue)
       end
@@ -207,7 +207,7 @@ RSpec.describe Issue, type: :model do
       issue.save
       assert_logging(issue.reload, :observe_issue, 2)
 
-      Timecop.travel 1.minutes.from_now
+      Timecop.travel 1.second.from_now
       issue.update_column(:aasm_state, 'answered')
       create(:observation, issue: issue)
       issue.reload.should be_observed

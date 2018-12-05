@@ -59,7 +59,7 @@ describe Issue do
         })
       end.to change{ Issue.count }.by(1)
 
-      issue_id = api_response.data.id
+      issue = Issue.find(api_response.data.id) 
 
       assert_logging(Issue.last, :create_entity, 1)
 
@@ -68,17 +68,17 @@ describe Issue do
           type: 'observations',
           attributes: {note: 'Observation Note', scope: 'admin'},
           relationships: {
-            issue: {data: {type: 'issues', id: issue_id }},
+            issue: {data: {type: 'issues', id: issue.id }},
             observation_reason: {
               data: {type: 'observation_reasons', id: reason.id}
             }
           }
         })
       end.to change{ Observation.count }.by(1)
-
       observation_id = api_response.data.id
 
-      assert_logging(Observation.last, :create_entity, 1)
+      assert_logging(issue.observations.last, :create_entity, 1)
+      assert_logging(issue.reload, :observe_issue, 1)
 
       api_get("/issues/#{issue_id}")
 
