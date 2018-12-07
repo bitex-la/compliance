@@ -351,9 +351,9 @@ module ArbreHelpers
           hr
           ArbreHelpers.render_extra_info_list(context, value, level)
         else 
-          context.concat('<li>'.html_safe) 
-          ArbreHelpers.render_text_or_link(context, nil, value)
-          context.concat('</li>'.html_safe)
+          div do
+            ArbreHelpers.render_link_or_text(context, nil, value)
+          end
         end
         level.pop
       end
