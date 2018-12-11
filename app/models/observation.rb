@@ -81,7 +81,6 @@ class Observation < ApplicationRecord
     was, is = saved_changes[:reply]
     if !is && was
       self.update_column('reply', was)
-      self.update_column('aasm_state', 'answered')
     end
   end
 
