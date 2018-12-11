@@ -157,26 +157,14 @@ describe 'an admin user' do
       fill_attachment('risk_score_seeds', 'gif', true, 0, 0, true)
     end
 
-    click_link "Base"
-    click_link "Add New Observation"
-
-    select_with_search(
-      '#issue_observations_attributes_0_observation_reason_input',
-      observation_reason.subject_en.truncate(40, omission:'…')
-    )
-    select_with_search(  
-      '#issue_observations_attributes_0_scope_input',
-      'Admin'
-    )
-
-    fill_in 'issue[observations_attributes][0][note]',
-      with: 'Please check this guy on world check'
+    add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
     issue = Issue.last
     observation = Observation.last
     assert_logging(issue, :create_entity, 1)
     assert_logging(issue, :update_entity, 1)
+    assert_logging(issue.reload, :observe_issue, 1)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -198,6 +186,7 @@ describe 'an admin user' do
 
     fill_in 'issue[observations_attributes][0][reply]',
       with: '0 hits go ahead!!!'
+
     click_button "Update Issue"
 
     click_link 'Risk Score (1)'
@@ -216,10 +205,20 @@ describe 'an admin user' do
     issue.reload.should be_answered
     observation.reload.should be_answered
 
+    add_observation(1, observation_reason, 'Please check this again')
+    
+    click_button "Update Issue"
+    issue.reload.should be_observed
+    assert_logging(issue.reload, :observe_issue, 2)
+
+    fill_in 'issue[observations_attributes][1][reply]',
+      with: '0 hits at 2018-06-07'
+    click_button "Update Issue"
+
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 3)
+    assert_logging(issue, :update_entity, 5)
     issue.person.should be_enabled
     assert_logging(issue.person, :enable_person, 1)
 
@@ -285,22 +284,12 @@ describe 'an admin user' do
     end
 
     # Admin sends an observation to customer about their identification (it was blurry)
-    click_link 'Base'
-    click_link 'Add New Observation'
-    select_with_search(
-      '#issue_observations_attributes_0_observation_reason_input',
-      observation_reason.subject_en.truncate(40, omission:'…')
-    )
-    select_with_search(  
-      '#issue_observations_attributes_0_scope_input',
-      'Client'
-    ) 
+    add_observation(observation_reason, 'Please re-send your document')
     
-    fill_in 'issue[observations_attributes][0][note]',
-      with: 'Please re-send your document'
     click_button 'Update Issue'
 
     assert_logging(issue, :update_entity, 2)
+    assert_logging(issue.reload, :observe_issue, 1)
 
     Observation.where(issue: issue).count.should == 1
     issue.reload.should be_observed
@@ -324,6 +313,7 @@ describe 'an admin user' do
     }
 
     assert_logging(issue, :update_entity, 3)
+    assert_logging(issue.reload, :observe_issue, 1)
 
     assert_response 200
 
@@ -475,24 +465,12 @@ describe 'an admin user' do
       fill_attachment('natural_docket_seed', 'png', false)
     end
 
-    click_link "Base"
-    click_link "Add New Observation"
-
-    select_with_search(
-      '#issue_observations_attributes_0_observation_reason_input',
-      observation_reason.subject_en.truncate(40, omission:'…')
-    )
-    select_with_search(  
-      '#issue_observations_attributes_0_scope_input',
-      'Admin'
-    )  
-   
-    fill_in 'issue[observations_attributes][0][note]',
-      with: 'Please check this guy on world check'
+    add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
     issue = Issue.last
     assert_logging(issue, :create_entity, 1)
+    assert_logging(issue.reload, :observe_issue, 1)
     observation = Observation.last
     issue.should be_observed
     observation.should be_new
@@ -505,6 +483,21 @@ describe 'an admin user' do
     issue.reload.should be_answered
     observation.reload.should be_answered
 
+    Timecop.travel 2.days.from_now
+
+    add_observation(1, observation_reason, 'Please check this guy on FBI database')
+    add_observation(2, observation_reason, 'Please check this on SII')
+
+    click_button "Update Issue"
+    assert_logging(issue.reload, :observe_issue, 2)
+
+    fill_in 'issue[observations_attributes][1][reply]',
+      with: '0 hits go ahead!!!'
+    
+    fill_in 'issue[observations_attributes][2][reply]',
+      with: 'He is OK on SII'  
+
+    click_button "Update Issue"
     click_link "Approve"
 
     issue.reload.should be_approved
@@ -606,6 +599,7 @@ describe 'an admin user' do
     issue = create(:basic_issue, person: person)
     observation = create(:robot_observation, issue: issue)
     issue.reload.should be_observed
+    assert_logging(issue.reload, :observe_issue, 1)
 
     login_as admin_user
     
@@ -623,6 +617,7 @@ describe 'an admin user' do
 
     issue.reload.should be_answered
     assert_logging(Issue.last, :update_entity, 2)
+    assert_logging(issue.reload, :observe_issue, 1)
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should_not be_enabled
@@ -911,4 +906,21 @@ describe 'an admin user' do
     pending
     fail
   end
+end
+
+def add_observation(index = 0, reason, note)
+  click_link "Base"
+  click_link "Add New Observation"
+
+  select_with_search(
+    "#issue_observations_attributes_#{index}_observation_reason_input",
+    reason.subject_en.truncate(40, omission:'…')
+  )
+  select_with_search(  
+    "#issue_observations_attributes_#{index}_scope_input",
+    reason.scope.capitalize
+  )
+
+  fill_in "issue[observations_attributes][#{index}][note]",
+    with: note
 end
