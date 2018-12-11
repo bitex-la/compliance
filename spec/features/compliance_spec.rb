@@ -241,15 +241,24 @@ describe 'an admin user' do
     issue = person.issues.reload.first
     assert_logging(issue, :create_entity, 1)
     observation_reason = create(:observation_reason)
+    wc_observation_reason = create(:world_check_reason)
+
+    wc_observation = Observation.create!(
+      observation_reason: wc_observation_reason,
+      note: 'Run a WC screening for this guy',
+      issue: issue,
+      scope: 'robot'
+    )
 
     # assume that issue info is complete
-    issue.complete!
+    #issue.complete!
     assert_logging(issue, :update_entity, 1)
 
     # Admin does not see it as pending
     login_as admin_user
 
     expect(page).to have_content 'Signed in successfully.'
+    click_on 'Observed'
 
     # Admin sees issue in dashboard.
     expect(page).to have_content issue.id
@@ -287,22 +296,30 @@ describe 'an admin user' do
     # Admin sends an observation to customer about their identification (it was blurry)
     click_link 'Base'
     click_link 'Add New Observation'
+
+    api_update "/observations/#{wc_observation.id}", {
+      type: 'observations',
+      id: wc_observation.id,
+      attributes: {reply: 'All ok'}
+    }
+
     select_with_search(
-      '#issue_observations_attributes_0_observation_reason_input',
+      '#issue_observations_attributes_1_observation_reason_input',
       observation_reason.subject_en.truncate(40, omission:'…')
     )
     select_with_search(  
-      '#issue_observations_attributes_0_scope_input',
+      '#issue_observations_attributes_1_scope_input',
       'Client'
     ) 
     
-    fill_in 'issue[observations_attributes][0][note]',
+    fill_in 'issue[observations_attributes][1][note]',
       with: 'Please re-send your document'
+    
     click_button 'Update Issue'
 
-    assert_logging(issue, :update_entity, 2)
+    assert_logging(issue, :update_entity, 3)
 
-    Observation.where(issue: issue).count.should == 1
+    Observation.where(issue: issue).count.should == 2
     issue.reload.should be_observed
 
     # The issue goes away from the dashboard.
@@ -323,7 +340,7 @@ describe 'an admin user' do
       attributes: {reply: 'Va de vuelta el documento!!!'}
     }
 
-    assert_logging(issue, :update_entity, 3)
+    assert_logging(issue, :update_entity, 4)
 
     assert_response 200
 
@@ -342,10 +359,16 @@ describe 'an admin user' do
     page.should have_content 'Reject'
     page.should have_content 'Dismiss'
 
+    fill_in 'issue[observations_attributes][0][reply]',
+      with: 'Double checked by compliance'
+
+    click_button 'Update Issue'
     click_link 'Approve'
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 4)
+    assert_logging(issue, :update_entity, 6)
+    wc_observation.reload.should be_answered
+    wc_observation.reply.should == 'Double checked by compliance'
     Observation.last.should be_answered
     click_link 'Dashboard' 
 
