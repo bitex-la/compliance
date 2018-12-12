@@ -29,4 +29,27 @@ RSpec.describe Observation, type: :model do
     issue = create(:basic_issue)
     create(:strange_observation, issue: issue)
   end
+
+  it 'preserve previous reply value if new value is nil' do
+    obv = described_class.create(
+      note: 'The note',
+      reply: nil,
+      issue: create(:basic_issue)
+    )
+  
+    obv.update(reply: 'Reply from a backround process')
+    expect(obv).to have_state(:answered)
+    obv.update(reply: nil)
+    expect(obv).to have_state(:answered)
+
+    expect(obv.reload.reply).to eq 'Reply from a backround process'
+    expect(obv).to have_state(:answered)
+    assert_logging(obv, :update_entity, 2)
+
+    obv.update(reply: 'Reply UPDATED from a backround process')
+
+    expect(obv.reload.reply).to eq 'Reply UPDATED from a backround process'
+    expect(obv).to have_state(:answered)
+    assert_logging(obv, :update_entity, 3)
+  end
 end

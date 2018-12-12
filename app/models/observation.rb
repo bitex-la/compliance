@@ -19,6 +19,7 @@ class Observation < ApplicationRecord
   belongs_to :observation_reason, optional: true
 
   before_save  :check_for_answer
+  after_save :preserve_previous_reply_if_not_nil
   after_commit :sync_issue_observed_status
 
   validate :validate_scope_integrity
@@ -59,7 +60,6 @@ class Observation < ApplicationRecord
 
   def check_for_answer
     answer! if reply.present? && may_answer?
-    reset! if !reply.present? && answered?
   end
 
   def sync_issue_observed_status
@@ -76,6 +76,13 @@ class Observation < ApplicationRecord
   end
   
   private
+
+  def preserve_previous_reply_if_not_nil
+    was, is = saved_changes[:reply]
+    if !is && was
+      self.update_column('reply', was)
+    end
+  end
 
   def validate_scope_integrity
     if scope != observation_reason.try(:scope)
