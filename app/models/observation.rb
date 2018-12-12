@@ -46,7 +46,7 @@ class Observation < ApplicationRecord
   } 
 
   aasm do
-    state :new, initial: true
+    state :new, initial: true     
     state :answered
   
     event :answer do
