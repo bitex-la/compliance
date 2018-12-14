@@ -65,6 +65,12 @@ ActiveAdmin.register Issue do
   end
 
   controller do
+
+    def scoped_collection
+      super.includes :person,
+        observations: [:observation_reason]
+    end
+
     def edit
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
@@ -307,9 +313,10 @@ ActiveAdmin.register Issue do
           seed = rs.object
           if seed.persisted?     
             ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
-            if  ArbreHelpers.is_a_valid_json?(seed.extra_info)
-              ArbreHelpers.json_renderer(context, seed.extra_info_hash)
-            else
+            begin 
+              extra_info_as_json = JSON.parse(seed.extra_info)
+              ArbreHelpers.json_renderer(context, extra_info_as_json)
+            rescue JSON::ParserError
               rs.input :extra_info, input_html: { readonly: true, disabled: true }
             end
           else
