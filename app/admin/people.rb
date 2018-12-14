@@ -100,18 +100,20 @@ ActiveAdmin.register Person do
 
         if observations = resource.all_observations.sort_by(&:created_at).reverse
           panel "Observations" do
-            table_for observations do
-              column :issue {|o| link_to "##{o.issue.id}", [resource, o.issue] }
-              column :observation_reason
-              column :scope
-              column "" do |o|
-                span o.note
-                br
-                strong "Reply:"
-                span o.reply
+            Appsignal.instrument('render_observations') do
+              table_for observations do
+                column :issue {|o| link_to "##{o.issue.id}", [resource, o.issue] }
+                column :observation_reason
+                column :scope
+                column "" do |o|
+                  span o.note
+                  br
+                  strong "Reply:"
+                  span o.reply
+                end
+                column :created_at
+                column :updated_at
               end
-              column :created_at
-              column :updated_at
             end
           end
         end
@@ -176,6 +178,7 @@ ActiveAdmin.register Person do
       end
 
       tab "Contact (#{resource.phones.count + resource.emails.count})" do
+        
         ArbreHelpers.panel_grid(self, resource.phones) do |d|
           ArbreHelpers.fruit_show_section(self, d)
         end

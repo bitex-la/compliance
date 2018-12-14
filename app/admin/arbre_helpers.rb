@@ -118,14 +118,16 @@ module ArbreHelpers
   end
 
   def self.panel_grid(context, objects, &block)
-    context.instance_eval do
-      objects.in_groups_of(2).each do |group|
-        columns do
-          group.each_with_index do |a, i|
-            column do
-              next if a.nil?
-              panel a.name do
-                instance_exec a, &block
+    Appsignal.instrument("render_#{objects.klass.name}_grid") do
+      context.instance_eval do
+        objects.in_groups_of(2).each do |group|
+          columns do
+            group.each_with_index do |a, i|
+              column do
+                next if a.nil?
+                panel a.name do
+                  instance_exec a, &block
+                end
               end
             end
           end
@@ -135,21 +137,25 @@ module ArbreHelpers
   end
 
   def self.has_one_form(context, builder, title, relationship, &fields)
-    b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
-    builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
+    Appsignal.instrument("render_#{relationship.to_s}") do
+      b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
+      builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
+    end
   end
 
   def self.has_many_form(context, builder, relationship, extra={}, &fields)
-    builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
-      instance_exec(f, context, &fields)
-      if f.object.persisted? && !extra[:cant_remove]
-        unless f.object.class.name == 'Attachment'
-          f.template.concat(context.link_to("Remove",
-            f.object,
-            method: :delete,
-            data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
-            class: 'button has_many_remove'
-          ))
+    Appsignal.instrument("render_#{relationship.to_s}") do
+      builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
+        instance_exec(f, context, &fields)
+        if f.object.persisted? && !extra[:cant_remove]
+          unless f.object.class.name == 'Attachment'
+            f.template.concat(context.link_to("Remove",
+              f.object,
+              method: :delete,
+              data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
+              class: 'button has_many_remove'
+            ))
+          end
         end
       end
     end
@@ -205,83 +211,91 @@ module ArbreHelpers
   end
 
   def self.fruit_collection_show_tab(context, title, relation)
-    context.instance_eval do
-      all = resource.send(relation).current.order("created_at DESC")
-      tab "#{title} (#{all.count})" do
-        ArbreHelpers.panel_grid(self, all) do |d|
-          ArbreHelpers.fruit_show_section(self, d)
+    Appsignal.instrument("render_#{relation.to_s}") do
+      context.instance_eval do
+        all = resource.send(relation).current.order("created_at DESC")
+        tab "#{title} (#{all.count})" do
+          ArbreHelpers.panel_grid(self, all) do |d|
+            ArbreHelpers.fruit_show_section(self, d)
+          end
         end
       end
     end
   end
 
   def self.fruit_show_section(context, fruit, others = [])
-    context.instance_eval do
-      columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
-      columns = columns.map{|c| c.gsub(/_id$/,'') } -
-        %w(id person issue created_at updated_at replaces extra_info external_link)
-      attributes_table_for fruit do
-        row(:show){|o| link_to o.name, o }
-        columns.each do |n|
-          row(n)
+    Appsignal.instrument("render_#{fruit.class.name}") do
+      context.instance_eval do
+        columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
+        columns = columns.map{|c| c.gsub(/_id$/,'') } -
+          %w(id person issue created_at updated_at replaces extra_info external_link)
+        attributes_table_for fruit do
+          row(:show){|o| link_to o.name, o }
+          columns.each do |n|
+            row(n)
+          end
+          others.each do |o|
+            row(o)
+          end
+          if fruit.replaces
+            row(:replaces)
+          end
+          row(:created_at)
+          row(:issue)
         end
-        others.each do |o|
-          row(o)
+        if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
+          h4 "External links"
+          ArbreHelpers.show_links(self, fruit.external_link.split(',').compact)
         end
-        if fruit.replaces
-          row(:replaces)
+        if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
+          h4 "Extra info"
+          begin 
+            extra_info_as_json = JSON.parse(fruit.extra_info)
+            ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+          rescue JSON::ParserError
+            span fruit.extra_info
+          end
         end
-        row(:created_at)
-        row(:issue)
-      end
-      if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
-        h4 "External links"
-        ArbreHelpers.show_links(self, fruit.external_link.split(',').compact)
-      end
-      if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
-        h4 "Extra info"
-        begin 
-          extra_info_as_json = JSON.parse(fruit.extra_info)
-          ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
-        rescue JSON::ParserError
-          span fruit.extra_info
+        fruit.attachments.each do |a|
+          ArbreHelpers.attachment_preview(self, a)
         end
-      end
-      fruit.attachments.each do |a|
-        ArbreHelpers.attachment_preview(self, a)
       end
     end
   end
 
   def self.seed_collection_show_tab(context, title, relation)
-    context.instance_eval do
-      tab "#{title} (#{resource.send(relation).count})" do
-        ArbreHelpers.panel_grid(self, resource.send(relation)) do |d|
-          ArbreHelpers.seed_show_section(self, d)
+    Appsignal.instrument("render_#{relation.to_s}") do
+      context.instance_eval do
+        tab "#{title} (#{resource.send(relation).count})" do
+          ArbreHelpers.panel_grid(self, resource.send(relation)) do |d|
+            ArbreHelpers.seed_show_section(self, d)
+          end
         end
       end
     end
   end
 
   def self.seed_show_section(context, seed, others = [])
-    context.instance_eval do
-      ArbreHelpers.seed_attributes_table self, seed, others
-      if seed.respond_to?(:external_link) && !seed.external_link.blank?
-        h4 "External links"
-        ArbreHelpers.show_links(self, seed.external_link.split(',').compact)
-      end
-      if seed.respond_to? :extra_info 
-        h4 "Extra info"
-        begin 
-          extra_info_as_json = JSON.parse(seed.extra_info)
-          ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
-        rescue JSON::ParserError
-          span seed.extra_info
+    Appsignal.instrument("render_#{seed.class.name}") do
+      context.instance_eval do
+        ArbreHelpers.seed_attributes_table self, seed, others
+        if seed.respond_to?(:external_link) && !seed.external_link.blank?
+          h4 "External links"
+          ArbreHelpers.show_links(self, seed.external_link.split(',').compact)
         end
-      end
-      attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
-      attachments.each do |a|
-        ArbreHelpers.attachment_preview(self, a)
+        if seed.respond_to? :extra_info 
+          h4 "Extra info"
+          begin 
+            extra_info_as_json = JSON.parse(seed.extra_info)
+            ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+          rescue JSON::ParserError
+            span seed.extra_info
+          end
+        end
+        attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
+        attachments.each do |a|
+          ArbreHelpers.attachment_preview(self, a)
+        end
       end
     end
   end
