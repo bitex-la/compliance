@@ -122,126 +122,144 @@ ActiveAdmin.register Issue do
           end
         end
 
-        h3 "Observations"
-        ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
-          sf.input :observation_reason
-          sf.input :scope
-          sf.input :note, input_html: {rows: 3}
-          sf.input :reply, input_html: {rows: 3}
-        end
+        Appsignal.instrument('render_observations') do
+          h3 "Observations"
+          ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
+            sf.input :observation_reason
+            sf.input :scope
+            sf.input :note, input_html: {rows: 3}
+            sf.input :reply, input_html: {rows: 3}
+          end
+        end 
 
-        h3 "Notes Seeds"
-        div class: 'note_seeds' do
-          ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
-            nf.input :body, input_html: {rows: 3}
-            ArbreHelpers.has_many_attachments(context, nf)
+        Appsignal.instrument('render_note_seeds') do
+          h3 "Notes Seeds"
+          div class: 'note_seeds' do
+            ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
+              nf.input :body, input_html: {rows: 3}
+              ArbreHelpers.has_many_attachments(context, nf)
+            end
           end
         end
       end
 
       tab :docket do
-        if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-          ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
-            sf.input :commercial_name
-            sf.input :legal_name
-            sf.input :industry
-            sf.input :business_description, input_html: {rows: 3}
-            sf.input :country
-            if resource.person.legal_entity_docket
-              sf.input :copy_attachments,
-                label: "Move existing Legal Entity Docket attachments to the new one"
+        Appsignal.instrument('render_legal_entity_docket') do
+          if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
+            ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+              sf.input :commercial_name
+              sf.input :legal_name
+              sf.input :industry
+              sf.input :business_description, input_html: {rows: 3}
+              sf.input :country
+              if resource.person.legal_entity_docket
+                sf.input :copy_attachments,
+                  label: "Move existing Legal Entity Docket attachments to the new one"
+              end
+              ArbreHelpers.has_many_attachments(self, sf)
             end
-            ArbreHelpers.has_many_attachments(self, sf)
           end
         end
 
-        if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-          ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-            sf.input :first_name
-            sf.input :last_name
-            sf.input :birth_date, as: :datepicker,
-              datepicker_options: {
-                change_year: true,
-                change_month: true
-              }
-            sf.input :nationality, as: :country
-            sf.input :gender_id, as: :select, collection: GenderKind.all
-            sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
-            sf.input :job_title
-            sf.input :job_description
-            sf.input :politically_exposed
-            sf.input :politically_exposed_reason, input_html: {rows: 3}
-            if resource.person.natural_docket
-              sf.input :copy_attachments,
-                label: "Move existing Natural Person Docket attachments to the new one"
+        Appsignal.instrument('render_natural_docket') do
+          if resource.for_person_type == :natural_person || resource.for_person_type.nil?
+            ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
+              sf.input :first_name
+              sf.input :last_name
+              sf.input :birth_date, as: :datepicker,
+                datepicker_options: {
+                  change_year: true,
+                  change_month: true
+                }
+              sf.input :nationality, as: :country
+              sf.input :gender_id, as: :select, collection: GenderKind.all
+              sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
+              sf.input :job_title
+              sf.input :job_description
+              sf.input :politically_exposed
+              sf.input :politically_exposed_reason, input_html: {rows: 3}
+              if resource.person.natural_docket
+                sf.input :copy_attachments,
+                  label: "Move existing Natural Person Docket attachments to the new one"
+              end
+              ArbreHelpers.has_many_attachments(self, sf)
             end
-            ArbreHelpers.has_many_attachments(self, sf)
           end
         end
       end
 
       tab "Domicile (#{resource.domicile_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
-          sf.input :country
-          sf.input :state
-          sf.input :city
-          sf.input :street_address
-          sf.input :street_number
-          sf.input :postal_code
-          sf.input :floor
-          sf.input :apartment
-          ArbreHelpers.fields_for_replaces context, sf, :domiciles
-          ArbreHelpers.has_many_attachments(context, sf)
+        Appsignal.instrument('render_domicile_seed') do
+          ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
+            sf.input :country
+            sf.input :state
+            sf.input :city
+            sf.input :street_address
+            sf.input :street_number
+            sf.input :postal_code
+            sf.input :floor
+            sf.input :apartment
+            ArbreHelpers.fields_for_replaces context, sf, :domiciles
+            ArbreHelpers.has_many_attachments(context, sf)
+          end
         end
       end
 
       tab "ID (#{resource.identification_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
-          sf.input :number
-          sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-          sf.input :issuer, as: :country
-          sf.input :public_registry_authority
-          sf.input :public_registry_book
-          sf.input :public_registry_extra_data
-          ArbreHelpers.fields_for_replaces context, sf, :identifications
-          ArbreHelpers.has_many_attachments(context, sf)
+        Appsignal.instrument('render_identification_seeds') do
+          ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
+            sf.input :number
+            sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
+            sf.input :issuer, as: :country
+            sf.input :public_registry_authority
+            sf.input :public_registry_book
+            sf.input :public_registry_extra_data
+            ArbreHelpers.fields_for_replaces context, sf, :identifications
+            ArbreHelpers.has_many_attachments(context, sf)
+          end
         end
       end
 
       tab "Allowance (#{resource.allowance_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
-          sf.input :amount
-          sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
-          ArbreHelpers.fields_for_replaces context, sf, :allowances
-          ArbreHelpers.has_many_attachments(context, sf)
+        Appsignal.instrument('render_allowance_seeds') do
+          ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
+            sf.input :amount
+            sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
+            ArbreHelpers.fields_for_replaces context, sf, :allowances
+            ArbreHelpers.has_many_attachments(context, sf)
+          end
         end
       end
 
       tab :invoicing do
         columns do 
           column do
-            ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
-              af.input :vat_status_id, as: :select, collection: VatStatusKind.all
-              af.input :tax_id
-              af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
-              af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
-              af.input :full_name
-              af.input :country
-              af.input :address
-              ArbreHelpers.fields_for_replaces self, af,
-                :argentina_invoicing_details
-              ArbreHelpers.has_many_attachments(self, af)
+            Appsignal.instrument('render_argentina_invoicing_details') do
+              ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
+                af.input :vat_status_id, as: :select, collection: VatStatusKind.all
+                af.input :tax_id
+                af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
+                af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
+                af.input :full_name
+                af.input :country
+                af.input :address
+                ArbreHelpers.fields_for_replaces self, af,
+                  :argentina_invoicing_details
+                ArbreHelpers.has_many_attachments(self, af)
+              end
             end
           end
           column do
-            ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
-              cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
-              cf.input :tax_id
-              cf.input :giro
-              cf.input :ciudad
-              cf.input :comuna
-              ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
-              ArbreHelpers.has_many_attachments(self, cf)
+            Appsignal.instrument('render_chile_invoicing_detail') do
+              ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
+                cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
+                cf.input :tax_id
+                cf.input :giro
+                cf.input :ciudad
+                cf.input :comuna
+                ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
+                ArbreHelpers.has_many_attachments(self, cf)
+              end
             end
           end
         end
@@ -250,29 +268,33 @@ ActiveAdmin.register Issue do
       tab "Affinity (#{resource.affinity_seeds.count})" do
         columns do
           column span: 2 do
-            ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
-              rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
-              if rf.object.related_person_id.nil?
-                rf.input :related_person_id, as: :search_select, url: proc{ search_person_people_path },
-                  fields: ['keyword'], display_name: 'suggestion', minimum_input_length: 1
-              else
-                rf.template.concat('<li>'.html_safe) 
-                rf.template.concat("<label>Related person</label>".html_safe)
-                rf.template.concat(
-                  context.link_to rf.object.related_person.name, rf.object.related_person
-                )
-                rf.template.concat('</li>'.html_safe) 
+            Appsignal.instrument('render_affinity_seeds') do
+              ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
+                rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
+                if rf.object.related_person_id.nil?
+                  rf.input :related_person_id, as: :search_select, url: proc{ search_person_people_path },
+                    fields: ['keyword'], display_name: 'suggestion', minimum_input_length: 1
+                else
+                  rf.template.concat('<li>'.html_safe) 
+                  rf.template.concat("<label>Related person</label>".html_safe)
+                  rf.template.concat(
+                    context.link_to rf.object.related_person.name, rf.object.related_person
+                  )
+                  rf.template.concat('</li>'.html_safe) 
+                end
+                ArbreHelpers.fields_for_replaces context, rf, :affinities
+                ArbreHelpers.has_many_attachments(context, rf)
               end
-              ArbreHelpers.fields_for_replaces context, rf, :affinities
-              ArbreHelpers.has_many_attachments(context, rf)
             end
           end
           column do 
-            h3 "Current affinities"
-            resource.person.all_affinities.each do |d|
-              panel d.name do
-                attributes_table_for d do
-                  ArbreHelpers.affinity_card(self, d)
+            Appsignal.instrument('render_current_affinities') do
+              h3 "Current affinities"
+              resource.person.all_affinities.each do |d|
+                panel d.name do
+                  attributes_table_for d do
+                    ArbreHelpers.affinity_card(self, d)
+                  end
                 end
               end
             end
@@ -281,49 +303,55 @@ ActiveAdmin.register Issue do
       end
 
       tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
-          pf.input :number
-          pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
-          pf.input :country
-          pf.input :has_whatsapp
-          pf.input :has_telegram
-          pf.input :note, input_html: {rows: 3}
-          if current = context.resource.person.phones.current.presence
-            pf.input :replaces, collection: current
+        Appsignal.instrument('render_phone_seeds') do
+          ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
+            pf.input :number
+            pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
+            pf.input :country
+            pf.input :has_whatsapp
+            pf.input :has_telegram
+            pf.input :note, input_html: {rows: 3}
+            if current = context.resource.person.phones.current.presence
+              pf.input :replaces, collection: current
+            end
           end
         end
         br
-        ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
-          ef.input :address
-          ef.input :email_kind_id, as: :select, collection: EmailKind.all
-          if current = context.resource.person.emails.current.presence
-            ef.input :replaces, collection: current
+        Appsignal.instrument('render_email_seeds') do
+          ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
+            ef.input :address
+            ef.input :email_kind_id, as: :select, collection: EmailKind.all
+            if current = context.resource.person.emails.current.presence
+              ef.input :replaces, collection: current
+            end
           end
         end
       end
 
       tab "Risk Score (#{resource.risk_score_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :risk_score_seeds do |rs, context|
-          rs.input :score
-          rs.input :provider
-          rs.input :external_link
-          if current = context.resource.person.risk_scores.current.presence
-            rs.input :replaces, collection: current
-          end
-          seed = rs.object
-          if seed.persisted?     
-            ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
-            begin 
-              extra_info_as_json = JSON.parse(seed.extra_info)
-              ArbreHelpers.json_renderer(context, extra_info_as_json)
-            rescue JSON::ParserError
-              rs.input :extra_info, input_html: { readonly: true, disabled: true }
+        Appsignal.instrument('render_risk_score') do
+          ArbreHelpers.has_many_form self, f, :risk_score_seeds do |rs, context|
+            rs.input :score
+            rs.input :provider
+            rs.input :external_link
+            if current = context.resource.person.risk_scores.current.presence
+              rs.input :replaces, collection: current
             end
-          else
-            rs.input :extra_info 
-          end
+            seed = rs.object
+            if seed.persisted?     
+              ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
+              begin 
+                extra_info_as_json = JSON.parse(seed.extra_info)
+                ArbreHelpers.json_renderer(context, extra_info_as_json)
+              rescue JSON::ParserError
+                rs.input :extra_info, input_html: { readonly: true, disabled: true }
+              end
+            else
+              rs.input :extra_info 
+            end
 
-          ArbreHelpers.has_many_attachments(context, rs)
+            ArbreHelpers.has_many_attachments(context, rs)
+          end
         end
       end
     end

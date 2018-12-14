@@ -344,13 +344,15 @@ module ArbreHelpers
   end
 
   def self.render_extra_info_array(context, data)
-    data.each do |value|
-      if ArbreHelpers.is_a_list?(value)
-        hr
-        ArbreHelpers.render_extra_info_list(context, value)
-      else 
-        div do
-          ArbreHelpers.render_link_or_text(context, nil, value.to_s)
+    context.instance_eval do
+      data.each do |value|
+        if ArbreHelpers.is_a_list?(value)
+          hr
+          ArbreHelpers.render_extra_info_list(context, value)
+        else 
+          div do
+            ArbreHelpers.render_link_or_text(context, nil, value.to_s)
+          end
         end
       end
     end
