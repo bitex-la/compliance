@@ -355,7 +355,7 @@ module ArbreHelpers
           ArbreHelpers.render_extra_info_list(context, value, level)
         else 
           div do
-            ArbreHelpers.render_link_or_text(context, nil, value)
+            ArbreHelpers.render_link_or_text(context, nil, value.to_s)
           end
         end
         level.pop
@@ -372,7 +372,7 @@ module ArbreHelpers
         if ArbreHelpers.is_a_list?(value)  
           ArbreHelpers.render_extra_info_list(context, value, level)
         else 
-          ArbreHelpers.render_link_or_text(context, label, value)
+          ArbreHelpers.render_link_or_text(context, label, value.to_s)
         end
       end
     end
@@ -410,7 +410,7 @@ module ArbreHelpers
           value = ArbreHelpers.render_list(context, value)
         else
           context.concat('<li>'.html_safe) 
-          ArbreHelpers.render_text_or_link(context, nil, value)
+          ArbreHelpers.render_text_or_link(context, nil, value.to_s)
           context.concat('</li>'.html_safe)
         end
       end
@@ -427,7 +427,7 @@ module ArbreHelpers
         if ArbreHelpers.is_a_list?(value)  
           ArbreHelpers.render_list(context, value)
         else
-          ArbreHelpers.render_text_or_link(context, label, value)
+          ArbreHelpers.render_text_or_link(context, label, value.to_s)
         end
       end
       context.concat('</li>'.html_safe) 
