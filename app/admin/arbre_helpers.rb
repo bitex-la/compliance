@@ -328,72 +328,60 @@ module ArbreHelpers
   end
 
   def self.extra_info_renderer(context, data)
-    context.instance_eval do 
-      level = Array.new
+    context.instance_eval do |ctx|
       div class: 'extra_info' do 
-        ArbreHelpers.render_extra_info_list(context, data, level)
+        ArbreHelpers.render_extra_info_list(ctx, data)
       end
     end
   end
 
-  def self.render_extra_info_list(context, data, level)
-    context.instance_eval do
-      if data.is_a?(Array)
-        ArbreHelpers.render_extra_info_array(context, data, level)
-      else 
-        ArbreHelpers.render_extra_info_hash(context, data, level)
-      end
+  def self.render_extra_info_list(context, data)    
+    if data.is_a?(Array)
+      ArbreHelpers.render_extra_info_array(context, data)
+    else 
+      ArbreHelpers.render_extra_info_hash(context, data)
     end
   end
 
   def self.render_extra_info_array(context, data, level)
-    context.instance_eval do
-      data.each do |value|
-        level.push(value)
-        if ArbreHelpers.is_a_list?(value)
-          hr
-          ArbreHelpers.render_extra_info_list(context, value, level)
-        else 
-          div do
-            ArbreHelpers.render_link_or_text(context, nil, value.to_s)
-          end
+    data.each do |value|
+      if ArbreHelpers.is_a_list?(value)
+        hr
+        ArbreHelpers.render_extra_info_list(context, value)
+      else 
+        div do
+          ArbreHelpers.render_link_or_text(context, nil, value.to_s)
         end
-        level.pop
       end
     end
   end
 
-  def self.render_extra_info_hash(context, data, level)
-    context.instance_eval do
-      data.keys.each do |key|
-        level.push(key)
-        label = key
-        value = data[key]
-        if ArbreHelpers.is_a_list?(value)  
-          ArbreHelpers.render_extra_info_list(context, value, level)
-        else 
-          ArbreHelpers.render_link_or_text(context, label, value.to_s)
-        end
+  def self.render_extra_info_hash(context, data)
+    data.keys.each do |key|
+      label = key
+      value = data[key]
+      if ArbreHelpers.is_a_list?(value)  
+        ArbreHelpers.render_extra_info_list(context, value)
+      else 
+        ArbreHelpers.render_link_or_text(context, label, value.to_s)
       end
     end
   end
 
   def self.json_renderer(context, data)
-    context.instance_eval do
+    context.instance_eval do |ctx|
       context.concat("<li class='extra_info'>".html_safe) 
       context.concat('<h4>Extra info</h4>'.html_safe) 
-      ArbreHelpers.render_list(context, data)
+      ArbreHelpers.render_list(ctx, data)
       context.concat('</li>'.html_safe)
     end
   end
 
   def self.render_list(context, data)
-    context.instance_eval do
-      if data.is_a?(Array)
-        ArbreHelpers.render_array(context, data)
-      else 
-        ArbreHelpers.render_hash(context, data)
-      end
+    if data.is_a?(Array)
+      ArbreHelpers.render_array(context, data)
+    else 
+      ArbreHelpers.render_hash(context, data)
     end
   end
 
@@ -402,36 +390,32 @@ module ArbreHelpers
   end
 
   def self.render_array(context, data)
-    context.instance_eval do
-      context.concat('<ul>'.html_safe)
-      data.each do |value|
-        if ArbreHelpers.is_a_list?(value)
-          context.concat('<hr/>'.html_safe)
-          value = ArbreHelpers.render_list(context, value)
-        else
-          context.concat('<li>'.html_safe) 
-          ArbreHelpers.render_text_or_link(context, nil, value.to_s)
-          context.concat('</li>'.html_safe)
-        end
+    context.concat('<ul>'.html_safe)
+    data.each do |value|
+      if ArbreHelpers.is_a_list?(value)
+        context.concat('<hr/>'.html_safe)
+        value = ArbreHelpers.render_list(context, value)
+      else
+        context.concat('<li>'.html_safe) 
+        ArbreHelpers.render_text_or_link(context, nil, value.to_s)
+        context.concat('</li>'.html_safe)
       end
-      context.concat('</ul>'.html_safe) 
     end
+    context.concat('</ul>'.html_safe) 
   end
 
   def self.render_hash(context, data)
-    context.instance_eval do 
-      context.concat('<li>'.html_safe) 
-      data.keys.each do |key|
-        label = key
-        value = data[key]
-        if ArbreHelpers.is_a_list?(value)  
-          ArbreHelpers.render_list(context, value)
-        else
-          ArbreHelpers.render_text_or_link(context, label, value.to_s)
-        end
+    context.concat('<li>'.html_safe) 
+    data.keys.each do |key|
+      label = key
+      value = data[key]
+      if ArbreHelpers.is_a_list?(value)  
+        ArbreHelpers.render_list(context, value)
+      else
+        ArbreHelpers.render_text_or_link(context, label, value.to_s)
       end
-      context.concat('</li>'.html_safe) 
     end
+    context.concat('</li>'.html_safe) 
   end
 
   def self.render_text_or_link(context, key, text)
