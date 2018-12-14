@@ -343,7 +343,7 @@ module ArbreHelpers
     end
   end
 
-  def self.render_extra_info_array(context, data, level)
+  def self.render_extra_info_array(context, data)
     data.each do |value|
       if ArbreHelpers.is_a_list?(value)
         hr
