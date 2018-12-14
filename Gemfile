@@ -21,7 +21,7 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 
 gem 'settingslogic'
-gem 'activeadmin'
+gem 'activeadmin', '>= 1.4.3'
 gem 'activeadmin_addons'
 gem 'haml'
 gem 'devise'
@@ -72,6 +72,7 @@ group :test do
 end
 
 group :development do
+  gem 'bullet'
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-rails', '~> 1.3', require: false
   gem 'capistrano-bundler', '~> 1.1.2', require: false

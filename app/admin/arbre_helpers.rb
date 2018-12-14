@@ -10,9 +10,10 @@ module ArbreHelpers
           end 
           if resource.respond_to?(:extra_info)  && !resource.extra_info.nil?
             h4 "Extra info"
-            if  ArbreHelpers.is_a_valid_json?(resource.extra_info)
-              ArbreHelpers.extra_info_renderer(self, resource.extra_info_hash)
-            else
+            begin 
+              extra_info_as_json = JSON.parse(resource.extra_info)
+              ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+            rescue JSON::ParserError
               span resource.extra_info
             end
           end
@@ -117,14 +118,16 @@ module ArbreHelpers
   end
 
   def self.panel_grid(context, objects, &block)
-    context.instance_eval do
-      objects.in_groups_of(2).each do |group|
-        columns do
-          group.each_with_index do |a, i|
-            column do
-              next if a.nil?
-              panel a.name do
-                instance_exec a, &block
+    Appsignal.instrument("render_#{objects.klass.name}_grid") do
+      context.instance_eval do
+        objects.in_groups_of(2).each do |group|
+          columns do
+            group.each_with_index do |a, i|
+              column do
+                next if a.nil?
+                panel a.name do
+                  instance_exec a, &block
+                end
               end
             end
           end
@@ -134,21 +137,25 @@ module ArbreHelpers
   end
 
   def self.has_one_form(context, builder, title, relationship, &fields)
-    b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
-    builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
+    Appsignal.instrument("render_#{relationship.to_s}") do
+      b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
+      builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
+    end
   end
 
   def self.has_many_form(context, builder, relationship, extra={}, &fields)
-    builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
-      instance_exec(f, context, &fields)
-      if f.object.persisted? && !extra[:cant_remove]
-        unless f.object.class.name == 'Attachment'
-          f.template.concat(context.link_to("Remove",
-            f.object,
-            method: :delete,
-            data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
-            class: 'button has_many_remove'
-          ))
+    Appsignal.instrument("render_#{relationship.to_s}") do
+      builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
+        instance_exec(f, context, &fields)
+        if f.object.persisted? && !extra[:cant_remove]
+          unless f.object.class.name == 'Attachment'
+            f.template.concat(context.link_to("Remove",
+              f.object,
+              method: :delete,
+              data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
+              class: 'button has_many_remove'
+            ))
+          end
         end
       end
     end
@@ -204,81 +211,91 @@ module ArbreHelpers
   end
 
   def self.fruit_collection_show_tab(context, title, relation)
-    context.instance_eval do
-      all = resource.send(relation).current.order("created_at DESC")
-      tab "#{title} (#{all.count})" do
-        ArbreHelpers.panel_grid(self, all) do |d|
-          ArbreHelpers.fruit_show_section(self, d)
+    Appsignal.instrument("render_#{relation.to_s}") do
+      context.instance_eval do
+        all = resource.send(relation).current.order("created_at DESC")
+        tab "#{title} (#{all.count})" do
+          ArbreHelpers.panel_grid(self, all) do |d|
+            ArbreHelpers.fruit_show_section(self, d)
+          end
         end
       end
     end
   end
 
   def self.fruit_show_section(context, fruit, others = [])
-    context.instance_eval do
-      columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
-      columns = columns.map{|c| c.gsub(/_id$/,'') } -
-        %w(id person issue created_at updated_at replaces extra_info external_link)
-      attributes_table_for fruit do
-        row(:show){|o| link_to o.name, o }
-        columns.each do |n|
-          row(n)
+    Appsignal.instrument("render_#{fruit.class.name}") do
+      context.instance_eval do
+        columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
+        columns = columns.map{|c| c.gsub(/_id$/,'') } -
+          %w(id person issue created_at updated_at replaces extra_info external_link)
+        attributes_table_for fruit do
+          row(:show){|o| link_to o.name, o }
+          columns.each do |n|
+            row(n)
+          end
+          others.each do |o|
+            row(o)
+          end
+          if fruit.replaces
+            row(:replaces)
+          end
+          row(:created_at)
+          row(:issue)
         end
-        others.each do |o|
-          row(o)
+        if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
+          h4 "External links"
+          ArbreHelpers.show_links(self, fruit.external_link.split(',').compact)
         end
-        if fruit.replaces
-          row(:replaces)
+        if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
+          h4 "Extra info"
+          begin 
+            extra_info_as_json = JSON.parse(fruit.extra_info)
+            ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+          rescue JSON::ParserError
+            span fruit.extra_info
+          end
         end
-        row(:created_at)
-        row(:issue)
-      end
-      if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
-        h4 "External links"
-        ArbreHelpers.show_links(self, fruit.external_link.split(',').compact)
-      end
-      if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
-        h4 "Extra info"
-        if  ArbreHelpers.is_a_valid_json?(fruit.extra_info)
-          ArbreHelpers.extra_info_renderer(self, fruit.extra_info_hash)
-        else
-          span fruit.extra_info
+        fruit.attachments.each do |a|
+          ArbreHelpers.attachment_preview(self, a)
         end
-      end
-      fruit.attachments.each do |a|
-        ArbreHelpers.attachment_preview(self, a)
       end
     end
   end
 
   def self.seed_collection_show_tab(context, title, relation)
-    context.instance_eval do
-      tab "#{title} (#{resource.send(relation).count})" do
-        ArbreHelpers.panel_grid(self, resource.send(relation)) do |d|
-          ArbreHelpers.seed_show_section(self, d)
+    Appsignal.instrument("render_#{relation.to_s}") do
+      context.instance_eval do
+        tab "#{title} (#{resource.send(relation).count})" do
+          ArbreHelpers.panel_grid(self, resource.send(relation)) do |d|
+            ArbreHelpers.seed_show_section(self, d)
+          end
         end
       end
     end
   end
 
   def self.seed_show_section(context, seed, others = [])
-    context.instance_eval do
-      ArbreHelpers.seed_attributes_table self, seed, others
-      if seed.respond_to?(:external_link) && !seed.external_link.blank?
-        h4 "External links"
-        ArbreHelpers.show_links(self, seed.external_link.split(',').compact)
-      end
-      if seed.respond_to? :extra_info 
-        h4 "Extra info"
-        if  ArbreHelpers.is_a_valid_json?(seed.extra_info)
-          ArbreHelpers.extra_info_renderer(self, seed.extra_info_hash)
-        else
-          span seed.extra_info
+    Appsignal.instrument("render_#{seed.class.name}") do
+      context.instance_eval do
+        ArbreHelpers.seed_attributes_table self, seed, others
+        if seed.respond_to?(:external_link) && !seed.external_link.blank?
+          h4 "External links"
+          ArbreHelpers.show_links(self, seed.external_link.split(',').compact)
         end
-      end
-      attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
-      attachments.each do |a|
-        ArbreHelpers.attachment_preview(self, a)
+        if seed.respond_to? :extra_info 
+          h4 "Extra info"
+          begin 
+            extra_info_as_json = JSON.parse(seed.extra_info)
+            ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+          rescue JSON::ParserError
+            span seed.extra_info
+          end
+        end
+        attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
+        attachments.each do |a|
+          ArbreHelpers.attachment_preview(self, a)
+        end
       end
     end
   end
@@ -325,73 +342,62 @@ module ArbreHelpers
   end
 
   def self.extra_info_renderer(context, data)
-    context.instance_eval do 
-      level = Array.new
+    context.instance_eval do |ctx|
       div class: 'extra_info' do 
-        ArbreHelpers.render_extra_info_list(context, data, level)
+        ArbreHelpers.render_extra_info_list(ctx, data)
       end
     end
   end
 
-  def self.render_extra_info_list(context, data, level)
-    context.instance_eval do
-      if data.is_a?(Array)
-        ArbreHelpers.render_extra_info_array(context, data, level)
-      else 
-        ArbreHelpers.render_extra_info_hash(context, data, level)
-      end
+  def self.render_extra_info_list(context, data)    
+    if data.is_a?(Array)
+      ArbreHelpers.render_extra_info_array(context, data)
+    else 
+      ArbreHelpers.render_extra_info_hash(context, data)
     end
   end
 
-  def self.render_extra_info_array(context, data, level)
+  def self.render_extra_info_array(context, data)
     context.instance_eval do
       data.each do |value|
-        level.push(value)
         if ArbreHelpers.is_a_list?(value)
           hr
-          ArbreHelpers.render_extra_info_list(context, value, level)
+          ArbreHelpers.render_extra_info_list(context, value)
         else 
           div do
-            ArbreHelpers.render_link_or_text(context, nil, value)
+            ArbreHelpers.render_link_or_text(context, nil, value.to_s)
           end
         end
-        level.pop
       end
     end
   end
 
-  def self.render_extra_info_hash(context, data, level)
-    context.instance_eval do
-      data.keys.each do |key|
-        level.push(key)
-        label = key
-        value = data[key]
-        if ArbreHelpers.is_a_list?(value)  
-          ArbreHelpers.render_extra_info_list(context, value, level) if ArbreHelpers.is_a_list?(value)
-        else 
-          ArbreHelpers.render_link_or_text(context, label, value)
-        end
+  def self.render_extra_info_hash(context, data)
+    data.keys.each do |key|
+      label = key
+      value = data[key]
+      if ArbreHelpers.is_a_list?(value)  
+        ArbreHelpers.render_extra_info_list(context, value)
+      else 
+        ArbreHelpers.render_link_or_text(context, label, value.to_s)
       end
     end
   end
 
   def self.json_renderer(context, data)
-    context.instance_eval do
-      level = Array.new
+    context.instance_eval do |ctx|
       context.concat("<li class='extra_info'>".html_safe) 
       context.concat('<h4>Extra info</h4>'.html_safe) 
-      ArbreHelpers.render_list(context, data, level)
+      ArbreHelpers.render_list(ctx, data)
       context.concat('</li>'.html_safe)
     end
   end
 
-  def self.render_list(context, data, level)
-    context.instance_eval do
-      if data.is_a?(Array)
-        ArbreHelpers.render_array(context, data, level)
-      else 
-        ArbreHelpers.render_hash(context, data, level)
-      end
+  def self.render_list(context, data)
+    if data.is_a?(Array)
+      ArbreHelpers.render_array(context, data)
+    else 
+      ArbreHelpers.render_hash(context, data)
     end
   end
 
@@ -399,46 +405,38 @@ module ArbreHelpers
     data.is_a?(Array) || data.is_a?(Hash)
   end
 
-  def self.render_array(context, data, level)
-    context.instance_eval do
-      context.concat('<ul>'.html_safe)
-      data.each do |value|
-        level.push(value)
-        if ArbreHelpers.is_a_list?(value)
-          context.concat('<hr/>'.html_safe)
-          value = ArbreHelpers.render_list(context, value, level)
-        else
-          context.concat('<li>'.html_safe) 
-          ArbreHelpers.render_text_or_link(context, nil, value)
-          context.concat('</li>'.html_safe)
-        end
-        level.pop
+  def self.render_array(context, data)
+    context.concat('<ul>'.html_safe)
+    data.each do |value|
+      if ArbreHelpers.is_a_list?(value)
+        context.concat('<hr/>'.html_safe)
+        value = ArbreHelpers.render_list(context, value)
+      else
+        context.concat('<li>'.html_safe) 
+        ArbreHelpers.render_text_or_link(context, nil, value.to_s)
+        context.concat('</li>'.html_safe)
       end
-      context.concat('</ul>'.html_safe) 
     end
+    context.concat('</ul>'.html_safe) 
   end
 
-  def self.render_hash(context, data, level)
-    context.instance_eval do 
-      context.concat('<li>'.html_safe) 
-      data.keys.each do |key|
-        level.push(key)
-        label = key
-        value = data[key]
-        if ArbreHelpers.is_a_list?(value)  
-          ArbreHelpers.render_list(context, value, level) if ArbreHelpers.is_a_list?(value)
-        else
-          ArbreHelpers.render_text_or_link(context, label, value)
-        end
-        level.pop
+  def self.render_hash(context, data)
+    context.concat('<li>'.html_safe) 
+    data.keys.each do |key|
+      label = key
+      value = data[key]
+      if ArbreHelpers.is_a_list?(value)  
+        ArbreHelpers.render_list(context, value)
+      else
+        ArbreHelpers.render_text_or_link(context, label, value.to_s)
       end
-      context.concat('</li>'.html_safe) 
     end
+    context.concat('</li>'.html_safe) 
   end
 
   def self.render_text_or_link(context, key, text)
     context.concat("<strong>#{key}: </strong>".html_safe) if key
-    if ArbreHelpers.url_regex.match(text.to_s)
+    if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
       context.concat("<a href='#{text}' target='_blank'>#{text}</a><br/>".html_safe) 
     else
       context.concat("#{text}<br/>".html_safe) 
@@ -448,7 +446,7 @@ module ArbreHelpers
   def self.render_link_or_text(context, key, text)
     context.instance_eval do
       strong "#{key}: "
-      if ArbreHelpers.url_regex.match(text.to_s)
+      if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
         span do
           link_to text, text, target: "_blank"
         end
@@ -457,16 +455,5 @@ module ArbreHelpers
       end
       br
     end
-  end
-
-  def self.url_regex
-    /^((http(s)?(\:\/\/))+(www\.)?([\w\-\.\/])*(\.[a-zA-Z]{2,3}\/?))[^\s\b\n|]*[^.,;:\?\!\@\^\$ -]/
-  end
-
-  def self.is_a_valid_json?(data)
-    return false if data.blank?
-    !!JSON.parse(data)
-  rescue JSON::ParserError
-    false  
   end
 end
