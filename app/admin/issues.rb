@@ -209,7 +209,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
           sf.input :number
           sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-          sf.input :issuer
+          sf.input :issuer, as: :string
           sf.input :public_registry_authority
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
