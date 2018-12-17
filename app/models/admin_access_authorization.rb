@@ -5,7 +5,23 @@ class AdminAccessAuthorization < ActiveAdmin::AuthorizationAdapter
       
       case action
       when :read, :create, :update
-        [Issue, Person, Observation].include?(klass)
+        [ Issue, 
+          Person, 
+          Observation, 
+          NaturalDocketSeed, 
+          LegalEntityDocketSeed,
+          DomicileSeed,
+          IdentificationSeed,
+          AllowanceSeed,
+          AffinitySeed,
+          ArgentinaInvoicingDetailSeed,
+          ChileInvoicingDetailSeed,
+          RiskScoreSeed,
+          PhoneSeed,
+          EmailSeed,
+          FundDeposit,
+          Attachment,
+        ].include?(klass)
       else
         false
       end

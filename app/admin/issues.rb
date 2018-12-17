@@ -53,7 +53,7 @@ ActiveAdmin.register Issue do
   end
 
 
-  Issue.aasm.events.map(&:name).each do |action|
+  Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       if current_admin_user.is_restricted && !Issue.restricted_actions.include?(action)
         link_to action.to_s.titleize, [action, :person, :issue], method: :post

@@ -13,10 +13,26 @@ ActiveAdmin.register Person do
   end
 
   actions :all, except: [:destroy]
+  action_item :enable, only: [:edit, :update], if: -> {!current_admin_user.is_restricted && !resource.enabled} do 
+    link_to "Enable", [:enable, :person], method: :post
+  end
+  action_item :disable, only: [:edit, :update], if: -> {!current_admin_user.is_restricted && resource.enabled} do 
+    link_to "Disable", [:disable, :person], method: :post
+  end
 
   collection_action :search_person, method: :get do 
     keyword = params[:q][:groupings]['0'][:keyword_contains]
     render json: Person.suggest(keyword)
+  end
+
+  member_action :enable, method: :post do
+    resource.update!(enabled: true)
+    redirect_to action: :show
+  end
+
+  member_action :disable, method: :post do
+    resource.update!(enabled: false)
+    redirect_to action: :show
   end
 
   filter :emails_address_cont, label: "Email"
@@ -55,7 +71,6 @@ ActiveAdmin.register Person do
 
   form do |f|
     f.inputs 'Basics' do
-      f.input :enabled
       f.input :risk, as:  :select, collection: %w(low medium high)
     end
 
