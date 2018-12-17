@@ -148,15 +148,17 @@ module ArbreHelpers
   def self.has_many_form(context, builder, relationship, extra={}, &fields)
     Appsignal.instrument("render_#{relationship.to_s}") do
       builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
-        instance_exec(f, context, &fields)
-        if f.object.persisted? && !extra[:cant_remove]
-          unless f.object.class.name == 'Attachment'
-            f.template.concat(context.link_to("Remove",
-              f.object,
-              method: :delete,
-              data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
-              class: 'button has_many_remove'
-            ))
+        Appsignal.instrument("render_one_of_#{relationship.to_s}") do
+          instance_exec(f, context, &fields)
+          if f.object.persisted? && !extra[:cant_remove]
+            unless f.object.class.name == 'Attachment'
+              f.template.concat(context.link_to("Remove",
+                f.object,
+                method: :delete,
+                data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
+                class: 'button has_many_remove'
+              ))
+            end
           end
         end
       end
@@ -199,18 +201,20 @@ module ArbreHelpers
   def self.has_many_attachments(context, form)
     Appsignal.instrument("render_has_many_attachments") do
       ArbreHelpers.has_many_form context, form, :attachments do |af, ctx|
-        a = af.object
-        if a.persisted?
-          af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
-          Appsignal.instrument("concat_attachment_preview") do
-            af.template.concat(
-              Arbre::Context.new({}, af.template){
-                ArbreHelpers.attachment_preview(self, a)
-              }.to_s
-            )
+        Appsignal.instrument("render_one_of_has_many_attachments") do
+          a = af.object
+          if a.persisted?
+            af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
+            Appsignal.instrument("concat_attachment_preview") do
+              af.template.concat(
+                Arbre::Context.new({}, af.template){
+                  ArbreHelpers.attachment_preview(self, a)
+                }.to_s
+              )
+            end
+          else
+            af.input :document, as: :file, label: "Attachment"
           end
-        else
-          af.input :document, as: :file, label: "Attachment"
         end
       end
     end
