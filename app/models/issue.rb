@@ -262,6 +262,7 @@ class Issue < ApplicationRecord
 
   def self.restricted_actions
     %i(
+      complete
       approve
       abandon
       dismiss
