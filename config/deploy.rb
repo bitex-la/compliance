@@ -7,6 +7,7 @@ set :repo_url, "git@github.com:bitex-la/compliance.git"
 set :user, "ubuntu"
 
 set :deploy_to, "/home/ubuntu/apps/#{app_name}"
+set :branch, 'edit-without-replaces-and-observations'
 
 set :puma_bind,       "unix://#{shared_path}/tmp/sockets/#{fetch(:application)}-puma.sock"
 set :puma_state,      "#{shared_path}/tmp/pids/puma.state"
@@ -70,7 +71,7 @@ namespace :deploy do
     end
   end
 
-  before :starting,     :check_revision
+  #before :starting,     :check_revision
   after  :finishing,    :compile_assets
   after  :finishing,    :cleanup
   after  :finishing,    :restart
