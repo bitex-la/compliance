@@ -55,7 +55,11 @@ ActiveAdmin.register Issue do
 
   Issue.aasm.events.map(&:name).each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
-      link_to action.to_s.titleize, [action, :person, :issue], method: :post
+      if current_admin_user.is_restricted && !Issue.restricted_actions.include?(action)
+        link_to action.to_s.titleize, [action, :person, :issue], method: :post
+      elsif !current_admin_user.is_restricted
+        link_to action.to_s.titleize, [action, :person, :issue], method: :post
+      end
     end
 
     member_action action, method: :post do
