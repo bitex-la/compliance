@@ -122,7 +122,6 @@ ActiveAdmin.register Issue do
           end
         end
 
-=begin       
         h3 "Observations"
         ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
           sf.input :observation_reason
@@ -130,7 +129,6 @@ ActiveAdmin.register Issue do
           sf.input :note, input_html: {rows: 3}
           sf.input :reply, input_html: {rows: 3}
         end
-=end
 
         h3 "Notes Seeds"
         div class: 'note_seeds' do
@@ -148,7 +146,9 @@ ActiveAdmin.register Issue do
             sf.input :legal_name
             sf.input :industry
             sf.input :business_description, input_html: {rows: 3}
-            #sf.input :country
+            Appsignal.instrument("render_country_for_docket") do
+              sf.input :country
+            end
             if resource.person.legal_entity_docket
               sf.input :copy_attachments,
                 label: "Move existing Legal Entity Docket attachments to the new one"
@@ -166,7 +166,7 @@ ActiveAdmin.register Issue do
                 change_year: true,
                 change_month: true
               }
-            #sf.input :nationality, as: :country
+            sf.input :nationality, as: :country
             sf.input :gender_id, as: :select, collection: GenderKind.all
             sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
             sf.input :job_title
@@ -184,7 +184,7 @@ ActiveAdmin.register Issue do
 
       tab "Domicile (#{resource.domicile_seeds.count})" do
         ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
-          #sf.input :country
+          sf.input :country
           sf.input :state
           sf.input :city
           sf.input :street_address
@@ -192,7 +192,7 @@ ActiveAdmin.register Issue do
           sf.input :postal_code
           sf.input :floor
           sf.input :apartment
-          #ArbreHelpers.fields_for_replaces context, sf, :domiciles
+          ArbreHelpers.fields_for_replaces context, sf, :domiciles
           ArbreHelpers.has_many_attachments(context, sf)
         end
       end
@@ -201,11 +201,11 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
           sf.input :number
           sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-          #sf.input :issuer, as: :country
+          sf.input :issuer, as: :country
           sf.input :public_registry_authority
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
-          #ArbreHelpers.fields_for_replaces context, sf, :identifications
+          ArbreHelpers.fields_for_replaces context, sf, :identifications
           ArbreHelpers.has_many_attachments(context, sf)
         end
       end
@@ -214,7 +214,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
           sf.input :amount
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
-          #ArbreHelpers.fields_for_replaces context, sf, :allowances
+          ArbreHelpers.fields_for_replaces context, sf, :allowances
           ArbreHelpers.has_many_attachments(context, sf)
         end
       end
@@ -228,10 +228,10 @@ ActiveAdmin.register Issue do
               af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
               af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
               af.input :full_name
-              #af.input :country
+              af.input :country
               af.input :address
-             # ArbreHelpers.fields_for_replaces self, af,
-             #   :argentina_invoicing_details
+              ArbreHelpers.fields_for_replaces self, af,
+                :argentina_invoicing_details
               ArbreHelpers.has_many_attachments(self, af)
             end
           end
@@ -242,7 +242,7 @@ ActiveAdmin.register Issue do
               cf.input :giro
               cf.input :ciudad
               cf.input :comuna
-              #ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
+              ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
               ArbreHelpers.has_many_attachments(self, cf)
             end
           end
@@ -265,7 +265,7 @@ ActiveAdmin.register Issue do
                 )
                 rf.template.concat('</li>'.html_safe) 
               end
-              #ArbreHelpers.fields_for_replaces context, rf, :affinities
+              ArbreHelpers.fields_for_replaces context, rf, :affinities
               ArbreHelpers.has_many_attachments(context, rf)
             end
           end
@@ -288,21 +288,21 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
           pf.input :number
           pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
-          #pf.input :country
+          pf.input :country
           pf.input :has_whatsapp
           pf.input :has_telegram
           pf.input :note, input_html: {rows: 3}
-          #if current = context.resource.person.phones.current.presence
-          #  pf.input :replaces, collection: current
-          #end
+          if current = context.resource.person.phones.current.presence
+            pf.input :replaces, collection: current
+          end
         end
         br
         ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
           ef.input :address
           ef.input :email_kind_id, as: :select, collection: EmailKind.all
-          #if current = context.resource.person.emails.current.presence
-          #  ef.input :replaces, collection: current
-          #end
+          if current = context.resource.person.emails.current.presence
+            ef.input :replaces, collection: current
+          end
         end
       end
 
@@ -311,9 +311,9 @@ ActiveAdmin.register Issue do
           rs.input :score
           rs.input :provider
           rs.input :external_link
-          #if current = context.resource.person.risk_scores.current.presence
-          #  rs.input :replaces, collection: current
-          #end
+          if current = context.resource.person.risk_scores.current.presence
+            rs.input :replaces, collection: current
+          end
           seed = rs.object
           if seed.persisted?     
             ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 

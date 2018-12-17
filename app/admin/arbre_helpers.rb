@@ -76,11 +76,13 @@ module ArbreHelpers
   end
 
   def self.fields_for_replaces(context, form, assoc)
-    context.instance_eval do
-      if replaceable = context.resource.person.send(assoc).current.presence
-        form.input :replaces, collection: replaceable
-        form.input :copy_attachments,
-          label: "Move attachments of replaced #{assoc} to the new one"
+    Appsignal.instrument("render_fields_for_replaces") do
+      context.instance_eval do
+        if replaceable = context.resource.person.send(assoc).current.presence
+          form.input :replaces, collection: replaceable
+          form.input :copy_attachments,
+            label: "Move attachments of replaced #{assoc} to the new one"
+        end
       end
     end
   end
@@ -195,17 +197,21 @@ module ArbreHelpers
   end
 
   def self.has_many_attachments(context, form)
-    ArbreHelpers.has_many_form context, form, :attachments do |af, ctx|
-      a = af.object
-      if a.persisted?
-        af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
-        af.template.concat(
-          Arbre::Context.new({}, af.template){
-            ArbreHelpers.attachment_preview(self, a)
-          }.to_s
-        )
-      else
-        af.input :document, as: :file, label: "Attachment"
+    Appsignal.instrument("render_has_many_attachments") do
+      ArbreHelpers.has_many_form context, form, :attachments do |af, ctx|
+        a = af.object
+        if a.persisted?
+          af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
+          Appsignal.instrument("concat_attachment_preview") do
+            af.template.concat(
+              Arbre::Context.new({}, af.template){
+                ArbreHelpers.attachment_preview(self, a)
+              }.to_s
+            )
+          end
+        else
+          af.input :document, as: :file, label: "Attachment"
+        end
       end
     end
   end
