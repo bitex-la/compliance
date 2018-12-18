@@ -3,6 +3,24 @@ require 'rails_helper'
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
   
+  it 'restrict another admin user' do 
+    restricted_user = create(:admin_user)
+    login_as admin_user
+
+    expect(restricted_user.is_restricted).to be_falsey
+    click_link 'Admin Users'
+
+    within "tr[id='admin_user_#{AdminUser.first.id}'] td[class='col col-actions']" do
+      click_link 'Edit'
+    end
+
+    click_link 'Restrict'
+    expect(restricted_user.reload.is_restricted).to be_truthy
+
+    click_link 'Give full access'
+    expect(restricted_user.reload.is_restricted).to be_falsey
+  end
+
   it 'creates a new natural person and its issue via admin' do
     observation_reason = create(:human_world_check_reason)
     login_as admin_user
@@ -22,124 +40,8 @@ describe 'an admin user' do
     click_link 'Add Person Information'
     click_button 'Create new issue'
     
-    click_link 'ID (0)'
-    click_link "Add New Identification seed"
-    fill_seed("identification",{
-      number: '123456789',
-      issuer: 'AR'
-    })
-
-    select_with_search(
-      '#issue_identification_seeds_attributes_0_identification_kind_id_input',
-      'national_id'
-    )
-
-    within(".has_many_container.identification_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('identification_seeds', 'jpg', true, 0, 0, true)
-    end
-
-    click_link 'Contact (0)'
-    click_link "Add New Email seed"
-    fill_seed("email",{
-      address: 'tester@rspec.org',
-    })
-
-    select_with_search(
-      '#issue_email_seeds_attributes_0_email_kind_id_input',
-      'work'
-    )
-
-    click_link "Add New Phone seed"
-    fill_seed("phone",{
-      number: '+541145250470',
-      note: 'Only in office hours',
-      country: 'AR'
-    })
-
-    select_with_search(
-      '#issue_phone_seeds_attributes_0_phone_kind_id_input',
-      'main'
-    )
-
-    click_link 'Domicile (0)' 
-    click_link "Add New Domicile seed"
-
-    fill_seed('domicile', {
-       state: 'Buenos Aires',
-       city: 'C.A.B.A',
-       street_address: 'Monroe',
-       street_number: '4567',
-       postal_code: '1657',
-       floor: '1',
-       apartment: 'C',
-       country: 'AR'
-    })
-    within(".has_many_container.domicile_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('domicile_seeds', 'zip', true, 0, 0, true)
-    end
-
-    click_link 'Allowance (0)' 
-    click_link "Add New Allowance seed"
-
-    select_with_search(
-      '#issue_allowance_seeds_attributes_0_kind_id_input',
-      'us_dollar'
-    )
-   
-    fill_seed("allowance", {
-      amount: "100"
-    })
-
-    within(".has_many_container.allowance_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('allowance_seeds', 'gif', true, 0, 0, true)
-    end
-
-    click_link 'Docket' 
-    fill_seed("natural_docket", {
-      first_name: "Lionel",
-      last_name: "Higuain",
-      nationality: 'AR'
-    }, false)
-
-    select_with_search(
-      '#issue_natural_docket_seed_attributes_marital_status_id_input',
-      'married'
-    )  
-    select_with_search(
-      '#issue_natural_docket_seed_attributes_gender_id_input',
-      'male'
-    )
-
-    fill_seed("natural_docket", {
-     job_title: "Programmer",
-     job_description: "Develop cool software for the real people",
-     politically_exposed_reason: "Nothing I am a legit guy!",
-     birth_date: "1985-01-01"
-    }, false)
-
-    within("#natural_docket_seed") do
-      find('.has_many_container.attachments').click_link("Add New Attachment")
-      fill_attachment('natural_docket_seed', 'png', false)
-    end
-
-    click_link 'Risk Score (0)' 
-    click_link "Add New Risk score seed"
-
-    fill_seed('risk_score', {
-      score: 'green',
-      provider: 'bing',
-      external_link: 'https://goo.gl/vVvoK5,https://goo.gl/YpV5CZ',
-      extra_info: File.read('spec/fixtures/risk_score/serp_api_with_hits.json')
-    })
-
-    within(".has_many_container.risk_score_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('risk_score_seeds', 'gif', true, 0, 0, true)
-    end
-
+    fulfil_new_issue_form
+    
     add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
@@ -922,7 +824,10 @@ describe 'an admin user' do
     end
     page.current_path.should == "/people/#{person.id}/edit"
 
-    find(:css, "#person_enabled").set(false)
+    click_link 'Disable'
+
+    click_link 'Edit Person'
+
     select_with_search('#person_risk_input', 'low')
     click_button 'Update Person'
 
@@ -966,21 +871,4 @@ describe 'an admin user' do
     pending
     fail
   end
-end
-
-def add_observation(index = 0, reason, note)
-  click_link "Base"
-  click_link "Add New Observation"
-
-  select_with_search(
-    "#issue_observations_attributes_#{index}_observation_reason_input",
-    reason.subject_en.truncate(40, omission:'…')
-  )
-  select_with_search(  
-    "#issue_observations_attributes_#{index}_scope_input",
-    reason.scope.capitalize
-  )
-
-  fill_in "issue[observations_attributes][#{index}][note]",
-    with: note
 end
