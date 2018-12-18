@@ -3,6 +3,24 @@ require 'rails_helper'
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
   
+  it 'restrict another admin user' do 
+    restricted_user = create(:admin_user)
+    login_as admin_user
+
+    expect(restricted_user.is_restricted).to be_falsey
+    click_link 'Admin Users'
+
+    within "tr[id='admin_user_#{AdminUser.first.id}'] td[class='col col-actions']" do
+      click_link 'Edit'
+    end
+
+    click_link 'Restrict'
+    expect(restricted_user.reload.is_restricted).to be_truthy
+
+    click_link 'Give full access'
+    expect(restricted_user.reload.is_restricted).to be_falsey
+  end
+
   it 'creates a new natural person and its issue via admin' do
     observation_reason = create(:human_world_check_reason)
     login_as admin_user
@@ -830,7 +848,10 @@ describe 'an admin user' do
     end
     page.current_path.should == "/people/#{person.id}/edit"
 
-    find(:css, "#person_enabled").set(false)
+    click_link 'Disable'
+
+    click_link 'Edit Person'
+
     select_with_search('#person_risk_input', 'low')
     click_button 'Update Person'
 
