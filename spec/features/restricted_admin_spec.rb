@@ -90,17 +90,13 @@ describe 'a restricted admin user' do
     click_link 'Domicile (1)'
     
     select_with_search(
-      '#issue_domicile_seeds_attributes_0_country_input',
-      'Argentina'
-    )
-
-    select_with_search(
       '#issue_domicile_seeds_attributes_0_replaces_input',
       Domicile.first.name
     )
 
     within ".has_many_container.domicile_seeds" do
       fill_seed('domicile', {
+        country: 'AR',
         state: 'Buenos Aires',
         city: 'C.A.B.A',
         street_address: 'Triunvirato',
