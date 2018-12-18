@@ -52,7 +52,6 @@ ActiveAdmin.register Issue do
     redirect_to [person, issue]
   end
 
-
   Issue.aasm.events.map(&:name).each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
@@ -147,7 +146,7 @@ ActiveAdmin.register Issue do
             sf.input :industry
             sf.input :business_description, input_html: {rows: 3}
             Appsignal.instrument("render_country_for_docket") do
-              sf.input :country, as: :select, collection: I18n.t('countries').invert
+              sf.input :country, as: :autocomplete, url: search_country_people_path
             end
             if resource.person.legal_entity_docket
               sf.input :copy_attachments,
@@ -167,7 +166,7 @@ ActiveAdmin.register Issue do
                   change_year: true,
                   change_month: true
                 }
-              sf.input :nationality, as: :select, collection: I18n.t('countries').invert
+              sf.input :nationality, as: :autocomplete, url: search_country_people_path
             end
             Appsignal.instrument("rendering_association_natural_docket_fields") do
               sf.input :gender_id, as: :select, collection: GenderKind.all
@@ -192,7 +191,7 @@ ActiveAdmin.register Issue do
 
       tab "Domicile (#{resource.domicile_seeds.count})" do
         ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
-          sf.input :country, as: :select, collection: I18n.t('countries').invert
+          sf.input :country, as: :autocomplete, url: '/people/search_country'
           sf.input :state
           sf.input :city
           sf.input :street_address
@@ -209,7 +208,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
           sf.input :number
           sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-          sf.input :issuer, as: :select, collection: I18n.t('countries').invert
+          sf.input :issuer, as: :autocomplete, url: '/people/search_country'
           sf.input :public_registry_authority
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
@@ -236,7 +235,7 @@ ActiveAdmin.register Issue do
               af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
               af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
               af.input :full_name
-              af.input :country, as: :select, collection: I18n.t('countries').invert
+              af.input :country, as: :autocomplete, url: search_country_people_path
               af.input :address
               ArbreHelpers.fields_for_replaces self, af,
                 :argentina_invoicing_details
@@ -296,7 +295,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
           pf.input :number
           pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
-          pf.input :country, as: :select, collection: I18n.t('countries').invert
+          pf.input :country, as: :autocomplete, url: '/people/search_country'
           pf.input :has_whatsapp
           pf.input :has_telegram
           pf.input :note, input_html: {rows: 3}
