@@ -147,7 +147,9 @@ ActiveAdmin.register Issue do
             sf.input :legal_name
             sf.input :industry
             sf.input :business_description, input_html: {rows: 3}
-            sf.input :country
+            Appsignal.instrument("render_country_for_docket") do
+              sf.input :country, as: :autocomplete, url: search_country_people_path
+            end
             if resource.person.legal_entity_docket
               sf.input :copy_attachments,
                 label: "Move existing Legal Entity Docket attachments to the new one"
@@ -158,32 +160,40 @@ ActiveAdmin.register Issue do
 
         if resource.for_person_type == :natural_person || resource.for_person_type.nil?
           ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-            sf.input :first_name
-            sf.input :last_name
-            sf.input :birth_date, as: :datepicker,
-              datepicker_options: {
-                change_year: true,
-                change_month: true
-              }
-            sf.input :nationality, as: :country
-            sf.input :gender_id, as: :select, collection: GenderKind.all
-            sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
-            sf.input :job_title
-            sf.input :job_description
-            sf.input :politically_exposed
-            sf.input :politically_exposed_reason, input_html: {rows: 3}
-            if resource.person.natural_docket
-              sf.input :copy_attachments,
-                label: "Move existing Natural Person Docket attachments to the new one"
+            Appsignal.instrument("rendering_first_natural_docket_fields") do
+              sf.input :first_name
+              sf.input :last_name
+              sf.input :birth_date, as: :datepicker,
+                datepicker_options: {
+                  change_year: true,
+                  change_month: true
+                }
+              sf.input :nationality, as: :autocomplete, url: search_country_people_path
             end
-            ArbreHelpers.has_many_attachments(self, sf)
+            Appsignal.instrument("rendering_association_natural_docket_fields") do
+              sf.input :gender_id, as: :select, collection: GenderKind.all
+              sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
+            end
+            Appsignal.instrument("rendering_last_natural_docket_fields") do
+              sf.input :job_title
+              sf.input :job_description
+              sf.input :politically_exposed
+              sf.input :politically_exposed_reason, input_html: {rows: 3}
+              if resource.person.natural_docket
+                sf.input :copy_attachments,
+                  label: "Move existing Natural Person Docket attachments to the new one"
+              end
+            end
+            Appsignal.instrument("rendering_has_many_attachments_on_docket") do
+              ArbreHelpers.has_many_attachments(self, sf)
+            end
           end
         end
       end
 
       tab "Domicile (#{resource.domicile_seeds.count})" do
         ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
-          sf.input :country
+          sf.input :country, as: :autocomplete, url: '/people/search_country'
           sf.input :state
           sf.input :city
           sf.input :street_address
@@ -200,7 +210,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
           sf.input :number
           sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-          sf.input :issuer, as: :country
+          sf.input :issuer, as: :autocomplete, url: '/people/search_country'
           sf.input :public_registry_authority
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
@@ -227,7 +237,7 @@ ActiveAdmin.register Issue do
               af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
               af.input :receipt_kind_id, as: :select , collection: ReceiptKind.all
               af.input :full_name
-              af.input :country
+              af.input :country, as: :autocomplete, url: search_country_people_path
               af.input :address
               ArbreHelpers.fields_for_replaces self, af,
                 :argentina_invoicing_details
@@ -287,7 +297,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
           pf.input :number
           pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
-          pf.input :country
+          pf.input :country, as: :autocomplete, url: '/people/search_country'
           pf.input :has_whatsapp
           pf.input :has_telegram
           pf.input :note, input_html: {rows: 3}

@@ -267,15 +267,12 @@ describe 'an admin user' do
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
+      issuer: 'AR' 
     })
 
     select_with_search(
       '#issue_identification_seeds_attributes_0_identification_kind_id_input',
       'national_id'
-    )
-    select_with_search(
-      '#issue_identification_seeds_attributes_0_issuer_input',
-      'Argentina'
     )
 
     person.identifications.reload
@@ -295,19 +292,15 @@ describe 'an admin user' do
     click_link "Domicile (0)"
     click_link "Add New Domicile seed"
 
-    select_with_search(
-      '#issue_domicile_seeds_attributes_0_country_input',
-      'Argentina'
-    )
-    
     fill_seed('domicile', {
-       state: 'Buenos Aires',
-       city: 'C.A.B.A',
-       street_address: 'Monroe',
-       street_number: '4567',
-       postal_code: '1657',
-       floor: '1',
-       apartment: 'C'
+      country: 'AR',
+      state: 'Buenos Aires',
+      city: 'C.A.B.A',
+      street_address: 'Monroe',
+      street_number: '4567',
+      postal_code: '1657',
+      floor: '1',
+      apartment: 'C'
     })
 
     person.domiciles.reload
@@ -354,12 +347,9 @@ describe 'an admin user' do
       '#issue_natural_docket_seed_attributes_gender_id_input',
       'male'
     )
-    select_with_search(
-      '#issue_natural_docket_seed_attributes_nationality_input',
-      'Argentina'
-    )
 
     fill_seed("natural_docket", {
+      nationality: 'AR',
       first_name: "Lionel",
       last_name: "Higuain",
       birth_date: "1985-01-01"
@@ -644,17 +634,13 @@ describe 'an admin user' do
       click_link 'Domicile (1)'
 
       select_with_search(
-        '#issue_domicile_seeds_attributes_0_country_input',
-        'Argentina'
-      )
-
-      select_with_search(
         '#issue_domicile_seeds_attributes_0_replaces_input',
         Domicile.first.name
       )
 
       within ".has_many_container.domicile_seeds" do
         fill_seed('domicile', {
+          country: 'AR',
           state: 'Buenos Aires',
           city: 'C.A.B.A',
           street_address: 'Ayacucho',
@@ -705,16 +691,13 @@ describe 'an admin user' do
       click_link "ID (0)"
       click_link "Add New Identification seed"
       fill_seed("identification",{
-        number: '123456789'
+        number: '123456789',
+        issuer: 'AR'
       })
 
       select_with_search(
         '#issue_identification_seeds_attributes_0_identification_kind_id_input',
         'national_id'
-      )
-      select_with_search(
-        '#issue_identification_seeds_attributes_0_issuer_input',
-        'Argentina'
       )
 
       within(".has_many_container.identification_seeds") do
@@ -725,12 +708,8 @@ describe 'an admin user' do
       click_link "Domicile (0)"
       click_link "Add New Domicile seed"
 
-      select_with_search(
-        '#issue_domicile_seeds_attributes_0_country_input',
-        'Argentina'
-      )
-
       fill_seed('domicile', {
+        country: 'AR',
         state: 'Buenos Aires',
         city: 'C.A.B.A',
         street_address: 'Monroe',
@@ -799,16 +778,13 @@ describe 'an admin user' do
       click_link "ID (1)"
       click_link "Add New Identification seed"
       fill_seed("identification",{
-        number: '123456789'
+        number: '123456789',
+        issuer: 'AR'
       })
 
       select_with_search(
         '#issue_identification_seeds_attributes_0_identification_kind_id_input',
         'national_id'
-      )
-      select_with_search(
-        '#issue_identification_seeds_attributes_0_issuer_input',
-        'Argentina'
       )
 
       within(".has_many_container.identification_seeds") do
