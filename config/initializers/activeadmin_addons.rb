@@ -9,4 +9,7 @@ ActiveadminAddons.setup do |config|
 
   # Set DateTimePickerInput input format. This if for backend (Ruby)
   # config.datetime_picker_input_format = "%Y-%m-%d %H:%M"
+  ISO3166.configure do |config|
+    config.locales = [:en]
+  end
 end

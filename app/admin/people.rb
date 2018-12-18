@@ -19,6 +19,16 @@ ActiveAdmin.register Person do
     render json: Person.suggest(keyword)
   end
 
+  collection_action :search_country, method: :get do 
+    keyword = params[:term]
+    render json: I18n.t('countries').invert
+      .select{|x| x.downcase.starts_with?(keyword)}
+      .map{|k, v| {
+        label: k,
+        value: v
+      }}
+  end
+
   filter :emails_address_cont, label: "Email"
   filter :identifications_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
   filter :natural_dockets_first_name_cont, label: "First Name"
