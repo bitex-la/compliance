@@ -52,6 +52,9 @@ GEM
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
     active_material (1.4.2)
+    active_model_otp (1.1.0)
+      activemodel
+      rotp
     active_model_serializers (0.10.7)
       actionpack (>= 4.1, < 6)
       activemodel (>= 4.1, < 6)
@@ -353,6 +356,8 @@ GEM
     responders (2.4.0)
       actionpack (>= 4.2.0, < 5.3)
       railties (>= 4.2.0, < 5.3)
+    rotp (4.0.2)
+      addressable (~> 2.5)
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
     rspec-expectations (3.8.1)
@@ -455,6 +460,7 @@ PLATFORMS
 DEPENDENCIES
   aasm
   actionpack-action_caching
+  active_model_otp (= 1.1.0)
   active_model_serializers (~> 0.10.0)
   activeadmin (>= 1.4.3)
   activeadmin_addons
