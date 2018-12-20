@@ -24,6 +24,7 @@ ActiveAdmin.register AdminUser do
     id_column
     column :email
     column :is_restricted
+    column :otp_enabled
     column :current_sign_in_at
     column :sign_in_count
     column :created_at
@@ -32,9 +33,20 @@ ActiveAdmin.register AdminUser do
 
   filter :email
   filter :is_restricted
+  filter :otp_enabled
   filter :current_sign_in_at
   filter :sign_in_count
   filter :created_at
+
+  action_item :toggle_otp, only: :show do
+    text = resource.otp_enabled? ? 'Disable OTP' : 'Enable OTP'
+    link_to(text, otp_admin_user_path(resource), method: :post)
+  end
+
+  member_action :otp, method: :post do
+    resource.update!(otp_enabled: !resource.otp_enabled)
+    redirect_to admin_user_path(resource), notice: "OTP #{resource.otp_enabled? ? 'enabled' : 'disabled'}"
+  end
 
   form do |f|
     f.inputs do
@@ -43,5 +55,16 @@ ActiveAdmin.register AdminUser do
       f.input :password_confirmation
     end
     f.actions
+  end
+
+  sidebar 'OTP', only: :show do
+    if resource.otp_enabled?
+      span 'OTP is enabled'
+    else
+      div(class: 'qrcode', 'data-provisioning-uri' => resource.provisioning_uri("Compliance Admin | #{resource.email}"))
+      attributes_table_for resource do
+        row :otp_secret_key
+      end
+    end
   end
 end
