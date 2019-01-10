@@ -431,7 +431,7 @@ module ArbreHelpers
   end
 
   def self.render_hash(context, data)
-    context.concat("<li>".html_safe) 
+    context.concat('<li>'.html_safe) 
     data.keys.each do |key|
       label = key
       value = data[key]
