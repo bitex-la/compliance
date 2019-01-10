@@ -431,7 +431,7 @@ module ArbreHelpers
   end
 
   def self.render_hash(context, data)
-    context.concat('<li>'.html_safe) 
+    context.concat("<li>".html_safe) 
     data.keys.each do |key|
       label = key
       value = data[key]
@@ -447,7 +447,7 @@ module ArbreHelpers
   def self.render_text_or_link(context, key, text)
     context.concat("<strong>#{key}: </strong>".html_safe) if key
     if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
-      context.concat("<a href='#{text}' target='_blank'>#{text}</a><br/>".html_safe) 
+      context.concat("<a href='#{text}' target='_blank'>#{text.truncate(40, omission:'…')}</a><br/>".html_safe) 
     else
       context.concat("#{text}<br/>".html_safe) 
     end
