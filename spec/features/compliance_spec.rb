@@ -82,7 +82,8 @@ describe 'an admin user' do
     end
 
     within '.extra_info' do
-      expect(page).to have_content 'title: https://www.clarin.com/deportes/futbol-internacional/copa ...'
+      expect(page)
+        .to have_content "title: #{"https://www.clarin.com/deportes/futbol-internacional/copa ...".truncate(40, omission:'…')}"
       expect(page).to have_content 'title: 20 Octubre, 2010 by unomásuno - issuu'
     end
 
