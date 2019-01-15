@@ -32,7 +32,7 @@ gem 'devise'
 gem 'cancancan'
 gem 'draper'
 gem 'aws-sdk', '< 2.0'
-gem "paperclip", "4.3.6"
+gem "paperclip", "~>6.1.0"
 gem 'aasm'
 gem 'zipline'
 

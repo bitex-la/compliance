@@ -18,6 +18,21 @@ describe Attachment do
     }
   end
 
+  it 'attaches a file with a large base64 encoded image' do
+    issue = create(:basic_issue)
+    seed = create(:full_natural_docket_seed,
+      issue: issue, add_all_attachments: false)
+
+    fixtures = RSpec.configuration.file_fixture_path
+  
+    file_one, file_two = %i(one two).map do |file|
+      base64 = Pathname.new(File.join(fixtures, "base64_#{file}_image.txt")).read
+      api_create "/attachments",
+        jsonapi_base64_attachment('natural_docket_seeds', seed.id.to_s, base64, :jpeg)
+      api_response.data
+    end
+  end
+
   describe "when re-arranging attachments" do
     it "can be re-attached to a fruit" do
       pending

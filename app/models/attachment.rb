@@ -26,7 +26,7 @@ class Attachment < ApplicationRecord
     end
     all << 'fund_deposits'
   end
-
+ 
   validates_attachment :document,
     content_type: {
       content_type: [
@@ -50,6 +50,7 @@ class Attachment < ApplicationRecord
     /zip|ZIP\z/,
     /rar|RAR\z/,
   ]
+
 
   def attached_to_something
     return unless attached_to.nil?
