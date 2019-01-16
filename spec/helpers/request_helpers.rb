@@ -38,7 +38,7 @@ module RequestHelpers
 
   def mime_for(ext)
     case ext
-      when :bmp, :png, :jpg, :gif, :BMP, :JPG, :PNG, :GIF then "image/#{ext.downcase}"
+      when :bmp, :png, :jpg, :jpeg, :JPEG, :gif, :BMP, :JPG, :PNG, :GIF then "image/#{ext.downcase}"
       when :pdf, :zip, :PDF, :ZIP then "application/#{ext.downcase}"
       when :rar, :RAR then "application/x-rar-compressed"
       else raise "No fixture for #{ext.downcase} files"
@@ -64,6 +64,18 @@ module RequestHelpers
       attributes: {
         document: "data:#{mime_for(ext)};base64,#{bytes_for(ext)}",
         document_file_name: "áñçfile微信图片.#{ext}",
+        document_content_type: mime_for(ext)
+      }
+    }
+  end
+
+  def jsonapi_base64_attachment(seed_type, seed_id, base64, ext = :jpg)
+    {
+      type: "attachments",
+      relationships: {attached_to_seed: {data: {id: seed_id, type: seed_type}}},
+      attributes: {
+        document: "data:#{mime_for(ext)};base64,#{base64}",
+        document_file_name: "from_base_64.#{ext}",
         document_content_type: mime_for(ext)
       }
     }
