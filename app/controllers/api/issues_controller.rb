@@ -29,7 +29,7 @@ class Api::IssuesController < Api::ApiController
       issues: [ :person, id: nil ],
       people: []
 
-    return jsonapi_422(nil) unless mapper.data
+    return jsonapi_422 unless mapper.data
 
     if mapper.save_all
       jsonapi_response mapper.data,

@@ -8,7 +8,7 @@ class Api::SeedController < Api::FruitController
     begin
       params[:data][:id] = resource.id
     rescue NoMethodError
-      return jsonapi_422(nil)
+      return jsonapi_422
     end
 
     map_and_save(200)
@@ -23,7 +23,7 @@ class Api::SeedController < Api::FruitController
 
   def map_and_save(success_code)
     mapper = get_mapper
-    return jsonapi_422(nil) unless mapper.data
+    return jsonapi_422 unless mapper.data
 
     if mapper.data.save
       jsonapi_response mapper.data, options_for_response, success_code

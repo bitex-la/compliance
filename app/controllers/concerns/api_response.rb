@@ -47,11 +47,11 @@ module ApiResponse
     json_response error_data, status
   end
 
-  def jsonapi_422(exception)
+  def jsonapi_422
     jsonapi_error(422, 'unprocessable_entity')
   end
 
-  def jsonapi_404(exception)
+  def jsonapi_404
     jsonapi_error(404, 'not_found')
   end
 
