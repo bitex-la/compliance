@@ -57,6 +57,32 @@ Rails.application.routes.draw do
     resource :system do
       post :truncate
     end
+
+    namespace :public do
+      resources :people, only: :show
+      %i(
+        natural_docket_seeds
+        legal_entity_docket_seeds
+        argentina_invoicing_detail_seeds
+        chile_invoicing_detail_seeds
+        domicile_seeds
+        allowance_seeds
+        identification_seeds
+        phone_seeds
+        email_seeds
+        note_seeds
+        affinity_seeds
+      ).each do |entities|
+        resources entities, only: [:show, :create, :update]
+      end
+      resources :observations, only: [:show, :update]
+      # resources :issues, only: :show do
+      #   member do
+      #     post :complete
+      #   end
+      # end
+      # resources :attachments, only: :create
+    end
   end
 
   devise_for :admin_users, ActiveAdmin::Devise.config
