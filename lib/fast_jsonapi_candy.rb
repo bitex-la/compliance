@@ -1,3 +1,6 @@
+module Public
+end
+
 module FastJsonapiCandy
   module Fruit
     extend ActiveSupport::Concern
@@ -20,6 +23,32 @@ module FastJsonapiCandy
           include FastJsonapiCandy::Seed
         }
       end
+
+      def derive_public_seed_serializer!(*attr_exceptions)
+        klass = Class.new
+        Public.const_set(@naming.public_seed_serializer, klass)
+        naming_copy = @naming
+        klass.class_eval{
+          include FastJsonapiCandy::PublicSeed
+          build_public_attributes(
+            naming_copy.serializer.constantize.attributes_to_serialize,
+            attr_exceptions
+          )
+        }
+      end
+    end
+  end
+
+  module PublicSeed
+    extend ActiveSupport::Concern
+
+    included do
+      naming = Garden::Naming.new(name)
+      include Serializer
+      set_type naming.seed_plural
+      build_has_one :person
+
+      build_has_many :attachments
     end
   end
 
@@ -27,11 +56,9 @@ module FastJsonapiCandy
     extend ActiveSupport::Concern
 
     included do
+      include FastJsonapiCandy::PublicSeed
       naming = Garden::Naming.new(name)
-      include Serializer
-      set_type naming.seed_plural
       build_belongs_to :issue
-      build_has_one :person
 
       if naming.seed.constantize.column_names.include?('replaces_id')
         belongs_to :replaces, record_type: naming.plural,
@@ -40,7 +67,6 @@ module FastJsonapiCandy
 
       belongs_to :fruit, record_type: naming.plural,
         serializer: naming.serializer
-      build_has_many :attachments
 
       if attrs = naming.serializer.constantize.attributes_to_serialize
         attributes *attrs.try(:keys)
@@ -74,6 +100,10 @@ module FastJsonapiCandy
         them.each do |it|
           has_one it, record_type: it.to_s.pluralize
         end
+      end
+
+      def build_public_attributes(attrs, exceptions)
+        attributes *attrs.keys.reject! { |a| exceptions.include? a }
       end
 
       def build_timestamps

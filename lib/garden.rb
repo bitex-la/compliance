@@ -148,6 +148,7 @@ module Garden
       self.base = original.to_s.underscore.singularize
         .gsub(/_serializer$/, '')
         .gsub(/_seed/, '')
+        .gsub(/public\//, '')
     end
 
     def fruit(suffix='')
@@ -163,6 +164,10 @@ module Garden
     end
 
     def seed_serializer
+      fruit('SeedSerializer')
+    end
+
+    def public_seed_serializer
       fruit('SeedSerializer')
     end
 

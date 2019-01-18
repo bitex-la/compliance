@@ -4,4 +4,5 @@ class PhoneSerializer
     :has_telegram, :note
   build_timestamps
   derive_seed_serializer!
+  derive_public_seed_serializer!
 end

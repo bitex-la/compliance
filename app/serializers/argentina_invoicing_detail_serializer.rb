@@ -4,4 +4,5 @@ class ArgentinaInvoicingDetailSerializer
     :country, :address, :full_name
   build_timestamps
   derive_seed_serializer!
+  derive_public_seed_serializer!
 end

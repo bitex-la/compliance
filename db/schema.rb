@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181220155535) do
+ActiveRecord::Schema.define(version: 20190114191215) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "namespace"
@@ -399,6 +399,7 @@ ActiveRecord::Schema.define(version: 20181220155535) do
     t.datetime "updated_at", null: false
     t.string "aasm_state"
     t.boolean "fill_with_previous_info", default: false
+    t.boolean "private", default: false
     t.index ["aasm_state"], name: "index_issues_on_aasm_state"
     t.index ["person_id"], name: "index_issues_on_person_id"
   end
@@ -504,6 +505,7 @@ ActiveRecord::Schema.define(version: 20181220155535) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.boolean "private"
     t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
@@ -518,6 +520,7 @@ ActiveRecord::Schema.define(version: 20181220155535) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.boolean "private"
     t.index ["issue_id"], name: "index_notes_on_issue_id"
     t.index ["person_id"], name: "index_notes_on_person_id"
     t.index ["replaced_by_id"], name: "index_notes_on_replaced_by_id"
@@ -560,6 +563,7 @@ ActiveRecord::Schema.define(version: 20181220155535) do
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false, null: false
     t.integer "risk"
+    t.string "api_token"
   end
 
   create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
