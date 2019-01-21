@@ -76,12 +76,12 @@ Rails.application.routes.draw do
         resources entities, only: [:show, :create, :update]
       end
       resources :observations, only: [:show, :update]
+      resources :attachments, only: :create
       # resources :issues, only: :show do
       #   member do
       #     post :complete
       #   end
       # end
-      # resources :attachments, only: :create
     end
   end
 
