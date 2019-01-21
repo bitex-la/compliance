@@ -31,7 +31,6 @@ class Api::Public::SeedController < Api::Public::ApiController
   end
 
   def map_and_save(success_code)
-    debugger
     mapper = get_mapper
     return jsonapi_422 unless mapper.data
 
