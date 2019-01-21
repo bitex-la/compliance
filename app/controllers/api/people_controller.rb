@@ -18,12 +18,22 @@ class Api::PeopleController < Api::ApiController
   end
 
   def create
-    jsonapi_response Person.create, {}, 201
+    person = if params["data"]
+      mapper = JsonapiMapper.doc_unsafe!(
+        params.permit!.to_h, [:people], people: %I[external_id])
+
+      mapper.data.save
+      mapper.data
+    else
+      Person.create
+    end
+
+    jsonapi_response person, {}, 201
   end
 
   def update
     mapper = JsonapiMapper.doc_unsafe!(
-      params.permit!.to_h, [:people], people: %I[enabled risk])
+      params.permit!.to_h, [:people], people: %I[enabled risk external_id])
 
     return jsonapi_422 unless mapper.data
 

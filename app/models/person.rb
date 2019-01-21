@@ -3,6 +3,9 @@ class Person < ApplicationRecord
 
   after_save :log_if_enabled
   after_save :expire_action_cache
+  before_validation do
+    self.api_token ||= SecureRandom.hex(40)
+  end
   
   HAS_MANY_REPLACEABLE = %i{
     domiciles

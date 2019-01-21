@@ -19,8 +19,52 @@ describe Person do
           type: 'people',
           id: Person.last.id.to_s,
           attributes: {
+            external_id: nil,
+            api_token: Person.last.api_token,
             enabled: false,
             risk: nil,
+            created_at: 1514764800,
+            updated_at: 1514764800
+          },
+          relationships: {
+            issues: {data: []},
+            domiciles: {data: []},
+            identifications: {data: []},
+            natural_dockets: {data: []},
+            legal_entity_dockets: {data: []},
+            argentina_invoicing_details: {data: []},
+            chile_invoicing_details: {data: []},
+            allowances: {data: []},
+            fund_deposits: {data: []},
+            phones: {data: []},
+            emails: {data: []},
+            notes: {data: []},
+            affinities: {data: []},
+            risk_scores: {data: []},
+            attachments: {data: []},
+          }
+        },
+        included: []
+      }
+    end
+    
+    it 'creates a new user with external id' do
+      expect{ api_create('/people', {
+        type: 'people',
+        attributes: {
+          external_id: 123
+        }
+      }) }.to change{ Person.count }.by(1)
+
+      json_response.should == {
+        data: {
+          type: 'people',
+          id: Person.last.id.to_s,
+          attributes: {
+            enabled: false,
+            risk: nil,
+            external_id: 123,
+            api_token: Person.last.api_token,
             created_at: 1514764800,
             updated_at: 1514764800
           },
@@ -62,6 +106,8 @@ describe Person do
         attributes: {
           enabled: true,
           risk: 'medium',
+          api_token: person.api_token,
+          external_id: nil,
           created_at: 1514764800,
           updated_at: 1514764800
         },
@@ -393,7 +439,8 @@ describe Person do
             title:  'my nickname',
             body:   'Please call me by my nickname: Mr. Bond',
             created_at: 1514764800,
-            updated_at: 1514764800
+            updated_at: 1514764800,
+            private: nil
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
