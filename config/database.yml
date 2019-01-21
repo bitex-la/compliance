@@ -1,7 +1,7 @@
 
 default: &default
   adapter: mysql2
-  encoding: utf8
+  encoding: utf8mb4
   pool: 64
   timeout: 5000
   username: <%= ENV.fetch("MYSQL_USERNAME") %>

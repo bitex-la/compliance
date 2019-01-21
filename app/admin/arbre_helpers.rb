@@ -11,8 +11,10 @@ module ArbreHelpers
           if resource.respond_to?(:extra_info)  && !resource.extra_info.nil?
             h4 "Extra info"
             begin 
-              extra_info_as_json = JSON.parse(resource.extra_info)
-              ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+              if resource.extra_info
+                extra_info_as_json = JSON.parse(resource.extra_info)
+                ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+              end
             rescue JSON::ParserError
               span resource.extra_info
             end
@@ -260,8 +262,10 @@ module ArbreHelpers
         if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
           h4 "Extra info"
           begin 
-            extra_info_as_json = JSON.parse(fruit.extra_info)
-            ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+            if fruit.extra_info
+              extra_info_as_json = JSON.parse(fruit.extra_info)
+              ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+            end
           rescue JSON::ParserError
             span fruit.extra_info
           end
@@ -296,8 +300,10 @@ module ArbreHelpers
         if seed.respond_to? :extra_info 
           h4 "Extra info"
           begin 
-            extra_info_as_json = JSON.parse(seed.extra_info)
-            ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+            if seed.extra_info
+              extra_info_as_json = JSON.parse(seed.extra_info)
+              ArbreHelpers.extra_info_renderer(self, extra_info_as_json)
+            end
           rescue JSON::ParserError
             span seed.extra_info
           end
@@ -447,7 +453,7 @@ module ArbreHelpers
   def self.render_text_or_link(context, key, text)
     context.concat("<strong>#{key}: </strong>".html_safe) if key
     if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
-      context.concat("<a href='#{text}' target='_blank'>#{text.truncate(40, omission:'…')}</a><br/>".html_safe) 
+      context.concat("<a href='#{text}' target='_blank'>#{text.truncate(40, omission:'...')}</a><br/>".html_safe) 
     else
       context.concat("#{text}<br/>".html_safe) 
     end
@@ -458,7 +464,7 @@ module ArbreHelpers
       strong "#{key}: "
       if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
         span do
-          link_to text, text, target: "_blank"
+          link_to text.truncate(40, omission:'...'), text, target: "_blank"
         end
       else
         span text
