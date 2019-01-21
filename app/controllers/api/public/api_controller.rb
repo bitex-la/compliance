@@ -11,8 +11,7 @@ class Api::Public::ApiController < ApplicationController
   end
 
   def authenticate_token
-    #TODO: Parse token
-    token = request.headers['Authorization']
+    token = request.headers['Authorization'].gsub(/Token token=/, '')
     if Person.find_by(api_token: token)
       request.env['api_token'] = token
     end
