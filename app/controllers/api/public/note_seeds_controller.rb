@@ -7,7 +7,7 @@ class Api::Public::NoteSeedsController < Api::Public::SeedController
 
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [:issues, :note_seeds],
+      [:issues],
       issues: [],
       note_seeds: [
         :title,
@@ -15,7 +15,8 @@ class Api::Public::NoteSeedsController < Api::Public::SeedController
         :attachments,
         :copy_attachments,
         :replaces,
-        :issue
+        :issue,
+        private: false
       ]
   end
 end

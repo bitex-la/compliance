@@ -1,5 +1,5 @@
 class Api::Public::SeedController < Api::Public::ApiController
-  before_action :verify_scope, only: :show
+  before_action :verify_scope, only: [:show, :update]
 
   def show
     jsonapi_public_response resource

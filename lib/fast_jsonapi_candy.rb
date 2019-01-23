@@ -24,7 +24,7 @@ module FastJsonapiCandy
         }
       end
 
-      def derive_public_seed_serializer!(*attr_exceptions)
+      def derive_public_seed_serializer!(attr_exceptions = [])
         klass = Class.new
         Public.const_set(@naming.public_seed_serializer, klass)
         naming_copy = @naming
@@ -103,7 +103,7 @@ module FastJsonapiCandy
       end
 
       def build_public_attributes(attrs, exceptions)
-        attributes *attrs.keys.reject! { |a| exceptions.include? a }
+        attributes *(attrs.keys.reject { |a| exceptions.include? a })
       end
 
       def build_timestamps

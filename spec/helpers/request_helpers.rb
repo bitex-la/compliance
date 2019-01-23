@@ -12,6 +12,13 @@ module RequestHelpers
     assert_response expected_status
   end
 
+  def public_api_request(method, path, params = {}, expected_status = 200)
+    person = Person.last || create(:new_natural_person)
+    send(method, "/api/public#{path}", params: params,
+      headers: { 'Authorization': "Token token=#{person.api_token}" })
+    assert_response expected_status
+  end
+
   def api_get(path, params = {}, expected_status = 200)
     api_request(:get, path, params, expected_status)
   end
@@ -26,6 +33,18 @@ module RequestHelpers
 
   def api_destroy(path, expected_status = 204)
     api_request(:delete, path, {}, expected_status)
+  end
+
+  def public_api_get(path, params = {}, expected_status = 200)
+    public_api_request(:get, path, params, expected_status)
+  end
+
+  def public_api_create(path, data, expected_status = 201)
+    public_api_request(:post, path, {data: data}, expected_status)
+  end
+
+  def public_api_update(path, data, expected_status = 200)
+    public_api_request(:patch, path, {data: data}, expected_status)
   end
 
   def json_response

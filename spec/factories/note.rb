@@ -3,6 +3,7 @@ FactoryBot.define_persons_item_and_seed(:note,
     title { 'my nickname' }
     body { 'Please call me by my nickname: Mr. Bond' }
     transient { add_all_attachments { true } }
+    private false
   },
   alt_full_note: proc {
     title { 'oh my god' }

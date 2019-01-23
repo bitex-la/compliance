@@ -83,6 +83,83 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   end
 end
 
+shared_examples "public seed" do |type, initial_factory, later_factory,
+  relations_proc = -> { {} }|
+
+  initial_seed = "#{initial_factory}_seed"
+  later_seed = "#{later_factory}_seed"
+  seed_type = Garden::Naming.new(type).seed_plural
+  serializer = Garden::Naming.new(type).serializer.constantize
+
+  it "Get a #{seed_type}" do
+    issue = create(:basic_issue)
+    person = issue.person
+    exceptions = serializer.try(:attrs_exceptions) || []
+    public_attrs = attributes_for(initial_seed)
+      .reject { |attr, value| exceptions.include? attr }
+    content = public_attrs.merge(issue: issue)
+    seed = create(initial_seed, content)
+
+    public_api_get "/#{seed_type}/#{seed.id}"
+
+    seed_response = api_response.data
+    seed_response.attributes.to_h.should >= public_attrs
+  end
+
+  it "Creates and updates a #{seed_type}" do
+    issue = create(:basic_issue)
+    person = issue.person
+    exceptions = serializer.try(:attrs_exceptions) || []
+    public_attrs = attributes_for(initial_seed)
+      .reject { |attr, value| exceptions.include? attr }
+    initial_relations = instance_exec(&relations_proc)
+    issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
+
+    server_sent_relations = {
+      person: {data: {id: person.id.to_s, type: 'people'}},
+      attachments: {data: []},
+      fruit: {data: nil},
+    }
+
+    public_api_create "/#{seed_type}", {
+      type: seed_type,
+      attributes: public_attrs,
+      relationships: issue_relation.merge(initial_relations)
+    }
+
+    seed = api_response.data
+    seed.attributes.to_h.should >= public_attrs
+      
+
+    json_response[:data][:relationships].should >=
+      issue_relation
+        .merge(initial_relations)
+        .merge(server_sent_relations)
+
+    later_attrs = attributes_for(later_seed)
+    later_relations = instance_exec(&relations_proc)
+
+    public_api_update "/#{seed_type}/#{seed.id}", {
+      type: seed_type,
+      attributes: later_attrs,
+      relationships: later_relations
+    }
+
+    seed_id = api_response.data.id
+
+    api_response.data.attributes.should >= later_attrs
+    json_response[:data][:relationships].should >=
+      issue_relation
+        .merge(later_relations)
+        .merge(server_sent_relations)
+
+    file_one, file_two = %i(gif png).map do |ext|
+      public_api_create "/attachments", jsonapi_attachment(seed_type, seed_id, ext)
+      api_response.data
+    end
+  end
+end
+
 shared_examples "docket" do |type, initial_factory|
   initial_seed = "#{initial_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
