@@ -15,7 +15,7 @@ unless Rails.env.production?
    body_es: 'Mr. Robot por favor vaya a Google y revise al cliente',
    subject_pt: 'O robô deve executar uma revisão automatizada do Google',
    body_pt: 'Mr. Robot, por favor, vá para o Google e verifique o cliente',
-   scope: 2
+   scope: 1
  )
 
  human_google = ObservationReason.create!(
@@ -25,7 +25,7 @@ unless Rails.env.production?
    body_es: 'Por favor vaya a Google y haga una revisión manual',
    subject_pt: 'O administrador deve executar uma revisão manual do Google',
    body_pt: 'Por favor, vá para Google e verifique o cliente',
-   scope: 1
+   scope: 2
  )
 
  robot_worldcheck = ObservationReason.create!(
@@ -35,7 +35,7 @@ unless Rails.env.production?
    body_es: 'Mr. Robot por favor vaya a worldcheck y revise al cliente',
    subject_pt: 'O robô deve executar uma revisão automatizada do worldcheck',
    body_pt: 'Mr. Robot, por favor, vá para o Worldcheck e verifique o cliente',
-   scope: 2
+   scope: 1
  )
 
  human_worldcheck = ObservationReason.create!(
@@ -45,7 +45,7 @@ unless Rails.env.production?
    body_es: 'Por favor vaya a worldcheck y haga una revisión manual',
    subject_pt: 'O administrador deve executar uma revisão manual do worldcheck',
    body_pt: 'Por favor, vá para worlcheck e verifique o cliente',
-   scope: 1
+   scope: 2
  )
 
  on_demand_google = ObservationReason.create!(
@@ -55,7 +55,7 @@ unless Rails.env.production?
    body_es: 'Por favor vaya a Google y haga una revisión manual',
    subject_pt: 'O administrador deve executar uma revisão manual do Google sob demanda',
    body_pt: 'Por favor, vá para Google e verifique o cliente',
-   scope: 1
+   scope: 2
  )
 
  on_demand_worldcheck = ObservationReason.create!(
@@ -65,7 +65,7 @@ unless Rails.env.production?
    body_es: 'Por favor vaya a Worldcheck y haga una revisión manual',
    subject_pt: 'O administrador deve executar uma revisão manual do Worldcheck sob demanda',
    body_pt: 'Por favor, vá para Worlcheck e verifique o cliente',
-   scope: 1
+   scope: 2
  )
 
  risk_score_alert = ObservationReason.create!(
