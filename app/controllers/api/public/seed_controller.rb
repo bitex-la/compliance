@@ -35,7 +35,7 @@ class Api::Public::SeedController < Api::Public::ApiController
     return jsonapi_422 unless mapper.data
 
     if mapper.data.save
-      jsonapi_response mapper.data, options_for_response, success_code
+      jsonapi_public_response mapper.data, options_for_response, success_code
     else
       json_response mapper.all_errors, 422
     end

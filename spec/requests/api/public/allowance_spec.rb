@@ -5,5 +5,6 @@ describe Allowance do
   it_behaves_like 'public seed',
     :allowances,
     :salary_allowance,
-    :alt_salary_allowance
+    :alt_salary_allowance,
+    [:amount, :weight]
 end

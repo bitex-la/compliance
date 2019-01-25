@@ -16,7 +16,8 @@ class Api::NoteSeedsController < Api::SeedController
         :attachments,
         :copy_attachments,
         :replaces,
-        :issue
+        :issue,
+        :private
       ]
   end
 end

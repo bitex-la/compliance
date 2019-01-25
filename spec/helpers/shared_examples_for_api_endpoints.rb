@@ -9,12 +9,12 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   it "Destroy a #{seed_type}" do
     seed = create(initial_seed, issue: create(:basic_issue))
     api_destroy "/#{seed_type}/#{seed.id}"
-    
+
     response.body.should be_blank
 
     api_get "/#{seed_type}/#{seed.id}", {}, 404
   end
-   
+
   it "Creates, updates and approves #{seed_type}" do
     issue = create(:basic_issue)
     person = issue.person
@@ -84,7 +84,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 end
 
 shared_examples "public seed" do |type, initial_factory, later_factory,
-  relations_proc = -> { {} }|
+  exceptions = [], relations_proc = -> { {} }|
 
   initial_seed = "#{initial_factory}_seed"
   later_seed = "#{later_factory}_seed"
@@ -94,7 +94,6 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
   it "Get a #{seed_type}" do
     issue = create(:basic_issue)
     person = issue.person
-    exceptions = serializer.try(:attrs_exceptions) || []
     public_attrs = attributes_for(initial_seed)
       .reject { |attr, value| exceptions.include? attr }
     content = public_attrs.merge(issue: issue)
@@ -104,12 +103,12 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
 
     seed_response = api_response.data
     seed_response.attributes.to_h.should >= public_attrs
+    seed_response.attributes.to_h.should_not include(*exceptions)
   end
 
   it "Creates and updates a #{seed_type}" do
     issue = create(:basic_issue)
     person = issue.person
-    exceptions = serializer.try(:attrs_exceptions) || []
     public_attrs = attributes_for(initial_seed)
       .reject { |attr, value| exceptions.include? attr }
     initial_relations = instance_exec(&relations_proc)
@@ -117,8 +116,7 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
 
     server_sent_relations = {
       person: {data: {id: person.id.to_s, type: 'people'}},
-      attachments: {data: []},
-      fruit: {data: nil},
+      attachments: {data: []}
     }
 
     public_api_create "/#{seed_type}", {
@@ -129,7 +127,7 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
 
     seed = api_response.data
     seed.attributes.to_h.should >= public_attrs
-      
+    seed.attributes.to_h.should_not include(*exceptions)
 
     json_response[:data][:relationships].should >=
       issue_relation
@@ -148,6 +146,7 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
     seed_id = api_response.data.id
 
     api_response.data.attributes.should >= later_attrs
+    api_response.data.attributes.to_h.should_not include(*exceptions)
     json_response[:data][:relationships].should >=
       issue_relation
         .merge(later_relations)
@@ -460,7 +459,7 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
   it "Can customize fields on #{type} index" do
     api_get "/#{type}", {fields: { type => fields_definition}}
     json_response[:data].map do |d|
-      d[:attributes].keys.map(&:to_s) + 
+      d[:attributes].keys.map(&:to_s) +
       (d[:relationships] || {}).keys.map(&:to_s)
     end.flatten.uniq.should == fields_definition.split(',')
   end

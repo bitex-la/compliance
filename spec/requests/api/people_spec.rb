@@ -440,7 +440,7 @@ describe Person do
             body:   'Please call me by my nickname: Mr. Bond',
             created_at: 1514764800,
             updated_at: 1514764800,
-            private: nil
+            private: false
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
