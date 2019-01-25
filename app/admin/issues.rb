@@ -327,8 +327,10 @@ ActiveAdmin.register Issue do
           if seed.persisted?     
             ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
             begin 
-              extra_info_as_json = JSON.parse(seed.extra_info)
-              ArbreHelpers.json_renderer(context, extra_info_as_json)
+              if seed.extra_info
+                extra_info_as_json = JSON.parse(seed.extra_info)
+                ArbreHelpers.json_renderer(context, extra_info_as_json)
+              end
             rescue JSON::ParserError
               rs.input :extra_info, input_html: { readonly: true, disabled: true }
             end
