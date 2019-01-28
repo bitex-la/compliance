@@ -8,13 +8,23 @@ unless Rails.env.production?
 
  ############# CREATE SUPPORT ENTITIES #################
  # 1. Observations reasons
- human_worldcheck = ObservationReason.create!(
-   subject_en: 'Admin must run a manual worldcheck review',
-   body_en: 'Please go to worlcheck and check the customer',
-   subject_es: 'Admin debe correr una revisión manual en worldcheck',
-   body_es: 'Por favor vaya a worldcheck y haga una revisión manual',
-   subject_pt: 'O administrador deve executar uma revisão manual do worldcheck',
-   body_pt: 'Por favor, vá para worlcheck e verifique o cliente',
+ robot_google = ObservationReason.create!(
+   subject_en: 'Robot must run an automated Google review',
+   body_en: 'Mr. Robot please go to Google and check the customer',
+   subject_es: 'Robot debe correr una revisión automatica en Google',
+   body_es: 'Mr. Robot por favor vaya a Google y revise al cliente',
+   subject_pt: 'O robô deve executar uma revisão automatizada do Google',
+   body_pt: 'Mr. Robot, por favor, vá para o Google e verifique o cliente',
+   scope: 1
+ )
+
+ human_google = ObservationReason.create!(
+   subject_en: 'Admin must run a manual Google review',
+   body_en: 'Please go to Google and check the customer',
+   subject_es: 'Admin debe correr una revisión manual en Google',
+   body_es: 'Por favor vaya a Google y haga una revisión manual',
+   subject_pt: 'O administrador deve executar uma revisão manual do Google',
+   body_pt: 'Por favor, vá para Google e verifique o cliente',
    scope: 2
  )
 
@@ -26,6 +36,46 @@ unless Rails.env.production?
    subject_pt: 'O robô deve executar uma revisão automatizada do worldcheck',
    body_pt: 'Mr. Robot, por favor, vá para o Worldcheck e verifique o cliente',
    scope: 1
+ )
+
+ human_worldcheck = ObservationReason.create!(
+   subject_en: 'Admin must run a manual worldcheck review',
+   body_en: 'Please go to worlcheck and check the customer',
+   subject_es: 'Admin debe correr una revisión manual en worldcheck',
+   body_es: 'Por favor vaya a worldcheck y haga una revisión manual',
+   subject_pt: 'O administrador deve executar uma revisão manual do worldcheck',
+   body_pt: 'Por favor, vá para worlcheck e verifique o cliente',
+   scope: 2
+ )
+
+ on_demand_google = ObservationReason.create!(
+   subject_en: 'Admin must run a manual Google on demand review',
+   body_en: 'Please go to Google and check the customer',
+   subject_es: 'Admin debe correr una revisión manual en Google por demanda',
+   body_es: 'Por favor vaya a Google y haga una revisión manual',
+   subject_pt: 'O administrador deve executar uma revisão manual do Google sob demanda',
+   body_pt: 'Por favor, vá para Google e verifique o cliente',
+   scope: 2
+ )
+
+ on_demand_worldcheck = ObservationReason.create!(
+   subject_en: 'Admin must run a manual Worldcheck on demand review',
+   body_en: 'Please go to Worlcheck and check the customer',
+   subject_es: 'Admin debe correr una revisión manual en Worldcheck por demanda',
+   body_es: 'Por favor vaya a Worldcheck y haga una revisión manual',
+   subject_pt: 'O administrador deve executar uma revisão manual do Worldcheck sob demanda',
+   body_pt: 'Por favor, vá para Worlcheck e verifique o cliente',
+   scope: 2
+ )
+
+ risk_score_alert = ObservationReason.create!(
+  subject_en: 'Risk score alert',
+  body_en: 'New score assessment',
+  subject_es: 'Alerta de score de riesgo',
+  body_es: 'Nuevo score de riesgo',
+  subject_pt: 'Alerta de pontuação de risco',
+  body_pt: 'Nova avaliação de pontuação',
+  scope: 2
  )
 
  ilegible_id = ObservationReason.create!(
@@ -66,15 +116,5 @@ unless Rails.env.production?
    subject_pt: 'Informações sobre entidade legal incompleta',
    body_pt: 'Por favor, preencha as informações básicas para uma entidade legal',
    scope: 0
- )
-
- risk_score_alert = ObservationReason.create!(
-  subject_en: 'Risk score alert',
-  body_en: 'New score assessment',
-  subject_es: 'Alerta de score de riesgo',
-  body_es: 'Nuevo score de riesgo',
-  subject_pt: 'Alerta de pontuação de risco',
-  body_pt: 'Nova avaliação de pontuação',
-  scope: 2
  )
 end
