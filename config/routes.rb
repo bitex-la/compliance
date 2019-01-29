@@ -77,11 +77,11 @@ Rails.application.routes.draw do
       end
       resources :observations, only: [:show, :update]
       resources :attachments, only: :create
-      # resources :issues, only: :show do
-      #   member do
-      #     post :complete
-      #   end
-      # end
+      resources :issues, only: :show do
+        member do
+          post :complete
+        end
+      end
     end
   end
 
