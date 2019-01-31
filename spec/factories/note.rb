@@ -9,7 +9,13 @@ FactoryBot.define_persons_item_and_seed(:note,
     title { 'oh my god' }
     body { 'A super duper body' }
     transient { add_all_attachments { true } }
-  }
+  },
+  full_private_note: proc {
+    title { 'my private nickname' }
+    body { 'Please call me by my private nickname: Mr. Private Bond' }
+    transient { add_all_attachments { true } }
+    private true
+  },
 )
 
 FactoryBot.define do 

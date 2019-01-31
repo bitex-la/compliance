@@ -45,9 +45,13 @@ module ApiResponse
       options[:include] = possible_relations.keys
     end
 
-    ser = serializer.new(it, options)
-    body = ser.serialized_json
-    json_response body, status
+    begin
+      ser = serializer.new(it, options)
+      body = ser.serialized_json
+      json_response body, status
+    rescue ArgumentError
+      jsonapi_422
+    end
   end
 
   def error_response(errors)

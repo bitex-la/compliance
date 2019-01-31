@@ -99,7 +99,7 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
     content = public_attrs.merge(issue: issue)
     seed = create(initial_seed, content)
 
-    public_api_get "/#{seed_type}/#{seed.id}"
+    public_api_get person.api_token, "/#{seed_type}/#{seed.id}"
 
     seed_response = api_response.data
     seed_response.attributes.to_h.should >= public_attrs
@@ -119,7 +119,7 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
       attachments: {data: []}
     }
 
-    public_api_create "/#{seed_type}", {
+    public_api_create person.api_token, "/#{seed_type}", {
       type: seed_type,
       attributes: public_attrs,
       relationships: issue_relation.merge(initial_relations)
@@ -137,7 +137,7 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
     later_attrs = attributes_for(later_seed)
     later_relations = instance_exec(&relations_proc)
 
-    public_api_update "/#{seed_type}/#{seed.id}", {
+    public_api_update person.api_token, "/#{seed_type}/#{seed.id}", {
       type: seed_type,
       attributes: later_attrs,
       relationships: later_relations
@@ -153,7 +153,7 @@ shared_examples "public seed" do |type, initial_factory, later_factory,
         .merge(server_sent_relations)
 
     file_one, file_two = %i(gif png).map do |ext|
-      public_api_create "/attachments", jsonapi_attachment(seed_type, seed_id, ext)
+      public_api_create person.api_token, "/attachments", jsonapi_attachment(seed_type, seed_id, ext)
       api_response.data
     end
   end

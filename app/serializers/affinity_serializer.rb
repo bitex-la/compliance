@@ -7,10 +7,5 @@ class AffinitySerializer
     record_type: :people,
     serializer: 'PersonSerializer'
   derive_seed_serializer!
-end
-
-class AffinitySeedSerializer
-  belongs_to :related_person,
-    record_type: :people,
-    serializer: 'PersonSerializer'
+  derive_public_seed_serializer!
 end

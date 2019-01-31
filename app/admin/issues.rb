@@ -135,6 +135,7 @@ ActiveAdmin.register Issue do
         div class: 'note_seeds' do
           ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
             nf.input :body, input_html: {rows: 3}
+            nf.input :private
             ArbreHelpers.has_many_attachments(context, nf)
           end
         end

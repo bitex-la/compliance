@@ -14,6 +14,7 @@ FactoryBot.define do
         full_phone_seed
         full_email_seed
         full_note_seed
+        full_private_note_seed
         full_affinity_seed
         salary_allowance_seed 
         savings_allowance_seed

@@ -61,7 +61,10 @@ class Issue < ApplicationRecord
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
 
+  has_many :public_note_seeds, -> { where('private = false') }, class_name: 'NoteSeed'
+
   has_many :observations
+  has_many :public_observations, -> { where("scope = #{Observation.scopes[:client]}") }, class_name: 'Observation'
   accepts_nested_attributes_for :observations,
     reject_if: proc { |attr| attr['scope'].blank? || attr['observation_reason_id'].blank? }
 
@@ -299,6 +302,10 @@ class Issue < ApplicationRecord
     entities
   end
 
+  def self.eager_issue_public_entities
+    eager_issue_entities.reject {|x| x[0].keys.first == "note_seeds"}
+  end
+
   def self.eager_seed_entities
     [:person, :fruit , attachments:[:attached_to_fruit, :attached_to_seed]]
   end
@@ -358,6 +365,49 @@ class Issue < ApplicationRecord
       :'identifications_seeds.attachments',
       :observations,
       :'observations.observation_reason'
+    ]
+  end
+
+  def self.public_included_for
+    entities = included_for.reject do |x| 
+      [
+        :risk_score_seeds,
+        :'risk_score_seeds.attachments',
+        :person,
+        :'person.identifications',
+        :'person.identifications.attachments',
+        :'person.domiciles',
+        :'person.domiciles.attachments',
+        :'person.natural_dockets',
+        :'person.natural_dockets.attachments',
+        :'person.legal_entity_dockets',
+        :'person.legal_entity_dockets.attachments',
+        :'person.argentina_invoicing_details',
+        :'person.argentina_invoicing_details.attachments',
+        :'person.chile_invoicing_details',
+        :'person.chile_invoicing_details.attachments',
+        :'person.phones',
+        :'person.phones.attachments',
+        :'person.emails',
+        :'person.emails.attachments',
+        :'person.notes',
+        :'person.notes.attachments',
+        :'person.affinities',
+        :'person.affinities.atachments',
+        :'person.allowances',
+        :'person.allowances.attachments',
+        :'person.fund_deposits',
+        :'person.fund_deposits.attachments',
+        :'person.risk_scores',
+        :'person.risk_scores.attachments',
+      ].include? x
+    end
+
+    entities.concat [
+      :public_note_seeds,
+      :'public_note_seeds.attachments',
+      :public_observations,
+      :'public_observations.observation_reason'
     ]
   end
 end
