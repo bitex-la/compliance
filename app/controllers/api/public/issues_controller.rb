@@ -7,7 +7,12 @@ class Api::Public::IssuesController < Api::Public::ApiController
       active: true
     ).result.first
 
-    jsonapi_public_response issue, {include: params[:include] || Issue.public_included_for}
+    if issue
+      jsonapi_public_response issue, 
+        {include: params[:include] || Issue.public_included_for}
+    else
+      jsonapi_404
+    end
   end
 
   def complete
