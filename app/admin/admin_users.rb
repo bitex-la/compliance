@@ -1,5 +1,5 @@
 ActiveAdmin.register AdminUser do
-  menu priority: 3, if: -> { !current_admin_user.is_restricted }
+  menu priority: 4, if: -> { !current_admin_user.is_restricted }
   permit_params :email, :password, :password_confirmation, :is_restricted
 
   action_item :restrict, only: [:show, :edit, :update], if: -> {!current_admin_user.is_restricted && !resource.is_restricted} do 

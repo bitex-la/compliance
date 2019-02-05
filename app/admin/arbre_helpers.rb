@@ -152,14 +152,16 @@ module ArbreHelpers
       builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
         Appsignal.instrument("render_one_of_#{relationship.to_s}") do
           instance_exec(f, context, &fields)
-          if f.object.persisted? && !extra[:cant_remove]
-            unless f.object.class.name == 'Attachment'
-              f.template.concat(context.link_to("Remove",
-                f.object,
-                method: :delete,
-                data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
-                class: 'button has_many_remove'
-              ))
+          if f.object
+            if f.object.persisted? && !extra[:cant_remove]
+              unless f.object.class.name == 'Attachment'
+                f.template.concat(context.link_to("Remove",
+                  f.object,
+                  method: :delete,
+                  data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
+                  class: 'button has_many_remove'
+                ))
+              end
             end
           end
         end
@@ -470,6 +472,34 @@ module ArbreHelpers
         span text
       end
       br
+    end
+  end
+
+  def self.render_workflow_progress(context)
+    context.instance_eval do
+      context.resource.workflows.in_groups_of(2).each do |group|
+        columns do
+          group.each_with_index do |w, i|
+            column do
+              next if w.nil?
+              panel w.name do
+                h3 "Workflow completed at #{w.completness_ratio}%"
+                div class: 'meter' do
+                  span style: "width: #{w.completness_ratio}%"
+                end
+                h3 "Tasks"
+                table_for w.tasks do
+                  column :id {|t| link_to t.id, [w, t]}
+                  column :task_type {|t| link_to t.try(:task_type).try(:name), [w, t]}
+                  column :state
+                  column :current_retries
+                  column :max_retries
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

@@ -50,6 +50,8 @@ Rails.application.routes.draw do
       attachments
       observation_reasons
       observations
+      tasks
+      workflows
     ).each do |entities|
       resources entities, only: [:show, :index, :create, :update]
     end

@@ -140,6 +140,10 @@ ActiveAdmin.register Issue do
         end
       end
 
+      tab :workflows do
+        ArbreHelpers.render_workflow_progress(self)
+      end
+
       tab :docket do
         if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
           ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|

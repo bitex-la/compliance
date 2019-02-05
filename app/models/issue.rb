@@ -61,6 +61,9 @@ class Issue < ApplicationRecord
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
 
+  has_many :workflows
+  accepts_nested_attributes_for :workflows, allow_destroy: true
+
   has_many :observations
   accepts_nested_attributes_for :observations,
     reject_if: proc { |attr| attr['scope'].blank? || attr['observation_reason_id'].blank? }

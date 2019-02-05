@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190121144300) do
+ActiveRecord::Schema.define(version: 20190205185245) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.string "namespace"
@@ -642,18 +642,34 @@ ActiveRecord::Schema.define(version: 20190121144300) do
     t.index ["replaced_by_id"], name: "index_risk_scores_on_replaced_by_id"
   end
 
-  create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
-    t.integer "entity_id"
-    t.string "entity_type"
-    t.text "sentence", limit: 4294967295
-    t.text "result", limit: 4294967295
-    t.integer "performer_id"
-    t.integer "task_kind_id"
+  create_table "task_types", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
+    t.string "name"
+    t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
+    t.bigint "workflow_id"
     t.string "aasm_state"
+    t.integer "index"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "max_retries", default: 0
+    t.integer "current_retries", default: 0
+    t.bigint "task_type_id"
+    t.index ["task_type_id"], name: "index_tasks_on_task_type_id"
+    t.index ["workflow_id"], name: "index_tasks_on_workflow_id"
+  end
+
+  create_table "workflows", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.integer "scope"
-    t.string "field"
+    t.string "aasm_state"
+    t.integer "workflow_kind_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "issue_id"
+    t.index ["issue_id"], name: "index_workflows_on_issue_id"
   end
 
   add_foreign_key "affinities", "affinities", column: "replaced_by_id"
@@ -730,4 +746,7 @@ ActiveRecord::Schema.define(version: 20190121144300) do
   add_foreign_key "risk_scores", "issues"
   add_foreign_key "risk_scores", "people"
   add_foreign_key "risk_scores", "risk_scores", column: "replaced_by_id"
+  add_foreign_key "tasks", "task_types"
+  add_foreign_key "tasks", "workflows"
+  add_foreign_key "workflows", "issues"
 end
