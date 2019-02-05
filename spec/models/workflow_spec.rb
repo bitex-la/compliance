@@ -38,16 +38,35 @@ RSpec.describe Workflow, type: :model do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
-      basic_workflow.start!
       expect { basic_workflow.finish! }.to raise_error AASM::InvalidTransition
       
       basic_workflow.tasks.first.start!
+      expect(basic_workflow).to have_state(:started)
       basic_workflow.tasks.first.finish!
+      expect(basic_workflow).to have_state(:started)
 
       expect { basic_workflow.finish! }.to raise_error AASM::InvalidTransition
 
       basic_workflow.tasks[1..-1].each {|task| task.start!; task.finish!}
-      expect(basic_workflow.reload).to allow_transition_to(:performed)
+      expect(basic_workflow).to have_state(:performed)
+    end
+
+    it 'goes to failed if all tasks fails and all has zero retries available' do
+      3.times do 
+        create(:basic_task, workflow: basic_workflow)
+      end
+      basic_workflow.tasks.each {|task| task.start!; task.fail!}
+      expect(basic_workflow).to have_state(:started)
+
+      basic_workflow.tasks.each do |task|
+        expect(task.can_retry?).to be_truthy
+      end
+
+      3.times do 
+        basic_workflow.tasks.each {|task| task.retry!; task.fail!}
+      end
+
+      expect(basic_workflow).to have_state(:failed)
     end
   end
 end

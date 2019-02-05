@@ -68,6 +68,10 @@ class Workflow < ApplicationRecord
     tasks.all? {|task| task.performed?}
   end
 
+  def all_tasks_failed?
+    tasks.all? {|task| task.failed? && !task.can_retry?}
+  end
+
   def completed_tasks
     tasks.select{|x| x.performed?}
   end

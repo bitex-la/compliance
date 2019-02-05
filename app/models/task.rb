@@ -16,16 +16,25 @@ class Task < ApplicationRecord
 
     event :start do
       transitions from: :new, to: :started
+      after do
+        workflow.start! if workflow.may_start?
+      end
     end
 
     event :finish do 
       transitions from: :started, to: :performed
       transitions from: :retried, to: :performed
+      after do
+        workflow.finish! if workflow.all_tasks_performed?
+      end
     end
 
     event :fail do
       transitions from: :started, to: :failed
       transitions from: :retried, to: :failed
+      after do
+        workflow.fail! if workflow.all_tasks_failed?
+      end
     end
 
     event :retry do
