@@ -1,4 +1,4 @@
-class Api::IdentificationSeedsController < Api::SeedController
+class Api::IdentificationSeedsController < Api::EntityController
   def resource_class
     IdentificationSeed
   end

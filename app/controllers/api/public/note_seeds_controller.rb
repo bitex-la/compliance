@@ -1,4 +1,4 @@
-class Api::Public::NoteSeedsController < Api::Public::SeedController
+class Api::Public::NoteSeedsController < Api::Public::EntityController
   def resource_class
     NoteSeed.where(private: false)
   end

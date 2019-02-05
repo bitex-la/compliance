@@ -1,4 +1,4 @@
-class Api::Public::SeedController < Api::Public::ApiController
+class Api::Public::EntityController < Api::Public::ApiController
   before_action :verify_scope, only: [:show, :update]
 
   def show

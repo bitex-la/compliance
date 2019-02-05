@@ -1,4 +1,4 @@
-class Api::Public::ObservationsController < Api::Public::SeedController
+class Api::Public::ObservationsController < Api::Public::EntityController
   def resource_class
     Observation.where(scope: 'client')
   end

@@ -1,4 +1,4 @@
-class Api::Public::DomicileSeedsController < Api::Public::SeedController
+class Api::Public::DomicileSeedsController < Api::Public::EntityController
   def resource_class
     DomicileSeed
   end
