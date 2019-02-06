@@ -344,7 +344,7 @@ class Issue < ApplicationRecord
       :legal_entity_docket_seed,
       :'legal_entity_docket_seed.attachments',
       :argentina_invoicing_detail_seed,
-      :'argentina_invoicing_detail_seed.atachments',
+      :'argentina_invoicing_detail_seed.attachments',
       :chile_invoicing_detail_seed,
       :'chile_invoicing_detail_seed.attachments',
       :allowance_seeds,

@@ -21,8 +21,17 @@ describe Issue do
           "phone_seeds"=>1,
           "argentina_invoicing_detail_seeds"=>1,
           "allowance_seeds"=>2,
-          "note_seeds"=>1, #Only 1 note is public, the other one is private
+          "note_seeds"=>1 #Only 1 note is public, the other one is private
         }
+
+      api_response.included.select{|item| item.type.include? '_seed'}.each do |item|
+        item.relationships.attachments.data.each do |attachment|
+          found = api_response.included.find do |i|
+            i.type == "attachments" && i.id == attachment.id
+          end
+          expect(found).to be_truthy
+        end
+      end
 
       #Not public relationships
       %i(risk_score_seeds, people).each do |relationship|
