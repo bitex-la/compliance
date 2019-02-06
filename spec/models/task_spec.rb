@@ -2,8 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Task, type: :model do 
   let(:invalid_task) { described_class.new }
-  let(:basic_task) { 
-    create(:basic_task, workflow: create(:basic_workflow)) }
+  let(:basic_task) { create(:basic_task) }
 
   it 'is not valid without a workflow' do
     expect(invalid_task).to_not be_valid

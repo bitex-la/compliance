@@ -53,6 +53,10 @@ class Task < ApplicationRecord
     aasm_state
   end
 
+  def state=(status)
+    self.aasm_state = status
+  end
+
   def can_retry?
     current_retries < max_retries
   end
