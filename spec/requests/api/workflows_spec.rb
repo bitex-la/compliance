@@ -128,7 +128,29 @@ describe Workflow do
         api_request :post, "/tasks/#{task_two.id}/finish", {}, 200
         
         expect(workflow.reload).to have_state(:performed)
-    end
+      end
+
+      it 'appear as finished if all tasks failed' do
+        workflow = create(:basic_workflow)
+
+        2.times do
+          create(:basic_task, workflow: workflow, max_retries: 0)
+        end
+
+        api_request :post, "/workflows/#{workflow.id}/start", {}, 200 
+
+        task_one = workflow.tasks.first
+        task_two = workflow.tasks.second
+
+        api_request :post, "/tasks/#{task_one.id}/start", {}, 200
+        api_request :post, "/tasks/#{task_one.id}/fail", {}, 200
+        api_request :post, "/tasks/#{task_two.id}/start", {}, 200
+        api_request :post, "/tasks/#{task_two.id}/fail", {}, 200
+
+        api_get "/workflows/#{workflow.id}", {}, 200
+
+        api_response.data.attributes.state.should == 'failed'
+      end
     end
   end
 end

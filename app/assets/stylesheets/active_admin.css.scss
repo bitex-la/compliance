@@ -355,6 +355,26 @@ body.active_admin{
 			color: #5E6469;
     }
 
+    li.has_many_container.tasks {
+      fieldset {
+        float: none;
+        width: auto;
+        padding: 10px;
+				margin: 5px 0 10px 0;
+				ol li.file.input {
+					padding: 0;
+				}
+
+        .attributes_table.attachment table{
+          margin-bottom: 0;
+        }
+      }
+
+      .has_many_remove {
+				top: 0px;
+			}
+    }
+
     li.has_many_container.attachments{
 			padding: 10px;
 

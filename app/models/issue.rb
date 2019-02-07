@@ -176,9 +176,9 @@ class Issue < ApplicationRecord
         person.update(enabled: true)
         log_state_change(:approve_issue)
       end
-      transitions from: :draft, to: :approved
-      transitions from: :new, to: :approved
-      transitions from: :answered, to: :approved
+      transitions from: :draft, to: :approved, guard: :all_workflows_performed?
+      transitions from: :new, to: :approved, guard: :all_workflows_performed?
+      transitions from: :answered, to: :approved, guard: :all_workflows_performed?
     end
 
     event :abandon do
@@ -203,6 +203,10 @@ class Issue < ApplicationRecord
       count += send(relation).count unless send(relation).blank?
     end
     count
+  end
+
+  def all_workflows_performed?
+    workflows.all? {|workflow| workflow.performed?} 
   end
 
   def state

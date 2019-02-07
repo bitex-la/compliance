@@ -55,6 +55,7 @@ ActiveAdmin.register Issue do
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
+      next unless resource.all_workflows_performed?
       next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end
@@ -140,8 +141,13 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab :workflows do
-        ArbreHelpers.render_workflow_progress(self)
+      tab "Workflows (#{resource.workflows.count})" do
+        #ArbreHelpers.render_workflow_progress(self)
+        ArbreHelpers.has_many_form self, f, :workflows do |wf, context|
+          wf.input :scope
+          wf.input :workflow_kind_id, as: :select, collection: WorkflowKind.all
+          ArbreHelpers.has_many_tasks(context, wf)
+        end
       end
 
       tab :docket do

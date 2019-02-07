@@ -64,6 +64,10 @@ class Workflow < ApplicationRecord
     aasm_state
   end
 
+  def state=(status)
+    self.aasm_state = status
+  end
+
   def all_tasks_performed?
     tasks.all? {|task| task.performed?}
   end

@@ -154,7 +154,7 @@ module ArbreHelpers
           instance_exec(f, context, &fields)
           if f.object
             if f.object.persisted? && !extra[:cant_remove]
-              unless f.object.class.name == 'Attachment'
+              unless f.object.class.name == 'Attachment' || f.object.class.name == 'Task'
                 f.template.concat(context.link_to("Remove",
                   f.object,
                   method: :delete,
@@ -219,6 +219,20 @@ module ArbreHelpers
           else
             af.input :document, as: :file, label: "Attachment"
           end
+        end
+      end
+    end
+  end
+
+  def self.has_many_tasks(context, form)
+    Appsignal.instrument("render_has_many_tasks") do
+      ArbreHelpers.has_many_form context, form, :tasks do |tf, ctx|
+        task = tf.object
+        if task.persisted?
+          tf.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
+        else
+          tf.input :task_type
+          tf.input :max_retries
         end
       end
     end
