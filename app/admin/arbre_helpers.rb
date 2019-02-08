@@ -228,11 +228,13 @@ module ArbreHelpers
     Appsignal.instrument("render_has_many_tasks") do
       ArbreHelpers.has_many_form context, form, :tasks do |tf, ctx|
         task = tf.object
+        tf.input :task_type, input_html: { disabled: task.persisted? } 
+        tf.input :max_retries, input_html: { disabled: task.persisted? } 
+        if !task.new_record?
+          tf.input :state, input_html: { disabled: task.persisted? } 
+        end
         if task.persisted?
           tf.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
-        else
-          tf.input :task_type
-          tf.input :max_retries
         end
       end
     end
@@ -489,30 +491,15 @@ module ArbreHelpers
     end
   end
 
-  def self.render_workflow_progress(context)
+  def self.render_workflow_progress(context, entity_type, object)
+    color_suffix = object.completness_ratio < 99 ? 'orange' : ''
+
     context.instance_eval do
-      context.resource.workflows.in_groups_of(2).each do |group|
-        columns do
-          group.each_with_index do |w, i|
-            column do
-              next if w.nil?
-              panel w.name do
-                h3 "Workflow completed at #{w.completness_ratio}%"
-                div class: 'meter' do
-                  span style: "width: #{w.completness_ratio}%"
-                end
-                h3 "Tasks"
-                table_for w.tasks do
-                  column :id {|t| link_to t.id, [w, t]}
-                  column :task_type {|t| link_to t.try(:task_type).try(:name), [w, t]}
-                  column :state
-                  column :current_retries
-                  column :max_retries
-                end
-              end
-            end
-          end
-        end
+      h3 class: 'light_header' do
+        "#{entity_type} completed at #{object.completness_ratio}%"
+      end
+      div class: "meter #{color_suffix}" do
+        span style: "width: #{object.completness_ratio}%"
       end
     end
   end

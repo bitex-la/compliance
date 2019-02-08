@@ -55,7 +55,9 @@ ActiveAdmin.register Issue do
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
-      next unless resource.all_workflows_performed?
+      if action == :approve
+        next unless resource.all_workflows_performed?
+      end
       next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end
@@ -142,8 +144,14 @@ ActiveAdmin.register Issue do
       end
 
       tab "Workflows (#{resource.workflows.count})" do
-        #ArbreHelpers.render_workflow_progress(self)
         ArbreHelpers.has_many_form self, f, :workflows do |wf, context|
+          wf.template.concat(
+            Arbre::Context.new({}, wf.template){
+              li do
+                ArbreHelpers.render_workflow_progress(self, "workflow", wf.object)
+              end
+            }.to_s
+          )
           wf.input :scope
           wf.input :workflow_kind_id, as: :select, collection: WorkflowKind.all
           ArbreHelpers.has_many_tasks(context, wf)
@@ -397,6 +405,23 @@ ActiveAdmin.register Issue do
         end
       end
 
+      tab "Workflows (#{resource.workflows.count})" do
+        ArbreHelpers.panel_grid(self, resource.workflows) do |workflow|
+          ArbreHelpers.render_workflow_progress(self, 'Workflow', workflow)
+          ArbreHelpers.seed_attributes_table self, workflow
+          h3 class: 'light_header' do
+            "Tasks"
+          end
+          table_for workflow.tasks, {class: 'tasks'} do
+            column :id {|t| link_to t.id, [workflow, t]}
+            column :task_type {|t| link_to t.try(:task_type).try(:name), [workflow, t]}
+            column :state
+            column :current_retries
+            column :max_retries
+          end
+        end       
+      end  
+
       tab :docket do
         if seed = issue.legal_entity_docket_seed.presence
           panel seed.name do
@@ -411,7 +436,6 @@ ActiveAdmin.register Issue do
         end
       end
 
-      
       ArbreHelpers.seed_collection_show_tab(self, "Domicile", :domicile_seeds)
       ArbreHelpers.seed_collection_show_tab(self, "Id", :identification_seeds)
       ArbreHelpers.seed_collection_show_tab(self, "Allowance", :allowance_seeds)

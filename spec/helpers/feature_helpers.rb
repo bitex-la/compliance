@@ -18,6 +18,16 @@ module FeatureHelpers
     end
   end
 
+  def fill_task(index = 0, att_index = 0, max_retries = 0)
+    select_with_search(
+      "#issue_workflows_attributes_#{index}_tasks_attributes_#{att_index}_task_type_input",
+      'Run something in background'
+    )
+
+    find("#issue_workflows_attributes_#{index}_tasks_attributes_#{att_index}_max_retries")
+      .set(0)
+  end
+
   def fill_attachment(kind, ext = 'jpg', has_many = true, index = 0, att_index = 0, accented = false)
     wait_for_ajax
     path = if has_many
@@ -70,6 +80,24 @@ module FeatureHelpers
   end
 
   def fulfil_new_issue_form
+    click_link 'Workflows (0)'
+    click_link "Add New Workflow"
+
+    select_with_search(
+      '#issue_workflows_attributes_0_scope_input',
+      'Robot'
+    )
+
+    select_with_search(
+      '#issue_workflows_attributes_0_workflow_kind_id_input',
+      'onboarding'
+    )
+
+    2.times do |i|
+      click_link "Add New Task"
+      fill_task(0, i)
+    end
+
     click_link 'ID (0)'
     click_link "Add New Identification seed"
     fill_seed("identification",{

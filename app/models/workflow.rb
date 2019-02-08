@@ -36,6 +36,7 @@ class Workflow < ApplicationRecord
 
     event :start do 
       transitions from: :new, to: :started
+      transitions from: :performed, to: :started
     end
 
     event :fail do

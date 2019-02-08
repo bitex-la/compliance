@@ -23,6 +23,8 @@ describe 'an admin user' do
 
   it 'creates a new natural person and its issue via admin' do
     observation_reason = create(:human_world_check_reason)
+    robot_task_type = create(:generic_robot_task)
+   
     login_as admin_user
 
     click_link 'People'
@@ -48,7 +50,6 @@ describe 'an admin user' do
     issue = Issue.last
     observation = Observation.last
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 1)
     assert_logging(issue.reload, :observe_issue, 1)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
@@ -97,14 +98,32 @@ describe 'an admin user' do
     issue.reload.should be_observed
     assert_logging(issue.reload, :observe_issue, 2)
 
+    expect(page).to_not have_content("Approve")
+
+    task_one = issue.workflows.first.tasks.first
+    task_one.start!
+    task_one.finish!
+
     fill_in 'issue[observations_attributes][1][reply]',
       with: '0 hits at 2018-06-07'
     click_button "Update Issue"
 
+    click_link 'Workflows (1)'
+    expect(page).to have_content("workflow completed at 50%")
+    
+    task_two = issue.workflows.first.tasks.last
+    task_two.start!
+    task_two.finish!
+
+    click_button "Update Issue"
+    click_link 'Workflows (1)'
+    expect(page).to have_content("workflow completed at 100%")
+
+    expect(page).to have_content("Approve")
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 5)
+    assert_logging(issue, :update_entity, 6)
     issue.person.should be_enabled
     assert_logging(issue.person, :enable_person, 1)
 
@@ -118,6 +137,12 @@ describe 'an admin user' do
     within '.extra_info' do
       expect(page).to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
       expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
+    end
+
+    click_link 'Workflows (1)'
+    within '#workflows-1' do
+      expect(page).to have_content("Workflow completed at 100%")
+      page.should have_css("table.tasks tr", count: 3)
     end
   end
 
