@@ -108,6 +108,7 @@ describe 'an admin user' do
       with: '0 hits at 2018-06-07'
     click_button "Update Issue"
 
+    expect(page).to have_content('Please check open workflows')
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 50%")
     
@@ -118,6 +119,7 @@ describe 'an admin user' do
     click_button "Update Issue"
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 100%")
+
 
     expect(page).to have_content("Approve")
     click_link "Approve"

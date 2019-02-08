@@ -78,6 +78,9 @@ ActiveAdmin.register Issue do
     def edit
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
+      unless resource.all_workflows_performed?
+        flash[:alert] = "Please check open workflows"
+      end
       super
     end
 
@@ -129,7 +132,7 @@ ActiveAdmin.register Issue do
         h3 "Observations"
         ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
           sf.input :observation_reason
-          sf.input :scope
+          sf.input :scope, as: :select
           sf.input :note, input_html: {rows: 3}
           sf.input :reply, input_html: {rows: 3}
         end

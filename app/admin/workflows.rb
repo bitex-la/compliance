@@ -1,11 +1,19 @@
 ActiveAdmin.register Workflow do
-  menu priority: 3
+  menu false
 
-  actions :all, :except => [:destroy]
+  actions :all, :except => [:index, :show, :new, :edit]
 
   scope :running, default: true
   scope :failing
   scope :all
+
+  controller do
+    def destroy
+      issue = resource.issue
+      resource.destroy
+      redirect_to edit_person_issue_url(issue.person, issue)
+    end
+  end
 
   index do
     column(:id)

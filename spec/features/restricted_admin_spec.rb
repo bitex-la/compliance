@@ -33,6 +33,7 @@ describe 'a restricted admin user' do
 
   it 'can create a natural person and it issue, but cannot approve, reject, dismiss or abandon it' do
     observation_reason = create(:human_world_check_reason)
+    robot_task_type = create(:generic_robot_task)
     login_as restricted_user
 
     click_link 'People'
