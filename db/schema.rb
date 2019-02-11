@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190205185245) do
+ActiveRecord::Schema.define(version: 20190211163136) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.string "namespace"
@@ -560,6 +560,7 @@ ActiveRecord::Schema.define(version: 20190205185245) do
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false, null: false
     t.integer "risk"
+    t.string "aasm_state"
   end
 
   create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
@@ -601,6 +602,13 @@ ActiveRecord::Schema.define(version: 20190205185245) do
     t.index ["person_id"], name: "index_phones_on_person_id"
     t.index ["phone_kind_id"], name: "index_phones_on_phone_kind_id"
     t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
+  end
+
+  create_table "risk_keywords", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
+    t.string "word_es"
+    t.string "word_en"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "risk_score_seeds", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
@@ -650,6 +658,7 @@ ActiveRecord::Schema.define(version: 20190205185245) do
     t.integer "max_retries", default: 0
     t.integer "current_retries", default: 0
     t.bigint "task_type_id"
+    t.text "output"
     t.index ["task_type_id"], name: "index_tasks_on_task_type_id"
     t.index ["workflow_id"], name: "index_tasks_on_workflow_id"
   end

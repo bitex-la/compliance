@@ -22,8 +22,8 @@ class Task < ApplicationRecord
     end
 
     event :finish do 
-      transitions from: :started, to: :performed
-      transitions from: :retried, to: :performed
+      transitions from: :started, to: :performed, guard: :has_an_output?
+      transitions from: :retried, to: :performed, guard: :has_an_output?
       after do
         workflow.finish! if workflow.all_tasks_performed?
       end
@@ -59,5 +59,9 @@ class Task < ApplicationRecord
 
   def can_retry?
     current_retries < max_retries
+  end
+
+  def has_an_output?
+    !output.blank?
   end
 end

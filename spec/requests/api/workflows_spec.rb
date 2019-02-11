@@ -121,10 +121,19 @@ describe Workflow do
         task_two = workflow.tasks.second
 
         api_request :post, "/tasks/#{task_one.id}/start", {}, 200
+        api_update "/tasks/#{task_one.id}", {
+          type: 'tasks',
+          attributes: {output: 'All ok'}
+        }
         api_request :post, "/tasks/#{task_one.id}/finish", {}, 200
+
         api_request :post, "/workflows/#{workflow.id}/finish", {}, 422
 
         api_request :post, "/tasks/#{task_two.id}/start", {}, 200
+        api_update "/tasks/#{task_two.id}", {
+          type: 'tasks',
+          attributes: {output: 'All ok'}
+        }
         api_request :post, "/tasks/#{task_two.id}/finish", {}, 200
         
         expect(workflow.reload).to have_state(:performed)

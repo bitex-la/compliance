@@ -10,6 +10,7 @@ ActiveAdmin.register Workflow do
   controller do
     def destroy
       issue = resource.issue
+      resource.tasks.map{|task| task.destroy}
       resource.destroy
       redirect_to edit_person_issue_url(issue.person, issue)
     end

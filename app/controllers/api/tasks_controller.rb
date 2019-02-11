@@ -22,6 +22,7 @@ class Api::TasksController < Api::SeedController
         workflows: [],
         task_types: [],
         tasks: [
+          :output,
           :max_retries,
           :current_retries,
           :task_type,

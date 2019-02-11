@@ -23,15 +23,32 @@ RSpec.describe Task, type: :model do
     end
 
     %i(started retried).each do |state|
-      it "goes from #{state} to performed on finish" do
-        expect(basic_task)
-          .to transition_from(state).to(:performed).on_event(:finish)
-      end
-
       it "goes from #{state} to performed on fail" do
         expect(basic_task)
           .to transition_from(state).to(:failed).on_event(:fail)
       end
+    end
+
+    it "goes from started to performed on finish" do
+      basic_task.start!
+      expect do
+        basic_task.finish!
+      end.to raise_error AASM::InvalidTransition
+      basic_task.update!(output: "Task performed at #{DateTime.now}")
+      expect(basic_task.reload)
+        .to transition_from(:started).to(:performed).on_event(:finish)
+    end
+
+    it "goes from retried to performed on finish" do
+      basic_task.start!
+      basic_task.fail!
+      basic_task.retry!
+      expect do
+        basic_task.finish!
+      end.to raise_error AASM::InvalidTransition
+      basic_task.update!(output: "Task performed at #{DateTime.now}")
+      expect(basic_task.reload)
+        .to transition_from(:retried).to(:performed).on_event(:finish)
     end
 
     it 'goes from failed to retried on retry' do

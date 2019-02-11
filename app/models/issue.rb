@@ -206,6 +206,7 @@ class Issue < ApplicationRecord
   end
 
   def all_workflows_performed?
+    return true if workflows.empty?
     workflows.all? {|workflow| workflow.performed?} 
   end
 

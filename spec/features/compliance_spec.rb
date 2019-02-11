@@ -102,6 +102,7 @@ describe 'an admin user' do
 
     task_one = issue.workflows.first.tasks.first
     task_one.start!
+    task_one.update!(output: 'All ok')
     task_one.finish!
 
     fill_in 'issue[observations_attributes][1][reply]',
@@ -114,13 +115,12 @@ describe 'an admin user' do
     
     task_two = issue.workflows.first.tasks.last
     task_two.start!
+    task_two.update!(output: 'All ok')
     task_two.finish!
 
     click_button "Update Issue"
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 100%")
-
-
     expect(page).to have_content("Approve")
     click_link "Approve"
 
@@ -275,6 +275,104 @@ describe 'an admin user' do
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
     assert_logging(person, :enable_person, 1)
+  end
+
+  it 'Can add/remove workflows and tasks to issues' do
+    robot_task_type = create(:generic_robot_task)
+    person = create :new_natural_person
+    issue = person.issues.reload.first
+    observation_reason = create(:observation_reason)
+
+    login_as admin_user
+
+    expect(page).to have_content 'Signed in successfully.'
+    click_on 'Draft'
+
+    # Admin sees issue in dashboard.
+    expect(page).to have_content issue.id
+
+    # Admin clicks in the issue to see the detail
+    within("#issue_#{issue.id} td.col.col-id") do
+      click_link(issue.id)
+    end
+
+    click_link 'Workflows (0)'
+
+    click_link "Add New Workflow"
+    select_with_search(
+      '#issue_workflows_attributes_0_scope_input',
+      'Robot'
+    )
+
+    select_with_search(
+      '#issue_workflows_attributes_0_workflow_kind_id_input',
+      'onboarding'
+    )
+
+    3.times do |i|
+      click_link "Add New Task"
+      fill_task(0, i)
+    end
+
+    within '#workflows-0 .has_many_container.tasks fieldset:nth-of-type(1)' do
+      click_link 'Remove'
+    end
+
+    click_button 'Update Issue'
+
+    add_observation(0, observation_reason, 'Please re-send your full names')
+
+    click_button 'Update Issue'
+
+    click_link 'Workflows (1)'
+
+    find("#issue_workflows_attributes_0_tasks_attributes_1__destroy").set(true)
+    click_button 'Update Issue'
+
+    observation = issue.observations.first
+    api_update "/observations/#{observation.id}", {
+      type: 'observations',
+      id: observation.id,
+      attributes: {reply: 'All ok'}
+    }
+
+    click_link 'Workflows (1)'
+    within '#workflows-1' do
+      click_link 'Remove'
+      page.driver.browser.switch_to.alert.accept
+    end
+
+    click_link 'Workflows (0)'
+
+    click_link "Add New Workflow"
+    select_with_search(
+      '#issue_workflows_attributes_0_scope_input',
+      'Robot'
+    )
+
+    select_with_search(
+      '#issue_workflows_attributes_0_workflow_kind_id_input',
+      'onboarding'
+    )
+
+    click_link "Add New Task"
+    fill_task(0, 0)
+
+    click_button 'Update Issue'
+
+    task = issue.reload.workflows.first.tasks.first
+
+    api_request :post, "/tasks/#{task.id}/start", {}, 200
+    api_update "/tasks/#{task.id}", {
+      type: 'tasks',
+      attributes: {output: 'All ok'}
+    }
+    api_request :post, "/tasks/#{task.id}/finish", {}, 200
+
+    click_button 'Update Issue'
+
+    click_link 'Approve'
+    issue.reload.should be_approved
   end
 
   it "Edits a customer by creating a new issue" do

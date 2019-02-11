@@ -112,6 +112,13 @@ describe Task do
       api_request :post, "/tasks/#{task.id}/finish", {}, 422
 
       api_request :post, "/tasks/#{task.id}/start", {}, 200
+      api_request :post, "/tasks/#{task.id}/finish", {}, 422
+
+      api_update "/tasks/#{task.id}", {
+        type: 'tasks',
+        attributes: {output: 'All ok'}
+      }
+
       api_request :post, "/tasks/#{task.id}/finish", {}, 200
     end
 
@@ -124,6 +131,13 @@ describe Task do
       api_request :post, "/tasks/#{task.id}/finish", {}, 422
 
       api_request :post, "/tasks/#{task.id}/retry", {}, 200
+      api_request :post, "/tasks/#{task.id}/finish", {}, 422
+
+      api_update "/tasks/#{task.id}", {
+        type: 'tasks',
+        attributes: {output: 'All ok'}
+      }
+
       api_request :post, "/tasks/#{task.id}/finish", {}, 200
     end
 
