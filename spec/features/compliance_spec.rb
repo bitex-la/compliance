@@ -342,6 +342,7 @@ describe 'an admin user' do
       page.driver.browser.switch_to.alert.accept
     end
 
+    expect(page).to_not have_content 'Workflows (1)'
     click_link 'Workflows (0)'
 
     click_link "Add New Workflow"
