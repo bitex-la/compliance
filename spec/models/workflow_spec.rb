@@ -40,7 +40,7 @@ RSpec.describe Workflow, type: :model do
       end
       expect { basic_workflow.finish! }.to raise_error AASM::InvalidTransition
       
-      basic_workflow.tasks.first.start!
+      basic_workflow.reload.tasks.first.start!
       expect(basic_workflow).to have_state(:started)
       basic_workflow.tasks.first.update!(output: 'all ok!')
       basic_workflow.tasks.first.finish!
@@ -57,7 +57,7 @@ RSpec.describe Workflow, type: :model do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
-      basic_workflow.tasks.each {|task| task.start!; task.fail!}
+      basic_workflow.reload.tasks.each {|task| task.start!; task.fail!}
       expect(basic_workflow).to have_state(:started)
 
       basic_workflow.tasks.each do |task|

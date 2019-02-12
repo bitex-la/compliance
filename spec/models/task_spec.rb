@@ -24,6 +24,7 @@ RSpec.describe Task, type: :model do
 
     %i(started retried).each do |state|
       it "goes from #{state} to performed on fail" do
+        basic_task.start!
         expect(basic_task)
           .to transition_from(state).to(:failed).on_event(:fail)
       end
