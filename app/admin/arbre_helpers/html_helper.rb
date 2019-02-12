@@ -80,7 +80,7 @@ module ArbreHelpers
       context.instance_eval do |ctx|
         context.concat("<li class='extra_info'>".html_safe) 
         context.concat('<h4>Extra info</h4>'.html_safe) 
-        ArbreHelpers.render_list(ctx, data)
+        ArbreHelpers::HtmlHelper.render_list(ctx, data)
         context.concat('</li>'.html_safe)
       end
     end
