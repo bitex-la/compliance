@@ -148,7 +148,7 @@ describe Workflow do
 
         api_request :post, "/workflows/#{workflow.id}/start", {}, 200 
 
-        task_one = workflow.tasks.first
+        task_one = workflow.reload.tasks.first
         task_two = workflow.tasks.second
 
         api_request :post, "/tasks/#{task_one.id}/start", {}, 200
