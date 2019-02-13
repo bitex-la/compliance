@@ -9,6 +9,6 @@ class Api::TaskTypesController < Api::SeedController
     JsonapiMapper.doc_unsafe!(params.permit!.to_h,
       %w(task_types),
       { task_types: 
-        %i(name description)}
+        %i(name description)})
   end
 end
