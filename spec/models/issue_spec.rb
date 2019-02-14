@@ -76,12 +76,11 @@ RSpec.describe Issue, type: :model do
       end.not_to change{ person.enabled }
     end
 
-    it 'enables person on approve' do
+    it 'do not enable person on approve' do
       person = create :new_natural_person
       
-      expect do
-        person.issues.reload.last.approve!
-      end.to change{ person.enabled }.to(true)
+      person.issues.reload.last.approve!
+      expect(person.enabled).to be_falsey
     end
   end
 
