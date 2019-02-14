@@ -126,8 +126,8 @@ describe 'an admin user' do
 
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 6)
-    issue.person.should be_enabled
-    assert_logging(issue.person, :enable_person, 1)
+    expect(issue.person.enabled).to be_falsey
+    assert_logging(issue.person, :enable_person, 0)
 
     click_link 'Risk Score (1)'
 
@@ -146,6 +146,26 @@ describe 'an admin user' do
       expect(page).to have_content("Workflow completed at 100%")
       page.should have_css("table.tasks tr", count: 3)
     end
+
+    visit "/people/#{issue.person.id}"
+
+    click_link 'Edit Person'
+    click_link 'Enable'
+
+    expect(issue.person.reload.enabled).to be_truthy
+    assert_logging(issue.person, :enable_person, 1)
+    
+    click_link 'Edit Person'
+    click_link 'Disable'
+    assert_logging(issue.person, :enable_person, 1)
+    assert_logging(issue.person, :disable_person, 1)
+    expect(issue.person.reload.enabled).to be_falsey
+
+    click_link 'Edit Person'
+    click_link 'Enable'
+
+    expect(issue.person.reload.enabled).to be_truthy
+    assert_logging(issue.person, :enable_person, 2)
   end
 
   it 'reviews a newly created customer' do
@@ -274,7 +294,15 @@ describe 'an admin user' do
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
-    assert_logging(person, :enable_person, 1)
+    assert_logging(person, :enable_person, 0)
+
+    visit "/people/#{issue.person.id}"
+
+    click_link 'Edit Person'
+    click_link 'Enable'
+
+    expect(issue.person.reload.enabled).to be_truthy
+    assert_logging(issue.person, :enable_person, 1)
   end
 
   it 'Can add/remove workflows and tasks to issues' do
