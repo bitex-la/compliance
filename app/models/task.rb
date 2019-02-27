@@ -33,7 +33,7 @@ class Task < ApplicationRecord
       transitions from: :started, to: :failed
       transitions from: :retried, to: :failed
       after do
-        workflow.fail! if workflow.all_tasks_failed?
+        workflow.fail! if workflow.any_task_failed? && workflow.may_fail?
       end
     end
 

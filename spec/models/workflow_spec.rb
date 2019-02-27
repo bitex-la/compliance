@@ -53,7 +53,7 @@ RSpec.describe Workflow, type: :model do
       expect(basic_workflow).to have_state(:performed)
     end
 
-    it 'goes to failed if all tasks fails and all has zero retries available' do
+    it 'goes to failed if any of tasks fails and has zero retries available' do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
