@@ -54,6 +54,23 @@ RSpec.describe Workflow, type: :model do
       expect(basic_workflow.issue.state).to eq 'answered'
     end
 
+    it 'if workflow is done but has open observations, issue remains observed' do
+      2.times do 
+        create(:basic_task, workflow: basic_workflow)
+      end
+
+      issue = basic_workflow.issue
+
+      robot_observation = create(:robot_observation, issue: issue)
+      client_observation = create(:observation, issue: issue)
+
+      basic_workflow.reload.tasks
+        .each {|task| task.start!; task.update!(output: 'all clear!') ; task.finish!}
+      
+      expect(issue.reload).to have_state(:observed)
+      expect(basic_workflow).to have_state(:performed)
+    end
+
     it 'goes to failed if any of tasks fails and has zero retries available' do
       3.times do 
         create(:basic_task, workflow: basic_workflow)

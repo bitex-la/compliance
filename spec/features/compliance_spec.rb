@@ -118,6 +118,8 @@ describe 'an admin user' do
     task_two.update!(output: 'All ok')
     task_two.finish!
 
+    expect(issue.reload.state).to eq 'answered'
+
     click_button "Update Issue"
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 100%")
@@ -125,7 +127,7 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 6)
+    assert_logging(issue, :update_entity, 7)
     expect(issue.person.enabled).to be_falsey
     assert_logging(issue.person, :enable_person, 0)
 
