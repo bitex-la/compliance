@@ -6,5 +6,6 @@ ActiveAdmin.register TaskType  do
     column :id
     column :name
     column :description
+    actions
   end
 end

@@ -54,6 +54,14 @@ class Workflow < ApplicationRecord
           all_tasks_performed?
         end
       end
+
+      after do
+        # check issue status, if all clear
+        # issue state must be answered
+        if issue.all_workflows_performed?
+          issue.answer! if issue.may_answer? && !issue.has_open_observations?
+        end
+      end
     end
   end
 

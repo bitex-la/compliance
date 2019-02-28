@@ -51,6 +51,7 @@ RSpec.describe Workflow, type: :model do
       basic_workflow.tasks[1..-1]
         .each {|task| task.start!; task.update!(output: 'all clear!') ; task.finish!}
       expect(basic_workflow).to have_state(:performed)
+      expect(basic_workflow.issue.state).to eq 'answered'
     end
 
     it 'goes to failed if any of tasks fails and has zero retries available' do

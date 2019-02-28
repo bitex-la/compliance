@@ -11,7 +11,7 @@ module ArbreHelpers
           end
           if task.persisted?
             tf.input :current_retries, input_html: { disabled: true } 
-            tf.input :output, input_html: { disabled: true } 
+            tf.input :output
             tf.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
           end
         end
