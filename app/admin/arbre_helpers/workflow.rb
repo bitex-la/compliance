@@ -5,7 +5,7 @@ module ArbreHelpers
   
       context.instance_eval do
         h3 class: 'light_header' do
-          "#{object.workflow_kind} #{entity_type} completed at #{object.completness_ratio}%"
+          "#{object.workflow_type} #{entity_type} completed at #{object.completness_ratio}%"
         end
         div class: "meter #{color_suffix}" do
           span style: "width: #{object.completness_ratio}%"

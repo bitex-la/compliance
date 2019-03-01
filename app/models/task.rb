@@ -1,9 +1,11 @@
 class Task < ApplicationRecord
   include AASM
   include Loggable
+  include Parametrizable
+
+  before_validation -> { to_underscore('task_type') }, on: [:create, :update]
 
   belongs_to :workflow
-  belongs_to :task_type
 
   ransack_alias :state, :aasm_state
 
@@ -25,7 +27,7 @@ class Task < ApplicationRecord
       transitions from: :started, to: :performed, guard: :has_an_output?
       transitions from: :retried, to: :performed, guard: :has_an_output?
       after do
-        workflow.finish! if workflow.all_tasks_performed?
+        workflow.finish! if workflow.reload.all_tasks_performed?
       end
     end
 

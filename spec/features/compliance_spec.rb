@@ -23,7 +23,6 @@ describe 'an admin user' do
 
   it 'creates a new natural person and its issue via admin' do
     observation_reason = create(:human_world_check_reason)
-    robot_task_type = create(:generic_robot_task)
    
     login_as admin_user
 
@@ -43,14 +42,15 @@ describe 'an admin user' do
     click_button 'Create new issue'
     
     fulfil_new_issue_form
-    
-    add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
+
     issue = Issue.last
-    observation = Observation.last
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue.reload, :observe_issue, 1)
+
+    # Fake here that an implementor set workflow tasks
+    task_one = create(:basic_task, workflow: issue.workflows.first)
+    task_two = create(:basic_task, workflow: issue.workflows.first)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -67,13 +67,7 @@ describe 'an admin user' do
       .first.document_file_name.should == 'an_simple_????.gif'
 
     issue.natural_docket_seed.should == NaturalDocketSeed.last
-    issue.should be_observed
-    observation.should be_new
-
-    fill_in 'issue[observations_attributes][0][reply]',
-      with: '0 hits go ahead!!!'
-
-    click_button "Update Issue"
+    issue.should be_draft
 
     click_link 'Risk Score (1)'
 
@@ -88,46 +82,39 @@ describe 'an admin user' do
       expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
     end
 
-    assert_logging(issue, :update_entity, 2)
-    issue.reload.should be_answered
-    observation.reload.should be_answered
-
-    add_observation(1, observation_reason, 'Please check this again')
-    
-    click_button "Update Issue"
-    issue.reload.should be_observed
-    assert_logging(issue.reload, :observe_issue, 2)
+    assert_logging(issue, :update_entity, 1)
+    issue.reload.should be_draft
 
     expect(page).to_not have_content("Approve")
 
-    task_one = issue.workflows.first.tasks.first
     task_one.start!
     task_one.update!(output: 'All ok')
     task_one.finish!
 
-    fill_in 'issue[observations_attributes][1][reply]',
-      with: '0 hits at 2018-06-07'
     click_button "Update Issue"
 
     expect(page).to have_content('Please check open workflows')
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 50%")
     
-    task_two = issue.workflows.first.tasks.last
     task_two.start!
     task_two.update!(output: 'All ok')
     task_two.finish!
+
+    #fake here that issue goes to answered
+    issue.answer!
 
     expect(issue.reload.state).to eq 'answered'
 
     click_button "Update Issue"
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 100%")
+
     expect(page).to have_content("Approve")
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 7)
+    assert_logging(issue, :update_entity, 6)
     expect(issue.person.enabled).to be_falsey
     assert_logging(issue.person, :enable_person, 0)
 
@@ -305,105 +292,6 @@ describe 'an admin user' do
 
     expect(issue.person.reload.enabled).to be_truthy
     assert_logging(issue.person, :enable_person, 1)
-  end
-
-  it 'Can add/remove workflows and tasks to issues' do
-    robot_task_type = create(:generic_robot_task)
-    person = create :new_natural_person
-    issue = person.issues.reload.first
-    observation_reason = create(:observation_reason)
-
-    login_as admin_user
-
-    expect(page).to have_content 'Signed in successfully.'
-    click_on 'Draft'
-
-    # Admin sees issue in dashboard.
-    expect(page).to have_content issue.id
-
-    # Admin clicks in the issue to see the detail
-    within("#issue_#{issue.id} td.col.col-id") do
-      click_link(issue.id)
-    end
-
-    click_link 'Workflows (0)'
-
-    click_link "Add New Workflow"
-    select_with_search(
-      '#issue_workflows_attributes_0_scope_input',
-      'Robot'
-    )
-
-    select_with_search(
-      '#issue_workflows_attributes_0_workflow_kind_id_input',
-      'onboarding'
-    )
-
-    3.times do |i|
-      click_link "Add New Task"
-      fill_task(0, i)
-    end
-
-    within '#workflows-0 .has_many_container.tasks fieldset:nth-of-type(1)' do
-      click_link 'Remove'
-    end
-
-    click_button 'Update Issue'
-
-    add_observation(0, observation_reason, 'Please re-send your full names')
-
-    click_button 'Update Issue'
-
-    click_link 'Workflows (1)'
-
-    find("#issue_workflows_attributes_0_tasks_attributes_1__destroy").set(true)
-    click_button 'Update Issue'
-
-    observation = issue.observations.first
-    api_update "/observations/#{observation.id}", {
-      type: 'observations',
-      id: observation.id,
-      attributes: {reply: 'All ok'}
-    }
-
-    click_link 'Workflows (1)'
-    within '#workflows-1' do
-      click_link 'Remove'
-      page.driver.browser.switch_to.alert.accept
-    end
-
-    expect(page).to_not have_content 'Workflows (1)'
-    click_link 'Workflows (0)'
-
-    click_link "Add New Workflow"
-    select_with_search(
-      '#issue_workflows_attributes_0_scope_input',
-      'Robot'
-    )
-
-    select_with_search(
-      '#issue_workflows_attributes_0_workflow_kind_id_input',
-      'onboarding'
-    )
-
-    click_link "Add New Task"
-    fill_task(0, 0)
-
-    click_button 'Update Issue'
-
-    task = issue.reload.workflows.first.tasks.first
-
-    api_request :post, "/tasks/#{task.id}/start", {}, 200
-    api_update "/tasks/#{task.id}", {
-      type: 'tasks',
-      attributes: {output: 'All ok'}
-    }
-    api_request :post, "/tasks/#{task.id}/finish", {}, 200
-
-    click_button 'Update Issue'
-
-    click_link 'Approve'
-    issue.reload.should be_approved
   end
 
   it "Edits a customer by creating a new issue" do

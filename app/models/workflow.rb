@@ -1,9 +1,9 @@
 class Workflow < ApplicationRecord
   include AASM
   include Loggable
+  include Parametrizable
 
-  validates :workflow_kind, inclusion: { in: WorkflowKind.all }
-  ransackable_static_belongs_to :workflow_kind
+  before_validation -> { to_underscore('workflow_type') }, on: [:create, :update]
 
   def self.scopes
     %i(robot admin)
@@ -66,7 +66,7 @@ class Workflow < ApplicationRecord
   end
 
   def name
-   "Workflow ##{id} - #{workflow_kind}"
+   "Workflow ##{id} - #{workflow_type}"
   end
 
   def state

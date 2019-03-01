@@ -88,15 +88,7 @@ module FeatureHelpers
       'Robot'
     )
 
-    select_with_search(
-      '#issue_workflows_attributes_0_workflow_kind_id_input',
-      'onboarding'
-    )
-
-    2.times do |i|
-      click_link "Add New Task"
-      fill_task(0, i)
-    end
+    fill_in "issue[workflows_attributes][0][workflow_type]", with: 'onboarding'
 
     click_link 'ID (0)'
     click_link "Add New Identification seed"

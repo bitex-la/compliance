@@ -156,7 +156,7 @@ ActiveAdmin.register Issue do
             }.to_s
           )
           wf.input :scope
-          wf.input :workflow_kind_id, as: :select, collection: WorkflowKind.all
+          wf.input :workflow_type
           ArbreHelpers::Task.has_many_tasks(context, wf)
         end
       end

@@ -1,2 +1,0 @@
-class TaskType < ApplicationRecord
-end
