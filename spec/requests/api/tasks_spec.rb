@@ -8,7 +8,7 @@ describe Task do
     :task_without_retries,
     {max_retries_eq: 0},
     'max_retries',
-    'task_type'  
+    'workflow'  
 
   describe 'creating a new task' do
     it 'responds with an Unprocessable Entity when body is empty' do
@@ -26,14 +26,15 @@ describe Task do
 
     it 'creates a new task' do
       workflow = create(:basic_workflow)
-      task_type = create(:generic_robot_task)
 
       expect do
         api_create('/tasks', {
           type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
           relationships: {
-            workflow: {data:{id: workflow.id, type: 'workflows'}},
-            task_type: {data:{id: task_type.id, type: 'task_types'}}
+            workflow: {data:{id: workflow.id, type: 'workflows'}}
           }
         })
       end.to change{ Task.count }.by 1
@@ -45,15 +46,9 @@ describe Task do
 
       api_response.data.relationships.workflow
         .data.id.to_i.should == workflow.id
-      
-      api_response.data.relationships.task_type
-        .data.id.to_i.should == task_type.id  
 
       api_response.included.select{|o| o.type == 'workflows'}
         .map(&:id).should == [workflow.id.to_s]
-
-      api_response.included.select{|o| o.type == 'task_types'}
-        .map(&:id).should == [task_type.id.to_s]
     end
   end
 
@@ -81,10 +76,7 @@ describe Task do
       api_response.data.attributes.current_retries.should == 2
 
       api_response.data.relationships.workflow
-        .data.id.to_i.should == task.workflow.id
-      
-      api_response.data.relationships.task_type
-        .data.id.to_i.should == task.task_type.id  
+        .data.id.to_i.should == task.workflow.id 
     end
 
     it 'cannot modify task state from update' do

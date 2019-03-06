@@ -18,9 +18,8 @@ class Api::TasksController < Api::SeedController
   protected
     def get_mapper
       JsonapiMapper.doc_unsafe! params.permit!.to_h,
-        [:tasks, :workflows, :task_types],
+        [:tasks, :workflows],
         workflows: [],
-        task_types: [],
         tasks: [
           :output,
           :max_retries,

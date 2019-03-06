@@ -23,7 +23,7 @@ class Api::WorkflowsController < Api::SeedController
         workflows: [
           :issue,
           :scope,
-          :workflow_kind_code
+          :workflow_type
         ]
     end
 end

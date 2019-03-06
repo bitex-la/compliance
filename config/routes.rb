@@ -49,7 +49,6 @@ Rails.application.routes.draw do
       fund_deposits
       attachments
       observation_reasons
-      task_types
       observations
       workflows
     ).each do |entities|

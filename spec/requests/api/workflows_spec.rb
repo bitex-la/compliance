@@ -70,11 +70,11 @@ describe Workflow do
 
       api_update "/workflows/#{workflow.id}", {
         type: 'workflows',
-        attributes: {scope: 'admin', workflow_kind_code: 'risk_check'}
+        attributes: {scope: 'admin', workflow_type: 'risk_check'}
       }
 
       api_response.data.attributes.scope.should == 'admin'
-      api_response.data.attributes.workflow_kind_code.should == 'risk_check'
+      api_response.data.attributes.workflow_type.should == 'risk_check'
 
       api_response.data.relationships.issue
         .data.id.to_i.should == workflow.issue.id 
