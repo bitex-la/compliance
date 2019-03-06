@@ -82,7 +82,7 @@ module FastJsonapiCandy
           updated_at
         ).each do |attr|
           attribute attr do |obj|
-            obj.send(attr).to_i
+            obj.send(attr)
           end
         end
       end
