@@ -64,7 +64,11 @@ ActiveAdmin.register Issue do
 
     member_action action, method: :post do
       resource.send("#{action}!")
-      redirect_to action: :show
+      if resource.state == 'approved'
+        redirect_to person_path(resource.person)
+      else
+        redirect_to action: :show
+      end
     end
   end
 

@@ -101,12 +101,15 @@ describe 'an admin user' do
     task_two.update!(output: 'All ok')
     task_two.finish!
 
-    #fake here that issue goes to answered
-    issue.answer!
+    issue.complete!
 
-    expect(issue.reload.state).to eq 'answered'
+    #fake here that issue goes to answered
+    issue.workflows.first.finish!
+
+    expect(issue.reload.state).to eq 'new'
 
     click_button "Update Issue"
+
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 100%")
 
@@ -114,7 +117,7 @@ describe 'an admin user' do
     click_link "Approve"
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 6)
+    assert_logging(issue, :update_entity, 5)
     expect(issue.person.enabled).to be_falsey
     assert_logging(issue.person, :enable_person, 0)
 
@@ -130,15 +133,6 @@ describe 'an admin user' do
       expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
     end
 
-    click_link 'Workflows (1)'
-    within '#workflows-1' do
-      expect(page).to have_content("Workflow completed at 100%")
-      page.should have_css("table.tasks tr", count: 3)
-    end
-
-    visit "/people/#{issue.person.id}"
-
-    click_link 'Edit Person'
     click_link 'Enable'
 
     expect(issue.person.reload.enabled).to be_truthy
@@ -468,9 +462,6 @@ describe 'an admin user' do
     new_identification.attachments.count.should == 12
     new_natural_docket.attachments.count.should == 1
 
-    within '.row.row-person' do
-      click_link person.id
-    end
     person.should be_enabled
   end
 
@@ -717,10 +708,6 @@ describe 'an admin user' do
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
       new_domicile.attachments.count.should == 11
-
-      within '.row.row-person' do
-      	click_link Person.first.id
-      end
     end
 
     it 'can add new seeds' do
@@ -778,10 +765,6 @@ describe 'an admin user' do
       issue.reload.should be_approved
 
       assert_logging(Issue.last, :update_entity, 2)
-
-      within ".row.row-person" do
-        click_link person.id
-      end
 
       person.reload.domiciles.count == 2
       person.reload.identifications.count == 2
@@ -847,9 +830,6 @@ describe 'an admin user' do
       issue.reload.should be_approved
       assert_logging(issue, :update_entity, 1)
 
-      within '.row.row-person' do
-      	click_link  person.id
-      end
       person.allowances.reload
       person.identifications.reload
       person.allowances.first.weight.should == AllowanceSeed.last.weight

@@ -26,17 +26,11 @@ class Task < ApplicationRecord
     event :finish do 
       transitions from: :started, to: :performed, guard: :has_an_output?
       transitions from: :retried, to: :performed, guard: :has_an_output?
-      after do
-        workflow.finish! if workflow.reload.all_tasks_performed?
-      end
     end
 
     event :fail do
       transitions from: :started, to: :failed
       transitions from: :retried, to: :failed
-      after do
-        workflow.fail! if workflow.any_task_failed? && workflow.may_fail?
-      end
     end
 
     event :retry do

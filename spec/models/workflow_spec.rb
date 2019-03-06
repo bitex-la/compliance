@@ -34,11 +34,10 @@ RSpec.describe Workflow, type: :model do
       end
     end
 
-    it 'goes from started to performed only if related task are done' do
+    it 'can mark a workflow as performed even if tasks are pending' do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
-      expect { basic_workflow.finish! }.to raise_error AASM::InvalidTransition
       
       basic_workflow.reload.tasks.first.start!
       expect(basic_workflow).to have_state(:started)
@@ -46,12 +45,12 @@ RSpec.describe Workflow, type: :model do
       basic_workflow.tasks.first.finish!
       expect(basic_workflow).to have_state(:started)
 
-      expect { basic_workflow.finish! }.to raise_error AASM::InvalidTransition
+      basic_workflow.reload.finish!
 
       basic_workflow.tasks[1..-1]
         .each {|task| task.start!; task.update!(output: 'all clear!') ; task.finish!}
-      expect(basic_workflow).to have_state(:performed)
-      expect(basic_workflow.issue.state).to eq 'answered'
+
+      expect(basic_workflow).to have_state(:performed)   
     end
 
     it 'if workflow is done but has open observations, issue remains observed' do
@@ -68,10 +67,10 @@ RSpec.describe Workflow, type: :model do
         .each {|task| task.start!; task.update!(output: 'all clear!') ; task.finish!}
       
       expect(issue.reload).to have_state(:observed)
-      expect(basic_workflow).to have_state(:performed)
+      expect(basic_workflow).to have_state(:started)
     end
 
-    it 'goes to failed if any of tasks fails and has zero retries available' do
+    it 'does not go to failed if any of tasks fails and has zero retries available' do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
@@ -86,7 +85,11 @@ RSpec.describe Workflow, type: :model do
         basic_workflow.tasks.each {|task| task.retry!; task.fail!}
       end
 
-      expect(basic_workflow).to have_state(:failed)
+      basic_workflow.tasks.each do |task|
+        expect(task.current_retries).to eq 3
+        expect(task).to have_state(:failed)
+      end
+      expect(basic_workflow).to have_state(:started)
     end
   end
 end

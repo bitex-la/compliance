@@ -36,7 +36,6 @@ class Workflow < ApplicationRecord
 
     event :start do 
       transitions from: :new, to: :started
-      transitions from: :performed, to: :started
     end
 
     event :fail do
@@ -49,19 +48,7 @@ class Workflow < ApplicationRecord
     end
 
     event :finish do
-      transitions from: :started, to: :performed do 
-        guard do 
-          all_tasks_performed?
-        end
-      end
-
-      after do
-        # check issue status, if all clear
-        # issue state must be answered
-        if issue.all_workflows_performed?
-          issue.answer! if issue.may_answer? && !issue.has_open_observations?
-        end
-      end
+      transitions from: :started, to: :performed
     end
   end
 
