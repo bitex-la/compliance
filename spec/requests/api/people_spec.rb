@@ -21,8 +21,8 @@ describe Person do
           attributes: {
             enabled: false,
             risk: nil,
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             issues: {data: []},
@@ -62,8 +62,8 @@ describe Person do
         attributes: {
           enabled: true,
           risk: 'medium',
-          created_at: 1514764800,
-          updated_at: 1514764800
+          created_at: '2018-01-01T00:00:00.000Z',
+          updated_at: '2018-01-01T00:00:00.000Z'
         },
         relationships: {
           issues: {data: [{ type: 'issues', id: issue.id.to_s }] },
@@ -171,8 +171,8 @@ describe Person do
             postal_code: "1432",
             floor: "5",
             apartment: "A",
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -196,8 +196,8 @@ describe Person do
             public_registry_authority: nil,
             public_registry_book: nil,
             public_registry_extra_data: nil,
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -225,8 +225,8 @@ describe Person do
             politically_exposed: false,
             politically_exposed_reason: nil,
             birth_date: person.natural_dockets.first.birth_date.to_formatted_s,
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -247,8 +247,8 @@ describe Person do
             weight: 1000,
             amount: 1000,
             kind: "USD",
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: { data: {id: person.id.to_s, type:"people"}},
@@ -269,8 +269,8 @@ describe Person do
             weight: 1000,
             amount: 1000,
             kind_code: "usd",
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type:"people"}},
@@ -294,8 +294,8 @@ describe Person do
             has_whatsapp: true,
             has_telegram: false,
             note: 'please do not call on Sundays',
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -315,8 +315,8 @@ describe Person do
           attributes: {
             address:  person.emails.first.address,
             email_kind_code: 'authentication',
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -336,8 +336,8 @@ describe Person do
           id: person.affinities.first.id.to_s,
           attributes: {
             affinity_kind_code: person.affinities.first.affinity_kind.to_s,
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
@@ -370,8 +370,8 @@ describe Person do
             country: "AR",
             full_name: "Julio Iglesias",
             address: "Jujuy 3421",
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships:
           {
@@ -392,8 +392,8 @@ describe Person do
           attributes: {
             title:  'my nickname',
             body:   'Please call me by my nickname: Mr. Bond',
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},

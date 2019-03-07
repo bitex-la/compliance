@@ -53,7 +53,7 @@ ActiveAdmin.register Issue do
   end
 
 
-  Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
+  Issue.aasm.events.map(&:name).reject{|x| [:observe].include? x}.each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       if action == :approve
         next unless resource.all_workflows_performed?
@@ -161,6 +161,7 @@ ActiveAdmin.register Issue do
           )
           wf.input :scope
           wf.input :workflow_type
+          wf.input :state, as: :select, collection: Workflow.aasm.states.map(&:name)
           ArbreHelpers::Task.has_many_tasks(context, wf)
         end
       end
@@ -421,7 +422,7 @@ ActiveAdmin.register Issue do
           end
           table_for workflow.tasks, {class: 'tasks'} do
             column :id {|t| link_to t.id, [workflow, t]}
-            column :task_type {|t| link_to t.try(:task_type).try(:name), [workflow, t]}
+            column :task_type {|t| link_to t.try(:task_type), [workflow, t]}
             column :state
             column :current_retries
             column :max_retries

@@ -7,11 +7,11 @@ module ArbreHelpers
           tf.input :task_type, input_html: { disabled: task.persisted? } 
           tf.input :max_retries, input_html: { disabled: task.persisted? } 
           if !task.new_record?
-            tf.input :state, input_html: { disabled: task.persisted? } 
+            tf.input :state, as: :select, collection: ::Task.aasm.states.map(&:name)
           end
           if task.persisted?
             tf.input :current_retries, input_html: { disabled: true } 
-            tf.input :output, input_html: { disabled: true } 
+            tf.input :output
             tf.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
           end
         end
