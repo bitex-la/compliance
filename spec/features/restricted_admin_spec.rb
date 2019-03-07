@@ -61,6 +61,13 @@ describe 'a restricted admin user' do
 
     click_button "Update Issue"
 
+    click_link 'Workflows (1)'
+
+    within '.has_many_container.workflows' do
+      click_link 'Mark as finished'
+    end
+    expect(page).to have_content 'Only admins with full access can do this action'
+
     expect(page).to_not have_content 'Approve'
     expect(page).to_not have_content 'Dismiss'
     expect(page).to_not have_content 'Abandon'

@@ -82,9 +82,6 @@ ActiveAdmin.register Issue do
     def edit
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
-      unless resource.all_workflows_performed?
-        flash[:alert] = "Please check open workflows"
-      end
       super
     end
 
@@ -161,7 +158,17 @@ ActiveAdmin.register Issue do
           )
           wf.input :scope
           wf.input :workflow_type
-          wf.input :state, as: :select, collection: Workflow.aasm.states.map(&:name)
+          if !wf.object.new_record?
+            wf.input :state, input_html: { disabled: wf.object.persisted? } 
+            if wf.object.may_finish? || wf.object.may_start?
+              wf.template.concat(
+                Arbre::Context.new({}, wf.template){
+                  li do
+                    link_to 'Mark as finished', [:finish, wf.object], class: 'button', method: :post
+                  end
+              }.to_s)
+            end
+          end
           ArbreHelpers::Task.has_many_tasks(context, wf)
         end
       end
