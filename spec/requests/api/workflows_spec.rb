@@ -110,12 +110,11 @@ describe Workflow do
         api_request :post, "/workflows/#{workflow.id}/finish", {}, 200
       end
 
-      it 'cannot finish a workflow from started if it has pending tasks' do
+      it 'can finish a workflow from started if it has pending tasks' do
         workflow = create(:basic_workflow, 
           tasks: [create(:basic_task), create(:basic_task)])
 
         api_request :post, "/workflows/#{workflow.id}/start", {}, 200 
-        api_request :post, "/workflows/#{workflow.id}/finish", {}, 422
 
         task_one = workflow.tasks.first
         task_two = workflow.tasks.second
@@ -127,7 +126,7 @@ describe Workflow do
         }
         api_request :post, "/tasks/#{task_one.id}/finish", {}, 200
 
-        api_request :post, "/workflows/#{workflow.id}/finish", {}, 422
+        api_request :post, "/workflows/#{workflow.id}/finish", {}, 200
 
         api_request :post, "/tasks/#{task_two.id}/start", {}, 200
         api_update "/tasks/#{task_two.id}", {
@@ -135,11 +134,13 @@ describe Workflow do
           attributes: {output: 'All ok'}
         }
         api_request :post, "/tasks/#{task_two.id}/finish", {}, 200
+
+        api_request :post, "/workflows/#{workflow.id}/finish", {}, 422
         
         expect(workflow.reload).to have_state(:performed)
       end
 
-      it 'appear as finished if all tasks failed' do
+      it 'if all tasks failed workflow does not became failed automatically' do
         workflow = create(:basic_workflow)
 
         2.times do
@@ -158,7 +159,9 @@ describe Workflow do
 
         api_get "/workflows/#{workflow.id}", {}, 200
 
-        api_response.data.attributes.state.should == 'failed'
+        api_response.data.attributes.state.should == 'started'
+
+        api_request :post, "/workflows/#{workflow.id}/fail", {}, 200
       end
     end
   end
