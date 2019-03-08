@@ -453,9 +453,9 @@ module ArbreHelpers
   def self.render_text_or_link(context, key, text)
     context.concat("<strong>#{key}: </strong>".html_safe) if key
     if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
-      context.concat("<a href='#{text}' target='_blank'>#{text.truncate(40, omission:'...')}</a><br/>".html_safe) 
+      context.concat("<a href='#{text}' target='_blank'>#{ArbreHelpers.strip_html_tags(text).truncate(40, omission:'...')}</a><br/>".html_safe) 
     else
-      context.concat("#{text}<br/>".html_safe) 
+      context.concat("#{ArbreHelpers.strip_html_tags(text)}<br/>".html_safe) 
     end
   end
 
@@ -464,12 +464,16 @@ module ArbreHelpers
       strong "#{key}: "
       if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
         span do
-          link_to text.truncate(40, omission:'...'), text, target: "_blank"
+          link_to ArbreHelpers.strip_html_tags(text).truncate(40, omission:'...'), text, target: "_blank"
         end
       else
-        span text
+        span ArbreHelpers.strip_html_tags(text)
       end
       br
     end
+  end
+
+  def self.strip_html_tags(text)
+    Nokogiri::HTML(text).text
   end
 end
