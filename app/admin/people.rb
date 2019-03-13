@@ -14,10 +14,10 @@ ActiveAdmin.register Person do
 
   actions :all, except: [:destroy]
   action_item :enable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && !resource.enabled} do 
-    link_to "Enable", [:enable, :person], method: :post
+    link_to "Enable Person", [:enable, :person], method: :post
   end
   action_item :disable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.enabled} do 
-    link_to "Disable", [:disable, :person], method: :post
+    link_to "Disable Person", [:disable, :person], method: :post
   end
 
   collection_action :search_person, method: :get do 

@@ -93,7 +93,6 @@ describe 'an admin user' do
 
     click_button "Update Issue"
 
-    expect(page).to have_content('Please check open workflows')
     click_link 'Workflows (1)'
     expect(page).to have_content("workflow completed at 50%")
     
