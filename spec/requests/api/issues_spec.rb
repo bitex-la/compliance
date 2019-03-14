@@ -25,13 +25,28 @@ describe Issue do
         .group_by{|i| i.type }
         .map{|a,b| [a, b.count ] }.to_h
         .should == {
-          "attachments"=>66, 
+          "attachments"=>154, 
           "email_seeds"=>2, 
           "emails"=>2, 
+          "affinity_seeds"=>1,
+          "affinities"=>1,
+          "allowance_seeds"=>2,
+          "allowances"=>2,
+          "argentina_invoicing_detail_seeds"=>1,
+          "argentina_invoicing_details"=>1,
+          "domicile_seeds"=>1,
+          "domiciles"=>1,
+          "note_seeds"=>1,
           "identification_seeds"=>2, 
           "identifications"=>2, 
           "natural_docket_seeds"=>2, 
           "natural_dockets"=>2, 
+          "fund_deposits"=>1,
+          "notes"=>1,
+          "phone_seeds"=>1,
+          "phones"=>1,
+          "risk_scores"=>1,
+          "risk_score_seeds"=>1,
           "people"=>3
         }
     end
