@@ -23,7 +23,7 @@ RSpec.describe Person, type: :model do
   end
 
   it 'Add state changes to event log when enable/disable' do 
-    person = create(:full_natural_person)
+    person = create(:full_natural_person, enabled: false)
     assert_logging(person, :enable_person, 0)
     2.times do
       person.update(enabled: true)
