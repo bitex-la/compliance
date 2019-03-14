@@ -1,13 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe Person, type: :model do
-  let(:person) { create(:full_natural_person) }
-
+RSpec.describe Person, type: :model do  
   it 'is valid without issues' do
     expect(Person.new).to be_valid
   end
 
   it 'knows which fruits can be replaced' do
+    person =  create(:full_natural_person)
     new_phone = create :full_phone, person: person
     person.reload.phones.first.update(replaced_by: new_phone)
 
@@ -24,7 +23,7 @@ RSpec.describe Person, type: :model do
   end
 
   it 'Add state changes to event log when enable/disable' do 
-    person = create(:empty_person)
+    person = create(:full_natural_person)
     assert_logging(person, :enable_person, 0)
     2.times do
       person.update(enabled: true)
@@ -37,6 +36,7 @@ RSpec.describe Person, type: :model do
   end 
   
   it 'shows only observations for meaningful issues' do 
+    person = create(:full_natural_person)
     one = create(:basic_issue, person: person)
     two = create(:basic_issue, person: person)
     three = create(:basic_issue, person: person)
@@ -55,13 +55,13 @@ RSpec.describe Person, type: :model do
 
   describe 'looking for suggestions' do
     it 'search a person by id, first name, last name, email, phone and identification' do
-      person
+      person = create(:full_natural_person)
 
-      expect(Person.suggest('3').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 3"})
+      expect(Person.suggest('1').first)
+        .to include({:id=>1, :suggestion=>"人 1: Joe Doe - 1"})
 
       expect(Person.suggest('Joe').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - Joe - Doe"})
+        .to include({:id=>1, :suggestion=>"人 1: Joe Doe - Joe - Doe"})
 
       expect(Person.suggest('Johnny')).to be_empty
       
@@ -75,7 +75,7 @@ RSpec.describe Person, type: :model do
         .to include({:id=>1, :suggestion=>"人 1: Joe Doe - +5491125410470"})
 
       expect(Person.suggest('2545566').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 2545566"})
+        .to include({:id=>1, :suggestion=>"人 1: Joe Doe - 2545566"})
 
       expect(Person.suggest('80932388')).to be_empty
     end

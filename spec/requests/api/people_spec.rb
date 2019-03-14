@@ -471,13 +471,13 @@ describe Person do
       # URL encoded json with ransack filters.
 
       api_get "/people/?filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=joe"
-      api_response.data.count.should == 5
+      api_response.data.count.should == 4
 
       api_get "/people/?filter[identifications_number_or_argentina_invoicing_details_tax_id_eq]=20955754290"
       api_response.data.count.should == 2 # joe & bob
 
       api_get "/people/?filter[natural_dockets_first_name_or_natural_dockets_last_name_cont]=doe"
-      api_response.data.count.should == 6 # joe & bob
+      api_response.data.count.should == 5 # joe & bob
     end
   end
 

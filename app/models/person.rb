@@ -143,7 +143,7 @@ class Person < ApplicationRecord
           suggestion: d[:suggestion].map{|e| x.instance_eval(e)}.join(' - ')
         }})
     end
-    result.uniq[0..per_page]
+    result.uniq[0..per_page].sort_by{|k| k[:id]}
   end
 
   private
