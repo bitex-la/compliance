@@ -98,13 +98,13 @@ unless Rails.env.production?
     scope: 0
   )
 
-  human_superfactura = ObservationReason.create!(
-    subject_en: 'Please check superfactura results',
-    body_en: 'Check superfactura review results',
-    subject_es: 'Por favor verifica los resultados de superfactura',
-    body_es: 'Consulta los resultados de la revisión de superfactura',
+  human_openfactura = ObservationReason.create!(
+    subject_en: 'Please check openfactura results',
+    body_en: 'Check openfactura review results',
+    subject_es: 'Por favor verifica los resultados de openfactura',
+    body_es: 'Consulta los resultados de la revisión de openfactura',
     subject_pt: 'O administrador deve executar uma revisão manual do worldcheck',
-    body_pt: 'Por favor, verifique os resultados superfactura',
+    body_pt: 'Por favor, verifique os resultados openfactura',
     scope: 2
   )
 
@@ -118,8 +118,8 @@ unless Rails.env.production?
     description: 'Perform a serpapi search for a person'
   )
 
-  superfactura_robot_task = TaskType.create!(
-    name: 'Run superfactura check for person RUT',
-    description: 'Sanitize person information using superfactura data'
+  openfactura_robot_task = TaskType.create!(
+    name: 'Run openfactura check for person RUT',
+    description: 'Sanitize person information using openfactura data'
   )
 end
