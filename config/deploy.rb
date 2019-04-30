@@ -1,6 +1,11 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.11.0"
 
+unless ENV['compliance_host']
+  puts "Invoke setting compliance_host environment var"
+  exit
+end
+
 app_name = "compliance"
 set :application, "compliance"
 set :repo_url, "git@github.com:bitex-la/compliance.git"
