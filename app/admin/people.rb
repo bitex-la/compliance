@@ -60,7 +60,8 @@ ActiveAdmin.register Person do
   filter :enabled
   filter :risk
 
-  scope('Legal Person') { |scope| scope.joins(:legal_entity_dockets) }
+  scope :all
+  scope('Legal Entity') { |scope| scope.joins(:legal_entity_dockets) }
   scope('Natural Person') { |scope| scope.joins(:natural_dockets) }
 
   action_item :add_person_information, only: %i(show edit) do
