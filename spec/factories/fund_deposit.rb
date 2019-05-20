@@ -1,6 +1,7 @@
 FactoryBot.define do 
   factory :full_fund_deposit, class: FundDeposit do 
     amount { 1000 }
+    exchange_rate_adjusted_amount{ amount }
     currency_code { 'usd' }
     deposit_method_code { 'bank' }
     external_id { 1 }
@@ -8,6 +9,7 @@ FactoryBot.define do
 
   factory :fund_deposit, class: FundDeposit do 
     amount { 1000 }
+    exchange_rate_adjusted_amount{ amount }
     currency_code { 'usd' }
     deposit_method_code { 'bank' }
     external_id { 1 }
@@ -19,6 +21,7 @@ FactoryBot.define do
 
   factory :alt_fund_deposit, class: FundDeposit do 
     amount { 2000 }
+    exchange_rate_adjusted_amount{ amount * 45 }
     currency_code { 'ars' }
     deposit_method_code { 'debin' }
     external_id { 2 }

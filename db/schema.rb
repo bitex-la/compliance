@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190121144300) do
+ActiveRecord::Schema.define(version: 20190513182158) do
 
   create_table "active_admin_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.string "namespace"
@@ -327,14 +327,15 @@ ActiveRecord::Schema.define(version: 20190121144300) do
   end
 
   create_table "fund_deposits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
-    t.decimal "amount", precision: 20, scale: 8
-    t.integer "currency_id"
-    t.integer "deposit_method_id"
-    t.bigint "person_id"
+    t.decimal "amount", precision: 20, scale: 8, null: false
+    t.integer "currency_id", null: false
+    t.integer "deposit_method_id", null: false
+    t.bigint "person_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.integer "external_id"
+    t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"
   end
@@ -560,7 +561,6 @@ ActiveRecord::Schema.define(version: 20190121144300) do
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false, null: false
     t.integer "risk"
-    t.string "aasm_state"
   end
 
   create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
@@ -604,13 +604,6 @@ ActiveRecord::Schema.define(version: 20190121144300) do
     t.index ["replaced_by_id"], name: "index_phones_on_replaced_by_id"
   end
 
-  create_table "risk_keywords", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
-    t.string "word_es"
-    t.string "word_en"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "risk_score_seeds", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.string "score"
     t.string "provider"
@@ -640,20 +633,6 @@ ActiveRecord::Schema.define(version: 20190121144300) do
     t.index ["issue_id"], name: "index_risk_scores_on_issue_id"
     t.index ["person_id"], name: "index_risk_scores_on_person_id"
     t.index ["replaced_by_id"], name: "index_risk_scores_on_replaced_by_id"
-  end
-
-  create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
-    t.integer "entity_id"
-    t.string "entity_type"
-    t.text "sentence", limit: 4294967295
-    t.text "result", limit: 4294967295
-    t.integer "performer_id"
-    t.integer "task_kind_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "aasm_state"
-    t.integer "scope"
-    t.string "field"
   end
 
   add_foreign_key "affinities", "affinities", column: "replaced_by_id"

@@ -1,7 +1,7 @@
 default: &defaults
   push_api_key: <%= "#{ENV['APP_SIGNAL_KEY']}" %>
   name: "Compliance Bitex.la"
-  ignore_exceptions:
+  ignore_errors:
     - SystemExit
   debug: false
   sample: 25

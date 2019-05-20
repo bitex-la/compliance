@@ -30,6 +30,7 @@ describe FundDeposit do
 
       api_response.data.attributes.to_h.should >= {
         amount: '1000.0',
+        exchange_rate_adjusted_amount: '1000.0',
         currency_code: "usd",
         deposit_method_code: "bank",
         external_id: 1

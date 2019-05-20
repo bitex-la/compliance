@@ -4,6 +4,8 @@ class FundDeposit < ApplicationRecord
   validates :external_id, presence: true
   validates :deposit_method, inclusion: { in: DepositMethod.all }
   validates :currency, inclusion: { in: Currency.all }
+  validates :amount, :exchange_rate_adjusted_amount,
+    numericality: { greater_than: 0 }
 
   belongs_to :person
   ransackable_static_belongs_to :deposit_method
