@@ -1,9 +1,11 @@
 class Person < ApplicationRecord
-  include Loggable
+  include Loggable, StaticModels::BelongsTo
 
   after_save :log_if_enabled
   after_save :expire_action_cache
   
+  belongs_to :regularity, class_name: "PersonRegularity"
+
   HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
@@ -146,6 +148,21 @@ class Person < ApplicationRecord
     result.uniq[0..per_page]
   end
 
+  def refresh_person_regularity!
+    sum, count = fund_deposits.pluck('sum(exchange_rate_adjusted_amount), count(*)').first
+
+    self.regularity = PersonRegularity.all.reverse
+      .find {|x| x.applies? sum,count} 
+
+    should_log = regularity_id_changed?
+  
+    save!
+  
+    EventLog.log_entity!(self, AdminUser.current_admin_user, 
+      EventLogKind.update_person_regularity) if should_log
+
+  end
+
   private
 
   def expire_action_cache
@@ -208,7 +225,8 @@ class Person < ApplicationRecord
       :argentina_invoicing_details, 
       :chile_invoicing_details, 
       :notes, 
-      :attachments
+      :attachments,
+      :regularity
     ]
   end
 end

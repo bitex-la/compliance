@@ -7,6 +7,10 @@ RSpec.describe Person, type: :model do
     expect(Person.new).to be_valid
   end
 
+  it 'starts as casual regularity' do
+    expect(Person.new.regularity).to eq PersonRegularity.casual
+  end
+
   it 'knows which fruits can be replaced' do
     new_phone = create :full_phone, person: person
     person.reload.phones.first.update(replaced_by: new_phone)

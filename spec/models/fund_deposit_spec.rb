@@ -21,14 +21,84 @@ RSpec.describe FundDeposit, type: :model do
   end
 
   describe 'when customer becomes a regular' do
-    it 'can become a regular by amount funded' do
+    
+    it 'person changes regularity by amount funded' do
+      expect(person.regularity).to eq PersonRegularity.none
+      
+      create(:alt_fund_deposit, person: person)
+      expect(person.reload.regularity).to eq PersonRegularity.none
+     
+      create(:full_fund_deposit, person: person, amount: 2500)
+      expect(person.reload.regularity).to eq PersonRegularity.low
+
+      assert_logging(person, :update_person_regularity, 1) do |l|
+        fund_deposits = l.data.data.relationships.fund_deposits.data
+        expect(fund_deposits.size).to eq 2
+        
+        expect(l.data.included.find {|x| 
+          x.type == "regularities" && 
+          x.id == PersonRegularity.low.id.to_s
+        }).not_to be_nil
+      end
+    
+      create(:alt_fund_deposit, person: person)
+      expect(person.reload.regularity).to eq PersonRegularity.low
+
+      create(:full_fund_deposit, person: person, amount: 20000)
+      expect(person.reload.regularity).to eq PersonRegularity.high
+
+      assert_logging(person, :update_person_regularity, 2) do |l|
+        fund_deposits = l.data.data.relationships.fund_deposits.data
+        expect(fund_deposits.size).to eq 4
+        
+        expect(l.data.included.find {|x| 
+          x.type == "regularities" && 
+          x.id == PersonRegularity.high.id.to_s
+        }).not_to be_nil
+      end
+
+    end
+    
+    it 'person changes regularity by funding repeatedly' do
+      expect(person.regularity).to eq PersonRegularity.none
+     
+      create(:alt_fund_deposit, person: person, amount:1)
+      expect(person.reload.regularity).to eq PersonRegularity.none
+      
+      create(:full_fund_deposit, person: person, amount:1)
+      expect(person.reload.regularity).to eq PersonRegularity.none
+
+      create(:alt_fund_deposit, person: person, amount:1)
+      expect(person.reload.regularity).to eq PersonRegularity.low
+
+      #assert_logging(object, :create_entity, 1)
+
+      6.times do 
+        create(:alt_fund_deposit, person: person, amount:1)
+        expect(person.reload.regularity).to eq PersonRegularity.low
+      end
+      
+      create(:full_fund_deposit, person: person, amount: 1)
+      expect(person.reload.regularity).to eq PersonRegularity.high
+
+      #log
+
+    end
+
+    it 'casual person can become high_regular by funding repeatedly' do
       pending
       fail
     end
 
-    it 'can become a regular by funding repeatedly' do
+    it 'low_regular person can become high_regular by amount funded' do
       pending
       fail
     end
+    
+    it 'low_regular person can become high_regular by funding repeatedly' do
+      pending
+      fail
+    end
+
   end
 end

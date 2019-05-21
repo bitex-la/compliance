@@ -6,5 +6,9 @@ class AddAmountInUsdToFundDeposits < ActiveRecord::Migration[5.1]
     end
     add_column :fund_deposits, :exchange_rate_adjusted_amount, 
       :decimal, precision: 20, scale: 8, null: false
+
+    add_column :people, :regularity_id, :integer, null:false,
+      default: PersonRegularity.casual.id
+
   end
 end

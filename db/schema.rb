@@ -561,6 +561,7 @@ ActiveRecord::Schema.define(version: 20190513182158) do
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false, null: false
     t.integer "risk"
+    t.integer "regularity_id", default: 1, null: false
   end
 
   create_table "phone_seeds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|

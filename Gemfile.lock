@@ -253,6 +253,7 @@ GEM
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
+    hashie (3.6.0)
     i18n (1.3.0)
       concurrent-ruby (~> 1.0)
     i18n_data (0.8.0)
@@ -510,6 +511,7 @@ DEPENDENCIES
   font-awesome-rails
   geckodriver-helper
   haml
+  hashie
   jbuilder (~> 2.5)
   jquery-ui-rails
   jsonapi_mapper!

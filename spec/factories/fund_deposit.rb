@@ -20,8 +20,8 @@ FactoryBot.define do
   end
 
   factory :alt_fund_deposit, class: FundDeposit do 
-    amount { 2000 }
-    exchange_rate_adjusted_amount{ amount * 45 }
+    amount { 45000 }
+    exchange_rate_adjusted_amount{ amount / 45.0 }
     currency_code { 'ars' }
     deposit_method_code { 'debin' }
     external_id { 2 }
