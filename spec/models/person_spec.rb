@@ -8,7 +8,7 @@ RSpec.describe Person, type: :model do
   end
 
   it 'starts as casual regularity' do
-    expect(Person.new.regularity).to eq PersonRegularity.casual
+    expect(Person.new.regularity).to eq PersonRegularity.none
   end
 
   it 'knows which fruits can be replaced' do
@@ -59,11 +59,12 @@ RSpec.describe Person, type: :model do
 
   describe 'looking for suggestions' do
     it 'search a person by id, first name, last name, email, phone and identification' do
+      
       person
-
+      
       expect(Person.suggest('3').first)
         .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 3"})
-
+      
       expect(Person.suggest('Joe').first)
         .to include({:id=>3, :suggestion=>"人 3: Joe Doe - Joe - Doe"})
 
