@@ -59,6 +59,7 @@ ActiveAdmin.register Person do
   filter :updated_at
   filter :enabled
   filter :risk
+  filter :regularity
 
   action_item :add_person_information, only: %i(show edit) do
     link_to 'Add Person Information', new_with_fruits_person_issues_path(person)
@@ -98,6 +99,7 @@ ActiveAdmin.register Person do
     column :person_email
     column :enabled
     column :risk
+    column :regularity
     column :person_type
     column :created_at
     column :updated_at
@@ -113,6 +115,7 @@ ActiveAdmin.register Person do
               row :id
               row :enabled
               row :risk
+              row :regularity
             end
           end
           column do
