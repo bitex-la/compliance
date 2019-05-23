@@ -150,17 +150,16 @@ class Person < ApplicationRecord
 
   def refresh_person_regularity!
     sum, count = fund_deposits.pluck('sum(exchange_rate_adjusted_amount), count(*)').first
-
+    
     self.regularity = PersonRegularity.all.reverse
       .find {|x| x.applies? sum,count} 
 
     should_log = regularity_id_changed?
   
     save!
-  
-    EventLog.log_entity!(self, AdminUser.current_admin_user, 
-      EventLogKind.update_person_regularity) if should_log
 
+    EventLog.log_entity!(self.reload, AdminUser.current_admin_user, 
+      EventLogKind.update_person_regularity) if should_log
   end
 
   private

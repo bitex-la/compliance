@@ -21,7 +21,6 @@ RSpec.describe FundDeposit, type: :model do
   end
 
   describe 'when customer changes regularity' do
-    
     it 'person changes regularity by amount funded' do
       expect(person.regularity).to eq PersonRegularity.none
       
@@ -100,15 +99,34 @@ RSpec.describe FundDeposit, type: :model do
       end
     end
 
-    it 'low_regular person can become high_regular by amount funded' do
-      pending
-      fail
-    end
+    it 'none person can become high_regular by amount funded' do
+      expect(person.regularity).to eq PersonRegularity.none
+      
+      create(:full_fund_deposit, person: person, amount:50000)
+      expect(person.reload.regularity).to eq PersonRegularity.high
     
-    it 'low_regular person can become high_regular by funding repeatedly' do
-      pending
-      fail
-    end
+      assert_logging(person, :update_person_regularity, 1) do |l|
+        fund_deposits = l.data.data.relationships.fund_deposits.data
+        expect(fund_deposits.size).to eq 1
+        
+        expect(l.data.included.find {|x| 
+          x.type == "regularities" && 
+          x.id == PersonRegularity.high.id.to_s
+        }).not_to be_nil
+      end
 
+      create(:full_fund_deposit, person: person, amount:50000)
+      expect(person.reload.regularity).to eq PersonRegularity.high
+
+      assert_logging(person, :update_person_regularity, 1) do |l|
+        fund_deposits = l.data.data.relationships.fund_deposits.data
+        expect(fund_deposits.size).to eq 1
+  
+        expect(l.data.included.find {|x| 
+          x.type == "regularities" && 
+          x.id == PersonRegularity.high.id.to_s
+        }).not_to be_nil
+      end
+    end
   end
 end
