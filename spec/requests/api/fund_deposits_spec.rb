@@ -8,7 +8,7 @@ describe FundDeposit do
     :fund_deposits,
     :fund_deposit_with_person,
     :alt_fund_deposit_with_person,
-    {amount_eq: 2000, deposit_method_code_eq: 'debin'},
+    {amount_eq: 45000, deposit_method_code_eq: 'debin'},
     'amount,currency_code,person',
     'attachments'
 
