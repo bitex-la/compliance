@@ -137,7 +137,7 @@ class Person < ApplicationRecord
       {entity: 'NaturalDocketSeed', field: 'last_name', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'first_name', 'last_name']}
     ].each do |d|
       result = result.concat(d[:entity].constantize
-        .order(updated_at: :desc)
+        .order(updated_at: :desc, id: :desc)
         .page(page).per(per_page)
         .send(:ransack, {"#{d[:field]}_#{d[:matcher]}" => keyword})
         .result.map{|x| {
