@@ -25,7 +25,7 @@ RSpec.describe FundDeposit, type: :model do
       expect(person.regularity).to eq PersonRegularity.none
       
       create(:alt_fund_deposit, person: person)
-      expect(person.reload.regularity).to eq PersonRegularity.none
+      expect(person.regularity).to eq PersonRegularity.none
      
       expect do
         create(:full_fund_deposit, person: person, amount: 2500)
@@ -42,7 +42,7 @@ RSpec.describe FundDeposit, type: :model do
         } 
       )
 
-      expect(person.reload.regularity).to eq PersonRegularity.low
+      expect(person.regularity).to eq PersonRegularity.low
 
       assert_logging(person, :update_person_regularity, 1) do |l|  
         fund_deposits = l.data.data.relationships.fund_deposits.data
@@ -55,13 +55,13 @@ RSpec.describe FundDeposit, type: :model do
       end
 
       create(:alt_fund_deposit, person: person)
-      expect(person.reload.regularity).to eq PersonRegularity.low
+      expect(person.regularity).to eq PersonRegularity.low
       
       expect do
         create(:full_fund_deposit, person: person, amount: 20000)
       end.to change{person.issues.count}.by(1)
 
-      expect(person.reload.regularity).to eq PersonRegularity.high
+      expect(person.regularity).to eq PersonRegularity.high
 
       assert_logging(person, :update_person_regularity, 2) do |l|
         fund_deposits = l.data.data.relationships.fund_deposits.data
@@ -83,16 +83,16 @@ RSpec.describe FundDeposit, type: :model do
       expect(person.regularity).to eq PersonRegularity.none
      
       create(:alt_fund_deposit, person: person, amount:1)
-      expect(person.reload.regularity).to eq PersonRegularity.none
+      expect(person.regularity).to eq PersonRegularity.none
       
       create(:full_fund_deposit, person: person, amount:1)
-      expect(person.reload.regularity).to eq PersonRegularity.none
+      expect(person.regularity).to eq PersonRegularity.none
 
       expect do
         create(:alt_fund_deposit, person: person, amount:1)
       end.to change{person.issues.count}.by(1)
       
-      expect(person.reload.regularity).to eq PersonRegularity.low
+      expect(person.regularity).to eq PersonRegularity.low
 
       assert_logging(person, :update_person_regularity, 1) do |l|
         fund_deposits = l.data.data.relationships.fund_deposits.data
@@ -110,14 +110,14 @@ RSpec.describe FundDeposit, type: :model do
 
       6.times do 
         create(:alt_fund_deposit, person: person, amount:1)
-        expect(person.reload.regularity).to eq PersonRegularity.low
+        expect(person.regularity).to eq PersonRegularity.low
       end
       
       expect do
         create(:full_fund_deposit, person: person, amount: 1)
       end.to change{person.issues.count}.by(1)
       
-      expect(person.reload.regularity).to eq PersonRegularity.high
+      expect(person.regularity).to eq PersonRegularity.high
       
       assert_logging(person, :update_person_regularity, 2) do |l|
         fund_deposits = l.data.data.relationships.fund_deposits.data
@@ -143,12 +143,12 @@ RSpec.describe FundDeposit, type: :model do
         create(:full_fund_deposit, person: person, amount:50000)
       end.to change{person.issues.count}.by(1)
       
-      expect(person.reload.regularity).to eq PersonRegularity.high
+      expect(person.regularity).to eq PersonRegularity.high
     
       assert_logging(person, :update_person_regularity, 1)
 
       create(:full_fund_deposit, person: person, amount:50000)
-      expect(person.reload.regularity).to eq PersonRegularity.high
+      expect(person.regularity).to eq PersonRegularity.high
 
       assert_logging(person, :update_person_regularity, 1)
 

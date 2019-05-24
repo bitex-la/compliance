@@ -157,8 +157,8 @@ class Person < ApplicationRecord
     should_log = regularity_id_changed?
 
     if should_log
-      issue = Issue.new(person: self, state: 'new')
-      risk_score = issue.risk_score_seeds.build(
+      issue = issues.build(state: 'new')
+      issue.risk_score_seeds.build(
         score: regularity.code, 
         provider: 'open_compliance', 
         extra_info: {
@@ -168,12 +168,11 @@ class Person < ApplicationRecord
           funding_count: count
         }.to_json
       )
-      issue.save
     end 
 
     save!
 
-    EventLog.log_entity!(self.reload, AdminUser.current_admin_user, 
+    EventLog.log_entity!(self, AdminUser.current_admin_user, 
       EventLogKind.update_person_regularity) if should_log
   end
 

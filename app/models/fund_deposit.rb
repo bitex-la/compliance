@@ -22,6 +22,7 @@ class FundDeposit < ApplicationRecord
 
   private
   def refresh_person_regularity!
+    person.fund_deposits.reload
     person.refresh_person_regularity!
   end
 
