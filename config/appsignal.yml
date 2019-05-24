@@ -1,5 +1,5 @@
 default: &defaults
-  push_api_key: <%= "#{ENV['APP_SIGNAL_KEY']}" %>
+  push_api_key: <%= Settings.app_signal.key %>
   name: "Compliance Bitex.la"
   ignore_errors:
     - SystemExit
@@ -9,16 +9,16 @@ default: &defaults
 
 development:
   <<: *defaults
-  name: <%= "#{ENV['APP_SIGNAL_APP_NAME']} dev" %>
+  name: <%= "#{Settings.app_signal.app} dev" %>
   sample: 100
   debug: true
   active: false
 
 production:
   <<: *defaults
-  name: <%= "#{ENV['APP_SIGNAL_APP_NAME']} prod" %>
+  name: <%= "#{Settings.app_signal.app} prod" %>
 
 staging:
   <<: *defaults
   active: true
-  name: <%= "#{ENV['APP_SIGNAL_APP_NAME']} staging" %>
+  name: <%= "#{Settings.app_signal.app} staging" %>

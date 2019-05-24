@@ -1,0 +1,41 @@
+defaults: &defaults
+  secret_key_base: secret_key_base_for_staging_tries_to_be_a_bit_longer_than_before_just_to_make_sure_its_useful
+  
+  s3:                                                                              
+    aws_access_key_id: ____c                                                       
+    aws_secret_access_key: ____                                                    
+    attachments_bucket: production
+
+  mysql:
+    username: root
+    password: 
+    host: localhost
+    port: 3306
+
+  exception_recipients: "some@me.com,other@me.com"
+
+  app_signal:
+    key: some_appsignal_api_key
+    app: "Your company"
+
+  cache_store: '/tmp/cache/compliance'
+
+  regularities:
+    low:
+      funding_amount: 2500
+      funding_count: 3 
+    high:
+      funding_amount: 10000
+      funding_count: 10
+
+production:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults

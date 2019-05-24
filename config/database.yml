@@ -4,19 +4,18 @@ default: &default
   encoding: utf8mb4
   pool: 64
   timeout: 5000
-  username: <%= ENV.fetch("MYSQL_USERNAME") %>
-  password: <%= ENV.fetch("MYSQL_PASSWORD") {} %>
-<% if ENV.fetch("MYSQL_SOCKET") {} %>
-  socket: <%= ENV.fetch("MYSQL_SOCKET") {} %>
+  username: <%= Settings.mysql.username %>
+  password: <%= Settings.mysql.password %>
+<% if Settings.mysql.try(:socket) %>
+  socket: <%= Settings.mysql.socket %>
 <% else %>
-  host: <%= ENV.fetch("MYSQL_HOST") {} %>
-  port: <%= ENV.fetch("MYSQL_PORT") {} %>
+  host: <%= Settings.mysql.host %>
+  port: <%= Settings.mysql.port %>
 <% end %>
 
 development:
   <<: *default
   database: compliance_development
-
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

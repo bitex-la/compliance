@@ -57,7 +57,7 @@ Rails.application.configure do
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
   config.action_controller.perform_caching = true
-  config.cache_store = :file_store, ENV['CACHE_STORE'] || '/tmp/cache'
+  config.cache_store = :file_store, Settings.cache_store || '/tmp/cache'
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
@@ -105,8 +105,8 @@ Rails.application.configure do
     port: 587,
     authentication: "plain",
     enable_starttls_auto: true,
-    user_name: ENV['AWS_SES_API_KEY'],
-    password: ENV['AWS_SES_API_SECRET']
+    user_name: Settings.s3.aws_access_key_id,
+    password: Settings.s3.aws_secret_access_key
   }
 
   # Do not dump schema after migrations.
@@ -116,6 +116,6 @@ Rails.application.configure do
   :email => {
     :email_prefix => "[compliance_bitex.la][staging]",
     :sender_address => %{"notifier" <hola@bitex.la>},
-    :exception_recipients => ENV['EXCEPTION_RECIPIENTS'].strip.split(',')
+    :exception_recipients => Settings.exception_recipients.strip.split(',')
   }
 end

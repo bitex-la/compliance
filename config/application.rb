@@ -10,6 +10,7 @@ require "action_mailer/railtie"
 require "action_view/railtie"
 require "action_cable/engine"
 require "sprockets/railtie"
+
 # require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems
@@ -30,5 +31,8 @@ module Compliance
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    require_relative "../app/models/settings"
+    config.secret_key_base = Settings.secret_key_base
   end
 end
