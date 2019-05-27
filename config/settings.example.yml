@@ -6,6 +6,10 @@ defaults: &defaults
     aws_secret_access_key: ____                                                    
     attachments_bucket: production
 
+  ses:
+    access_key: some_access_key
+    secret: some_secret
+
   mysql:
     username: root
     password: 

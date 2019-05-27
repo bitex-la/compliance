@@ -94,10 +94,10 @@ Rails.application.configure do
     preserve_files: true,
     s3_region: 'us-east-1',
     s3_credentials: {
-      access_key_id: Secrets.s3.aws_access_key_id,
-      secret_access_key: Secrets.s3.aws_secret_access_key
+      access_key_id: Settings.s3.aws_access_key_id,
+      secret_access_key: Settings.s3.aws_secret_access_key
     },
-    bucket: Secrets.s3.attachments_bucket
+    bucket: Settings.s3.attachments_bucket
   }
 
   config.action_mailer.smtp_settings = {
@@ -105,8 +105,8 @@ Rails.application.configure do
     port: 587,
     authentication: "plain",
     enable_starttls_auto: true,
-    user_name: Settings.s3.aws_access_key_id,
-    password: Settings.s3.aws_secret_access_key
+    user_name: Settings.ses.access_key,
+    password: Settings.ses.secret
   }
 
   # Do not dump schema after migrations.
