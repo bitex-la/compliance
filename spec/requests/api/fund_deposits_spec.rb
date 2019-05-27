@@ -8,7 +8,7 @@ describe FundDeposit do
     :fund_deposits,
     :fund_deposit_with_person,
     :alt_fund_deposit_with_person,
-    {amount_eq: 2000, deposit_method_code_eq: 'debin'},
+    {amount_eq: 45000, deposit_method_code_eq: 'debin'},
     'amount,currency_code,person',
     'attachments'
 
@@ -30,6 +30,7 @@ describe FundDeposit do
 
       api_response.data.attributes.to_h.should >= {
         amount: '1000.0',
+        exchange_rate_adjusted_amount: '1000.0',
         currency_code: "usd",
         deposit_method_code: "bank",
         external_id: 1

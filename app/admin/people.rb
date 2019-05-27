@@ -59,6 +59,7 @@ ActiveAdmin.register Person do
   filter :updated_at
   filter :enabled
   filter :risk
+  filter :regularity
 
   scope :all
   scope('Legal Entity') { |scope| scope.joins(:legal_entity_dockets) }
@@ -102,6 +103,7 @@ ActiveAdmin.register Person do
     column :person_email
     column :enabled
     column :risk
+    column :regularity
     column :person_type
     column :created_at
     column :updated_at
@@ -117,6 +119,7 @@ ActiveAdmin.register Person do
               row :id
               row :enabled
               row :risk
+              row :regularity
             end
           end
           column do

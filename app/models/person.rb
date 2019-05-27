@@ -1,9 +1,11 @@
 class Person < ApplicationRecord
-  include Loggable
+  include Loggable, StaticModels::BelongsTo
 
   after_save :log_if_enabled
   after_save :expire_action_cache
   
+  belongs_to :regularity, class_name: "PersonRegularity"
+
   HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
@@ -135,7 +137,7 @@ class Person < ApplicationRecord
       {entity: 'NaturalDocketSeed', field: 'last_name', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'first_name', 'last_name']}
     ].each do |d|
       result = result.concat(d[:entity].constantize
-        .order(updated_at: :desc)
+        .order(updated_at: :desc, id: :desc)
         .page(page).per(per_page)
         .send(:ransack, {"#{d[:field]}_#{d[:matcher]}" => keyword})
         .result.map{|x| {
@@ -144,6 +146,34 @@ class Person < ApplicationRecord
         }})
     end
     result.uniq[0..per_page]
+  end
+
+  def refresh_person_regularity!
+    sum, count = fund_deposits.pluck('sum(exchange_rate_adjusted_amount), count(*)').first
+    
+    self.regularity = PersonRegularity.all.reverse
+      .find {|x| x.applies? sum,count} 
+
+    should_log = regularity_id_changed?
+
+    if should_log
+      issue = issues.build(state: 'new')
+      issue.risk_score_seeds.build(
+        score: regularity.code, 
+        provider: 'open_compliance', 
+        extra_info: {
+          regularity_funding_amount: regularity.funding_amount.to_d,
+          regularity_funding_count: regularity.funding_count,
+          funding_total_amount: sum.to_d,
+          funding_count: count
+        }.to_json
+      )
+    end 
+
+    save!
+
+    EventLog.log_entity!(self, AdminUser.current_admin_user, 
+      EventLogKind.update_person_regularity) if should_log
   end
 
   private
@@ -208,7 +238,8 @@ class Person < ApplicationRecord
       :argentina_invoicing_details, 
       :chile_invoicing_details, 
       :notes, 
-      :attachments
+      :attachments,
+      :regularity
     ]
   end
 end

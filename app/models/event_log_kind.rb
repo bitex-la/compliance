@@ -13,7 +13,8 @@ class EventLogKind
     [9,  :approve_issue],
     [10, :abandon_issue],
     [11, :enable_person],
-    [12, :disable_person]
+    [12, :disable_person],
+    [13, :update_person_regularity]
   ]
 
   def name

@@ -58,3 +58,6 @@ build-iPhoneSimulator/
 # Vim swap files
 *.swp
 *.byebug_history
+*.swo
+
+config/settings.yml

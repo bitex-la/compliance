@@ -25,6 +25,10 @@ describe Person do
             updated_at: 1514764800
           },
           relationships: {
+            regularity: { data: {
+              id: '1', 
+              type: 'regularities'
+            }},
             issues: {data: []},
             domiciles: {data: []},
             identifications: {data: []},
@@ -42,7 +46,15 @@ describe Person do
             attachments: {data: []},
           }
         },
-        included: []
+        included: [{ 
+          id: '1',
+          type: 'regularities', 
+          attributes: { 
+            code: 'none', 
+            funding_amount: 0, 
+            funding_count:0 
+          }
+        }]
       }
     end
 
@@ -66,6 +78,10 @@ describe Person do
           updated_at: 1514764800
         },
         relationships: {
+          regularity: { data: {
+              id: '1', 
+              type: 'regularities'
+          }},
           issues: {data: [{ type: 'issues', id: issue.id.to_s }] },
           domiciles: {data: [{
             id: person.domiciles.last.id.to_s,
