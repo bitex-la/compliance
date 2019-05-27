@@ -18,8 +18,8 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Configuring settings
-        command: cp .circleci/settings.yml config/settings.yml
+          name: Configuring settings
+          command: cp .circleci/settings.yml config/settings.yml
       - run:
           name: Which bundler?
           command: bundle -v
