@@ -43,7 +43,6 @@ gem 'static_models', github: 'bitex-la/static_models'
 
 gem 'kaminari'
 gem 'timecop'
-gem 'dotenv-rails'
 
 # field sanitization
 gem 'strip_attributes'
