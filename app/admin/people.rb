@@ -225,6 +225,7 @@ ActiveAdmin.register Person do
           table_for person.fund_deposits do           
             column :amount
             column :currency
+            column :exchange_rate_adjusted_amount
             column :deposit_method
             column :external_id
           end
