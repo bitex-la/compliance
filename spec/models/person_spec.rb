@@ -7,7 +7,7 @@ RSpec.describe Person, type: :model do
     expect(Person.new).to be_valid
   end
 
-  it 'starts as casual regularity' do
+  it 'starts as none regularity' do
     expect(Person.new.regularity).to eq PersonRegularity.none
   end
 

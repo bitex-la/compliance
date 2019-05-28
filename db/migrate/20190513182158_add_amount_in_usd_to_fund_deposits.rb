@@ -8,7 +8,6 @@ class AddAmountInUsdToFundDeposits < ActiveRecord::Migration[5.1]
       :decimal, precision: 20, scale: 8, null: false
 
     add_column :people, :regularity_id, :integer, null:false,
-      default: PersonRegularity.casual.id
-
+      default: PersonRegularity.none.id
   end
 end

@@ -50,9 +50,9 @@ RUN service mysql start \
 EXPOSE 5000
 
 CMD service mysql start \
-  && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
   && cd /usr/local/compliance \
   && git pull origin master \
+  && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
   && bundle install \
   && bundle exec rake db:migrate \
   && bundle exec rails s -p 5000 -b '0.0.0.0'

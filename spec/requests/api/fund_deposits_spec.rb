@@ -33,7 +33,7 @@ describe FundDeposit do
         exchange_rate_adjusted_amount: '1000.0',
         currency_code: "usd",
         deposit_method_code: "bank",
-        external_id: 1
+        external_id: "1"
       }
 
       api_response.data.relationships.person.data.id.should == person.id.to_s
