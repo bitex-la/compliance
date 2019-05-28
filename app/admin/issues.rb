@@ -325,7 +325,9 @@ ActiveAdmin.register Issue do
           end
           seed = rs.object
           if seed.persisted?     
-            ArbreHelpers.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
+            ArbreHelpers.has_many_links(context, rs, 
+              seed.external_link.split(',').compact,
+              'External links') if seed.external_link 
             begin 
               if seed.extra_info
                 extra_info_as_json = JSON.parse(seed.extra_info)
