@@ -12,6 +12,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   scope :dismissed
   scope :approved
   scope :changed_after_observation
+  scope :future
   scope :all
 
   filter :email_seeds_address_cont, label: "Email"
@@ -26,7 +27,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :natural_docket_seed_politically_exposed_eq, as: :select, label: "Is PEP"
   filter :created_at
   filter :updated_at
-
+  filter :show_after
 
   index title: '案 Issues Dashboard' do
     column(:id)  do |o|
@@ -41,5 +42,6 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     column(:state)
     column(:created_at)
     column(:updated_at)
+    column(:show_after)
   end
 end

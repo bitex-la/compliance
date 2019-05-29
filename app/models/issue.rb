@@ -6,8 +6,13 @@ class Issue < ApplicationRecord
 
   ransack_alias :state, :aasm_state
 
+  before_validation do 
+    self.show_after ||= Date.today
+  end
+
   after_save :sync_observed_status
   after_save :log_if_needed
+  validates :show_after, presence: true
 
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
@@ -74,18 +79,22 @@ class Issue < ApplicationRecord
   }
   scope :draft, -> { 
     with_relations.where('issues.aasm_state=?', 'draft')
+      .where('show_after <= ?', DateTime.now.to_date)
   }
 
   scope :fresh, -> { 
     with_relations.where('issues.aasm_state=?', 'new')
+      .where('show_after <= ?', DateTime.now.to_date)
   }
 
   scope :answered, -> { 
     with_relations.where('issues.aasm_state=?', 'answered')
+      .where('show_after <= ?', DateTime.now.to_date)
   }
 
   scope :observed, -> { 
     with_relations.where('issues.aasm_state=?', 'observed')
+      .where('show_after <= ?', DateTime.now.to_date)
   }
 
   scope :changed_after_observation, -> {
@@ -101,11 +110,17 @@ class Issue < ApplicationRecord
       .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
       .where(where.join(" OR "))
       .where("observations.reply IS NULL OR observations.reply = ''")
+      .where('show_after <= ?', DateTime.now.to_date)
   }
 
   scope :active, ->(yes=true){
     where("aasm_state #{'NOT' unless yes} IN (?)",
       %i(draft new observed answered))
+      .where('show_after <= ?', DateTime.now.to_date)
+  }
+
+  scope :future, -> { 
+    where('show_after > ?', DateTime.now.to_date)
   }
 
 	def self.ransackable_scopes(auth_object = nil)

@@ -4,6 +4,7 @@ ActiveAdmin.register Issue do
 
   filter :created_at
   filter :updated_at
+  filter :show_after
 
   index do
     column(:id)  do |o|
@@ -18,6 +19,7 @@ ActiveAdmin.register Issue do
     column(:state)
     column(:created_at)
     column(:updated_at)
+    column(:show_after)
   end
 
   config.clear_action_items!
@@ -33,6 +35,7 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :approved
   scope :changed_after_observation
+  scope :future
 
   collection_action :new_with_fruits, method: :get do
     @person = Person.find(params[:person_id])
@@ -121,6 +124,12 @@ ActiveAdmin.register Issue do
               row :updated_at
             end
           end
+        end
+
+        f.inputs "Issue" do
+          f.object.show_after = Date.today unless f.object.persisted?
+          f.input :show_after, as: :datepicker, datepicker_options: {
+              min_date: Date.today }
         end
 
         h3 "Observations"
@@ -365,6 +374,7 @@ ActiveAdmin.register Issue do
             attributes_table_for resource do
               row :created_at
               row :updated_at
+              row :show_after
             end
           end
         end
