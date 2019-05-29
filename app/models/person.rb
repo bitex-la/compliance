@@ -189,7 +189,7 @@ class Person < ApplicationRecord
   end
 
   def log_state_change(verb)
-    Event::EventLogger.call(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+    EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))
   end
 
   def self.eager_person_entities
