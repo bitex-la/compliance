@@ -31,7 +31,7 @@ FactoryBot.define do
 
     factory :future_issue do
       association :person, factory: :empty_person
-      show_after { Date.today + 1.months }
+      defer_until { Date.today + 1.months }
     end
   end
 end

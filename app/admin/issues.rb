@@ -4,7 +4,7 @@ ActiveAdmin.register Issue do
 
   filter :created_at
   filter :updated_at
-  filter :show_after
+  filter :defer_until
 
   index do
     column(:id)  do |o|
@@ -19,7 +19,7 @@ ActiveAdmin.register Issue do
     column(:state)
     column(:created_at)
     column(:updated_at)
-    column(:show_after)
+    column(:defer_until)
   end
 
   config.clear_action_items!
@@ -127,8 +127,7 @@ ActiveAdmin.register Issue do
         end
 
         f.inputs "Issue" do
-          f.object.show_after = Date.today unless f.object.persisted?
-          f.input :show_after, as: :datepicker, datepicker_options: {
+          f.input :defer_until, as: :datepicker, datepicker_options: {
               min_date: Date.today }
         end
 
@@ -374,7 +373,7 @@ ActiveAdmin.register Issue do
             attributes_table_for resource do
               row :created_at
               row :updated_at
-              row :show_after
+              row :defer_until
             end
           end
         end

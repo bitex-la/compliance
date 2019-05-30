@@ -6,7 +6,7 @@ RSpec.describe Issue, type: :model do
   let(:basic_issue) { create(:basic_issue) }
   let(:future_issue) { create(:future_issue) }
   let(:invalid_future_issue) { described_class.new(person: create(:empty_person),
-    show_after: Date.today - 1.days) }
+    defer_until: Date.today - 1.days) }
 
   it 'is not valid without a person' do
     expect(invalid_issue).to_not be_valid
