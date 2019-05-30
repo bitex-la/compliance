@@ -3,7 +3,7 @@ class AddShowAfterToIssues < ActiveRecord::Migration[5.1]
   def up
     add_column :issues, :defer_until, :date
 
-    Issue.all.each { |i| i.update_attribute(:defer_until, i.created_at) }
+    execute "UPDATE issues set defer_until = DATE(created_at)"
 
     change_column_null :issues, :defer_until, false
   end

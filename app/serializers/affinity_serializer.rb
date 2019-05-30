@@ -14,5 +14,3 @@ class AffinitySeedSerializer
     record_type: :people,
     serializer: 'PersonSerializer'
 end
-
-
