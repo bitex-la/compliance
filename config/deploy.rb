@@ -60,7 +60,7 @@ namespace :deploy do
       
       branch = fetch(:branch)
       unless `git rev-parse HEAD` == `git rev-parse origin/#{branch}`
-        puts "WARNING: HEAD is not the same as origin/#{branch}"
+        puts "WARNING: local #{branch} is not the same as origin/#{branch}"
         puts "Run `git push` to sync changes."
         exit
       end
