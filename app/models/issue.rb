@@ -15,7 +15,9 @@ class Issue < ApplicationRecord
   validate :defer_until_cannot_be_in_the_past
 
   def defer_until_cannot_be_in_the_past
-    if defer_until < Date.today
+    validation_date = created_at.try(:to_date) || Date.today
+    
+    if defer_until < validation_date
       errors.add(:defer_until, "can't be in the past")
     end
   end
