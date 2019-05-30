@@ -400,7 +400,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.datetime "updated_at", null: false
     t.string "aasm_state"
     t.boolean "fill_with_previous_info", default: false
-    t.date "show_after"
+    t.date "show_after", null: false
     t.index ["aasm_state"], name: "index_issues_on_aasm_state"
     t.index ["person_id"], name: "index_issues_on_person_id"
   end

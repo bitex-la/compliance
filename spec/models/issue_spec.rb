@@ -4,6 +4,9 @@ RSpec.describe Issue, type: :model do
   let(:invalid_issue) { described_class.new } 
   let(:empty_issue) { create(:basic_issue) }
   let(:basic_issue) { create(:basic_issue) }
+  let(:future_issue) { create(:future_issue) }
+  let(:invalid_future_issue) { described_class.new(person: create(:empty_person),
+    show_after: Date.today - 1.days) }
 
   it 'is not valid without a person' do
     expect(invalid_issue).to_not be_valid
@@ -11,6 +14,14 @@ RSpec.describe Issue, type: :model do
 
   it 'is valid with a person' do
     expect(basic_issue).to be_valid
+  end
+
+  it 'is valid future issue' do
+    expect(future_issue).to be_valid
+  end
+
+  it 'is not valid future issue when show after is less than creation date' do
+    expect(invalid_future_issue).to_not be_valid
   end
 
   describe 'when transitioning' do

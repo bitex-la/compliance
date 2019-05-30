@@ -1,11 +1,9 @@
 FactoryBot.define do
   factory :basic_issue, class: Issue do
-    show_after { DateTime.now.to_date }
     association :person, factory: :empty_person
   end
 
   factory :full_natural_person_issue, class: Issue do
-    show_after { DateTime.now.to_date }
     after(:create) do |issue, evaluator|
       %i(
         full_domicile_seed 
@@ -25,11 +23,15 @@ FactoryBot.define do
     end
 
     factory :full_approved_natural_person_issue do
-      show_after { DateTime.now.to_date }
       association :person, factory: :empty_person
       after(:create) do |issue|
         issue.approve!
       end
+    end
+
+    factory :future_issue do
+      association :person, factory: :empty_person
+      show_after { Date.today + 1.months }
     end
   end
 end

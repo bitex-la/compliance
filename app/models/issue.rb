@@ -12,7 +12,13 @@ class Issue < ApplicationRecord
 
   after_save :sync_observed_status
   after_save :log_if_needed
-  validates :show_after, presence: true
+  validate :show_after_cannot_be_in_the_past
+
+  def show_after_cannot_be_in_the_past
+    if show_after < Date.today
+      errors.add(:show_after, "can't be in the past")
+    end
+  end
 
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
