@@ -6,11 +6,8 @@ module Loggable
     after_commit(on: [:update]) { log(:update_entity) }
 
     def log(verb)
-      Event::EventLogger.call(
-        self, 
-        AdminUser.current_admin_user,
-        EventLogKind.send(verb)
-      )
+      EventLog.log_entity!(self, AdminUser.current_admin_user,
+        EventLogKind.send(verb))
     end  
   end
 end
