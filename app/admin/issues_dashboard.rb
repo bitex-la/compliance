@@ -27,7 +27,6 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :natural_docket_seed_politically_exposed_eq, as: :select, label: "Is PEP"
   filter :created_at
   filter :updated_at
-  filter :defer_until
 
   index title: '案 Issues Dashboard' do
     column(:id)  do |o|

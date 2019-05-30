@@ -83,25 +83,15 @@ class Issue < ApplicationRecord
       *HAS_ONE
     ) 
   }
-  scope :draft, -> { 
-    with_relations.where('issues.aasm_state=?', 'draft')
-      .where('defer_until <= ?', Date.today)
-  }
 
-  scope :fresh, -> { 
-    with_relations.where('issues.aasm_state=?', 'new')
-      .where('defer_until <= ?', Date.today)
-  }
-
-  scope :answered, -> { 
-    with_relations.where('issues.aasm_state=?', 'answered')
-      .where('defer_until <= ?', Date.today)
-  }
-
-  scope :observed, -> { 
-    with_relations.where('issues.aasm_state=?', 'observed')
-      .where('defer_until <= ?', Date.today)
-  }
+  {
+    draft: :draft,
+    fresh: :new,
+    answered: :answered,
+    observed: :observed
+  }.each do |k,v| 
+    scope k, -> { current.with_relations.where('issues.aasm_state=?', v) }  
+  end
 
   scope :changed_after_observation, -> {
     where = []
@@ -113,20 +103,24 @@ class Issue < ApplicationRecord
     end
 
     observed
+      .current
       .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
       .where(where.join(" OR "))
       .where("observations.reply IS NULL OR observations.reply = ''")
-      .where('defer_until <= ?', Date.today)
   }
 
   scope :active, ->(yes=true){
-    where("aasm_state #{'NOT' unless yes} IN (?)",
-      %i(draft new observed answered))
-      .where('defer_until <= ?', Date.today)
+    current.where("aasm_state #{'NOT' unless yes} IN (?)",
+      %i{draft new observed answered}
+    )
   }
 
   scope :future, -> { 
     where('defer_until > ?', Date.today)
+  }
+
+  scope :current, -> { 
+    where('defer_until <= ?', Date.today)
   }
 
 	def self.ransackable_scopes(auth_object = nil)

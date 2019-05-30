@@ -4,7 +4,6 @@ ActiveAdmin.register Issue do
 
   filter :created_at
   filter :updated_at
-  filter :defer_until
 
   index do
     column(:id)  do |o|

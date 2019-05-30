@@ -24,6 +24,20 @@ RSpec.describe Issue, type: :model do
     expect(invalid_future_issue).to_not be_valid
   end
 
+  it 'it moves from future to current scope' do
+    expect(Issue.future).to include future_issue
+    expect(Issue.current).to_not include future_issue
+    expect(Issue.draft).to_not include future_issue
+    expect(Issue.fresh).to_not include future_issue
+
+    Timecop.travel 3.months.from_now
+  
+    expect(Issue.future).to_not include future_issue
+    expect(Issue.current).to include future_issue
+    expect(Issue.draft).to include future_issue
+    expect(Issue.fresh).to_not include future_issue
+  end
+
   describe 'when transitioning' do
     it 'defaults to draft' do
       expect(empty_issue).to have_state(:draft)
