@@ -18,6 +18,7 @@ ActiveAdmin.register Issue do
     column(:state)
     column(:created_at)
     column(:updated_at)
+    column(:defer_until)
   end
 
   config.clear_action_items!
@@ -33,6 +34,7 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :approved
   scope :changed_after_observation
+  scope :future
 
   collection_action :new_with_fruits, method: :get do
     @person = Person.find(params[:person_id])
@@ -121,6 +123,11 @@ ActiveAdmin.register Issue do
               row :updated_at
             end
           end
+        end
+
+        f.inputs "Issue" do
+          f.input :defer_until, as: :datepicker, datepicker_options: {
+              min_date: Date.today }
         end
 
         h3 "Observations"
@@ -365,6 +372,7 @@ ActiveAdmin.register Issue do
             attributes_table_for resource do
               row :created_at
               row :updated_at
+              row :defer_until
             end
           end
         end

@@ -12,6 +12,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   scope :dismissed
   scope :approved
   scope :changed_after_observation
+  scope :future
   scope :all
 
   filter :email_seeds_address_cont, label: "Email"
@@ -27,7 +28,6 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :created_at
   filter :updated_at
 
-
   index title: '案 Issues Dashboard' do
     column(:id)  do |o|
       link_to o.id, [o.person, o]
@@ -41,5 +41,6 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     column(:state)
     column(:created_at)
     column(:updated_at)
+    column(:defer_until)
   end
 end

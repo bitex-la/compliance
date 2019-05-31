@@ -28,5 +28,10 @@ FactoryBot.define do
         issue.approve!
       end
     end
+
+    factory :future_issue do
+      association :person, factory: :empty_person
+      defer_until { Date.today + 1.months }
+    end
   end
 end

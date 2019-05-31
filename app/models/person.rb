@@ -149,7 +149,7 @@ class Person < ApplicationRecord
   end
 
   def refresh_person_regularity!
-    sum, count = fund_deposits.pluck('sum(exchange_rate_adjusted_amount), count(*)').first
+    sum, count = fund_deposits.pluck(Arel.sql('sum(exchange_rate_adjusted_amount), count(*)')).first
     
     self.regularity = PersonRegularity.all.reverse
       .find {|x| x.applies? sum,count} 

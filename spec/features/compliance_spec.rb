@@ -380,7 +380,7 @@ describe 'an admin user' do
     observation.reload.should be_answered
 
     Timecop.travel 2.days.from_now
-
+  
     add_observation(1, observation_reason, 'Please check this guy on FBI database')
     add_observation(2, observation_reason, 'Please check this on SII')
 

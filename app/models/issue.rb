@@ -6,8 +6,19 @@ class Issue < ApplicationRecord
 
   ransack_alias :state, :aasm_state
 
+  before_validation do 
+    self.defer_until ||= Date.today
+  end
+
   after_save :sync_observed_status
   after_save :log_if_needed
+  validate :defer_until_cannot_be_in_the_past
+
+  def defer_until_cannot_be_in_the_past
+    validation_date = created_at.try(:to_date) || Date.today
+    return if defer_until >= validation_date
+    errors.add(:defer_until, "can't be in the past")
+  end
 
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
@@ -72,21 +83,15 @@ class Issue < ApplicationRecord
       *HAS_ONE
     ) 
   }
-  scope :draft, -> { 
-    with_relations.where('issues.aasm_state=?', 'draft')
-  }
 
-  scope :fresh, -> { 
-    with_relations.where('issues.aasm_state=?', 'new')
-  }
-
-  scope :answered, -> { 
-    with_relations.where('issues.aasm_state=?', 'answered')
-  }
-
-  scope :observed, -> { 
-    with_relations.where('issues.aasm_state=?', 'observed')
-  }
+  {
+    draft: :draft,
+    fresh: :new,
+    answered: :answered,
+    observed: :observed
+  }.each do |k,v| 
+    scope k, -> { current.with_relations.where('issues.aasm_state=?', v) }  
+  end
 
   scope :changed_after_observation, -> {
     where = []
@@ -98,14 +103,24 @@ class Issue < ApplicationRecord
     end
 
     observed
+      .current
       .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
       .where(where.join(" OR "))
       .where("observations.reply IS NULL OR observations.reply = ''")
   }
 
   scope :active, ->(yes=true){
-    where("aasm_state #{'NOT' unless yes} IN (?)",
-      %i(draft new observed answered))
+    current.where("aasm_state #{'NOT' unless yes} IN (?)",
+      %i{draft new observed answered}
+    )
+  }
+
+  scope :future, -> { 
+    where('defer_until > ?', Date.today)
+  }
+
+  scope :current, -> { 
+    where('defer_until <= ?', Date.today)
   }
 
 	def self.ransackable_scopes(auth_object = nil)
