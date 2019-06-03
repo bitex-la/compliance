@@ -109,25 +109,35 @@ RSpec.describe Issue, type: :model do
       end.to change{ person.enabled }.to(true)
     end
 
-    it 'creates new issue with defer until date on approve if seeds has expiriration date' do
+    it 'creates new issues with defer until date on approve if seeds has expiration date' do
       person = create :empty_person
       issue = person.issues.create
       expires_at = 1.months.from_now.to_date
       issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
-      #issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
+      issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
+    
       issue.save!
 
       expect(person.issues.last).to be(issue)
 
-      issue.approve!
+      expect do
+        issue.approve!
+      end.to change{person.issues.count}.by(2)      
+      
+      person.reload
 
-      last = person.issues.last
-      expect(last).to_not be(issue)
-      expect(last.defer_until).to be(expires_at)
-      expect(last.note_seeds.first.title).to eq('title')
-      expect(last.note_seeds.first.body).to eq('body')
-      #expect(last.risk_score_seeds.first.score).to eq('score')
-      #expect(last.risk_score_seeds.first.replace).to eq(person.risk_score)
+      issue_notes = person.issues[-2]
+      expect(issue_notes).to_not be(issue)
+      expect(issue_notes.defer_until).to eq(expires_at)
+      expect(issue_notes.note_seeds.first.title).to eq('title')
+      expect(issue_notes.note_seeds.first.body).to eq('body')
+
+      risk_issue = person.issues.last
+      expect(risk_issue).to_not be(issue)
+      expect(risk_issue.defer_until).to eq(expires_at)
+      expect(risk_issue.risk_score_seeds.first.score).to eq('score')
+    
+      expect(risk_issue.risk_score_seeds.first.replaces).to eq(person.risk_scores.first)
     end
   end
 
