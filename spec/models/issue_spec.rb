@@ -20,7 +20,7 @@ RSpec.describe Issue, type: :model do
     expect(future_issue).to be_valid
   end
 
-  it 'is not valid future issue when show after is less than creation date' do
+  it 'is not valid future issue when defer until is less than creation date' do
     expect(invalid_future_issue).to_not be_valid
   end
 
@@ -36,6 +36,13 @@ RSpec.describe Issue, type: :model do
     expect(Issue.current).to include future_issue
     expect(Issue.draft).to include future_issue
     expect(Issue.fresh).to_not include future_issue
+  end
+
+  it 'is not valid issue when expires_at is less then creation date' do
+    expires_at = Date.today - 1.months
+    empty_issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
+    expect(empty_issue).to_not be_valid
+    expect(empty_issue.errors.messages.keys.first).to eq(:"note_seeds.expires_at")
   end
 
   describe 'when transitioning' do
