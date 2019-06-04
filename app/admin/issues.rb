@@ -367,8 +367,6 @@ ActiveAdmin.register Issue do
   end
 
   show do
-    #next unless resource.approved? # Only show approved issues.
-
     tabs do
       tab :base do
         columns do
