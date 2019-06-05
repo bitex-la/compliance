@@ -42,10 +42,12 @@ RUN rm -rf /usr/local/bin/rbenv-install
 
 RUN sed -i "s|bind-address.*|skip-networking|g" /etc/mysql/mysql.conf.d/mysqld.cnf
 
-RUN service mysql start \
-    && git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
+RUN git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
     && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
-    && cd /usr/local/compliance && bundle install && bundle exec rails db:setup
+    && cd /usr/local/compliance && bundle install 
+
+RUN service mysql start \
+    && cd /usr/local/compliance && bundle exec rails db:setup
 
 EXPOSE 5000
 
