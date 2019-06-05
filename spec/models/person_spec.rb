@@ -11,6 +11,18 @@ RSpec.describe Person, type: :model do
     expect(Person.new.regularity).to eq PersonRegularity.none
   end
 
+  it 'is in natural scope' do
+    person = create(:full_natural_person)
+    expect(Person.by_person_type("natural")).to include person
+    expect(Person.by_person_type("legal")).to_not include person
+  end
+
+  it 'is in legal scope' do
+    person = create(:full_legal_entity_person)
+    expect(Person.by_person_type("natural")).to_not include person
+    expect(Person.by_person_type("legal")).to include person
+  end
+
   it 'knows which fruits can be replaced' do
     new_phone = create :full_phone, person: person
     person.reload.phones.first.update(replaced_by: new_phone)
