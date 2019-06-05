@@ -124,8 +124,13 @@ class Issue < ApplicationRecord
   }
 
 	def self.ransackable_scopes(auth_object = nil)
-	  %i(active)
+	  %i(active by_person_type)
   end
+
+  scope :by_person_type, -> (type) { 
+    return joins(:person =>  :natural_dockets ) if type == "natural"
+    return joins(:person =>  :legal_entity_dockets ) if type == "legal"
+  }
 
   aasm do
     state :draft, initial: true

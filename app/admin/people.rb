@@ -63,8 +63,8 @@ ActiveAdmin.register Person do
   filter :regularity
 
   scope :all
-  scope('Legal Entity') { |scope| scope.joins(:legal_entity_dockets) }
-  scope('Natural Person') { |scope| scope.joins(:natural_dockets) }
+  scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
+  scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
 
   action_item :add_person_information, only: %i(show edit) do
     link_to 'Add Person Information', new_with_fruits_person_issues_path(person)
