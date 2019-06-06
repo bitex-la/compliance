@@ -44,7 +44,7 @@ RSpec.describe Issue, type: :model do
     expect(Issue.by_person_type("legal")).to_not include issue
   end
 
-  it 'is in natural scope' do
+  it 'new person with natural docket seed is in natural scope' do
     issue = create(:new_natural_person_issue)
     expect(Issue.by_person_type("natural")).to include issue
     expect(Issue.by_person_type("legal")).to_not include issue
