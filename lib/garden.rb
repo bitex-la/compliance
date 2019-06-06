@@ -109,7 +109,7 @@ module Garden
         old_fruits.update_all(replaced_by_id: fruit.id)
       end
 
-      create_defer_issue(fruit) unless expires_at.nil?
+      create_deferred_issue(fruit) unless expires_at.nil?
 
       fruit
     end
