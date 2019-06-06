@@ -11,12 +11,13 @@
   ```
 
 ## Environment variables
-- [ ] Rename .env.example file to .env or set the following environment variables:
-    - MYSQL_USERNAME: username of MySQL user
-    - MYSQL_PASSWORD: password of the MySQL password
-    - MYSQL_HOST: your MySQL host
-    - MYSQL_PORT: yout MySQL port
-    - MYSQL_SOCKET: your MySQL unix socket
+- [ ] Rename config/settings.example.yml file to config/settings.yml and set the following variables:
+    - mysql.username: username of MySQL user
+    - mysql.password: password of the MySQL password
+    - mysql.host: your MySQL host
+    - mysql.port: yout MySQL port
+or
+    - mysql.socket: your MySQL unix socket
 
 ## Create database 
 - [ ] `rails db:create`

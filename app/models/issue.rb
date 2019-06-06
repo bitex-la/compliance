@@ -113,22 +113,42 @@ class Issue < ApplicationRecord
   }
 
   scope :active, ->(yes=true){
-    current.where("aasm_state #{'NOT' unless yes} IN (?)",
+    current.active_states
+  }
+
+  scope :active_states, ->(yes=true){
+    where("aasm_state #{'NOT' unless yes} IN (?)",
       %i{draft new observed answered}
     )
   }
 
-  scope :future, -> { 
+  scope :future_all, -> { 
     where('defer_until > ?', Date.today)
   }
 
+  scope :future, -> { 
+    active_states.where('defer_until > ?', Date.today)
+  }
+  
   scope :current, -> { 
     where('defer_until <= ?', Date.today)
   }
 
 	def self.ransackable_scopes(auth_object = nil)
-	  %i(active)
+	  %i(active by_person_type)
   end
+
+  scope :by_person_type, -> (type) { 
+    if type == "natural"
+      left_outer_joins(:natural_docket_seed) 
+        .left_outer_joins(:person =>  :natural_dockets) 
+        .where("natural_docket_seeds.id is not null or natural_dockets.id is not null")
+    elsif type == "legal"
+      left_outer_joins(:legal_entity_docket_seed) 
+        .left_outer_joins(:person =>  :legal_entity_dockets) 
+        .where("legal_entity_docket_seeds.id is not null or legal_entity_dockets.id is not null")
+    end
+  }
 
   aasm do
     state :draft, initial: true

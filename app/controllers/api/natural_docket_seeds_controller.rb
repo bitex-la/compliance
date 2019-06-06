@@ -23,7 +23,8 @@ class Api::NaturalDocketSeedsController < Api::SeedController
         :politically_exposed_reason,
         :attachments,
         :copy_attachments,
-        :issue
+        :issue,
+        :expires_at
       ]
   end
 end

@@ -20,7 +20,7 @@ RSpec.describe Issue, type: :model do
     expect(future_issue).to be_valid
   end
 
-  it 'is not valid future issue when show after is less than creation date' do
+  it 'is not valid future issue when defer until is less than creation date' do
     expect(invalid_future_issue).to_not be_valid
   end
 
@@ -36,6 +36,30 @@ RSpec.describe Issue, type: :model do
     expect(Issue.current).to include future_issue
     expect(Issue.draft).to include future_issue
     expect(Issue.fresh).to_not include future_issue
+  end
+
+  it 'is in natural scope' do
+    issue = create(:full_approved_natural_person_issue)
+    expect(Issue.by_person_type("natural")).to include issue
+    expect(Issue.by_person_type("legal")).to_not include issue
+  end
+
+  it 'new person with natural docket seed is in natural scope' do
+    issue = create(:new_natural_person_issue)
+    expect(Issue.by_person_type("natural")).to include issue
+    expect(Issue.by_person_type("legal")).to_not include issue
+  end
+
+  it 'is in legal scope' do
+    issue = create(:full_approved_legal_entity_issue)
+    expect(Issue.by_person_type("natural")).to_not include issue
+    expect(Issue.by_person_type("legal")).to include issue
+  end
+
+  it 'is not valid issue when expires at is less than creation date' do
+    empty_issue.note_seeds.create(title:'title', body: 'body', expires_at: 1.month.ago)
+    expect(empty_issue).to_not be_valid
+    expect(empty_issue.errors.messages.keys.first).to eq(:"note_seeds.expires_at")
   end
 
   describe 'when transitioning' do
@@ -107,6 +131,37 @@ RSpec.describe Issue, type: :model do
       expect do
         person.issues.reload.last.approve!
       end.to change{ person.enabled }.to(true)
+    end
+
+    it 'creates deferred issues for each expiring seed' do
+      person = create :empty_person
+      issue = person.issues.create
+      expires_at = 1.month.from_now.to_date
+      issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
+      issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
+    
+      issue.save!
+
+      expect(person.issues.to_a).to eq([issue])
+
+      expect do
+        issue.approve!
+      end.to change{person.issues.count}.by(2)      
+      
+      person.reload
+
+      issue_notes = person.issues[-2]
+      expect(issue_notes).to_not be(issue)
+      expect(issue_notes.defer_until).to eq(expires_at)
+      expect(issue_notes.note_seeds.first.title).to eq('title')
+      expect(issue_notes.note_seeds.first.body).to eq('body')
+
+      risk_issue = person.issues.last
+      expect(risk_issue).to_not be(issue)
+      expect(risk_issue.defer_until).to eq(expires_at)
+      expect(risk_issue.risk_score_seeds.first.score).to eq('score')
+    
+      expect(risk_issue.risk_score_seeds.first.replaces).to eq(person.risk_scores.first)
     end
   end
 
