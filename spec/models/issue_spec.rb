@@ -39,8 +39,7 @@ RSpec.describe Issue, type: :model do
   end
 
   it 'is not valid issue when expires at is less than creation date' do
-    expires_at = Date.today - 1.months
-    empty_issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
+    empty_issue.note_seeds.create(title:'title', body: 'body', expires_at: 1.month.ago)
     expect(empty_issue).to_not be_valid
     expect(empty_issue.errors.messages.keys.first).to eq(:"note_seeds.expires_at")
   end
@@ -116,16 +115,16 @@ RSpec.describe Issue, type: :model do
       end.to change{ person.enabled }.to(true)
     end
 
-    it 'creates new issues with defer until date on approve if seeds has expiration date' do
+    it 'creates deferred issues for each expiring seed' do
       person = create :empty_person
       issue = person.issues.create
-      expires_at = 1.months.from_now.to_date
+      expires_at = 1.month.from_now.to_date
       issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
       issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
     
       issue.save!
 
-      expect(person.issues.last).to be(issue)
+      expect(person.issues.to_a).to eq([issue])
 
       expect do
         issue.approve!

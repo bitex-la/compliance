@@ -45,11 +45,6 @@ module FactoryBot
                   issue: resource.person.issues.reload.first,
                   fruit: resource
                 ).save(validate: false)
-
-                build("#{factory_name}_expires_seed",
-                  issue: resource.person.issues.reload.first,
-                  fruit: resource
-                ).save(validate: false)
               end
 
               factory "#{factory_name}_with_person" do
