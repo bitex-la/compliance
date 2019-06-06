@@ -1,8 +1,11 @@
 class Issue < ApplicationRecord
   include AASM
   include Loggable
+  StaticModels::BelongsTo
+
   belongs_to :person, optional: true
   validates :person, presence: true
+  belongs_to :reason, class_name: "IssueReason"
 
   ransack_alias :state, :aasm_state
 
