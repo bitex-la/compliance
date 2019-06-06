@@ -142,6 +142,7 @@ ActiveAdmin.register Issue do
         div class: 'note_seeds' do
           ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
             nf.input :body, input_html: {rows: 3}
+            nf.input :expires_at, as: :datepicker
             ArbreHelpers.has_many_attachments(context, nf)
           end
         end
@@ -161,6 +162,7 @@ ActiveAdmin.register Issue do
               sf.input :copy_attachments,
                 label: "Move existing Legal Entity Docket attachments to the new one"
             end
+            sf.input :expires_at, as: :datepicker
             ArbreHelpers.has_many_attachments(self, sf)
           end
         end
@@ -191,6 +193,7 @@ ActiveAdmin.register Issue do
                   label: "Move existing Natural Person Docket attachments to the new one"
               end
             end
+            sf.input :expires_at, as: :datepicker
             Appsignal.instrument("rendering_has_many_attachments_on_docket") do
               ArbreHelpers.has_many_attachments(self, sf)
             end
@@ -209,6 +212,7 @@ ActiveAdmin.register Issue do
           sf.input :floor
           sf.input :apartment
           ArbreHelpers.fields_for_replaces context, sf, :domiciles
+          sf.input :expires_at, as: :datepicker
           ArbreHelpers.has_many_attachments(context, sf)
         end
       end
@@ -222,6 +226,7 @@ ActiveAdmin.register Issue do
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
           ArbreHelpers.fields_for_replaces context, sf, :identifications
+          sf.input :expires_at, as: :datepicker
           ArbreHelpers.has_many_attachments(context, sf)
         end
       end
@@ -231,6 +236,7 @@ ActiveAdmin.register Issue do
           sf.input :amount
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
           ArbreHelpers.fields_for_replaces context, sf, :allowances
+          sf.input :expires_at, as: :datepicker
           ArbreHelpers.has_many_attachments(context, sf)
         end
       end
@@ -248,6 +254,7 @@ ActiveAdmin.register Issue do
               af.input :address
               ArbreHelpers.fields_for_replaces self, af,
                 :argentina_invoicing_details
+              af.input :expires_at, as: :datepicker
               ArbreHelpers.has_many_attachments(self, af)
             end
           end
@@ -259,6 +266,7 @@ ActiveAdmin.register Issue do
               cf.input :ciudad
               cf.input :comuna
               ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
+              cf.input :expires_at, as: :datepicker
               ArbreHelpers.has_many_attachments(self, cf)
             end
           end
@@ -282,6 +290,7 @@ ActiveAdmin.register Issue do
                 rf.template.concat('</li>'.html_safe) 
               end
               ArbreHelpers.fields_for_replaces context, rf, :affinities
+              rf.input :expires_at, as: :datepicker
               ArbreHelpers.has_many_attachments(context, rf)
             end
           end
@@ -311,6 +320,7 @@ ActiveAdmin.register Issue do
           if current = context.resource.person.phones.current.presence
             pf.input :replaces, collection: current
           end
+          pf.input :expires_at, as: :datepicker
         end
         br
         ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
@@ -319,6 +329,7 @@ ActiveAdmin.register Issue do
           if current = context.resource.person.emails.current.presence
             ef.input :replaces, collection: current
           end
+          ef.input :expires_at, as: :datepicker
         end
       end
 
@@ -346,7 +357,7 @@ ActiveAdmin.register Issue do
           else
             rs.input :extra_info 
           end
-
+          rs.input :expires_at, as: :datepicker
           ArbreHelpers.has_many_attachments(context, rs)
         end
       end
@@ -356,8 +367,6 @@ ActiveAdmin.register Issue do
   end
 
   show do
-    next unless resource.approved? # Only show approved issues.
-
     tabs do
       tab :base do
         columns do

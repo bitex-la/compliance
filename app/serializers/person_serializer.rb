@@ -2,7 +2,7 @@ class PersonSerializer
   include FastJsonapiCandy::Serializer
   set_type 'people'
 
-  attributes :enabled, :risk
+  attributes :enabled, :risk, :person_type
 
   build_belongs_to :regularity
 

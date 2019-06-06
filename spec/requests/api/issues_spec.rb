@@ -88,6 +88,25 @@ describe Issue do
       api_response.included.select{|o| o.type == 'observations'}
         .map(&:id).should == [observation_id]
     end
+
+    it 'creates a new issue with defer until' do
+      defer_until = 1.month.from_now.to_date
+      
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          attributes: {defer_until: defer_until},
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
+      end.to change{Issue.count}.by(1)
+
+      issue = Issue.find(api_response.data.id)
+      expect(issue.defer_until).to eq(defer_until)
+
+      api_get("/issues/#{issue.id}")
+      
+      expect(Date.parse(api_response.data.attributes.defer_until)).to eq(defer_until)
+    end
   end
 
   describe "when changing state" do
