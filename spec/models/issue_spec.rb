@@ -38,6 +38,24 @@ RSpec.describe Issue, type: :model do
     expect(Issue.fresh).to_not include future_issue
   end
 
+  it 'is in natural scope' do
+    issue = create(:full_approved_natural_person_issue)
+    expect(Issue.by_person_type("natural")).to include issue
+    expect(Issue.by_person_type("legal")).to_not include issue
+  end
+
+  it 'new person with natural docket seed is in natural scope' do
+    issue = create(:new_natural_person_issue)
+    expect(Issue.by_person_type("natural")).to include issue
+    expect(Issue.by_person_type("legal")).to_not include issue
+  end
+
+  it 'is in legal scope' do
+    issue = create(:full_approved_legal_entity_issue)
+    expect(Issue.by_person_type("natural")).to_not include issue
+    expect(Issue.by_person_type("legal")).to include issue
+  end
+
   it 'is not valid issue when expires at is less than creation date' do
     empty_issue.note_seeds.create(title:'title', body: 'body', expires_at: 1.month.ago)
     expect(empty_issue).to_not be_valid

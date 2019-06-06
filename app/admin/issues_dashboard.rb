@@ -20,6 +20,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :natural_docket_seed_first_name_cont, label: "First Name"
   filter :natural_docket_seed_last_name_cont,  label: "Last Name"
   filter :legal_entity_docket_seed_legal_name_or_legal_entity_docket_seed_commercial_name_cont, label: "Company Name"
+  filter :by_person_type, as: :select, collection: Person.person_types
   filter :note_seeds_title_or_note_seeds_body_cont, label: "Notes"
   filter :domicile_seeds_street_address_or_argentina_invoicing_detail_seed_address_cont, label: "Street Address"
   filter :domicile_seeds_street_number_or_argentina_invoicing_detail_seed_address_cont, label: "Street Number"
