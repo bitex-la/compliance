@@ -114,7 +114,7 @@ module Garden
       fruit
     end
 
-    def create_defer_issue(fruit)
+    def create_deferred_issue(fruit)
       new_issue = issue.person.issues.create(defer_until: expires_at)
       new_issue.add_seeds_replacing([fruit])
       new_issue.save!
