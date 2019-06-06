@@ -66,7 +66,7 @@ RSpec.describe Person, type: :model do
         .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 3"})
       
       expect(Person.suggest('Joe').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - Joe - Doe"})
+        .to include({:id=>4, :suggestion=>"人 4: Joe Doe - Joe - Doe"})
 
       expect(Person.suggest('Johnny')).to be_empty
       
@@ -80,7 +80,7 @@ RSpec.describe Person, type: :model do
         .to include({:id=>1, :suggestion=>"人 1: Joe Doe - +5491125410470"})
 
       expect(Person.suggest('2545566').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 2545566"})
+        .to include({:id=>4, :suggestion=>"人 4: Joe Doe - 2545566"})
 
       expect(Person.suggest('80932388')).to be_empty
     end
