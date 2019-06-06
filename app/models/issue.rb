@@ -110,15 +110,23 @@ class Issue < ApplicationRecord
   }
 
   scope :active, ->(yes=true){
-    current.where("aasm_state #{'NOT' unless yes} IN (?)",
+    current.active_states
+  }
+
+  scope :active_states, ->(yes=true){
+    where("aasm_state #{'NOT' unless yes} IN (?)",
       %i{draft new observed answered}
     )
   }
 
-  scope :future, -> { 
+  scope :future_all, -> { 
     where('defer_until > ?', Date.today)
   }
 
+  scope :future, -> { 
+    active_states.where('defer_until > ?', Date.today)
+  }
+  
   scope :current, -> { 
     where('defer_until <= ?', Date.today)
   }
