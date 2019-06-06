@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_28_203218) do
+ActiveRecord::Schema.define(version: 2019_05_31_171925) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -70,6 +70,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.integer "replaces_id"
     t.integer "fruit_id"
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["fruit_id"], name: "index_affinity_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_affinity_seeds_on_issue_id"
     t.index ["related_person_id"], name: "index_affinity_seeds_on_related_person_id"
@@ -86,6 +87,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.integer "replaces_id"
     t.boolean "copy_attachments"
     t.integer "kind_id"
+    t.date "expires_at"
     t.index ["fruit_id"], name: "index_allowance_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_allowance_seeds_on_replaces_id"
@@ -119,6 +121,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.string "full_name", null: false
     t.string "address"
     t.string "country", null: false
+    t.date "expires_at"
     t.index ["address"], name: "index_argentina_invoicing_detail_seeds_on_address"
     t.index ["country"], name: "index_argentina_invoicing_detail_seeds_on_country"
     t.index ["fruit_id"], name: "index_argentina_invoicing_detail_seeds_on_fruit_id"
@@ -187,6 +190,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
     t.integer "vat_status_id"
+    t.date "expires_at"
     t.index ["comuna"], name: "index_chile_invoicing_detail_seeds_on_comuna"
     t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
     t.index ["giro"], name: "index_chile_invoicing_detail_seeds_on_giro"
@@ -242,6 +246,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.bigint "fruit_id"
     t.integer "replaces_id"
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["city"], name: "index_domicile_seeds_on_city"
     t.index ["country"], name: "index_domicile_seeds_on_country"
     t.index ["fruit_id"], name: "index_domicile_seeds_on_fruit_id"
@@ -289,6 +294,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["address"], name: "index_email_seeds_on_address"
     t.index ["email_kind_id"], name: "index_email_seeds_on_email_kind_id"
     t.index ["fruit_id"], name: "index_email_seeds_on_fruit_id"
@@ -366,6 +372,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.string "public_registry_book"
     t.string "public_registry_extra_data"
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
     t.index ["identification_kind_id"], name: "index_identification_seeds_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
@@ -416,6 +423,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.datetime "updated_at", null: false
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["commercial_name"], name: "index_legal_entity_docket_seeds_on_commercial_name"
     t.index ["country"], name: "index_legal_entity_docket_seeds_on_country"
     t.index ["fruit_id"], name: "index_legal_entity_docket_seeds_on_fruit_id"
@@ -458,6 +466,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.boolean "politically_exposed"
     t.text "politically_exposed_reason", limit: 4294967295
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["birth_date"], name: "index_natural_docket_seeds_on_birth_date"
     t.index ["first_name", "last_name"], name: "index_natural_docket_seeds_on_first_name_and_last_name"
     t.index ["first_name"], name: "index_natural_docket_seeds_on_first_name"
@@ -506,6 +515,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
@@ -578,6 +588,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.bigint "replaces_id"
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
+    t.date "expires_at"
     t.index ["country"], name: "index_phone_seeds_on_country"
     t.index ["fruit_id"], name: "index_phone_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_phone_seeds_on_issue_id"
@@ -617,6 +628,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_203218) do
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
     t.bigint "issue_id"
+    t.date "expires_at"
     t.index ["fruit_id"], name: "index_risk_score_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_risk_score_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_risk_score_seeds_on_replaces_id"

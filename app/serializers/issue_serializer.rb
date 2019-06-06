@@ -12,5 +12,6 @@ class IssueSerializer
   build_has_many :allowance_seeds, :observations, :domicile_seeds,
     :identification_seeds, :phone_seeds, :email_seeds, 
     :note_seeds, :affinity_seeds, :risk_score_seeds
-  attributes :state
+  
+  attributes :state, :defer_until
 end
