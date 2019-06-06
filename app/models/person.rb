@@ -78,8 +78,10 @@ class Person < ApplicationRecord
   end
 
   scope :by_person_type, -> (type){ 
-    return joins(:natural_dockets) if type == "natural"
-    return joins(:legal_entity_dockets) if type == "legal"
+    {
+      natural: joins(:natural_dockets),
+      legal: joins(:legal_entity_dockets)
+    }[type.to_sym]
   }
 
   def self.ransackable_scopes(auth_object = nil)
