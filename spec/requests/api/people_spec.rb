@@ -22,7 +22,8 @@ describe Person do
             enabled: false,
             risk: nil,
             created_at: 1514764800,
-            updated_at: 1514764800
+            updated_at: 1514764800,
+            person_type: nil
           },
           relationships: {
             regularity: { data: {
@@ -75,7 +76,8 @@ describe Person do
           enabled: true,
           risk: 'medium',
           created_at: 1514764800,
-          updated_at: 1514764800
+          updated_at: 1514764800,
+          person_type: "natural_person"
         },
         relationships: {
           regularity: { data: {
