@@ -60,6 +60,5 @@ FactoryBot.define do
         issue.approve!
       end
     end
-
   end
 end
