@@ -58,7 +58,6 @@ RSpec.describe Issue, type: :model do
 
 
 
-
   describe 'when transitioning' do
     it 'defaults to draft' do
       expect(empty_issue).to have_state(:draft)
