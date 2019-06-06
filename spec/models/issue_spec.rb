@@ -115,7 +115,7 @@ RSpec.describe Issue, type: :model do
       end.to change{ person.enabled }.to(true)
     end
 
-    it 'creates new issues with defer until date on approve if seeds has expiration date' do
+    it 'creates deferred issues for each expiring seed' do
       person = create :empty_person
       issue = person.issues.create
       expires_at = 1.months.from_now.to_date
