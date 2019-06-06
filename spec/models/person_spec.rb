@@ -11,7 +11,7 @@ RSpec.describe Person, type: :model do
     expect(Person.new.regularity).to eq PersonRegularity.none
   end
 
-  it "isn't in natural and legal scope" do
+  it "isn't in natural nor legal scope" do
     person = create(:empty_person)
     expect(Person.by_person_type("natural")).to_not include person
     expect(Person.by_person_type("legal")).to_not include person
