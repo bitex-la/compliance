@@ -124,7 +124,7 @@ RSpec.describe Issue, type: :model do
     
       issue.save!
 
-      expect(person.issues.last).to be(issue)
+      expect(person.issues.to_a).to be([issue])
 
       expect do
         issue.approve!
