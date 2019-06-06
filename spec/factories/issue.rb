@@ -22,6 +22,10 @@ FactoryBot.define do
       end
     end
 
+    factory :new_natural_person_issue do
+      association :person, factory: :empty_person
+    end
+
     factory :full_approved_natural_person_issue do
       association :person, factory: :empty_person
       after(:create) do |issue|

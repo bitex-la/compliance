@@ -44,11 +44,20 @@ RSpec.describe Issue, type: :model do
     expect(Issue.by_person_type("legal")).to_not include issue
   end
 
+  it 'is in natural scope' do
+    issue = create(:new_natural_person_issue)
+    expect(Issue.by_person_type("natural")).to include issue
+    expect(Issue.by_person_type("legal")).to_not include issue
+  end
+
   it 'is in legal scope' do
     issue = create(:full_approved_legal_entity_issue)
     expect(Issue.by_person_type("natural")).to_not include issue
     expect(Issue.by_person_type("legal")).to include issue
   end
+
+
+
 
   describe 'when transitioning' do
     it 'defaults to draft' do
