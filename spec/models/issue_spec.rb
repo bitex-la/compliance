@@ -118,7 +118,7 @@ RSpec.describe Issue, type: :model do
     it 'creates deferred issues for each expiring seed' do
       person = create :empty_person
       issue = person.issues.create
-      expires_at = 1.months.from_now.to_date
+      expires_at = 1.month.from_now.to_date
       issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
       issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
     
