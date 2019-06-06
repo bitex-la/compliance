@@ -39,7 +39,6 @@ RSpec.describe Issue, type: :model do
   end
 
   it 'is not valid issue when expires at is less than creation date' do
-    expires_at = Date.today - 1.months
     empty_issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
     expect(empty_issue).to_not be_valid
     expect(empty_issue.errors.messages.keys.first).to eq(:"note_seeds.expires_at")
