@@ -26,10 +26,12 @@ class Api::IssuesController < Api::ApiController
   def create
     mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [ :people ],
-      issues: [ :defer_until, :person, id: nil ],
+      issues: [:reason_code, :defer_until, :person, id: nil ],
       people: []
 
     return jsonapi_422(nil) unless mapper.data
+
+    mapper.data.reason = IssueReason.find_by_code(mapper.data.reason_code)
 
     if mapper.save_all
       jsonapi_response mapper.data,

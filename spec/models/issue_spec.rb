@@ -24,6 +24,23 @@ RSpec.describe Issue, type: :model do
     expect(invalid_future_issue).to_not be_valid
   end
 
+  it 'has a default further_clarification reason' do
+    issue = create(:basic_issue)
+    expect(issue.reason).to eq(IssueReason.further_clarification)
+  end
+
+  it 'respect selected reason' do
+    issue = create(:basic_issue, reason: IssueReason.new_client)
+    expect(issue.reason).to eq(IssueReason.new_client)
+  end
+
+  it 'is not allow to change reason' do
+    issue = create(:basic_issue, reason: IssueReason.new_client)
+    issue.reason = IssueReason.further_clarification
+    expect(issue).to_not be_valid
+    expect(issue.errors.messages.keys.first).to eq(:"reason")
+  end
+
   it 'it moves from future to current scope' do
     expect(Issue.future).to include future_issue
     expect(Issue.current).to_not include future_issue

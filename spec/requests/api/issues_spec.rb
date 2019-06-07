@@ -107,6 +107,23 @@ describe Issue do
       
       expect(Date.parse(api_response.data.attributes.defer_until)).to eq(defer_until)
     end
+
+    it 'creates a new issue with custom reason' do  
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          attributes: {reason_code: IssueReason.new_client.code},
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
+      end.to change{Issue.count}.by(1)
+
+      issue = Issue.find(api_response.data.id)
+      expect(issue.reason).to eq(IssueReason.new_client)
+
+      api_get("/issues/#{issue.id}")
+      
+      expect(api_response.data.attributes.reason.code).to eq(IssueReason.new_client.code.to_s)
+    end
   end
 
   describe "when changing state" do

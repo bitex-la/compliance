@@ -15,6 +15,7 @@ ActiveAdmin.register Issue do
     column(:person_enabled)do |o|
       o.person.enabled
     end
+    column(:reason)
     column(:state)
     column(:created_at)
     column(:updated_at)
@@ -115,6 +116,7 @@ ActiveAdmin.register Issue do
               row :id
               row :state
               row :person
+              row :reason if f.object.persisted?
             end
           end
           column do
@@ -126,6 +128,7 @@ ActiveAdmin.register Issue do
         end
 
         f.inputs "Issue" do
+          f.input :reason, as: :select, collection: IssueReason.all unless f.object.persisted?
           f.input :defer_until, as: :datepicker, datepicker_options: {
               min_date: Date.today }
         end
@@ -375,6 +378,7 @@ ActiveAdmin.register Issue do
               row :id
               row :state
               row :person
+              row :reason
             end
           end
           column do

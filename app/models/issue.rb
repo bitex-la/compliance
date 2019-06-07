@@ -11,7 +11,7 @@ class Issue < ApplicationRecord
 
   before_validation do 
     self.defer_until ||= Date.today
-    #self.reason = IssueReason.new_client
+    self.reason ||= IssueReason.further_clarification
   end
 
   after_save :sync_observed_status
@@ -22,6 +22,13 @@ class Issue < ApplicationRecord
     validation_date = created_at.try(:to_date) || Date.today
     return if defer_until >= validation_date
     errors.add(:defer_until, "can't be in the past")
+  end
+
+  validate :reason_cannot_change
+
+  def reason_cannot_change
+    return unless reason_id_changed? && self.persisted?
+    errors.add(:reason, "change reason is not allowed!")
   end
 
   def sync_observed_status
