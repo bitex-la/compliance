@@ -11,6 +11,7 @@ class Issue < ApplicationRecord
 
   before_validation do 
     self.defer_until ||= Date.today
+    #self.reason = IssueReason.new_client
   end
 
   after_save :sync_observed_status
