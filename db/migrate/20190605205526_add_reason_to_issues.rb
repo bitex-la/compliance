@@ -4,10 +4,10 @@ class AddReasonToIssues < ActiveRecord::Migration[5.2]
     add_column :issues, :reason_id, :integer, null:true
 
     # 1 -> first issue of every person has new_client reason
-    Person.all.each do |p| 
+    Person.all.find_each do |p| 
       issue = p.issues.first
       next if issue.nil?
-      issue.update_attribute(:reason, IssueReason.new_client) 
+      issue.update_column(:reason_id, IssueReason.new_client.id) 
     end
 
     # 5 -> issue with a risk score has new_risk_information reason
@@ -17,7 +17,7 @@ class AddReasonToIssues < ActiveRecord::Migration[5.2]
     end
 
     # 3 -> issue with defer_until > created_at has update_expired_data reason 
-    Issue.where('defer_until is not null and defer_until > created_at').each do |i|
+    Issue.where('reason_id is null and defer_until is not null and defer_until > created_at').each do |i|
       i.update_attribute(:reason, IssueReason.update_expired_data) 
     end
 
