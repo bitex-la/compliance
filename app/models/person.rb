@@ -54,7 +54,9 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def person_email
-    emails.last.try(:address) || "N/A"
+    emails.last.try(:address) || 
+    issues.last.try(:email_seeds).try(:last).try(:address) || 
+    "N/A"
   end
 
   def natural_docket
@@ -89,24 +91,24 @@ class Person < ApplicationRecord
   end
 
   def person_info 
-    phone = person_phone
-    wa = person_whatsapp
-    info = person_name || person_email
-    
-    if phone
-      info += " ☎:" + phone
-      info += " WA:✓" if wa
-    end
-    
+    info = person_type == :natural_person ? "☺ " : "⚖ " 
+    info += person_name || "N/A"
+    info += " ✉:" + person_email  
+    info += " ☎:" + person_phone
+    info += person_whatsapp ? " WA:✓" : " WA:⨯"
     "#{info}"
   end
 
   def person_phone
-    phones.last.try(:number)
+    phones.last.try(:number) ||
+    issues.last.try(:phone_seeds).try(:last).try(:number) ||
+    "N/A" 
   end
 
   def person_whatsapp
     phones.last.try(:has_whatsapp)
+    issues.last.try(:phone_seeds).try(:last).try(:has_whatsapp) ||
+    false
   end
 
   def person_name
