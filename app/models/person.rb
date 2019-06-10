@@ -54,8 +54,10 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def person_email
-    emails.last.try(:address) || 
-    issues.last.try(:email_seeds).try(:last).try(:address) || 
+    email = emails.last.try(:address)
+    return email if email
+    email = issues.last.try(:email_seeds).try(:last).try(:address)
+    return "* #{email}" if email 
     "N/A"
   end
 
@@ -90,8 +92,15 @@ class Person < ApplicationRecord
     %i(by_person_type)
   end
 
-  def person_info 
-    info = person_type == :natural_person ? "☺ " : "⚖ " 
+  def person_info   
+    if person_type == :natural_person
+      info = "☺:"
+    elsif person_type == :legal_entity
+      info = "⚖:"
+    else
+      info = "?:"
+    end
+  
     info += person_name || "N/A"
     info += " ✉:" + person_email  
     info += " ☎:" + person_phone
@@ -100,23 +109,33 @@ class Person < ApplicationRecord
   end
 
   def person_phone
-    phones.last.try(:number) ||
-    issues.last.try(:phone_seeds).try(:last).try(:number) ||
+    phone = phones.last.try(:number)
+    return phone if phone
+    phone = issues.last.try(:phone_seeds).try(:last).try(:number)
+    return "* #{phone}" if phone
     "N/A" 
   end
 
   def person_whatsapp
-    phones.last.try(:has_whatsapp)
+    phones.last.try(:has_whatsapp) ||
     issues.last.try(:phone_seeds).try(:last).try(:has_whatsapp) ||
     false
   end
 
   def person_name
-    if (docket = natural_dockets.last)
-      [docket.first_name, docket.last_name].join(' ')
-    elsif (docket = legal_entity_dockets.last)
-      docket.legal_name || docket.commercial_name
-    end
+    name =  if (docket = natural_dockets.last)
+              [docket.first_name, docket.last_name].join(' ')
+            elsif (docket = legal_entity_dockets.last)
+              docket.legal_name || docket.commercial_name
+            end
+    return name if name
+
+    natural_docket = issues.last.try(:natural_docket_seed)
+    return "* #{[natural_docket.first_name, natural_docket.last_name].join(' ')}" if natural_docket
+
+    legal_entity = issues.last.try(:legal_entity_docket_seed)
+    name = legal_entity.legal_name || legal_entity.commercial_name if legal_entity
+    return "* #{name}" if name
   end
 
   def name
