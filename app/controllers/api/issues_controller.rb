@@ -31,8 +31,6 @@ class Api::IssuesController < Api::ApiController
 
     return jsonapi_422(nil) unless mapper.data
 
-    mapper.data.reason = IssueReason.find_by_code(mapper.data.reason_code)
-
     if mapper.save_all
       jsonapi_response mapper.data,
         {include: params[:include] || Issue.included_for}, 201

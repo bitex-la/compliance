@@ -38,7 +38,7 @@ RSpec.describe Issue, type: :model do
     issue = create(:basic_issue, reason: IssueReason.new_client)
     issue.reason = IssueReason.further_clarification
     expect(issue).to_not be_valid
-    expect(issue.errors.messages.keys.first).to eq(:"reason")
+    expect(issue.errors.messages).to include :reason
   end
 
   it 'it moves from future to current scope' do
