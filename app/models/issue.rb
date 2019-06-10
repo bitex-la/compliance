@@ -27,7 +27,7 @@ class Issue < ApplicationRecord
   validate :reason_cannot_change
 
   def reason_cannot_change
-    return unless reason_id_changed? && self.persisted?
+    return unless reason_id_changed? && persisted?
     errors.add(:reason, "change reason is not allowed!")
   end
 
