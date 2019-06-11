@@ -39,6 +39,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     column(:person_enabled)do |o|
       o.person.enabled
     end
+    column(:reason)
     column(:state)
     column(:created_at)
     column(:updated_at)
