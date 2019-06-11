@@ -84,70 +84,55 @@ class Person < ApplicationRecord
     %i(by_person_type)
   end
 
-  def person_type_seed
-    type = issues.last.try(:natural_docket_seed)
-    return "*☺:" if type
-    type = issues.last.try(:legal_entity_docket_seed)
-    return "*⚖:" if type
-    "?:"
-  end
-
   def person_info 
-    if person_type == :natural_person
-      info = "☺:"
-    elsif person_type == :legal_entity
-      info = "⚖:"
-    else
-      info = person_type_seed
+    [ "(#{id})",
+      person_info_name,
+      person_info_email,
+      person_info_phone
+    ].join(" ")
+  end
+
+  def person_info_name
+    case person_type
+      when :natural_person
+        "☺: #{natural_dockets.last.name_body}"
+      when :legal_entity
+        "🏭: #{legal_entity_dockets.last.name_body}"
+      else
+        if found = issues.map(&:natural_docket_seed).compact.last
+          "*☺: #{found.name_body}"
+        elsif found = issues.map(&:legal_entity_docket_seed).compact.last
+          "*🏭: #{found.name_body}"
+        end
     end
-  
-    info += person_name || "N/A"
-    info += " ✉:" + person_email  
-    info += " ☎:" + person_phone
-    info += person_whatsapp ? " WA:✓" : " WA:⨯"
   end
 
-  def person_email
-    email = emails.last.try(:address)
-    return email if email
-    email = issues.last.try(:email_seeds).try(:last).try(:address)
-    return "* #{email}" if email 
-    "N/A"
+  def person_info_email
+    template = "%s✉: %s"
+
+    if found = emails.last.try(:address)
+      template % [nil, found]
+    elsif found = issues.all.map{|i| i.dig(:email_seeds, :first, :address) }
+      .compact.last
+      template % ['*', found]
+    end
   end
 
-  def person_phone
-    phone = phones.last.try(:number)
-    return phone if phone
-    phone = issues.last.try(:phone_seeds).try(:last).try(:number)
-    return "* #{phone}" if phone
-    "N/A" 
-  end
+  def person_info_phone
+    phone, from_seed = if found = phones.last
+      found
+    elsif found = issues.all.map{|i| i.dig(:phone_seeds, :first) }.compact.last
+      [found, "*"]
+    end
 
-  def person_whatsapp
-    phones.last.try(:has_whatsapp) ||
-    issues.last.try(:phone_seeds).try(:last).try(:has_whatsapp) ||
-    false
-  end
+    return unless phone
 
-  def person_name
-    name =  if (docket = natural_dockets.last)
-              [docket.first_name, docket.last_name].join(' ')
-            elsif (docket = legal_entity_dockets.last)
-              docket.legal_name || docket.commercial_name
-            end
-    return name if name
-
-    natural_docket = issues.last.try(:natural_docket_seed)
-    return "* #{[natural_docket.first_name, natural_docket.last_name].join(' ')}" if natural_docket
-
-    legal_entity = issues.last.try(:legal_entity_docket_seed)
-    name = legal_entity.legal_name || legal_entity.commercial_name if legal_entity
-    return "* #{name}" if name
+    has_whatsapp = phone.has_whatsapp ? "✓" : "⨯"
+    "#{from_seed}☎: #{phone.number} #{from_seed}WA: #{has_whatsapp}"
   end
 
   def name
-    name = person_name || person_email
-    "人 #{id}: #{name}"
+    person_info
   end
 
   def fruits
