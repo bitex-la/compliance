@@ -84,6 +84,10 @@ class Person < ApplicationRecord
     %i(by_person_type)
   end
 
+  def name
+    "(#{id}) #{person_info_name || person_info_email}"
+  end
+
   def person_info 
     [ "(#{id})",
       person_info_name,
@@ -129,10 +133,6 @@ class Person < ApplicationRecord
 
     has_whatsapp = phone.has_whatsapp ? "✓" : "⨯"
     "#{from_seed}☎: #{phone.number} #{from_seed}WA: #{has_whatsapp}"
-  end
-
-  def name
-    person_info
   end
 
   def fruits
