@@ -53,14 +53,6 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
-  def person_email
-    email = emails.last.try(:address)
-    return email if email
-    email = issues.last.try(:email_seeds).try(:last).try(:address)
-    return "* #{email}" if email 
-    "N/A"
-  end
-
   def natural_docket
     natural_dockets.last
   end
@@ -92,20 +84,35 @@ class Person < ApplicationRecord
     %i(by_person_type)
   end
 
-  def person_info   
+  def person_type_seed
+    type = issues.last.try(:natural_docket_seed)
+    return "*☺:" if type
+    type = issues.last.try(:legal_entity_docket_seed)
+    return "*⚖:" if type
+    "?:"
+  end
+
+  def person_info 
     if person_type == :natural_person
       info = "☺:"
     elsif person_type == :legal_entity
       info = "⚖:"
     else
-      info = "?:"
+      info = person_type_seed
     end
   
     info += person_name || "N/A"
     info += " ✉:" + person_email  
     info += " ☎:" + person_phone
     info += person_whatsapp ? " WA:✓" : " WA:⨯"
-    "#{info}"
+  end
+
+  def person_email
+    email = emails.last.try(:address)
+    return email if email
+    email = issues.last.try(:email_seeds).try(:last).try(:address)
+    return "* #{email}" if email 
+    "N/A"
   end
 
   def person_phone

@@ -29,6 +29,21 @@ RSpec.describe Person, type: :model do
     expect(Person.by_person_type("legal")).to include person
   end
 
+  it 'returns N/A person info' do
+    person = create(:empty_person)
+    expect(person.reload.person_info).to eq("?:N/A ✉:N/A ☎:N/A WA:⨯")
+  end
+
+  it 'returns natural person info with name, email, phone number and whatsapp from fruits' do
+    person = create(:full_natural_person, :with_fixed_email)
+    expect(person.reload.person_info).to eq("☺:Joe Doe ✉:admin@example.com ☎:+5491125410470 WA:✓")
+  end
+
+  it 'returns natural person info with name, email, phone number and whatsapp from seeds' do
+    person = create(:new_natural_person, :with_fixed_email)
+    expect(person.reload.person_info).to eq("*☺:* Joe Doe ✉:* admin@example.com ☎:* +5491125410470 WA:✓")
+  end
+
   it 'knows which fruits can be replaced' do
     new_phone = create :full_phone, person: person
     person.reload.phones.first.update(replaced_by: new_phone)
