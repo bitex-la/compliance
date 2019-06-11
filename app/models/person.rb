@@ -89,7 +89,7 @@ class Person < ApplicationRecord
       person_info_name,
       person_info_email,
       person_info_phone
-    ].join(" ")
+    ].join(" ").strip
   end
 
   def person_info_name
@@ -112,7 +112,7 @@ class Person < ApplicationRecord
 
     if found = emails.last.try(:address)
       template % [nil, found]
-    elsif found = issues.all.map{|i| i.dig(:email_seeds, :first, :address) }
+    elsif found = issues.all.map{|i| i.email_seeds.first&.address }
       .compact.last
       template % ['*', found]
     end
@@ -121,7 +121,7 @@ class Person < ApplicationRecord
   def person_info_phone
     phone, from_seed = if found = phones.last
       found
-    elsif found = issues.all.map{|i| i.dig(:phone_seeds, :first) }.compact.last
+    elsif found = issues.all.map{|i| i.phone_seeds.first }.compact.last
       [found, "*"]
     end
 
