@@ -122,7 +122,7 @@ describe Issue do
 
       api_get("/issues/#{issue.id}")
       
-      expect(api_response.data.attributes.reason.code).to eq(IssueReason.new_client.code.to_s)
+      expect(api_response.data.attributes.reason_code).to eq(IssueReason.new_client.code.to_s)
     end
   end
 
