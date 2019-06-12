@@ -401,6 +401,16 @@ ActiveRecord::Schema.define(version: 2019_06_12_133601) do
     t.index ["replaced_by_id"], name: "index_identifications_on_replaced_by_id"
   end
 
+  create_table "issue_taggings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "issue_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["issue_id", "tag_id"], name: "index_issue_taggings_on_issue_id_and_tag_id", unique: true
+    t.index ["issue_id"], name: "index_issue_taggings_on_issue_id"
+    t.index ["tag_id"], name: "index_issue_taggings_on_tag_id"
+  end
+
   create_table "issues", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "person_id"
     t.datetime "created_at", null: false
@@ -576,6 +586,16 @@ ActiveRecord::Schema.define(version: 2019_06_12_133601) do
     t.integer "regularity_id", default: 1, null: false
   end
 
+  create_table "person_taggings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id", "tag_id"], name: "index_person_taggings_on_person_id_and_tag_id", unique: true
+    t.index ["person_id"], name: "index_person_taggings_on_person_id"
+    t.index ["tag_id"], name: "index_person_taggings_on_tag_id"
+  end
+
   create_table "phone_seeds", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "number"
     t.integer "phone_kind_id"
@@ -703,6 +723,8 @@ ActiveRecord::Schema.define(version: 2019_06_12_133601) do
   add_foreign_key "identifications", "identifications", column: "replaced_by_id"
   add_foreign_key "identifications", "issues"
   add_foreign_key "identifications", "people"
+  add_foreign_key "issue_taggings", "issues"
+  add_foreign_key "issue_taggings", "tags"
   add_foreign_key "issues", "people"
   add_foreign_key "legal_entity_docket_seeds", "issues"
   add_foreign_key "legal_entity_docket_seeds", "legal_entity_dockets", column: "fruit_id"
@@ -721,6 +743,8 @@ ActiveRecord::Schema.define(version: 2019_06_12_133601) do
   add_foreign_key "notes", "notes", column: "replaced_by_id"
   add_foreign_key "notes", "people"
   add_foreign_key "observations", "issues"
+  add_foreign_key "person_taggings", "people"
+  add_foreign_key "person_taggings", "tags"
   add_foreign_key "phone_seeds", "issues"
   add_foreign_key "phone_seeds", "phones", column: "fruit_id"
   add_foreign_key "phone_seeds", "phones", column: "replaces_id"

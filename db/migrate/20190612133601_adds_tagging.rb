@@ -4,8 +4,21 @@ class AddsTagging < ActiveRecord::Migration[5.2]
       t.string :name, limit: 30, null: false
       t.integer "tag_type", null: false
       t.timestamps
+      t.index [:tag_type, :name], unique: true
     end
 
-    add_index :tags, [:tag_type, :name], unique: true
+    create_table :person_taggings do |t|
+      t.belongs_to :person, index: true , null: false, foreign_key: true
+      t.belongs_to :tag, index: true , null: false, foreign_key: true
+      t.timestamps
+      t.index [:person_id, :tag_id], unique: true
+    end
+
+    create_table :issue_taggings do |t|
+      t.belongs_to :issue, index: true, null: false, foreign_key: true
+      t.belongs_to :tag, index: true, null: false, foreign_key: true
+      t.timestamps
+      t.index [:issue_id, :tag_id], unique: true
+    end
   end
 end

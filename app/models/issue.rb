@@ -7,6 +7,9 @@ class Issue < ApplicationRecord
   validates :person, presence: true
   belongs_to :reason, class_name: "IssueReason"
 
+  has_many :issue_taggings
+  has_many :tags, through: :issue_taggings
+
   ransack_alias :state, :aasm_state
 
   before_validation do 

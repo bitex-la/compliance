@@ -37,6 +37,10 @@ class Person < ApplicationRecord
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
 
+  has_many :person_taggings
+  has_many :tags, through: :person_taggings
+  accepts_nested_attributes_for :person_taggings, allow_destroy: true
+
   def replaceable_fruits
     %i[
       natural_dockets
