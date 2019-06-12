@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_05_205526) do
+ActiveRecord::Schema.define(version: 2019_06_12_133601) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -648,6 +648,14 @@ ActiveRecord::Schema.define(version: 2019_06_05_205526) do
     t.index ["issue_id"], name: "index_risk_scores_on_issue_id"
     t.index ["person_id"], name: "index_risk_scores_on_person_id"
     t.index ["replaced_by_id"], name: "index_risk_scores_on_replaced_by_id"
+  end
+
+  create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "name", limit: 30, null: false
+    t.integer "tag_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tag_type", "name"], name: "index_tags_on_tag_type_and_name", unique: true
   end
 
   add_foreign_key "affinities", "affinities", column: "replaced_by_id"
