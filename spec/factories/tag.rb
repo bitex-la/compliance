@@ -7,6 +7,11 @@ FactoryBot.define do
     tag_type { :person }
   end
 
+  factory :alt_person_tag, class: Tag do
+    name { 'this-is-a-person-tag-alt' }
+    tag_type { :person }
+  end
+
   factory :issue_tag, class: Tag do
     name { 'this-is-a-issue-tag-2' }
     tag_type { :issue }
