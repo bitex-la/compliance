@@ -58,6 +58,7 @@ FactoryBot.define do
       ).each do |name|
         create name, person: person
       end
+      create :full_person_tagging, person: person
     end
   end
 

@@ -1,6 +1,12 @@
 FactoryBot.define do
   factory :basic_issue, class: Issue do
     association :person, factory: :empty_person
+
+    factory :basic_issue_with_tags do
+      after(:create) do |issue, evaluator|
+        create :full_issue_tagging, issue: issue
+      end  
+    end
   end
 
   factory :full_natural_person_issue, class: Issue do

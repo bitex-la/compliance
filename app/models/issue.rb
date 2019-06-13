@@ -407,7 +407,8 @@ class Issue < ApplicationRecord
       :identification_seeds,
       :'identifications_seeds.attachments',
       :observations,
-      :'observations.observation_reason'
+      :'observations.observation_reason',
+      :tags
     ]
   end
 end

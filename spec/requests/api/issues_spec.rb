@@ -35,6 +35,22 @@ describe Issue do
           "people"=>3
         }
     end
+
+    it 'includes tags' do
+      one = create(:basic_issue_with_tags)
+
+      api_get "/issues"
+
+      api_response.data.size.should == 1
+
+      by_type = api_response.included
+        .group_by{|i| i.type }
+        .map{|a,b| [a, b.count ] }.to_h
+        .should == {
+          "tag"=>1,  
+          "people"=>1
+        }
+    end
   end
 
   describe 'Creating a new user Issue' do

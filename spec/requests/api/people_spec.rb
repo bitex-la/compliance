@@ -45,6 +45,7 @@ describe Person do
             affinities: {data: []},
             risk_scores: {data: []},
             attachments: {data: []},
+            tags: {data: []}
           }
         },
         included: [{ 
@@ -127,7 +128,10 @@ describe Person do
           }},
           attachments: {data: issue.person.attachments.map { |x|
             {id: x.id.to_s, type: "attachments"}
-          }}
+          }},
+          tags: {data: issue.person.tags.map { |x|
+            {id: x.id.to_s, type: "tags"}
+          }},
         }
       }
 
