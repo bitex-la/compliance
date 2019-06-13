@@ -14,12 +14,4 @@ class Tag < ApplicationRecord
     }
   
   validates :tag_type, presence: true
-
-  scope :person_tags, -> { 
-    where('tag_type = ?', :person)
-  }
-
-  scope :issue_tags, -> { 
-    where('tag_type = ?', :issue)
-  }
 end
