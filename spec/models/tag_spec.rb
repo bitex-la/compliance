@@ -43,4 +43,16 @@ RSpec.describe Tag, type: :model do
     tag = create(:issue_tag)
     expect(tag).to be_valid
   end
+
+  it 'is in person scope' do
+    tag = create(:person_tag)
+    expect(Tag.person).to include tag
+    expect(Tag.issue).to_not include tag
+  end
+
+  it 'is in issue scope' do
+    tag = create(:issue_tag)
+    expect(Tag.person).to_not include tag
+    expect(Tag.issue).to include tag
+  end
 end
