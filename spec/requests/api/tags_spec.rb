@@ -39,8 +39,9 @@ describe Tag do
       tag_type: attributes[:tag_type].to_s
     }
 
-    expect(Tag.first.name).to eq attributes[:name]
-    expect(Tag.first.tag_type).to eq attributes[:tag_type].to_s
+    tag = Tag.first
+    expect(tag.name).to eq attributes[:name]
+    expect(tag.tag_type).to eq attributes[:tag_type].to_s
   end
 
   it 'updates a tag' do
@@ -57,8 +58,9 @@ describe Tag do
       tag_type: one.tag_type.to_s
     }
 
-    expect(Tag.first.name).to eq 'new-name'
-    expect(Tag.first.tag_type).to eq one.tag_type.to_s
+    tag = Tag.first
+    expect(tag.name).to eq 'new-name'
+    expect(tag.tag_type).to eq one.tag_type.to_s
   end
 
   it 'destroy a tag' do

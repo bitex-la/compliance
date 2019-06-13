@@ -55,6 +55,13 @@ Rails.application.routes.draw do
       resources entities, only: [:show, :index, :create, :update]
     end
 
+    %i(
+      person_taggings
+      issue_taggings
+    ).each do |entities|
+      resources entities, except: [:new, :edit, :update]
+    end
+
     resource :system do
       post :truncate
     end
