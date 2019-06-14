@@ -72,4 +72,30 @@ describe Tag do
 
     api_get "/tags/#{one.id}", {}, 404
   end
+
+  describe 'when using filters' do
+    it 'filters by name' do
+      one = create(:person_tag)
+      
+      api_get "/tags/?filter[name_eq]=this-is-a-person-tag-1"
+      api_response.data.map{|i| i.id.to_i}.to_set.should ==
+        [one.id].to_set
+        
+      api_get "/tags/?filter[name_eq]=not-exists"
+      expect(api_response.data).to be_empty
+    end
+
+    it 'filters by tag type' do
+      person_tag = create(:person_tag)
+      issue_tag = create(:issue_tag)
+      
+      api_get "/tags/?filter[tag_type_eq]=person"
+      api_response.data.map{|i| i.id.to_i}.to_set.should ==
+        [person_tag.id].to_set
+      
+      api_get "/tags/?filter[tag_type_eq]=issue"
+      api_response.data.map{|i| i.id.to_i}.to_set.should ==
+        [issue_tag.id].to_set
+    end
+  end
 end

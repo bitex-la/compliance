@@ -17,6 +17,8 @@ class Tag < ApplicationRecord
 
   before_destroy :can_destroy?, prepend: true
 
+  ransacker :tag_type, formatter: proc {|v| tag_types[v]}
+
   private
 
   def can_destroy?
