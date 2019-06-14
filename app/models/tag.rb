@@ -14,4 +14,15 @@ class Tag < ApplicationRecord
     }
   
   validates :tag_type, presence: true
+
+  before_destroy :can_destroy?, prepend: true
+
+  private
+
+  def can_destroy?
+    return if tag_type == "person" && PersonTagging.where(tag: self).take.nil? ||
+      tag_type == "issue" && IssueTagging.where(tag: self).take.nil?
+    errors[:base] << "Can't be destroy because there are relations created"
+    throw :abort
+  end
 end

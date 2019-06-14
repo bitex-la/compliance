@@ -55,4 +55,22 @@ RSpec.describe Tag, type: :model do
     expect(Tag.person).to_not include tag
     expect(Tag.issue).to include tag
   end
+
+  it 'can not destroy if person_tagging exists' do
+    tag = create(:person_tag)
+    person_tagging = create(:full_person_tagging, tag: tag)
+    expect(tag.destroy).to eq(false)
+  end
+
+  it 'can not destroy if issue_tagging exists' do
+    tag = create(:issue_tag)
+    issue_tagging = create(:full_issue_tagging, tag: tag)
+    expect(tag.destroy).to eq(false)
+  end
+
+  it 'can destroy if no relation exists' do
+    tag = create(:person_tag)
+    expect(tag.destroy).to eq(tag)
+    expect(Tag.where( id: tag.id ).take).to be nil
+  end
 end
