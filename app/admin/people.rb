@@ -101,7 +101,7 @@ ActiveAdmin.register Person do
 
   index do
     column :id
-    column :person_email
+    column :person_info
     column :enabled
     column :risk
     column :regularity
