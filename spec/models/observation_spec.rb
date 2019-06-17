@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'helpers/shared_examples_for_models'
 
 RSpec.describe Observation, type: :model do
-  %i(abandon dismiss).each do |event|
+  %i(abandon dismiss reject).each do |event|
     it "scoped by admin return only observations who belongs to active issues, skip observations for issues in #{event} state" do
       issue = create(:basic_issue)
       another_issue = create(:basic_issue)
