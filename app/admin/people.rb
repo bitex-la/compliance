@@ -90,7 +90,7 @@ ActiveAdmin.register Person do
       f.input :risk, as:  :select, collection: %w(low medium high)
     end
 
-    ArbreHelpers.has_many_form self, f, :comments do |cf, context|
+    ArbreHelpers::Form.has_many_form self, f, :comments do |cf, context|
       cf.input :title
       cf.input :meta
       cf.input :body
@@ -155,7 +155,7 @@ ActiveAdmin.register Person do
           h3 "Notes"
           ArbreHelpers.panel_grid(self, fruits) do |d|
             para d.body
-            ArbreHelpers.attachments_list self, d.attachments
+            ArbreHelpers::Attachment.attachments_list self, d.attachments
             attributes_table_for d, :issue, :created_at
           end
         end
@@ -205,7 +205,7 @@ ActiveAdmin.register Person do
             ArbreHelpers::Affinity.affinity_card(self, d)
           end
           d.attachments.each do |a|
-            ArbreHelpers.attachment_preview(self, a)
+            ArbreHelpers::Attachment.preview(self, a)
           end
         end
       end

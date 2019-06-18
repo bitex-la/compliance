@@ -21,7 +21,7 @@ module ArbreHelpers
           end
           if attachments = resource.attachments.presence
             h3 "Attachments"
-            ArbreHelpers.attachments_list(self, attachments)
+            ArbreHelpers::Attachment.attachments_list(self, attachments)
           end
         end
 
@@ -89,38 +89,6 @@ module ArbreHelpers
     end
   end
 
-  def self.attachment_preview(context, a, show_attached_to = false)
-    return if a.nil? || a.new_record?
-    context.instance_eval do
-      if IMAGEABLE_CONTENT_TYPES.include?(a.document_content_type) 
-        div do
-          link_to image_tag(a.document_url, width: '100%'), a.document_url, target: "_blank"
-        end
-        attributes_table_for a do
-          row(:attachment){|o| link_to o.name, o }
-          if show_attached_to
-            row(:attached_to_type)
-            row(:attached_to)
-          end
-        end
-      else
-        div do
-          link_to "Download (no preview available)", a.document_url,
-            target: "_blank", class: 'button button-block'
-        end
-        attributes_table_for a do
-          row(:type){|o| o.document_content_type }
-          row(:size){|o| number_to_human_size o.document_file_size }
-          row(:attachment){|o| link_to o.name, attachment_path(o) }
-          if show_attached_to
-            row(:attached_to_type)
-            row(:attached_to)
-          end
-        end
-      end
-    end
-  end
-
   def self.panel_grid(context, objects, &block)
     Appsignal.instrument("render_#{objects.klass.name}_grid") do
       context.instance_eval do
@@ -133,33 +101,6 @@ module ArbreHelpers
                   instance_exec a, &block
                 end
               end
-            end
-          end
-        end
-      end
-    end
-  end
-
-  def self.has_one_form(context, builder, title, relationship, &fields)
-    Appsignal.instrument("render_#{relationship.to_s}") do
-      b_object =  builder.object.send(relationship) || builder.object.send("build_#{relationship}")
-      builder.inputs(title, for: [relationship, b_object], id: relationship.to_s, &fields)
-    end
-  end
-
-  def self.has_many_form(context, builder, relationship, extra={}, &fields)
-    Appsignal.instrument("render_#{relationship.to_s}") do
-      builder.has_many relationship, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
-        Appsignal.instrument("render_one_of_#{relationship.to_s}") do
-          instance_exec(f, context, &fields)
-          if f.object.persisted? && !extra[:cant_remove]
-            unless f.object.class.name == 'Attachment'
-              f.template.concat(context.link_to("Remove",
-                f.object,
-                method: :delete,
-                data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
-                class: 'button has_many_remove'
-              ))
             end
           end
         end
@@ -197,28 +138,6 @@ module ArbreHelpers
         end
         builder.template.concat('</li>'.html_safe)
       end 
-    end
-  end
-
-  def self.has_many_attachments(context, form)
-    Appsignal.instrument("render_has_many_attachments") do
-      ArbreHelpers.has_many_form context, form, :attachments do |af, ctx|
-        Appsignal.instrument("render_one_of_has_many_attachments") do
-          a = af.object
-          if a.persisted?
-            af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
-            Appsignal.instrument("concat_attachment_preview") do
-              af.template.concat(
-                Arbre::Context.new({}, af.template){
-                  ArbreHelpers.attachment_preview(self, a)
-                }.to_s
-              )
-            end
-          else
-            af.input :document, as: :file, label: "Attachment"
-          end
-        end
-      end
     end
   end
 
@@ -271,7 +190,7 @@ module ArbreHelpers
           end
         end
         fruit.attachments.each do |a|
-          ArbreHelpers.attachment_preview(self, a)
+          ArbreHelpers::Attachment.preview(self, a)
         end
       end
     end
@@ -310,7 +229,7 @@ module ArbreHelpers
         end
         attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
         attachments.each do |a|
-          ArbreHelpers.attachment_preview(self, a)
+          ArbreHelpers::Attachment.preview(self, a)
         end
       end
     end
@@ -323,15 +242,6 @@ module ArbreHelpers
     
     context.instance_eval do
       attributes_table_for resource, :fruit, *columns, *others
-    end
-  end
-
-  def self.attachments_list(context, attachments)
-    return if attachments.blank?
-    context.instance_eval do
-      attachments.each do |a|
-        ArbreHelpers.attachment_preview(self, a)
-      end
     end
   end
 
