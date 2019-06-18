@@ -149,20 +149,21 @@ module ArbreHelpers
 
   def self.has_many_form(context, builder, relationship, extra={}, &fields)
     Appsignal.instrument("render_#{relationship.to_s}") do
-      new_button_text = extra[:new_button_text]
-      builder.has_many relationship,new_record: new_button_text || true, class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
-        Appsignal.instrument("render_one_of_#{relationship.to_s}") do
-          instance_exec(f, context, &fields)
-          if f.object.persisted? && !extra[:cant_remove]
-            unless f.object.class.name == 'Attachment'
-              f.template.concat(context.link_to("Remove",
-                f.object,
-                method: :delete,
-                data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
-                class: 'button has_many_remove'
-              ))
+      new_button_text = extra[:new_button_text] || true
+      builder.has_many relationship,new_record: new_button_text, 
+        class: "#{'can_remove' unless extra[:cant_remove]}" do |f|
+          Appsignal.instrument("render_one_of_#{relationship.to_s}") do
+            instance_exec(f, context, &fields)
+            if f.object.persisted? && !extra[:cant_remove]
+              unless f.object.class.name == 'Attachment'
+                f.template.concat(context.link_to("Remove",
+                  f.object,
+                  method: :delete,
+                  data: {confirm: "This seed has been saved, removing it will delete all the seed data. Are you sure?"},
+                  class: 'button has_many_remove'
+                ))
+              end
             end
-          end
         end
       end
     end

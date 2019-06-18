@@ -132,8 +132,9 @@ ActiveAdmin.register Issue do
           f.input :defer_until, as: :datepicker, datepicker_options: {
               min_date: Date.today }
 
-          ArbreHelpers.has_many_form self, f, :issue_taggings, {:new_button_text => "Add New Tag"} do |cf, context|
-            cf.input :tag, as:  :select, collection: Tag.issue
+          ArbreHelpers.has_many_form self, f, :issue_taggings, 
+            {:new_button_text => "Add New Tag"} do |cf, context|
+              cf.input :tag, as:  :select, collection: Tag.issue
           end
         end
 
