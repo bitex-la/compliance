@@ -214,7 +214,7 @@ ActiveAdmin.register Issue do
           sf.input :postal_code
           sf.input :floor
           sf.input :apartment
-          ArbreHelpers.fields_for_replaces context, sf, :domiciles
+          ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
           sf.input :expires_at, as: :datepicker
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -228,7 +228,7 @@ ActiveAdmin.register Issue do
           sf.input :public_registry_authority
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
-          ArbreHelpers.fields_for_replaces context, sf, :identifications
+          ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
           sf.input :expires_at, as: :datepicker
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -238,7 +238,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
           sf.input :amount
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
-          ArbreHelpers.fields_for_replaces context, sf, :allowances
+          ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
           sf.input :expires_at, as: :datepicker
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -255,7 +255,7 @@ ActiveAdmin.register Issue do
               af.input :full_name
               af.input :country, as: :autocomplete, url: search_country_people_path
               af.input :address
-              ArbreHelpers.fields_for_replaces self, af,
+              ArbreHelpers::Replacement.fields_for_replaces self, af,
                 :argentina_invoicing_details
               af.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(self, af)
@@ -268,7 +268,7 @@ ActiveAdmin.register Issue do
               cf.input :giro
               cf.input :ciudad
               cf.input :comuna
-              ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
+              ArbreHelpers::Replacement.fields_for_replaces self, cf, :chile_invoicing_details
               cf.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(self, cf)
             end
@@ -292,7 +292,7 @@ ActiveAdmin.register Issue do
                 )
                 rf.template.concat('</li>'.html_safe) 
               end
-              ArbreHelpers.fields_for_replaces context, rf, :affinities
+              ArbreHelpers::Replacement.fields_for_replaces context, rf, :affinities
               rf.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(context, rf)
             end
