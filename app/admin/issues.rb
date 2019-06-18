@@ -346,13 +346,13 @@ ActiveAdmin.register Issue do
           end
           seed = rs.object
           if seed.persisted?     
-            ArbreHelpers.has_many_links(context, rs, 
+            ArbreHelpers::HtmlHelper.has_many_links(context, rs, 
               seed.external_link.split(',').compact,
               'External links') if seed.external_link 
             begin 
               if seed.extra_info
                 extra_info_as_json = JSON.parse(seed.extra_info)
-                ArbreHelpers.json_renderer(context, extra_info_as_json)
+                ArbreHelpers::HtmlHelper.json_renderer(context, extra_info_as_json)
               end
             rescue JSON::ParserError
               rs.input :extra_info, input_html: { readonly: true, disabled: true }
@@ -392,7 +392,7 @@ ActiveAdmin.register Issue do
 
         if observations = resource.observations.presence
           h3 "Observations"
-          ArbreHelpers.panel_grid(self, observations) do |d|
+          ArbreHelpers::Layout.panel_grid(self, observations) do |d|
             attributes_table_for d, :observation_reason, :scope, :created_at, :updated_at
             para d.note
             strong "Reply:"
@@ -402,7 +402,7 @@ ActiveAdmin.register Issue do
 
         if seeds = resource.note_seeds.presence
           h3 "Note Seeds"
-          ArbreHelpers.panel_grid(self, seeds) do |d|
+          ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
             attributes_table_for d, :fruit
             para d.body
             ArbreHelpers::Attachment.attachments_list self, d.fruit.try(:attachments)
@@ -446,11 +446,11 @@ ActiveAdmin.register Issue do
       ArbreHelpers.seed_collection_show_tab(self, "Affinity", :affinity_seeds)
 
       tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
-        ArbreHelpers.panel_grid(self, resource.phone_seeds) do |d|
+        ArbreHelpers::Layout.panel_grid(self, resource.phone_seeds) do |d|
           ArbreHelpers.seed_show_section(self, d)
         end
 
-        ArbreHelpers.panel_grid(self, resource.email_seeds) do |d|
+        ArbreHelpers::Layout.panel_grid(self, resource.email_seeds) do |d|
           ArbreHelpers.seed_show_section(self, d)
         end
       end
