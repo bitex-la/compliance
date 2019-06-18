@@ -129,7 +129,7 @@ module ArbreHelpers
     def self.render_text_or_link(context, key, text)
       context.concat("<strong>#{key}: </strong>".html_safe) if key
       if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
-        context.concat("<a href='#{text}' target='_blank'>#{ArbreHelpers.strip_and_truncate(text)}</a><br/>".html_safe) 
+        context.concat("<a href='#{text}' target='_blank'>#{ArbreHelpers::HtmlHelper.strip_and_truncate(text)}</a><br/>".html_safe) 
       else
         context.concat("#{ArbreHelpers::HtmlHelper.strip_and_truncate(text)}<br/>".html_safe) 
       end
