@@ -131,7 +131,7 @@ module ArbreHelpers
       if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
         context.concat("<a href='#{text}' target='_blank'>#{ArbreHelpers.strip_and_truncate(text)}</a><br/>".html_safe) 
       else
-        context.concat("#{ArbreHelpers.strip_and_truncate(text)}<br/>".html_safe) 
+        context.concat("#{ArbreHelpers::HtmlHelper.strip_and_truncate(text)}<br/>".html_safe) 
       end
     end
 
@@ -140,17 +140,17 @@ module ArbreHelpers
         strong "#{key}: "
         if text.starts_with?('http') || text.starts_with?('ftp') || text.starts_with?('https')
           span do
-            link_to ArbreHelpers.strip_and_truncate(text), text, target: "_blank"
+            link_to ArbreHelpers::HtmlHelper.strip_and_truncate(text), text, target: "_blank"
           end
         else
-          span ArbreHelpers.strip_and_truncate(text)
+          span ArbreHelpers::HtmlHelper.strip_and_truncate(text)
         end
         br
       end
     end
 
     def self.strip_and_truncate(length = 40, text)
-      ArbreHelpers.strip_html_tags(text).truncate(length, omission:'...')
+      ArbreHelpers::HtmlHelper.strip_html_tags(text).truncate(length, omission:'...')
     end
 
     def self.strip_html_tags(text)
