@@ -413,49 +413,49 @@ ActiveAdmin.register Issue do
       tab :docket do
         if seed = issue.legal_entity_docket_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed)
+            ArbreHelpers::Seed.seed_show_section(self, seed)
           end
         end
 
         if seed = issue.natural_docket_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed)
+            ArbreHelpers::Seed.seed_show_section(self, seed)
           end
         end
       end
 
       
-      ArbreHelpers.seed_collection_show_tab(self, "Domicile", :domicile_seeds)
-      ArbreHelpers.seed_collection_show_tab(self, "Id", :identification_seeds)
-      ArbreHelpers.seed_collection_show_tab(self, "Allowance", :allowance_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Domicile", :domicile_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Id", :identification_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Allowance", :allowance_seeds)
 
       tab "Invoicing" do
         if seed = issue.argentina_invoicing_detail_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed, [:tax_id])
+            ArbreHelpers::Seed.seed_show_section(self, seed, [:tax_id])
           end
         end
 
         if seed = issue.chile_invoicing_detail_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed)
+            ArbreHelpers::Seed.seed_show_section(self, seed)
           end
         end
       end
 
-      ArbreHelpers.seed_collection_show_tab(self, "Affinity", :affinity_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Affinity", :affinity_seeds)
 
       tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
         ArbreHelpers::Layout.panel_grid(self, resource.phone_seeds) do |d|
-          ArbreHelpers.seed_show_section(self, d)
+          ArbreHelpers::Seed.seed_show_section(self, d)
         end
 
         ArbreHelpers::Layout.panel_grid(self, resource.email_seeds) do |d|
-          ArbreHelpers.seed_show_section(self, d)
+          ArbreHelpers::Seed.seed_show_section(self, d)
         end
       end
 
-      ArbreHelpers.seed_collection_show_tab(self, "Risk Score", :risk_score_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Risk Score", :risk_score_seeds)
     end
   end
 end
