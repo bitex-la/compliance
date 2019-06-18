@@ -201,9 +201,6 @@ class Issue < ApplicationRecord
     end
 
     event :reject do
-      after do
-        person.update(enabled: false) unless person.nil?
-      end
       transitions from:  :draft, to: :rejected
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
@@ -216,7 +213,6 @@ class Issue < ApplicationRecord
     event :approve do
       before{ harvest_all! }
       after do
-        person.update(enabled: true)
         log_state_change(:approve_issue)
       end
       transitions from: :draft, to: :approved
