@@ -303,7 +303,7 @@ ActiveAdmin.register Issue do
               resource.person.all_affinities.each do |d|
                 panel d.name do
                   attributes_table_for d do
-                    ArbreHelpers.affinity_card(self, d)
+                    ArbreHelpers::Affinity.affinity_card(self, d)
                   end
                 end
               end

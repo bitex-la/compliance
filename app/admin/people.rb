@@ -202,7 +202,7 @@ ActiveAdmin.register Person do
       tab "Affinities" do
         ArbreHelpers.panel_grid(self, resource.all_affinities) do |d|
           attributes_table_for d do
-            ArbreHelpers.affinity_card(self, d)
+            ArbreHelpers::Affinity.affinity_card(self, d)
           end
           d.attachments.each do |a|
             ArbreHelpers.attachment_preview(self, a)
