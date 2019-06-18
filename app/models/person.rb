@@ -57,10 +57,6 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
-  def person_email
-    emails.last.try(:address)
-  end
-
   def natural_docket
     natural_dockets.last
   end
@@ -93,16 +89,54 @@ class Person < ApplicationRecord
   end
 
   def name
-    name =
-      if (docket = natural_dockets.last)
-        [docket.first_name, docket.last_name].join(' ')
-      elsif (docket = legal_entity_dockets.last)
-        docket.legal_name || docket.commercial_name
-      else
-        person_email
-      end
+    "(#{id}) #{person_info_name || person_info_email}"
+  end
 
-    "人 #{id}: #{name}"
+  def person_info 
+    [ "(#{id})",
+      person_info_name,
+      person_info_email,
+      person_info_phone
+    ].join(" ").strip
+  end
+
+  def person_info_name
+    case person_type
+      when :natural_person
+        "☺: #{natural_dockets.last.name_body}"
+      when :legal_entity
+        "🏭: #{legal_entity_dockets.last.name_body}"
+      else
+        if found = issues.map(&:natural_docket_seed).compact.last
+          "*☺: #{found.name_body}"
+        elsif found = issues.map(&:legal_entity_docket_seed).compact.last
+          "*🏭: #{found.name_body}"
+        end
+    end
+  end
+
+  def person_info_email
+    template = "%s✉: %s"
+
+    if found = emails.last.try(:address)
+      template % [nil, found]
+    elsif found = issues.all.map{|i| i.email_seeds.first&.address }
+      .compact.last
+      template % ['*', found]
+    end
+  end
+
+  def person_info_phone
+    phone, from_seed = if found = phones.last
+      found
+    elsif found = issues.all.map{|i| i.phone_seeds.first }.compact.last
+      [found, "*"]
+    end
+
+    return unless phone
+
+    has_whatsapp = phone.has_whatsapp ? "✓" : "⨯"
+    "#{from_seed}☎: #{phone.number} #{from_seed}WA: #{has_whatsapp}"
   end
 
   def fruits
