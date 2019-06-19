@@ -4,7 +4,6 @@ class Event::EventLogger
     EventLog.create!(
       entity: entity,
       raw_data: "#{klass}Serializer".constantize.new(
-        raw_data: body,
         entity,
         {include: klass.constantize.try(:included_for)}
       ).serialized_json,
