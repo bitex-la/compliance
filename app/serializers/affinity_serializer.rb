@@ -8,9 +8,3 @@ class AffinitySerializer
     serializer: 'PersonSerializer'
   derive_seed_serializer!
 end
-
-class AffinitySeedSerializer
-  belongs_to :related_person,
-    record_type: :people,
-    serializer: 'PersonSerializer'
-end
