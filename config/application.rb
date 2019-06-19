@@ -1,8 +1,5 @@
 require_relative 'boot'
-
 require 'rails/all'
-
-
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -13,7 +10,6 @@ module Compliance
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
     config.paths.add "lib",             eager_load: true
-    config.paths.add "app/serializers", eager_load: true
     config.paths.add "app/services",    eager_load: true
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
@@ -22,5 +18,9 @@ module Compliance
 
     require_relative "../app/models/settings"
     config.secret_key_base = Settings.secret_key_base
+
+    config.after_initialize do
+      Dir[Rails.root.join("app/serializers/**/*.rb")].each {|f| require_dependency f}
+    end
   end
 end
