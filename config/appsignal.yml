@@ -11,7 +11,7 @@ development:
   <<: *defaults
   name: <%= "#{ENV['APP_SIGNAL_APP_NAME']} dev" %>
   sample: 100
-  debug: false
+  debug: true
   active: false
 
 production:
