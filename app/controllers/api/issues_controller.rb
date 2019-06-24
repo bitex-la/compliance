@@ -51,6 +51,18 @@ class Api::IssuesController < Api::ApiController
     end
   end
 
+  %i{
+    lock_issue
+    unlock_issue
+    renew_lock
+  }.each do |action|
+    define_method(action) do
+      issue = Issue.find(params[:id])
+      return jsonapi_error(422, "invalid transition") unless issue.send(action.to_s + '!')
+      jsonapi_response(issue, {}, 200)
+    end
+  end
+
   private
 
   def build_eager_load_list

@@ -168,4 +168,52 @@ describe Issue do
 				[one.id, two.id, three.id].to_set
     end
   end
+
+  describe 'locking issues' do
+    it 'can lock issue' do
+      issue = create(:basic_issue)
+      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+    end
+
+    it 'can not lock issue if lock by another user' do
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+
+      create(:admin_user)
+      
+      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 422
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+    end
+
+    it 'can unlock issue' do
+      AdminUser.current_admin_user = create(:admin_user)
+
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+
+      api_request :post, "/issues/#{issue.id}/unlock_issue", {}, 200
+      issue.reload
+      expect(issue.locked).to be false
+    end
+
+    it 'can renew lock' do
+      issue = create(:basic_issue)
+      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+
+      api_request :post, "/issues/#{issue.id}/renew_lock", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+    end
+  end
 end

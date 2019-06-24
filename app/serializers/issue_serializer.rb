@@ -13,5 +13,5 @@ class IssueSerializer
     :identification_seeds, :phone_seeds, :email_seeds, 
     :note_seeds, :affinity_seeds, :risk_score_seeds
   
-  attributes :state, :defer_until, :reason_code
+  attributes :state, :defer_until, :reason_code, :locked, :lock_expiration
 end

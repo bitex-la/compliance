@@ -7,6 +7,14 @@ Rails.application.routes.draw do
         Issue.aasm.events.map(&:name).each do |action|
           post action
         end
+
+        %i{
+          lock_issue
+          unlock_issue
+          renew_lock
+        }.each do |action|
+          post action
+        end
       end
     end
 
