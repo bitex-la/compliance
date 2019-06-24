@@ -31,6 +31,9 @@ defaults: &defaults
     high:
       funding_amount: 10000
       funding_count: 10
+      
+  lock_issues:
+    expiration_interval_minutes: 15
 
 production:
   <<: *defaults
