@@ -31,6 +31,59 @@ class Issue < ApplicationRecord
     errors.add(:reason, "change reason is not allowed!")
   end
 
+  belongs_to :lock_admin_user, class_name: "AdminUser", foreign_key: "lock_admin_user_id", optional: true
+  validate :locked_issue_cannot_changed
+
+  def locked_issue_cannot_changed
+    return unless locked
+    return if lock_expired?
+    return if lock_admin_user == AdminUser.current_admin_user
+    errors.add(:issue, "changes in locked issues are not allowed!")
+  end
+
+  def lock_expired?
+    return true if lock_expiration.nil?
+    DateTime.now >= lock_expiration 
+  end
+
+  def locked_by_me?
+    lock_admin_user == AdminUser.current_admin_user
+  end
+
+  def lock_issue!
+    with_lock do
+      next true if locked_by_me?
+      next false if locked? && !lock_expired?
+      self.locked = true
+      self.lock_admin_user = AdminUser.current_admin_user
+      self.lock_expiration = Settings.lock_issues.expiration_interval_minutes.minutes.from_now 
+      save!(:validate => false)
+      true
+    end
+  end
+
+  def renew_lock!
+    with_lock do
+      next false unless locked_by_me?
+      next false if lock_expired?
+      self.lock_expiration = Settings.lock_issues.expiration_interval_minutes.minutes.from_now
+      save!(:validate => false)
+      true
+    end
+  end
+
+  def unlock_issue!
+    with_lock do
+      next false unless locked_by_me?
+      next false if lock_expired?
+      self.locked = false
+      self.lock_admin_user = nil
+      self.lock_expiration = nil
+      save!(:validate => false)
+      true
+    end
+  end
+
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
     answer! if may_answer? && observations.any? && !has_open_observations?

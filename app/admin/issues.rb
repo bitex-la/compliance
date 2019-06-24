@@ -55,7 +55,6 @@ ActiveAdmin.register Issue do
     redirect_to [person, issue]
   end
 
-
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
       next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
@@ -78,6 +77,7 @@ ActiveAdmin.register Issue do
     def edit
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
+      resource.lock_issue!
       super
     end
 
@@ -88,7 +88,13 @@ ActiveAdmin.register Issue do
   end
 
   form do |f|
-
+    if f.object.locked? && !f.object.locked_by_me?
+      div class: 'flash flash_danger' do
+        "Issue is locked by #{f.object.lock_admin_user.email}. you cannot make changes until the other user release the lock."
+      end
+      br
+    end
+  
     unless f.object.errors.full_messages.empty?
       ul class: 'validation_errors' do
         f.object.errors.full_messages.each do |e|
