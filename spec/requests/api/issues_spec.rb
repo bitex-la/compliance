@@ -35,6 +35,15 @@ describe Issue do
           "people"=>3
         }
     end
+
+    it 'when fetching issues do not include future issues' do
+      current_issue = create(:basic_issue)
+      future_issue = create(:future_issue)
+
+      api_get "/issues"
+      expect(api_response.data.size).to eq 1
+      expect(api_response.data.first.id).to eq current_issue.id.to_s
+    end
   end
 
   describe 'Creating a new user Issue' do
