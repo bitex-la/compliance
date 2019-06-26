@@ -18,7 +18,6 @@ RSpec.describe IssueTagging, type: :model do
   it 'is invalid tag type' do
     issue_tag = build(:invalid_type_issue_tagging)
     expect(issue_tag).to_not be_valid
-    expect(issue_tag.errors.messages).to include :tag
     expect(issue_tag.errors.messages[:tag]).to include("can't be blank and must be an issue tag")
   end
 

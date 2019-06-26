@@ -61,7 +61,7 @@ describe Person do
     end
 
     it 'shows all the person info when the person exist' do
-      person = create(:full_natural_person_with_tag).reload
+      person = create(:full_natural_person,:with_tags).reload
       issue = person.issues.first
 
       # This is an old domicile, that should not be included in the response.

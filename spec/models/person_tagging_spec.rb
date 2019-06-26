@@ -18,7 +18,6 @@ RSpec.describe PersonTagging, type: :model do
   it 'is invalid tag type' do
     person_tag = build(:invalid_type_person_tagging)
     expect(person_tag).to_not be_valid
-    expect(person_tag.errors.messages).to include :tag
     expect(person_tag.errors.messages[:tag]).to include("can't be blank and must be a person tag")
   end
 

@@ -12,8 +12,7 @@ RSpec.describe Tag, type: :model do
   end
 
   it 'is invalid without type' do
-    tag = build(:empty_tag)
-    tag.name = 'valid-name'
+    tag = build(:empty_tag, name: 'valid-name')
     expect(tag).to_not be_valid
     expect(tag.errors.messages).to include :tag_type
   end
@@ -30,7 +29,6 @@ RSpec.describe Tag, type: :model do
   it 'is invalid if name contains invalid chars' do
     tag = build(:invalid_name_tag)
     expect(tag).to_not be_valid
-    expect(tag.errors.messages).to include :name
     expect(tag.errors.messages[:name]).to include('only support letters, numbers and hyphen')
   end
 
@@ -68,9 +66,9 @@ RSpec.describe Tag, type: :model do
     expect(tag.destroy).to eq(false)
   end
 
-  it 'can destroy if no relation exists' do
+  it 'can destroy if relation not exists' do
     tag = create(:person_tag)
     expect(tag.destroy).to eq(tag)
-    expect(Tag.where( id: tag.id ).take).to be nil
+    expect(Tag.find_by_id(tag.id)).to be nil
   end
 end
