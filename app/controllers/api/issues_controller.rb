@@ -1,11 +1,11 @@
 class Api::IssuesController < Api::ApiController
   def index
-    scope = Issue
+    scope = Issue.current
       .includes(*build_eager_load_list)
       .order(updated_at: :desc)
       .ransack(params[:filter])
       .result
-
+      
     page, per_page = Util::PageCalculator.call(params, 0, 3)
     issues = scope.page(page).per(per_page)
 
