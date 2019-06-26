@@ -133,7 +133,7 @@ ActiveAdmin.register Issue do
               min_date: Date.today }
 
           ArbreHelpers.has_many_form self, f, :issue_taggings, 
-            {:new_button_text => "Add New Tag"} do |cf, context|
+            new_button_text: "Add New Tag" do |cf, context|
               cf.input :tag, as:  :select, collection: Tag.issue
           end
         end
