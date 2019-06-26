@@ -18,7 +18,7 @@ RSpec.describe IssueTagging, type: :model do
   it 'is invalid tag type' do
     issue_tag = build(:invalid_type_issue_tagging)
     expect(issue_tag).to_not be_valid
-    expect(issue_tag.errors.messages[:tag]).to include("can't be blank and must be an issue tag")
+    expect(issue_tag.errors.messages[:tag]).to include("can't be blank and must be issue tag")
   end
 
   it 'validates that we cannot add the same tag twice' do
@@ -29,6 +29,6 @@ RSpec.describe IssueTagging, type: :model do
     expect(issue).to be_valid
 
     expect {issue.tags << tag }.to raise_error(ActiveRecord::RecordInvalid,
-      "Validation failed: Tag cant't contains duplicates in the same issue")
+      "Validation failed: Tag can't contain duplicates in the same issue")
   end
 end

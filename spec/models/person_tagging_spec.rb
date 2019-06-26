@@ -18,7 +18,7 @@ RSpec.describe PersonTagging, type: :model do
   it 'is invalid tag type' do
     person_tag = build(:invalid_type_person_tagging)
     expect(person_tag).to_not be_valid
-    expect(person_tag.errors.messages[:tag]).to include("can't be blank and must be a person tag")
+    expect(person_tag.errors.messages[:tag]).to include("can't be blank and must be person tag")
   end
 
   it 'validates that we cannot add the same tag twice' do
@@ -29,6 +29,6 @@ RSpec.describe PersonTagging, type: :model do
     expect(person).to be_valid
 
     expect {person.tags << tag }.to raise_error(ActiveRecord::RecordInvalid,
-      "Validation failed: Tag cant't contains duplicates in the same person")
+      "Validation failed: Tag can't contain duplicates in the same person")
   end
 end
