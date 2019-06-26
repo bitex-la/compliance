@@ -22,9 +22,12 @@ class Tag < ApplicationRecord
   private
 
   def can_destroy?
-    return if tag_type == "person" && PersonTagging.where(tag: self).take.nil? ||
-      tag_type == "issue" && IssueTagging.where(tag: self).take.nil?
-    errors[:base] << "Can't be destroy because there are relations created"
+    return unless {
+      "person" => PersonTagging,
+      "issue" => IssueTagging
+    }[tag_type].where(tag: self).exists?
+
+    errors[:base] << "Can't be destroy because there are relations with #{tag_type} created"
     throw :abort
   end
 end
