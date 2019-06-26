@@ -475,6 +475,26 @@ describe Person do
     it 'responds 404 when the person does not exist' do
       api_get "/people/1", {}, 404
     end
+
+
+    it 'create new person with tags' do
+      person_tag = create(:person_tag)
+
+      expect do
+        api_create('/people', {
+          type: 'people',
+          attributes: { enabled: true, risk:"low" },
+          relationships: { 
+            tags: {data: [{id: person_tag.id, type: 'tags'}] }
+          }
+        })
+      end.to change{Person.count}.by(1)
+
+      person = Person.find(api_response.data.id)
+      expect(person.tags).to include person_tag
+      expect(person.enabled).to eq true
+      expect(person.risk).to eq "low"
+    end
   end
 
   describe 'when using filters' do
