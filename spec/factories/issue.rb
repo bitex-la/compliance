@@ -1,6 +1,10 @@
 FactoryBot.define do
   factory :basic_issue, class: Issue do
     association :person, factory: :empty_person
+
+    factory :future_issue do
+      defer_until { Date.today + 1.months }
+    end
   end
 
   factory :full_natural_person_issue_with_fixed_email, class: Issue do
@@ -53,10 +57,7 @@ FactoryBot.define do
       end
     end
 
-    factory :future_issue do
-      association :person, factory: :empty_person
-      defer_until { Date.today + 1.months }
-    end
+    
   end
 
   factory :full_legal_entity_issue, class: Issue do
