@@ -13,8 +13,8 @@ describe PersonTagging do
         type: 'person_tagging',
         id: one.id.to_s,
         attributes: {
-          created_at: one.created_at.to_i,
-          updated_at: one.updated_at.to_i
+          created_at: one.created_at.as_json,
+          updated_at: one.updated_at.as_json
         },
         relationships: {
           person: {
@@ -57,8 +57,8 @@ describe PersonTagging do
         id: "1",
         type: "person_tagging",
         attributes: {
-          created_at: person_tagging.created_at.to_i,
-          updated_at: person_tagging.updated_at.to_i
+          created_at: person_tagging.created_at.as_json,
+          updated_at: person_tagging.updated_at.as_json
         },
         relationships: {
           person: {

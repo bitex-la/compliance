@@ -64,7 +64,7 @@ ActiveAdmin.register Issue do
 
     member_action action, method: :post do
       resource.send("#{action}!")
-      redirect_to action: :show
+      redirect_to person_path(resource.person)
     end
   end
 
@@ -132,33 +132,33 @@ ActiveAdmin.register Issue do
           f.input :defer_until, as: :datepicker, datepicker_options: {
               min_date: Date.today }
 
-          ArbreHelpers.has_many_form self, f, :issue_taggings, 
+          ArbreHelpers::Form.has_many_form self, f, :issue_taggings, 
             new_button_text: "Add New Tag" do |cf, context|
               cf.input :tag, as:  :select, collection: Tag.issue
           end
         end
 
         h3 "Observations"
-        ArbreHelpers.has_many_form self, f, :observations, cant_remove: true do |sf|
+        ArbreHelpers::Form.has_many_form self, f, :observations, cant_remove: true do |sf|
           sf.input :observation_reason
-          sf.input :scope
+          sf.input :scope, as: :select
           sf.input :note, input_html: {rows: 3}
           sf.input :reply, input_html: {rows: 3}
         end
 
         h3 "Notes Seeds"
         div class: 'note_seeds' do
-          ArbreHelpers.has_many_form self, f, :note_seeds do |nf, context|
+          ArbreHelpers::Form.has_many_form self, f, :note_seeds do |nf, context|
             nf.input :body, input_html: {rows: 3}
             nf.input :expires_at, as: :datepicker
-            ArbreHelpers.has_many_attachments(context, nf)
+            ArbreHelpers::Attachment.has_many_attachments(context, nf)
           end
         end
       end
 
       tab :docket do
         if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-          ArbreHelpers.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+          ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
             sf.input :commercial_name
             sf.input :legal_name
             sf.input :industry
@@ -171,12 +171,12 @@ ActiveAdmin.register Issue do
                 label: "Move existing Legal Entity Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
-            ArbreHelpers.has_many_attachments(self, sf)
+            ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
         end
 
         if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-          ArbreHelpers.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
+          ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
             Appsignal.instrument("rendering_first_natural_docket_fields") do
               sf.input :first_name
               sf.input :last_name
@@ -203,14 +203,14 @@ ActiveAdmin.register Issue do
             end
             sf.input :expires_at, as: :datepicker
             Appsignal.instrument("rendering_has_many_attachments_on_docket") do
-              ArbreHelpers.has_many_attachments(self, sf)
+              ArbreHelpers::Attachment.has_many_attachments(self, sf)
             end
           end
         end
       end
 
       tab "Domicile (#{resource.domicile_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :domicile_seeds do |sf, context|
+        ArbreHelpers::Form.has_many_form self, f, :domicile_seeds do |sf, context|
           sf.input :country, as: :autocomplete, url: '/people/search_country'
           sf.input :state
           sf.input :city
@@ -219,40 +219,40 @@ ActiveAdmin.register Issue do
           sf.input :postal_code
           sf.input :floor
           sf.input :apartment
-          ArbreHelpers.fields_for_replaces context, sf, :domiciles
+          ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
           sf.input :expires_at, as: :datepicker
-          ArbreHelpers.has_many_attachments(context, sf)
+          ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
 
       tab "ID (#{resource.identification_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :identification_seeds do |sf, context|
+        ArbreHelpers::Form.has_many_form self, f, :identification_seeds do |sf, context|
           sf.input :number
           sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
           sf.input :issuer, as: :autocomplete, url: '/people/search_country'
           sf.input :public_registry_authority
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
-          ArbreHelpers.fields_for_replaces context, sf, :identifications
+          ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
           sf.input :expires_at, as: :datepicker
-          ArbreHelpers.has_many_attachments(context, sf)
+          ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
 
       tab "Allowance (#{resource.allowance_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :allowance_seeds do |sf, context|
+        ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
           sf.input :amount
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
-          ArbreHelpers.fields_for_replaces context, sf, :allowances
+          ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
           sf.input :expires_at, as: :datepicker
-          ArbreHelpers.has_many_attachments(context, sf)
+          ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
 
       tab :invoicing do
         columns do 
           column do
-            ArbreHelpers.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
+            ArbreHelpers::Form.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
               af.input :vat_status_id, as: :select, collection: VatStatusKind.all
               af.input :tax_id
               af.input :tax_id_kind_id, as: :select, collection: TaxIdKind.all
@@ -260,22 +260,22 @@ ActiveAdmin.register Issue do
               af.input :full_name
               af.input :country, as: :autocomplete, url: search_country_people_path
               af.input :address
-              ArbreHelpers.fields_for_replaces self, af,
+              ArbreHelpers::Replacement.fields_for_replaces self, af,
                 :argentina_invoicing_details
               af.input :expires_at, as: :datepicker
-              ArbreHelpers.has_many_attachments(self, af)
+              ArbreHelpers::Attachment.has_many_attachments(self, af)
             end
           end
           column do
-            ArbreHelpers.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
+            ArbreHelpers::Form.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
               cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
               cf.input :tax_id
               cf.input :giro
               cf.input :ciudad
               cf.input :comuna
-              ArbreHelpers.fields_for_replaces self, cf, :chile_invoicing_details
+              ArbreHelpers::Replacement.fields_for_replaces self, cf, :chile_invoicing_details
               cf.input :expires_at, as: :datepicker
-              ArbreHelpers.has_many_attachments(self, cf)
+              ArbreHelpers::Attachment.has_many_attachments(self, cf)
             end
           end
         end
@@ -284,7 +284,7 @@ ActiveAdmin.register Issue do
       tab "Affinity (#{resource.affinity_seeds.count})" do
         columns do
           column span: 2 do
-            ArbreHelpers.has_many_form self, f, :affinity_seeds do |rf, context|
+            ArbreHelpers::Form.has_many_form self, f, :affinity_seeds do |rf, context|
               rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
               if rf.object.related_person_id.nil?
                 rf.input :related_person_id, as: :search_select, url: proc{ search_person_people_path },
@@ -297,9 +297,9 @@ ActiveAdmin.register Issue do
                 )
                 rf.template.concat('</li>'.html_safe) 
               end
-              ArbreHelpers.fields_for_replaces context, rf, :affinities
+              ArbreHelpers::Replacement.fields_for_replaces context, rf, :affinities
               rf.input :expires_at, as: :datepicker
-              ArbreHelpers.has_many_attachments(context, rf)
+              ArbreHelpers::Attachment.has_many_attachments(context, rf)
             end
           end
           column do 
@@ -308,7 +308,7 @@ ActiveAdmin.register Issue do
               resource.person.all_affinities.each do |d|
                 panel d.name do
                   attributes_table_for d do
-                    ArbreHelpers.affinity_card(self, d)
+                    ArbreHelpers::Affinity.affinity_card(self, d)
                   end
                 end
               end
@@ -318,7 +318,7 @@ ActiveAdmin.register Issue do
       end
 
       tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :phone_seeds do |pf, context|
+        ArbreHelpers::Form.has_many_form self, f, :phone_seeds do |pf, context|
           pf.input :number
           pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
           pf.input :country, as: :autocomplete, url: '/people/search_country'
@@ -331,7 +331,7 @@ ActiveAdmin.register Issue do
           pf.input :expires_at, as: :datepicker
         end
         br
-        ArbreHelpers.has_many_form self, f, :email_seeds do |ef, context|
+        ArbreHelpers::Form.has_many_form self, f, :email_seeds do |ef, context|
           ef.input :address
           ef.input :email_kind_id, as: :select, collection: EmailKind.all
           if current = context.resource.person.emails.current.presence
@@ -342,7 +342,7 @@ ActiveAdmin.register Issue do
       end
 
       tab "Risk Score (#{resource.risk_score_seeds.count})" do
-        ArbreHelpers.has_many_form self, f, :risk_score_seeds do |rs, context|
+        ArbreHelpers::Form.has_many_form self, f, :risk_score_seeds do |rs, context|
           rs.input :score
           rs.input :provider
           rs.input :external_link
@@ -351,13 +351,13 @@ ActiveAdmin.register Issue do
           end
           seed = rs.object
           if seed.persisted?     
-            ArbreHelpers.has_many_links(context, rs, 
+            ArbreHelpers::HtmlHelper.has_many_links(context, rs, 
               seed.external_link.split(',').compact,
               'External links') if seed.external_link 
             begin 
               if seed.extra_info
                 extra_info_as_json = JSON.parse(seed.extra_info)
-                ArbreHelpers.json_renderer(context, extra_info_as_json)
+                ArbreHelpers::HtmlHelper.json_renderer(context, extra_info_as_json)
               end
             rescue JSON::ParserError
               rs.input :extra_info, input_html: { readonly: true, disabled: true }
@@ -366,7 +366,7 @@ ActiveAdmin.register Issue do
             rs.input :extra_info 
           end
           rs.input :expires_at, as: :datepicker
-          ArbreHelpers.has_many_attachments(context, rs)
+          ArbreHelpers::Attachment.has_many_attachments(context, rs)
         end
       end
     end
@@ -400,7 +400,7 @@ ActiveAdmin.register Issue do
 
         if observations = resource.observations.presence
           h3 "Observations"
-          ArbreHelpers.panel_grid(self, observations) do |d|
+          ArbreHelpers::Layout.panel_grid(self, observations) do |d|
             attributes_table_for d, :observation_reason, :scope, :created_at, :updated_at
             para d.note
             strong "Reply:"
@@ -410,10 +410,10 @@ ActiveAdmin.register Issue do
 
         if seeds = resource.note_seeds.presence
           h3 "Note Seeds"
-          ArbreHelpers.panel_grid(self, seeds) do |d|
+          ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
             attributes_table_for d, :fruit
             para d.body
-            ArbreHelpers.attachments_list self, d.fruit.try(:attachments)
+            ArbreHelpers::Attachment.attachments_list self, d.fruit.try(:attachments)
           end
         end
       end
@@ -421,49 +421,49 @@ ActiveAdmin.register Issue do
       tab :docket do
         if seed = issue.legal_entity_docket_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed)
+            ArbreHelpers::Seed.seed_show_section(self, seed)
           end
         end
 
         if seed = issue.natural_docket_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed)
+            ArbreHelpers::Seed.seed_show_section(self, seed)
           end
         end
       end
 
       
-      ArbreHelpers.seed_collection_show_tab(self, "Domicile", :domicile_seeds)
-      ArbreHelpers.seed_collection_show_tab(self, "Id", :identification_seeds)
-      ArbreHelpers.seed_collection_show_tab(self, "Allowance", :allowance_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Domicile", :domicile_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Id", :identification_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Allowance", :allowance_seeds)
 
       tab "Invoicing" do
         if seed = issue.argentina_invoicing_detail_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed, [:tax_id])
+            ArbreHelpers::Seed.seed_show_section(self, seed, [:tax_id])
           end
         end
 
         if seed = issue.chile_invoicing_detail_seed.presence
           panel seed.name do
-            ArbreHelpers.seed_show_section(self, seed)
+            ArbreHelpers::Seed.seed_show_section(self, seed)
           end
         end
       end
 
-      ArbreHelpers.seed_collection_show_tab(self, "Affinity", :affinity_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Affinity", :affinity_seeds)
 
       tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
-        ArbreHelpers.panel_grid(self, resource.phone_seeds) do |d|
-          ArbreHelpers.seed_show_section(self, d)
+        ArbreHelpers::Layout.panel_grid(self, resource.phone_seeds) do |d|
+          ArbreHelpers::Seed.seed_show_section(self, d)
         end
 
-        ArbreHelpers.panel_grid(self, resource.email_seeds) do |d|
-          ArbreHelpers.seed_show_section(self, d)
+        ArbreHelpers::Layout.panel_grid(self, resource.email_seeds) do |d|
+          ArbreHelpers::Seed.seed_show_section(self, d)
         end
       end
 
-      ArbreHelpers.seed_collection_show_tab(self, "Risk Score", :risk_score_seeds)
+      ArbreHelpers::Seed.seed_collection_show_tab(self, "Risk Score", :risk_score_seeds)
     end
   end
 end

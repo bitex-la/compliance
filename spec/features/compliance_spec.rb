@@ -105,8 +105,8 @@ describe 'an admin user' do
 
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 5)
-    issue.person.should be_enabled
-    assert_logging(issue.person, :enable_person, 1)
+    expect(issue.person.enabled).to be_falsey
+    assert_logging(issue.person, :enable_person, 0)
 
     click_link 'Risk Score (1)'
 
@@ -119,6 +119,23 @@ describe 'an admin user' do
       expect(page).to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
       expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
     end
+
+    click_link 'Enable'
+
+    expect(issue.person.reload.enabled).to be_truthy
+    assert_logging(issue.person, :enable_person, 1)
+
+    click_link 'Edit Person'
+    click_link 'Disable'
+    assert_logging(issue.person, :enable_person, 1)
+    assert_logging(issue.person, :disable_person, 1)
+    expect(issue.person.reload.enabled).to be_falsey
+
+    click_link 'Edit Person'
+    click_link 'Enable'
+
+    expect(issue.person.reload.enabled).to be_truthy
+    assert_logging(issue.person, :enable_person, 2)
   end
 
   it 'reviews a newly created customer' do
@@ -247,7 +264,15 @@ describe 'an admin user' do
 
     visit "/people/#{person.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}"
-    assert_logging(person, :enable_person, 1)
+    assert_logging(person, :enable_person, 0)
+
+    visit "/people/#{issue.person.id}"
+
+    click_link 'Edit Person'
+    click_link 'Enable'
+
+    expect(issue.person.reload.enabled).to be_truthy
+    assert_logging(issue.person, :enable_person, 1)
   end
 
   it "Edits a customer by creating a new issue" do
@@ -424,9 +449,6 @@ describe 'an admin user' do
     new_identification.attachments.count.should == 12
     new_natural_docket.attachments.count.should == 1
 
-    within '.row.row-person' do
-      click_link person.id
-    end
     person.should be_enabled
   end
 
@@ -456,8 +478,8 @@ describe 'an admin user' do
     click_link 'Reject'
 
     issue.reload.should be_rejected
-    person.reload.should_not be_enabled
-    assert_logging(person, :disable_person, 1)
+    person.reload.should be_enabled
+    assert_logging(person, :disable_person, 0)
   end
 
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
@@ -597,7 +619,7 @@ describe 'an admin user' do
     assert_logging(issue.reload, :observe_issue, 1)
     Observation.last.should be_answered
     click_link 'Reject'
-    person.reload.should_not be_enabled
+    person.reload.should be_enabled
   end
 
   it "Abandons a new person issue that was inactive" do
@@ -674,9 +696,7 @@ describe 'an admin user' do
       new_domicile.replaced_by_id.should be_nil
       new_domicile.attachments.count.should == 11
 
-      within '.row.row-person' do
-      	click_link Person.first.id
-      end
+      
     end
 
     it 'can add new seeds' do
@@ -734,10 +754,6 @@ describe 'an admin user' do
       issue.reload.should be_approved
 
       assert_logging(Issue.last, :update_entity, 2)
-
-      within ".row.row-person" do
-        click_link person.id
-      end
 
       person.reload.domiciles.count == 2
       person.reload.identifications.count == 2
@@ -803,9 +819,6 @@ describe 'an admin user' do
       issue.reload.should be_approved
       assert_logging(issue, :update_entity, 1)
 
-      within '.row.row-person' do
-      	click_link  person.id
-      end
       person.allowances.reload
       person.identifications.reload
       person.allowances.first.weight.should == AllowanceSeed.last.weight

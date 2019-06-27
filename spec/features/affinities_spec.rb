@@ -39,13 +39,16 @@ describe 'an admin handling affinities' do
     end
 
     click_link 'Complete'
+    
+    visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Approve'
+
     click_link 'Dashboard' 
 
     visit "/people/#{person.id}"
 
     click_link 'Affinities'
-
+    
     expect(page).to have_content "RELATED PERSON (#{owner_one.id})"
     expect(page).to have_content "RELATED PERSON (#{owner_two.id}) 🏭: E Corp"
     expect(page).to have_content "RELATED PERSON (#{payee_one.id})"
@@ -93,6 +96,9 @@ describe 'an admin handling affinities' do
     end
 
     click_link 'Complete'
+
+    issue = Issue.last
+    visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Approve'
 
     visit "/people/#{person.id}"
@@ -131,6 +137,9 @@ describe 'an admin handling affinities' do
     click_button 'Update Issue'
 
     click_link 'Complete'
+
+    issue = Issue.last
+    visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Approve'
 
     visit "/people/#{person.id}"
