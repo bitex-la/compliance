@@ -347,7 +347,7 @@ RSpec.describe Issue, type: :model do
     let(:admin_user) { create(:admin_user) }
     let(:other_admin_user) { create(:other_admin_user) }
 
-    interval = Settings.lock_issues.expiration_interval_minutes.minutes
+    interval = Issue.lock_expiration_interval_minutes
 
     before :each do 
       AdminUser.current_admin_user = admin_user 

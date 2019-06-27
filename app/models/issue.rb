@@ -54,13 +54,19 @@ class Issue < ApplicationRecord
     lock_admin_user == AdminUser.current_admin_user
   end
 
+  def self.lock_expiration_interval_minutes
+    value = Settings['lock_issues'].nil? ? 15 : 
+      Settings['lock_issues'].fetch('expiration_interval_minutes', 15)
+    value.minutes
+  end
+
   def lock_issue!
     with_lock do
       next true if locked_by_me?
       next false if locked? && !lock_expired?
       self.locked = true
       self.lock_admin_user = AdminUser.current_admin_user
-      self.lock_expiration = Settings.lock_issues.expiration_interval_minutes.minutes.from_now 
+      self.lock_expiration = Issue.lock_expiration_interval_minutes.from_now
       save!(:validate => false)
       true
     end
@@ -70,7 +76,7 @@ class Issue < ApplicationRecord
     with_lock do
       next false unless locked_by_me?
       next false if lock_expired?
-      self.lock_expiration = Settings.lock_issues.expiration_interval_minutes.minutes.from_now
+      self.lock_expiration = Issue.lock_expiration_interval_minutes.from_now
       save!(:validate => false)
       true
     end
