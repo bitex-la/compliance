@@ -56,8 +56,13 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
   config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-    Bullet.console = true
+    #Bullet.enable = true
+    #Bullet.bullet_logger = true
+    #Bullet.console = true
+
+    next if Rails.configuration.cache_classes
+    ActiveSupport::Reloader.to_prepare do
+      Dir[Rails.root.join("app/serializers/**/*.rb")].each {|f| load f}
+    end
   end
 end
