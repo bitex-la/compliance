@@ -41,15 +41,18 @@ describe 'an admin handling affinities' do
 
     click_link 'Complete'
     
-    click_link 'Edit'
-
+    within "tr[id='issue_#{issue.id}'] td[class='col col-actions']" do
+      click_link 'Edit'
+    end
+    
     click_link 'Approve'
+
     click_link 'Dashboard' 
 
     visit "/people/#{person.id}"
 
     click_link 'Affinities'
-
+    
     expect(page).to have_content "RELATED PERSON (#{owner_one.id})"
     expect(page).to have_content "RELATED PERSON (#{owner_two.id}) 🏭: E Corp"
     expect(page).to have_content "RELATED PERSON (#{payee_one.id})"
@@ -98,8 +101,9 @@ describe 'an admin handling affinities' do
 
     click_link 'Edit'
     click_link 'Complete'
-    
-    click_link 'Edit'
+
+    issue = Issue.last
+    visit "/people/#{person.id}/issues/#{issue.id}/edit"
     click_link 'Approve'
 
     visit "/people/#{person.id}"
@@ -139,8 +143,9 @@ describe 'an admin handling affinities' do
 
     click_link 'Edit'
     click_link 'Complete'
-    
-    click_link 'Edit'
+
+    issue = Issue.last
+    visit "/people/#{person.id}/issues/#{issue.id}/edit"
     click_link 'Approve'
 
     visit "/people/#{person.id}"

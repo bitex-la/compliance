@@ -13,8 +13,8 @@ describe IssueTagging do
         type: 'issue_tagging',
         id: one.id.to_s,
         attributes: {
-          created_at: one.created_at.to_i,
-          updated_at: one.updated_at.to_i
+          created_at: one.created_at.as_json,
+          updated_at: one.updated_at.as_json
         },
         relationships: {
           issue: {
@@ -57,8 +57,8 @@ describe IssueTagging do
         id: "1",
         type: "issue_tagging",
         attributes: {
-          created_at: issue_tagging.created_at.to_i,
-          updated_at: issue_tagging.updated_at.to_i
+          created_at: issue_tagging.created_at.as_json,
+          updated_at: issue_tagging.updated_at.as_json
         },
         relationships: {
           issue: {

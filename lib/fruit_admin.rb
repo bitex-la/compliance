@@ -5,7 +5,7 @@ class FruitAdmin
       actions :all, :except => [:edit, :destroy]
 
       show do 
-        ArbreHelpers.fruit_show_page(self)
+        ArbreHelpers::Fruit.fruit_show_page(self)
       end
     end
   end
