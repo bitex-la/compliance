@@ -20,6 +20,7 @@ ActiveAdmin.register Issue do
     column(:created_at)
     column(:updated_at)
     column(:defer_until)
+    actions
   end
 
   config.clear_action_items!
@@ -82,7 +83,7 @@ ActiveAdmin.register Issue do
     end
 
     def show
-      return redirect_to edit_person_issue_url(resource.person, resource) if resource.editable?
+      #return redirect_to edit_person_issue_url(resource.person, resource) if resource.editable?
       super
     end
   end
