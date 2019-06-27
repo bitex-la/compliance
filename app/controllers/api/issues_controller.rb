@@ -1,11 +1,11 @@
 class Api::IssuesController < Api::ApiController
   def index
-    scope = Issue
+    scope = Issue.current
       .includes(*build_eager_load_list)
       .order(updated_at: :desc)
       .ransack(params[:filter])
       .result
-
+      
     page, per_page = Util::PageCalculator.call(params, 0, 3)
     issues = scope.page(page).per(per_page)
 
@@ -25,15 +25,31 @@ class Api::IssuesController < Api::ApiController
 
   def create
     mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [ :people ],
-      issues: [:reason_code, :defer_until, :person, id: nil ],
-      people: []
+      [ :people , :tags],
+      issues: [:reason_code, :defer_until, :person, :tags, id: nil ],
+      people: [],
+      tags: []
 
     return jsonapi_422(nil) unless mapper.data
 
     if mapper.save_all
       jsonapi_response mapper.data,
         {include: params[:include] || Issue.included_for}, 201
+    else
+      json_response mapper.all_errors, 422
+    end
+  end
+
+  def update
+    mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [],
+      issues: [ :defer_until, id: params[:id] ]
+      
+    return jsonapi_422(nil) unless mapper.data
+
+    if mapper.save_all
+      jsonapi_response mapper.data,
+        {include: params[:include] || Issue.included_for}, 200
     else
       json_response mapper.all_errors, 422
     end

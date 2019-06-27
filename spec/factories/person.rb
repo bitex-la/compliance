@@ -88,6 +88,11 @@ FactoryBot.define do
       end
     end
 
+    trait :with_tags do
+      after(:create) do |person, evaluator|
+        create :full_person_tagging, person: person
+      end
+    end
   end
 
   factory :full_legal_entity_person, class: Person do
