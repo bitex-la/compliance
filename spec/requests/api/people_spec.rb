@@ -45,6 +45,7 @@ describe Person do
             affinities: {data: []},
             risk_scores: {data: []},
             attachments: {data: []},
+            tags: {data: []}
           }
         },
         included: [{ 
@@ -60,7 +61,7 @@ describe Person do
     end
 
     it 'shows all the person info when the person exist' do
-      person = create(:full_natural_person).reload
+      person = create(:full_natural_person,:with_tags).reload
       issue = person.issues.first
 
       # This is an old domicile, that should not be included in the response.
@@ -127,7 +128,10 @@ describe Person do
           }},
           attachments: {data: issue.person.attachments.map { |x|
             {id: x.id.to_s, type: "attachments"}
-          }}
+          }},
+          tags: {data: issue.person.tags.map { |x|
+            {id: x.id.to_s, type: "tags"}
+          }},
         }
       }
 
@@ -470,6 +474,26 @@ describe Person do
 
     it 'responds 404 when the person does not exist' do
       api_get "/people/1", {}, 404
+    end
+
+
+    it 'create new person with tags' do
+      person_tag = create(:person_tag)
+
+      expect do
+        api_create('/people', {
+          type: 'people',
+          attributes: { enabled: true, risk:"low" },
+          relationships: { 
+            tags: {data: [{id: person_tag.id, type: 'tags'}] }
+          }
+        })
+      end.to change{Person.count}.by(1)
+
+      person = Person.find(api_response.data.id)
+      expect(person.tags).to include person_tag
+      expect(person.enabled).to eq true
+      expect(person.risk).to eq "low"
     end
   end
 
