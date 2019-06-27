@@ -34,11 +34,15 @@ describe 'an admin handling affinities' do
     visit '/'
 
     click_on 'Draft'
-    within("#issue_#{issue.id} td.col.col-id") do
-      click_link(issue.id)
+
+    within "tr[id='issue_#{issue.id}'] td[class='col']" do
+      click_link 'Edit'
     end
 
     click_link 'Complete'
+    
+    click_link 'Edit'
+
     click_link 'Approve'
     click_link 'Dashboard' 
 
@@ -92,7 +96,10 @@ describe 'an admin handling affinities' do
       expect(page).to have_content 'Issue was successfully updated.'
     end
 
+    click_link 'Edit'
     click_link 'Complete'
+    
+    click_link 'Edit'
     click_link 'Approve'
 
     visit "/people/#{person.id}"
@@ -130,7 +137,10 @@ describe 'an admin handling affinities' do
 
     click_button 'Update Issue'
 
+    click_link 'Edit'
     click_link 'Complete'
+    
+    click_link 'Edit'
     click_link 'Approve'
 
     visit "/people/#{person.id}"

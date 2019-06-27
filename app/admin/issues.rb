@@ -28,6 +28,10 @@ ActiveAdmin.register Issue do
     link_to 'New', new_person_issue_path(person)
   end
 
+  action_item :edit, only: [:show] do
+    link_to 'Edit', edit_person_issue_path(person, resource)
+  end
+
   scope :fresh, default: true
   scope :answered
   scope :draft
@@ -53,7 +57,7 @@ ActiveAdmin.register Issue do
     end
     issue = person.issues.create
     issue.add_seeds_replacing(fruits) unless params[:fruits].blank?
-    redirect_to [person, issue]
+    redirect_to edit_person_issue_url(person, issue)
   end
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
@@ -79,11 +83,6 @@ ActiveAdmin.register Issue do
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
       resource.lock_issue!
-      super
-    end
-
-    def show
-      #return redirect_to edit_person_issue_url(resource.person, resource) if resource.editable?
       super
     end
   end

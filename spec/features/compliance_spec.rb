@@ -45,6 +45,9 @@ describe 'an admin user' do
     add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
+
+    click_link "Edit"
+
     issue = Issue.last
     observation = Observation.last
 
@@ -75,6 +78,8 @@ describe 'an admin user' do
 
     click_button "Update Issue"
 
+    click_link "Edit"
+    
     click_link 'Risk Score (1)'
 
     within '.external_links' do
@@ -95,15 +100,19 @@ describe 'an admin user' do
     add_observation(1, observation_reason, 'Please check this again')
     
     click_button "Update Issue"
+    click_link "Edit"
+    
     issue.reload.should be_observed
     assert_logging(issue.reload, :observe_issue, 2)
 
     fill_in 'issue[observations_attributes][1][reply]',
       with: '0 hits at 2018-06-07'
     click_button "Update Issue"
-
+    click_link "Edit"
+    
     click_link "Approve"
-
+    click_link "Edit"
+    
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 6)
     issue.person.should be_enabled
@@ -154,7 +163,9 @@ describe 'an admin user' do
       click_link(issue.id)
     end
 
-    visit "/people/#{Person.first.id}/issues/#{issue.id}"
+    click_link "Edit"
+
+    visit "/people/#{Person.first.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{Person.first.id}/issues/#{issue.id}/edit"
 
     click_link 'ID (1)'
@@ -230,6 +241,8 @@ describe 'an admin user' do
       click_link(issue.id)
     end
 
+    click_link "Edit"
+    
     page.should have_content 'Reject'
     page.should have_content 'Dismiss'
 
@@ -237,6 +250,9 @@ describe 'an admin user' do
       with: 'Double checked by compliance'
 
     click_button 'Update Issue'
+    
+    click_link "Edit"
+    
     click_link 'Approve'
 
     issue.reload.should be_approved
@@ -365,6 +381,8 @@ describe 'an admin user' do
     add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
+    click_link "Edit"
+
     issue = Issue.last
     assert_logging(issue, :create_entity, 1)
     assert_logging(issue.reload, :observe_issue, 1)
@@ -375,6 +393,7 @@ describe 'an admin user' do
     fill_in 'issue[observations_attributes][0][reply]',
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
+    click_link "Edit"
 
     assert_logging(issue, :update_entity, 3) 
     issue.reload.should be_answered
@@ -386,6 +405,8 @@ describe 'an admin user' do
     add_observation(2, observation_reason, 'Please check this on SII')
 
     click_button "Update Issue"
+    click_link "Edit"
+
     assert_logging(issue.reload, :observe_issue, 2)
 
     fill_in 'issue[observations_attributes][1][reply]',
@@ -395,7 +416,10 @@ describe 'an admin user' do
       with: 'He is OK on SII'  
 
     click_button "Update Issue"
+    click_link "Edit"
+
     click_link "Approve"
+    click_link "Edit"
 
     issue.reload.should be_approved
     assert_logging(person, :enable_person, 1)
@@ -439,7 +463,7 @@ describe 'an admin user' do
     assert_logging(issue, :update_entity, 1)
     login_as admin_user
     click_on "Fresh"
-    visit "/people/#{issue.person.id}/issues/#{issue.id}"
+    visit "/people/#{issue.person.id}/issues/#{issue.id}/edit"
     click_link 'Dismiss'
 
     issue.reload.should be_dismissed
@@ -453,7 +477,7 @@ describe 'an admin user' do
     issue.complete!
     login_as admin_user
     click_on 'Answered'
-    visit "/people/#{issue.person.id}/issues/#{issue.id}"
+    visit "/people/#{issue.person.id}/issues/#{issue.id}/edit"
     click_link 'Reject'
 
     issue.reload.should be_rejected
@@ -474,6 +498,9 @@ describe 'an admin user' do
     within("#issue_#{issue.id} td.col.col-id") do
       click_link(issue.id)
     end
+
+    click_link "Edit"
+
     page.current_path.should ==
       "/people/#{person.id}/issues/#{issue.id}/edit"
 
@@ -481,6 +508,8 @@ describe 'an admin user' do
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
     assert_logging(issue, :update_entity, 3)
+    
+    click_link "Edit"
 
     click_link 'Approve'
 
@@ -512,6 +541,8 @@ describe 'an admin user' do
     within("#issue_#{issue.id} td.col.col-id") do
       click_link(issue.id)
     end
+
+    click_link "Edit"
 
     click_link "Base"
     click_link "Add New Observation"
@@ -546,6 +577,8 @@ describe 'an admin user' do
       click_link(issue.id)
     end
 
+    click_link "Edit"
+
     api_update "/observations/#{google_observation.id}", {
       type: 'observations',
       id: google_observation.id,
@@ -556,6 +589,7 @@ describe 'an admin user' do
       with: 'No hits'
 
     click_button 'Update Issue'
+    click_link "Edit"
 
     fill_in 'issue[observations_attributes][2][reply]',
       with: 'ID is ok'
@@ -586,6 +620,8 @@ describe 'an admin user' do
     within("#issue_#{issue.id} td.col.col-id") do
       click_link(issue.id)
     end
+    click_link "Edit"
+
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
     # Admin replies that there is not hits on worldcheck
@@ -597,6 +633,7 @@ describe 'an admin user' do
     assert_logging(Issue.last, :update_entity, 3)
     assert_logging(issue.reload, :observe_issue, 1)
     Observation.last.should be_answered
+    click_link "Edit"
     click_link 'Reject'
     person.reload.should_not be_enabled
   end
@@ -611,7 +648,8 @@ describe 'an admin user' do
 
     login_as admin_user
     click_on 'Answered'
-    visit "/people/#{person.id}/issues/#{issue.id}"
+    
+    visit "/people/#{person.id}/issues/#{issue.id}/edit"
     click_link 'Abandon'
 
     issue.reload.should be_abandoned
@@ -632,6 +670,7 @@ describe 'an admin user' do
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
       end
+      click_link "Edit"
 
       click_link 'Domicile (1)'
 
@@ -664,6 +703,7 @@ describe 'an admin user' do
       assert_logging(issue, :create_entity, 1)
       assert_logging(issue, :update_entity, 2)
 
+      click_link "Edit"
       click_link "Approve"
       issue.reload.should be_approved
       assert_logging(issue, :update_entity, 3)
@@ -689,6 +729,8 @@ describe 'an admin user' do
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
       end
+
+      click_link "Edit"
 
       click_link "ID (0)"
       click_link "Add New Identification seed"
@@ -731,6 +773,7 @@ describe 'an admin user' do
       assert_logging(Issue.last, :create_entity, 1)
       assert_logging(Issue.last, :update_entity, 2)
 
+      click_link "Edit"
       click_link "Approve"
       issue.reload.should be_approved
 
@@ -760,9 +803,13 @@ describe 'an admin user' do
       within("#issue_#{issue.id} td.col.col-id") do
         click_link(issue.id)
       end
+
+      click_link "Edit"
       page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
       visit "/people/#{person.id}/issues/#{issue.reload.id}"
+      click_link "Edit"
+
       page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
       click_link "ID (1)"
@@ -776,6 +823,7 @@ describe 'an admin user' do
       end
 
       visit "/people/#{person.id}/issues/#{issue.id}"
+      click_link "Edit"
 
       click_link "ID (1)"
       click_link "Add New Identification seed"
@@ -800,6 +848,7 @@ describe 'an admin user' do
       assert_logging(issue, :create_entity, 1)
       assert_logging(issue, :update_entity, 1) 
 
+      
       click_link 'Approve'
       issue.reload.should be_approved
       assert_logging(issue, :update_entity, 2)
