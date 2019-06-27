@@ -91,13 +91,13 @@ ActiveAdmin.register Person do
       f.input :risk, as:  :select, collection: %w(low medium high)
     end
 
-    ArbreHelpers.has_many_form self, f, :comments do |cf, context|
+    ArbreHelpers::Form.has_many_form self, f, :comments do |cf, context|
       cf.input :title
       cf.input :meta
       cf.input :body
     end
 
-    ArbreHelpers.has_many_form self, f, :person_taggings, 
+    ArbreHelpers::Form.has_many_form self, f, :person_taggings, 
       new_button_text: "Add New Tag" do |cf, context|
         cf.input :tag, as:  :select, collection: Tag.person
     end
@@ -162,9 +162,9 @@ ActiveAdmin.register Person do
 
         if fruits = resource.notes.presence
           h3 "Notes"
-          ArbreHelpers.panel_grid(self, fruits) do |d|
+          ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
             para d.body
-            ArbreHelpers.attachments_list self, d.attachments
+            ArbreHelpers::Attachment.attachments_list self, d.attachments
             attributes_table_for d, :issue, :created_at
           end
         end
@@ -173,27 +173,27 @@ ActiveAdmin.register Person do
       tab :docket do
         if fruit = resource.legal_entity_docket
           panel fruit.name do
-            ArbreHelpers.fruit_show_section(self, fruit)
+            ArbreHelpers::Fruit.fruit_show_section(self, fruit)
           end
         end
 
         if fruit = resource.natural_docket
           panel fruit.name do
-            ArbreHelpers.fruit_show_section(self, fruit)
+            ArbreHelpers::Fruit.fruit_show_section(self, fruit)
           end
         end
       end
 
-      ArbreHelpers.fruit_collection_show_tab(self, "Domicile", :domiciles)
-      ArbreHelpers.fruit_collection_show_tab(self, "Id", :identifications)
-      ArbreHelpers.fruit_collection_show_tab(self, "Allowance", :allowances)
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Domicile", :domiciles)
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Id", :identifications)
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Allowance", :allowances)
 
       tab "Invoicing" do
         if fruits = resource.argentina_invoicing_details.current.presence
           h3 "Argentina Invoicing details"
           fruits.each do |fruit|
-            ArbreHelpers.panel_grid(self, fruits) do |d|
-              ArbreHelpers.fruit_show_section(self, d, [:tax_id])
+            ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
             end
           end
         end
@@ -201,32 +201,32 @@ ActiveAdmin.register Person do
         if fruits = resource.chile_invoicing_details.current.presence
           h3 "Chile Invoicing details"
           fruits.each do |fruit|
-            ArbreHelpers.panel_grid(self, fruits) do |d|
-              ArbreHelpers.fruit_show_section(self, d)
+            ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
             end
           end
         end
       end
 
       tab "Affinities" do
-        ArbreHelpers.panel_grid(self, resource.all_affinities) do |d|
+        ArbreHelpers::Layout.panel_grid(self, resource.all_affinities) do |d|
           attributes_table_for d do
-            ArbreHelpers.affinity_card(self, d)
+            ArbreHelpers::Affinity.affinity_card(self, d)
           end
           d.attachments.each do |a|
-            ArbreHelpers.attachment_preview(self, a)
+            ArbreHelpers::Attachment.preview(self, a)
           end
         end
       end
 
       tab "Contact (#{resource.phones.count + resource.emails.count})" do
         
-        ArbreHelpers.panel_grid(self, resource.phones) do |d|
-          ArbreHelpers.fruit_show_section(self, d)
+        ArbreHelpers::Layout.panel_grid(self, resource.phones) do |d|
+          ArbreHelpers::Fruit.fruit_show_section(self, d)
         end
 
-        ArbreHelpers.panel_grid(self, resource.emails) do |d|
-          ArbreHelpers.fruit_show_section(self, d)
+        ArbreHelpers::Layout.panel_grid(self, resource.emails) do |d|
+          ArbreHelpers::Fruit.fruit_show_section(self, d)
         end
       end
 
@@ -242,7 +242,7 @@ ActiveAdmin.register Person do
         end
       end
 
-      ArbreHelpers.fruit_collection_show_tab(self, "Risk Score", :risk_scores)
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Risk Score", :risk_scores)
     end
   end
 end
