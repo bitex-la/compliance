@@ -61,6 +61,7 @@ ActiveAdmin.register Person do
   filter :enabled
   filter :risk
   filter :regularity
+  filter :tags_id , as: :select, collection: proc { Tag.person }, multiple: true
 
   scope :all
   scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
@@ -96,6 +97,11 @@ ActiveAdmin.register Person do
       cf.input :body
     end
 
+    ArbreHelpers::Form.has_many_form self, f, :person_taggings, 
+      new_button_text: "Add New Tag" do |cf, context|
+        cf.input :tag, as:  :select, collection: Tag.person
+    end
+
     f.actions
   end
 
@@ -127,6 +133,9 @@ ActiveAdmin.register Person do
             attributes_table_for resource do
               row :created_at
               row :updated_at
+              row :tags do  
+                resource.tags.pluck(:name).join(' - ')
+              end
             end
           end
         end
