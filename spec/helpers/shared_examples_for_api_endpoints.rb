@@ -159,8 +159,10 @@ shared_examples "docket" do |type, initial_factory|
       .should == [old_fruit.id.to_s]
 
     issue.approve!
+    person.update!(enabled: true)
 
     api_get "/#{type}/#{old_fruit.id}"
+
     json_response[:data][:relationships].should >= {
       person: {data: {id: person.id.to_s, type: "people"}},
       replaced_by: {data: {id: new_fruit_id, type: type.to_s}},
@@ -168,6 +170,7 @@ shared_examples "docket" do |type, initial_factory|
     }
 
     api_get "/#{type}/#{new_fruit_id}"
+    
     json_response[:data][:relationships].should >= {
       person: {data: {id: person.id.to_s, type: "people"}},
       replaced_by: {data: nil},
@@ -175,6 +178,7 @@ shared_examples "docket" do |type, initial_factory|
     }
 
     api_get "/#{seed_type}/#{seed.id}"
+    
     json_response[:data][:relationships].should >= {
       issue: {data: {id: issue.id.to_s, type: "issues"}},
       person: {data: {id: person.id.to_s, type: "people"}},
@@ -183,6 +187,7 @@ shared_examples "docket" do |type, initial_factory|
 
     # The person now has the new fruit
     api_get "/people/#{person.id}"
+    
     json_response[:data][:relationships]
       .map { |k, v| v[:data] }.flatten.compact
       .select { |d| d[:type] == type.to_s }
@@ -297,6 +302,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
       replaceable_fruit_id
 
     api_request :post, "/issues/#{replacing_issue.id}/approve"
+    person.update!(enabled: true)
     replacement_fruit_id = fruit_class.last.id.to_s
 
     api_get "/people/#{person.id}"

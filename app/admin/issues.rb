@@ -64,7 +64,7 @@ ActiveAdmin.register Issue do
 
     member_action action, method: :post do
       resource.send("#{action}!")
-      redirect_to action: :show
+      redirect_to person_path(resource.person)
     end
   end
 
@@ -141,7 +141,7 @@ ActiveAdmin.register Issue do
         h3 "Observations"
         ArbreHelpers::Form.has_many_form self, f, :observations, cant_remove: true do |sf|
           sf.input :observation_reason
-          sf.input :scope
+          sf.input :scope, as: :select
           sf.input :note, input_html: {rows: 3}
           sf.input :reply, input_html: {rows: 3}
         end

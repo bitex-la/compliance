@@ -124,13 +124,13 @@ RSpec.describe Issue, type: :model do
       end
     end
 
-    it 'disables person on reject' do
+    it 'does nothing on reject' do
       person = create :full_natural_person
       issue = create(:basic_issue, person: person)
       
       expect do
         issue.reject!
-      end.to change{ person.enabled }.to(false)
+      end.not_to change{ person.enabled }
     end
 
     it 'does nothing on dismiss' do
@@ -142,12 +142,11 @@ RSpec.describe Issue, type: :model do
       end.not_to change{ person.enabled }
     end
 
-    it 'enables person on approve' do
+    it 'do not enable person on approve' do
       person = create :new_natural_person
       
-      expect do
-        person.issues.reload.last.approve!
-      end.to change{ person.enabled }.to(true)
+      person.issues.reload.last.approve!
+      expect(person.enabled).to be_falsey
     end
 
     it 'creates deferred issues for each expiring seed' do
