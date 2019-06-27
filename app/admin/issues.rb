@@ -137,6 +137,11 @@ ActiveAdmin.register Issue do
           f.input :reason, as: :select, collection: IssueReason.all unless f.object.persisted?
           f.input :defer_until, as: :datepicker, datepicker_options: {
               min_date: Date.today }
+
+          ArbreHelpers.has_many_form self, f, :issue_taggings, 
+            new_button_text: "Add New Tag" do |cf, context|
+              cf.input :tag, as:  :select, collection: Tag.issue
+          end
         end
 
         h3 "Observations"
@@ -392,6 +397,9 @@ ActiveAdmin.register Issue do
               row :created_at
               row :updated_at
               row :defer_until
+              row :tags do  
+                resource.tags.pluck(:name).join(' - ')
+              end
             end
           end
         end
