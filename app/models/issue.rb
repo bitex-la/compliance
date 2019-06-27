@@ -7,6 +7,10 @@ class Issue < ApplicationRecord
   validates :person, presence: true
   belongs_to :reason, class_name: "IssueReason"
 
+  has_many :issue_taggings
+  has_many :tags, through: :issue_taggings
+  accepts_nested_attributes_for :issue_taggings, allow_destroy: true
+
   ransack_alias :state, :aasm_state
 
   before_validation do 
@@ -403,7 +407,8 @@ class Issue < ApplicationRecord
       :identification_seeds,
       :'identifications_seeds.attachments',
       :observations,
-      :'observations.observation_reason'
+      :'observations.observation_reason',
+      :tags
     ]
   end
 end
