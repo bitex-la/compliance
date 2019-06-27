@@ -15,8 +15,8 @@ describe Tag do
         attributes: {
           name: one.name,
           tag_type: one.tag_type,
-          created_at: one.created_at.to_i,
-          updated_at: one.updated_at.to_i
+          created_at: one.created_at.as_json,
+          updated_at: one.updated_at.as_json
         }
       ],
       meta: {
