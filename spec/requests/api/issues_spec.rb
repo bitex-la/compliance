@@ -323,7 +323,7 @@ describe Issue do
 
       api_get("/issues/#{issue.id}")
       
-      interval = Settings.lock_issues.expiration_interval_minutes.minutes
+      interval = Issue.lock_expiration_interval_minutes
 
       expect(api_response.data.attributes.locked).to eq true
       expect(DateTime.parse(api_response.data.attributes.lock_expiration)).to eq interval.from_now
