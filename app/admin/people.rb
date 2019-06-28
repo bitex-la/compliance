@@ -14,10 +14,10 @@ ActiveAdmin.register Person do
 
   actions :all, except: [:destroy]
   action_item :enable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && !resource.enabled} do 
-    link_to "Enable Person", [:enable, :person], method: :post
+    link_to "Enable", [:enable, :person], method: :post
   end
   action_item :disable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.enabled} do 
-    link_to "Disable Person", [:disable, :person], method: :post
+    link_to "Disable", [:disable, :person], method: :post
   end
 
   collection_action :search_person, method: :get do 
@@ -50,6 +50,7 @@ ActiveAdmin.register Person do
   filter :natural_dockets_first_name_cont, label: "First Name"
   filter :natural_dockets_last_name_cont,  label: "Last Name"
   filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
+  filter :by_person_type, as: :select, collection: Person.person_types
   filter :notes_title_or_notes_body_cont, label: "Notes"
   filter :domiciles_street_address_or_argentina_invoicing_details_address_cont, label: "Street Address"
   filter :domiciles_street_number_or_argentina_invoicing_details_address_cont, label: "Street Number"
@@ -59,6 +60,12 @@ ActiveAdmin.register Person do
   filter :updated_at
   filter :enabled
   filter :risk
+  filter :regularity
+  filter :tags_id , as: :select, collection: proc { Tag.person }, multiple: true
+
+  scope :all
+  scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
+  scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
 
   action_item :add_person_information, only: %i(show edit) do
     link_to 'Add Person Information', new_with_fruits_person_issues_path(person)
@@ -90,14 +97,20 @@ ActiveAdmin.register Person do
       cf.input :body
     end
 
+    ArbreHelpers::Form.has_many_form self, f, :person_taggings, 
+      new_button_text: "Add New Tag" do |cf, context|
+        cf.input :tag, as:  :select, collection: Tag.person
+    end
+
     f.actions
   end
 
   index do
     column :id
-    column :person_email
+    column :person_info
     column :enabled
     column :risk
+    column :regularity
     column :person_type
     column :created_at
     column :updated_at
@@ -113,12 +126,16 @@ ActiveAdmin.register Person do
               row :id
               row :enabled
               row :risk
+              row :regularity
             end
           end
           column do
             attributes_table_for resource do
               row :created_at
               row :updated_at
+              row :tags do  
+                resource.tags.pluck(:name).join(' - ')
+              end
             end
           end
         end
@@ -218,6 +235,7 @@ ActiveAdmin.register Person do
           table_for person.fund_deposits do           
             column :amount
             column :currency
+            column :exchange_rate_adjusted_amount
             column :deposit_method
             column :external_id
           end

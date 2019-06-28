@@ -58,7 +58,7 @@ class Attachment < ApplicationRecord
   end
 
   def document_url
-    self.document.url
+    self.document.expiring_url
   end
 
   def name

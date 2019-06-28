@@ -10,20 +10,16 @@ jobs:
       - image: bitexla/compliance_web
         environment:
           RAILS_ENV: test
-          MYSQL_USERNAME: root
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_PASSWORD: example
-          MYSQL_PORT: 3306
-          REDIS_HOST: redis
-          REDIS_PORT: 6379
           SELENIUM_HEADLESS: true
       - image: mysql/mysql-server:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=example
           - MYSQL_ROOT_HOST=%
-      - image: redis
     steps:
       - checkout
+      - run:
+          name: Configuring settings
+          command: cp .circleci/settings.yml config/settings.yml
       - run:
           name: Which bundler?
           command: bundle -v

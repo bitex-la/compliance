@@ -6,9 +6,10 @@ class DestroyableSeedAdmin
 
       controller do
         def destroy
-          issue = resource.issue
-          resource.destroy
-          redirect_to edit_person_issue_url(issue.person, issue)
+          super do |f|
+            issue = resource.issue
+            f.html { redirect_to edit_person_issue_url(issue.person, issue) }
+          end
         end
       end
     end

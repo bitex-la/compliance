@@ -7,6 +7,43 @@ RSpec.describe Person, type: :model do
     expect(Person.new).to be_valid
   end
 
+  it 'starts as none regularity' do
+    expect(Person.new.regularity).to eq PersonRegularity.none
+  end
+
+  it "isn't in natural nor legal scope" do
+    person = create(:empty_person)
+    expect(Person.by_person_type("natural")).to_not include person
+    expect(Person.by_person_type("legal")).to_not include person
+  end
+
+  it 'is in natural scope' do
+    person = create(:full_natural_person)
+    expect(Person.by_person_type("natural")).to include person
+    expect(Person.by_person_type("legal")).to_not include person
+  end
+
+  it 'is in legal scope' do
+    person = create(:full_legal_entity_person)
+    expect(Person.by_person_type("natural")).to_not include person
+    expect(Person.by_person_type("legal")).to include person
+  end
+
+  it 'returns N/A person info' do
+    person = create(:empty_person)
+    expect(person.reload.person_info).to eq("(1)")
+  end
+
+  it 'returns natural person info with name, email, phone number and whatsapp from fruits' do
+    person = create(:full_natural_person, :with_fixed_email)
+    expect(person.reload.person_info).to eq("(1) ☺: Joe Doe ✉: admin@example.com ☎: +5491125410470 WA: ✓")
+  end
+
+  it 'returns natural person info with name, email, phone number and whatsapp from seeds' do
+    person = create(:new_natural_person, :with_fixed_email)
+    expect(person.reload.person_info).to eq("(1) *☺: Joe Doe *✉: admin@example.com *☎: +5491125410470 *WA: ✓")
+  end
+
   it 'knows which fruits can be replaced' do
     new_phone = create :full_phone, person: person
     person.reload.phones.first.update(replaced_by: new_phone)
@@ -55,27 +92,28 @@ RSpec.describe Person, type: :model do
 
   describe 'looking for suggestions' do
     it 'search a person by id, first name, last name, email, phone and identification' do
+      
       person
-
+    
       expect(Person.suggest('3').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 3"})
-
+        .to include({:id=>3, :suggestion=>"(3) ☺: Joe Doe - 3"})
+      
       expect(Person.suggest('Joe').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - Joe - Doe"})
+        .to include({:id=>3, :suggestion=>"(3) ☺: Joe Doe - Joe - Doe"})
 
       expect(Person.suggest('Johnny')).to be_empty
       
       email_to_search = Email.first.address  
       expect(Person.suggest(email_to_search).first)
-        .to include({:id=>1, :suggestion=>"人 1: Joe Doe - #{email_to_search}"})
+        .to include({:id=>1, :suggestion=>"(1) ☺: Joe Doe - #{email_to_search}"})
       
       expect(Person.suggest('not_a_faker_email@test.com')).to be_empty
 
       expect(Person.suggest('1125410470').first)
-        .to include({:id=>1, :suggestion=>"人 1: Joe Doe - +5491125410470"})
+        .to include({:id=>1, :suggestion=>"(1) ☺: Joe Doe - +5491125410470"})
 
       expect(Person.suggest('2545566').first)
-        .to include({:id=>3, :suggestion=>"人 3: Joe Doe - 2545566"})
+        .to include({:id=>3, :suggestion=>"(3) ☺: Joe Doe - 2545566"})
 
       expect(Person.suggest('80932388')).to be_empty
     end

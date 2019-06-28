@@ -26,21 +26,21 @@ class Observation < ApplicationRecord
 
   scope :admin_pending, -> { 
     joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
     .where(scope: 'admin', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :robot_pending, -> { 
     joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
     .where(scope: 'robot', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :client_pending, -> { 
     joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
     .where(scope: 'client', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 

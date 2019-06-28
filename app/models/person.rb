@@ -1,9 +1,11 @@
 class Person < ApplicationRecord
-  include Loggable
+  include Loggable, StaticModels::BelongsTo
 
   after_save :log_if_enabled
   after_save :expire_action_cache
   
+  belongs_to :regularity, class_name: "PersonRegularity"
+
   HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
@@ -35,6 +37,10 @@ class Person < ApplicationRecord
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
 
+  has_many :person_taggings
+  has_many :tags, through: :person_taggings
+  accepts_nested_attributes_for :person_taggings, allow_destroy: true
+
   def replaceable_fruits
     %i[
       natural_dockets
@@ -50,10 +56,6 @@ class Person < ApplicationRecord
   end
 
   enum risk: %i(low medium high)
-
-  def person_email
-    emails.last.try(:address)
-  end
 
   def natural_docket
     natural_dockets.last
@@ -71,17 +73,70 @@ class Person < ApplicationRecord
     end
   end
 
-  def name
-    name =
-      if (docket = natural_dockets.last)
-        [docket.first_name, docket.last_name].join(' ')
-      elsif (docket = legal_entity_dockets.last)
-        docket.legal_name || docket.commercial_name
-      else
-        person_email
-      end
+  def self.person_types
+    %i(natural legal)
+  end
 
-    "人 #{id}: #{name}"
+  scope :by_person_type, -> (type){ 
+    {
+      natural: joins(:natural_dockets),
+      legal: joins(:legal_entity_dockets)
+    }[type.to_sym]
+  }
+
+  def self.ransackable_scopes(auth_object = nil)
+    %i(by_person_type)
+  end
+
+  def name
+    "(#{id}) #{person_info_name || person_info_email}"
+  end
+
+  def person_info 
+    [ "(#{id})",
+      person_info_name,
+      person_info_email,
+      person_info_phone
+    ].join(" ").strip
+  end
+
+  def person_info_name
+    case person_type
+      when :natural_person
+        "☺: #{natural_dockets.last.name_body}"
+      when :legal_entity
+        "🏭: #{legal_entity_dockets.last.name_body}"
+      else
+        if found = issues.map(&:natural_docket_seed).compact.last
+          "*☺: #{found.name_body}"
+        elsif found = issues.map(&:legal_entity_docket_seed).compact.last
+          "*🏭: #{found.name_body}"
+        end
+    end
+  end
+
+  def person_info_email
+    template = "%s✉: %s"
+
+    if found = emails.last.try(:address)
+      template % [nil, found]
+    elsif found = issues.all.map{|i| i.email_seeds.first&.address }
+      .compact.last
+      template % ['*', found]
+    end
+  end
+
+  def person_info_phone
+    phone, from_seed = if found = phones.last
+      found
+    elsif found = issues.all.map{|i| i.phone_seeds.first }.compact.last
+      [found, "*"]
+    end
+
+    return unless phone
+
+    has_whatsapp = phone.has_whatsapp ? "✓" : "⨯"
+    "#{from_seed}☎: #{phone.number} #{from_seed}WA: #{has_whatsapp}"
   end
 
   def fruits
@@ -135,7 +190,7 @@ class Person < ApplicationRecord
       {entity: 'NaturalDocketSeed', field: 'last_name', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'first_name', 'last_name']}
     ].each do |d|
       result = result.concat(d[:entity].constantize
-        .order(updated_at: :desc)
+        .order(updated_at: :desc, id: :desc)
         .page(page).per(per_page)
         .send(:ransack, {"#{d[:field]}_#{d[:matcher]}" => keyword})
         .result.map{|x| {
@@ -144,6 +199,34 @@ class Person < ApplicationRecord
         }})
     end
     result.uniq[0..per_page]
+  end
+
+  def refresh_person_regularity!
+    sum, count = fund_deposits.pluck(Arel.sql('sum(exchange_rate_adjusted_amount), count(*)')).first
+    
+    self.regularity = PersonRegularity.all.reverse
+      .find {|x| x.applies? sum,count} 
+
+    should_log = regularity_id_changed?
+
+    if should_log
+      issue = issues.build(state: 'new')
+      issue.risk_score_seeds.build(
+        score: regularity.code, 
+        provider: 'open_compliance', 
+        extra_info: {
+          regularity_funding_amount: regularity.funding_amount.to_d,
+          regularity_funding_count: regularity.funding_count,
+          funding_total_amount: sum.to_d,
+          funding_count: count
+        }.to_json
+      )
+    end 
+
+    save!
+
+    EventLog.log_entity!(self, AdminUser.current_admin_user, 
+      EventLogKind.update_person_regularity) if should_log
   end
 
   private
@@ -159,7 +242,7 @@ class Person < ApplicationRecord
   end
 
   def log_state_change(verb)
-    Event::EventLogger.call(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+    EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))
   end
 
   def self.eager_person_entities
@@ -208,7 +291,8 @@ class Person < ApplicationRecord
       :argentina_invoicing_details, 
       :chile_invoicing_details, 
       :notes, 
-      :attachments
+      :attachments,
+      :regularity
     ]
   end
 end

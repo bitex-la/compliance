@@ -79,7 +79,7 @@ describe 'an admin user' do
     within '.extra_info' do
       expect(page)
         .to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
+      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
     end
 
     assert_logging(issue, :update_entity, 1)
@@ -129,7 +129,7 @@ describe 'an admin user' do
 
     within '.extra_info' do
       expect(page).to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
+      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
     end
 
     click_link 'Enable'
@@ -417,7 +417,7 @@ describe 'an admin user' do
     observation.reload.should be_answered
 
     Timecop.travel 2.days.from_now
-
+  
     add_observation(1, observation_reason, 'Please check this guy on FBI database')
     add_observation(2, observation_reason, 'Please check this on SII')
 
@@ -490,8 +490,8 @@ describe 'an admin user' do
     click_link 'Reject'
 
     issue.reload.should be_rejected
-    person.reload.should_not be_enabled
-    assert_logging(person, :disable_person, 1)
+    person.reload.should be_enabled
+    assert_logging(person, :disable_person, 0)
   end
 
   it "Creates a user via API, asking for manual 'admin' worldcheck run" do
@@ -631,7 +631,7 @@ describe 'an admin user' do
     assert_logging(issue.reload, :observe_issue, 1)
     Observation.last.should be_answered
     click_link 'Reject'
-    person.reload.should_not be_enabled
+    person.reload.should be_enabled
   end
 
   it "Abandons a new person issue that was inactive" do

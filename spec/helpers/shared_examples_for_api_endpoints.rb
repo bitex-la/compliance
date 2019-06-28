@@ -6,6 +6,33 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   later_seed = "#{later_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
 
+  initial_expires_seed = "#{initial_factory}_expires_seed"
+
+  it "Creates an expiring seed" do
+    issue = create(:basic_issue)
+    person = issue.person
+
+    initial_attrs = attributes_for(initial_expires_seed)
+
+    initial_relations = instance_exec(&relations_proc)
+    issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
+
+    server_sent_relations = {
+      person: {data: {id: person.id.to_s, type: 'people'}},
+      attachments: {data: []},
+      fruit: {data: nil},
+    }
+
+    api_create "/#{seed_type}", {
+      type: seed_type,
+      attributes: initial_attrs,
+      relationships: issue_relation.merge(initial_relations)
+    }
+
+    seed = api_response.data
+    expect(Date.parse(seed.attributes.expires_at)).to eq(initial_attrs[:expires_at])
+  end
+
   it "Destroy a #{seed_type}" do
     seed = create(initial_seed, issue: create(:basic_issue))
     api_destroy "/#{seed_type}/#{seed.id}"
@@ -135,6 +162,7 @@ shared_examples "docket" do |type, initial_factory|
     person.update!(enabled: true)
 
     api_get "/#{type}/#{old_fruit.id}"
+
     json_response[:data][:relationships].should >= {
       person: {data: {id: person.id.to_s, type: "people"}},
       replaced_by: {data: {id: new_fruit_id, type: type.to_s}},
@@ -142,6 +170,7 @@ shared_examples "docket" do |type, initial_factory|
     }
 
     api_get "/#{type}/#{new_fruit_id}"
+    
     json_response[:data][:relationships].should >= {
       person: {data: {id: person.id.to_s, type: "people"}},
       replaced_by: {data: nil},
@@ -149,6 +178,7 @@ shared_examples "docket" do |type, initial_factory|
     }
 
     api_get "/#{seed_type}/#{seed.id}"
+    
     json_response[:data][:relationships].should >= {
       issue: {data: {id: issue.id.to_s, type: "issues"}},
       person: {data: {id: person.id.to_s, type: "people"}},

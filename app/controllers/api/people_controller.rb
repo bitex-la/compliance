@@ -18,7 +18,20 @@ class Api::PeopleController < Api::ApiController
   end
 
   def create
-    jsonapi_response Person.create, {}, 201
+    return jsonapi_response Person.create, {}, 201 if params[:data].nil?
+
+    mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:tags],
+      people: [:enabled, :risk, :tags, id: nil ],
+      tags: []
+
+    return jsonapi_422(nil) unless mapper.data
+
+    if mapper.save_all
+      jsonapi_response mapper.data,{}, 201
+    else
+      json_response mapper.all_errors, 422
+    end
   end
 
   def update

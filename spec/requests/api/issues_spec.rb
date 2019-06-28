@@ -35,6 +35,31 @@ describe Issue do
           "people"=>3
         }
     end
+
+    it 'includes tags' do
+      one = create(:basic_issue_with_tags)
+
+      api_get "/issues"
+
+      api_response.data.size.should == 1
+
+      by_type = api_response.included
+        .group_by{|i| i.type }
+        .map{|a,b| [a, b.count ] }.to_h
+        .should == {
+          "tag"=>1,  
+          "people"=>1
+        }
+    end
+
+    it 'when fetching issues do not include future issues' do
+      current_issue = create(:basic_issue)
+      future_issue = create(:future_issue)
+
+      api_get "/issues"
+      expect(api_response.data.size).to eq 1
+      expect(api_response.data.first.id).to eq current_issue.id.to_s
+    end
   end
 
   describe 'Creating a new user Issue' do
@@ -87,6 +112,76 @@ describe Issue do
         .data.first.id.should == observation_id
       api_response.included.select{|o| o.type == 'observations'}
         .map(&:id).should == [observation_id]
+    end
+
+    it 'creates a new issue with defer until' do
+      defer_until = 1.month.from_now.to_date
+      
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          attributes: {defer_until: defer_until},
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
+      end.to change{Issue.count}.by(1)
+
+      issue = Issue.find(api_response.data.id)
+      expect(issue.defer_until).to eq(defer_until)
+
+      api_get("/issues/#{issue.id}")
+      
+      expect(Date.parse(api_response.data.attributes.defer_until)).to eq(defer_until)
+    end
+
+    it 'creates a new issue with custom reason' do  
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          attributes: {reason_code: IssueReason.new_client.code},
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
+      end.to change{Issue.count}.by(1)
+
+      issue = Issue.find(api_response.data.id)
+      expect(issue.reason).to eq(IssueReason.new_client)
+
+      api_get("/issues/#{issue.id}")
+      expect(api_response.data.attributes.reason_code).to eq(IssueReason.new_client.code.to_s)
+    end
+
+    it 'creates a new issue with tags' do
+      issue_tag = create(:issue_tag)
+      
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          relationships: { 
+            person: {data: {id: person.id, type: 'people'}},
+            tags: {data: [{id: issue_tag.id, type: 'tags'}] },
+          }
+        })
+      end.to change{Issue.count}.by(1)
+
+      issue = Issue.find(api_response.data.id)
+      expect(issue.tags).to include issue_tag
+
+      api_get("/issues/#{issue.id}")
+      expect(api_response.data.relationships.tags.data.first.id).to eq(issue_tag.id.to_s)
+    end
+
+    it 'updates an issue defer until' do
+      issue = create(:basic_issue, defer_until: Date.today)
+
+      defer_until = 1.day.from_now.to_date
+      expect do
+        api_update("/issues/#{issue.id}", {
+          type: 'issues',
+          id: issue.id,
+          attributes: { defer_until: defer_until }
+        })
+      end.to change{issue.reload.defer_until}
+
+      expect(issue.reload.defer_until).to eq defer_until
     end
   end
 

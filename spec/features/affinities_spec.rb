@@ -39,20 +39,22 @@ describe 'an admin handling affinities' do
     end
 
     click_link 'Complete'
+    
+    visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Approve'
+
     click_link 'Dashboard' 
 
     visit "/people/#{person.id}"
 
     click_link 'Affinities'
-
-    expect(page).to have_content "RELATED PERSON 人 #{owner_one.id}:"
-    expect(page).to have_content "RELATED PERSON 人 #{owner_two.id}: E Corp"
-    expect(page).to have_content "RELATED PERSON 人 #{payee_one.id}:"
-    expect(page).to have_content "RELATED PERSON 人 #{payee_two.id}: Joe Doe" 
-
     
-    click_link "人 #{owner_one.id}:"
+    expect(page).to have_content "RELATED PERSON (#{owner_one.id})"
+    expect(page).to have_content "RELATED PERSON (#{owner_two.id}) 🏭: E Corp"
+    expect(page).to have_content "RELATED PERSON (#{payee_one.id})"
+    expect(page).to have_content "RELATED PERSON (#{payee_two.id}) ☺: Joe Doe" 
+
+    click_link "(#{owner_one.id}) *☺:"
     click_link 'Affinities'
 
     within("#attributes_table_affinity_4 .row.row-affinity_kind") do
@@ -94,6 +96,9 @@ describe 'an admin handling affinities' do
     end
 
     click_link 'Complete'
+
+    issue = Issue.last
+    visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Approve'
 
     visit "/people/#{person.id}"
@@ -101,8 +106,8 @@ describe 'an admin handling affinities' do
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
       expect(page).to have_content 'payee'
-      expect(page).to have_content '人 1: Joe Doe'
-      expect(page).to have_content '人 2:'
+      expect(page).to have_content '(1) ☺: Joe Doe'
+      expect(page).to have_content '(2) ☺:'
     end
   end
 
@@ -127,11 +132,14 @@ describe 'an admin handling affinities' do
 
     select_with_search(
       "#issue_affinity_seeds_attributes_0_replaces_input", 
-      "Affinity##{Affinity.last.id}: business_partner 人 #{related_person.id}")
+      "Affinity##{Affinity.last.id}: business_partner (#{related_person.id}) ☺: Joe…")
 
     click_button 'Update Issue'
 
     click_link 'Complete'
+
+    issue = Issue.last
+    visit "/people/#{person.id}/issues/#{issue.id}"
     click_link 'Approve'
 
     visit "/people/#{person.id}"
@@ -139,8 +147,8 @@ describe 'an admin handling affinities' do
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
       expect(page).to have_content 'stakeholder'
-      expect(page).to have_content '人 1: Joe Doe'
-      expect(page).to have_content '人 2:'
+      expect(page).to have_content '(1) ☺: Joe Doe'
+      expect(page).to have_content '(2) ☺:'
     end
   end
 end

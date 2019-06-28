@@ -41,6 +41,7 @@ Rails.application.routes.draw do
       email_seeds
       note_seeds
       affinity_seeds
+      tags
     ).each do |entities|
       resources entities, except: [:new, :edit]
     end
@@ -68,6 +69,13 @@ Rails.application.routes.draw do
         end
       end
     end
+    
+    %i(
+      person_taggings
+      issue_taggings
+    ).each do |entities|
+      resources entities, except: [:new, :edit, :update]
+    end
 
     resource :system do
       post :truncate
@@ -75,5 +83,9 @@ Rails.application.routes.draw do
   end
 
   devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self) rescue ActiveAdmin::DatabaseHitDuringLoad
+  begin 
+    ActiveAdmin.routes(self)
+  rescue ActiveAdmin::DatabaseHitDuringLoad
+    puts "Ignoring database hit during load"
+  end
 end

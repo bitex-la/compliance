@@ -10,14 +10,16 @@ ActiveAdmin.register Issue do
       link_to o.id, [o.person, o]
     end
     column(:person) do |o|
-      link_to o.person.person_email, o.person
+      link_to o.person.person_info, o.person
     end
     column(:person_enabled)do |o|
       o.person.enabled
     end
+    column(:reason)
     column(:state)
     column(:created_at)
     column(:updated_at)
+    column(:defer_until)
   end
 
   config.clear_action_items!
@@ -33,6 +35,7 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :approved
   scope :changed_after_observation
+  scope :future
 
   collection_action :new_with_fruits, method: :get do
     @person = Person.find(params[:person_id])
@@ -64,11 +67,7 @@ ActiveAdmin.register Issue do
 
     member_action action, method: :post do
       resource.send("#{action}!")
-      if resource.state == 'approved'
-        redirect_to person_path(resource.person)
-      else
-        redirect_to action: :show
-      end
+      redirect_to person_path(resource.person)
     end
   end
 
@@ -120,6 +119,7 @@ ActiveAdmin.register Issue do
               row :id
               row :state
               row :person
+              row :reason if f.object.persisted?
             end
           end
           column do
@@ -127,6 +127,17 @@ ActiveAdmin.register Issue do
               row :created_at
               row :updated_at
             end
+          end
+        end
+
+        f.inputs "Issue" do
+          f.input :reason, as: :select, collection: IssueReason.all unless f.object.persisted?
+          f.input :defer_until, as: :datepicker, datepicker_options: {
+              min_date: Date.today }
+
+          ArbreHelpers::Form.has_many_form self, f, :issue_taggings, 
+            new_button_text: "Add New Tag" do |cf, context|
+              cf.input :tag, as:  :select, collection: Tag.issue
           end
         end
 
@@ -142,6 +153,7 @@ ActiveAdmin.register Issue do
         div class: 'note_seeds' do
           ArbreHelpers::Form.has_many_form self, f, :note_seeds do |nf, context|
             nf.input :body, input_html: {rows: 3}
+            nf.input :expires_at, as: :datepicker
             ArbreHelpers::Attachment.has_many_attachments(context, nf)
           end
         end
@@ -187,6 +199,7 @@ ActiveAdmin.register Issue do
               sf.input :copy_attachments,
                 label: "Move existing Legal Entity Docket attachments to the new one"
             end
+            sf.input :expires_at, as: :datepicker
             ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
         end
@@ -217,6 +230,7 @@ ActiveAdmin.register Issue do
                   label: "Move existing Natural Person Docket attachments to the new one"
               end
             end
+            sf.input :expires_at, as: :datepicker
             Appsignal.instrument("rendering_has_many_attachments_on_docket") do
               ArbreHelpers::Attachment.has_many_attachments(self, sf)
             end
@@ -235,6 +249,7 @@ ActiveAdmin.register Issue do
           sf.input :floor
           sf.input :apartment
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
+          sf.input :expires_at, as: :datepicker
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
@@ -248,6 +263,7 @@ ActiveAdmin.register Issue do
           sf.input :public_registry_book
           sf.input :public_registry_extra_data
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
+          sf.input :expires_at, as: :datepicker
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
@@ -257,6 +273,7 @@ ActiveAdmin.register Issue do
           sf.input :amount
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
+          sf.input :expires_at, as: :datepicker
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
@@ -274,6 +291,7 @@ ActiveAdmin.register Issue do
               af.input :address
               ArbreHelpers::Replacement.fields_for_replaces self, af,
                 :argentina_invoicing_details
+              af.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(self, af)
             end
           end
@@ -285,6 +303,7 @@ ActiveAdmin.register Issue do
               cf.input :ciudad
               cf.input :comuna
               ArbreHelpers::Replacement.fields_for_replaces self, cf, :chile_invoicing_details
+              cf.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(self, cf)
             end
           end
@@ -308,6 +327,7 @@ ActiveAdmin.register Issue do
                 rf.template.concat('</li>'.html_safe) 
               end
               ArbreHelpers::Replacement.fields_for_replaces context, rf, :affinities
+              rf.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(context, rf)
             end
           end
@@ -337,6 +357,7 @@ ActiveAdmin.register Issue do
           if current = context.resource.person.phones.current.presence
             pf.input :replaces, collection: current
           end
+          pf.input :expires_at, as: :datepicker
         end
         br
         ArbreHelpers::Form.has_many_form self, f, :email_seeds do |ef, context|
@@ -345,6 +366,7 @@ ActiveAdmin.register Issue do
           if current = context.resource.person.emails.current.presence
             ef.input :replaces, collection: current
           end
+          ef.input :expires_at, as: :datepicker
         end
       end
 
@@ -358,7 +380,9 @@ ActiveAdmin.register Issue do
           end
           seed = rs.object
           if seed.persisted?     
-            ArbreHelpers::HtmlHelper.has_many_links(context, rs, seed.external_link.split(',').compact, 'External links') 
+            ArbreHelpers::HtmlHelper.has_many_links(context, rs, 
+              seed.external_link.split(',').compact,
+              'External links') if seed.external_link 
             begin 
               if seed.extra_info
                 extra_info_as_json = JSON.parse(seed.extra_info)
@@ -370,7 +394,7 @@ ActiveAdmin.register Issue do
           else
             rs.input :extra_info 
           end
-
+          rs.input :expires_at, as: :datepicker
           ArbreHelpers::Attachment.has_many_attachments(context, rs)
         end
       end
@@ -380,8 +404,6 @@ ActiveAdmin.register Issue do
   end
 
   show do
-    next unless resource.approved? # Only show approved issues.
-
     tabs do
       tab :base do
         columns do
@@ -390,12 +412,17 @@ ActiveAdmin.register Issue do
               row :id
               row :state
               row :person
+              row :reason
             end
           end
           column do
             attributes_table_for resource do
               row :created_at
               row :updated_at
+              row :defer_until
+              row :tags do  
+                resource.tags.pluck(:name).join(' - ')
+              end
             end
           end
         end

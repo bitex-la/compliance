@@ -1,13 +1,39 @@
 class Issue < ApplicationRecord
   include AASM
   include Loggable
+  StaticModels::BelongsTo
+
   belongs_to :person, optional: true
   validates :person, presence: true
+  belongs_to :reason, class_name: "IssueReason"
+
+  has_many :issue_taggings
+  has_many :tags, through: :issue_taggings
+  accepts_nested_attributes_for :issue_taggings, allow_destroy: true
 
   ransack_alias :state, :aasm_state
 
+  before_validation do 
+    self.defer_until ||= Date.today
+    self.reason ||= IssueReason.further_clarification
+  end
+
   after_save :sync_observed_status
   after_save :log_if_needed
+  validate :defer_until_cannot_be_in_the_past
+
+  def defer_until_cannot_be_in_the_past
+    validation_date = created_at.try(:to_date) || Date.today
+    return if defer_until >= validation_date
+    errors.add(:defer_until, "can't be in the past")
+  end
+
+  validate :reason_cannot_change
+
+  def reason_cannot_change
+    return unless reason_id_changed? && persisted?
+    errors.add(:reason, "change reason is not allowed!")
+  end
 
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
@@ -75,21 +101,15 @@ class Issue < ApplicationRecord
       *HAS_ONE
     ) 
   }
-  scope :draft, -> { 
-    with_relations.where('issues.aasm_state=?', 'draft')
-  }
 
-  scope :fresh, -> { 
-    with_relations.where('issues.aasm_state=?', 'new')
-  }
-
-  scope :answered, -> { 
-    with_relations.where('issues.aasm_state=?', 'answered')
-  }
-
-  scope :observed, -> { 
-    with_relations.where('issues.aasm_state=?', 'observed')
-  }
+  {
+    draft: :draft,
+    fresh: :new,
+    answered: :answered,
+    observed: :observed
+  }.each do |k,v| 
+    scope k, -> { current.with_relations.where('issues.aasm_state=?', v) }  
+  end
 
   scope :changed_after_observation, -> {
     where = []
@@ -101,19 +121,49 @@ class Issue < ApplicationRecord
     end
 
     observed
+      .current
       .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
       .where(where.join(" OR "))
       .where("observations.reply IS NULL OR observations.reply = ''")
   }
 
   scope :active, ->(yes=true){
+    current.active_states
+  }
+
+  scope :active_states, ->(yes=true){
     where("aasm_state #{'NOT' unless yes} IN (?)",
-      %i(draft new observed answered))
+      %i{draft new observed answered}
+    )
+  }
+
+  scope :future_all, -> { 
+    where('defer_until > ?', Date.today)
+  }
+
+  scope :future, -> { 
+    active_states.where('defer_until > ?', Date.today)
+  }
+  
+  scope :current, -> { 
+    where('defer_until <= ?', Date.today)
   }
 
 	def self.ransackable_scopes(auth_object = nil)
-	  %i(active)
+	  %i(active by_person_type)
   end
+
+  scope :by_person_type, -> (type) { 
+    if type == "natural"
+      left_outer_joins(:natural_docket_seed) 
+        .left_outer_joins(:person =>  :natural_dockets) 
+        .where("natural_docket_seeds.id is not null or natural_dockets.id is not null")
+    elsif type == "legal"
+      left_outer_joins(:legal_entity_docket_seed) 
+        .left_outer_joins(:person =>  :legal_entity_dockets) 
+        .where("legal_entity_docket_seeds.id is not null or legal_entity_dockets.id is not null")
+    end
+  }
 
   aasm do
     state :draft, initial: true
@@ -158,9 +208,6 @@ class Issue < ApplicationRecord
     end
 
     event :reject do
-      after do
-        person.update(enabled: false) unless person.nil?
-      end
       transitions from:  :draft, to: :rejected
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
@@ -295,7 +342,7 @@ class Issue < ApplicationRecord
   private  
 
   def log_state_change(verb)
-    Event::EventLogger.call(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+    EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))
   end
 
   def self.eager_issue_entities
@@ -364,7 +411,8 @@ class Issue < ApplicationRecord
       :identification_seeds,
       :'identifications_seeds.attachments',
       :observations,
-      :'observations.observation_reason'
+      :'observations.observation_reason',
+      :tags
     ]
   end
 end

@@ -1,16 +1,5 @@
 require_relative 'boot'
-
-require "rails"
-# Pick the frameworks you want:
-require "active_model/railtie"
-require "active_job/railtie"
-require "active_record/railtie"
-require "action_controller/railtie"
-require "action_mailer/railtie"
-require "action_view/railtie"
-require "action_cable/engine"
-require "sprockets/railtie"
-# require "rails/test_unit/railtie"
+require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -20,15 +9,14 @@ module Compliance
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
-    config.paths.add "lib",             eager_load: true
-    config.paths.add "app/serializers", eager_load: true
-    config.paths.add "app/services",    eager_load: true
-
+    config.eager_load_paths << "lib"
+    config.autoload_paths << "lib"
     # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration should go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded.
+    # Application configuration can go into files in config/initializers
+    # -- all .rb files in that directory are automatically loaded after loading
+    # the framework and any gems in your application.
 
-    # Don't generate system test files.
-    config.generators.system_tests = nil
+    require_relative "../app/models/settings"
+    config.secret_key_base = Settings.secret_key_base
   end
 end
