@@ -12,7 +12,7 @@ class Api::ApiController < ApplicationController
 
   def authenticate_token
     authenticate_with_http_token do |token, options|
-      AdminUser.find_by(api_token: token)
+      AdminUser.current_admin_user = AdminUser.find_by(api_token: token)
     end
   end
 end

@@ -227,4 +227,106 @@ describe Issue do
 				[one.id, two.id, three.id].to_set
     end
   end
+
+  describe 'locking issues' do
+    it 'can lock issue if is not locked' do
+      issue = create(:basic_issue)
+      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+    end
+
+    it 'can not lock issue if is locked by another user' do
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+
+      create(:admin_user)
+      
+      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 422
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+    end
+
+    it 'can unlock issue if is locked by me' do
+      AdminUser.current_admin_user = create(:admin_user)
+
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+
+      api_request :post, "/issues/#{issue.id}/unlock_issue", {}, 200
+      issue.reload
+      expect(issue.locked).to be false
+    end
+
+    it 'can not unlock issue if is locked by another user' do
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+
+      create(:admin_user)
+      
+      api_request :post, "/issues/#{issue.id}/unlock_issue", {}, 422
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+    end
+
+    it 'can renew lock' do
+      issue = create(:basic_issue)
+      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+
+      api_request :post, "/issues/#{issue.id}/renew_lock", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+    end
+
+    it 'can not renew lock if is locked by another user' do
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+
+      create(:admin_user)
+      
+      api_request :post, "/issues/#{issue.id}/renew_lock", {}, 422
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+    end
+
+    it 'fetch issue with locking information' do
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          attributes: {},
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
+      end.to change{Issue.count}.by(1)
+
+      issue = Issue.find(api_response.data.id)
+
+      Timecop.freeze DateTime.new(2018,01,01,13,0,0)
+      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+
+      api_get("/issues/#{issue.id}")
+      
+      interval = Issue.lock_expiration_interval_minutes
+
+      expect(api_response.data.attributes.locked).to eq true
+      expect(DateTime.parse(api_response.data.attributes.lock_expiration)).to eq interval.from_now
+    end
+  end
 end

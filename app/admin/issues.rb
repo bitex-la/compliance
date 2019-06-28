@@ -20,11 +20,16 @@ ActiveAdmin.register Issue do
     column(:created_at)
     column(:updated_at)
     column(:defer_until)
+    actions
   end
 
   config.clear_action_items!
   action_item :new, only: [:index] do
     link_to 'New', new_person_issue_path(person)
+  end
+
+  action_item :edit, only: [:show] do
+    link_to 'Edit', edit_person_issue_path(person, resource)
   end
 
   scope :fresh, default: true
@@ -52,9 +57,8 @@ ActiveAdmin.register Issue do
     end
     issue = person.issues.create
     issue.add_seeds_replacing(fruits) unless params[:fruits].blank?
-    redirect_to [person, issue]
+    redirect_to edit_person_issue_url(person, issue)
   end
-
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
@@ -64,7 +68,7 @@ ActiveAdmin.register Issue do
 
     member_action action, method: :post do
       resource.send("#{action}!")
-      redirect_to person_path(resource.person)
+      redirect_to person_issues_path(resource.person)
     end
   end
 
@@ -78,17 +82,19 @@ ActiveAdmin.register Issue do
     def edit
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
-      super
-    end
-
-    def show
-      return redirect_to edit_person_issue_url(resource.person, resource) if resource.editable?
+      resource.lock_issue!
       super
     end
   end
 
   form do |f|
-
+    if f.object.locked? && !f.object.locked_by_me?
+      div class: 'flash flash_danger' do
+        "Issue is locked by #{f.object.lock_admin_user.email}. you cannot make changes until the other user release the lock."
+      end
+      br
+    end
+  
     unless f.object.errors.full_messages.empty?
       ul class: 'validation_errors' do
         f.object.errors.full_messages.each do |e|

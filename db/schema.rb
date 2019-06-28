@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_12_133601) do
+ActiveRecord::Schema.define(version: 2019_06_21_203812) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -419,7 +419,11 @@ ActiveRecord::Schema.define(version: 2019_06_12_133601) do
     t.boolean "fill_with_previous_info", default: false
     t.date "defer_until", null: false
     t.integer "reason_id", null: false
+    t.boolean "locked", default: false, null: false
+    t.bigint "lock_admin_user_id"
+    t.datetime "lock_expiration"
     t.index ["aasm_state"], name: "index_issues_on_aasm_state"
+    t.index ["lock_admin_user_id"], name: "index_issues_on_lock_admin_user_id"
     t.index ["person_id"], name: "index_issues_on_person_id"
   end
 
@@ -725,6 +729,7 @@ ActiveRecord::Schema.define(version: 2019_06_12_133601) do
   add_foreign_key "identifications", "people"
   add_foreign_key "issue_taggings", "issues"
   add_foreign_key "issue_taggings", "tags"
+  add_foreign_key "issues", "admin_users", column: "lock_admin_user_id"
   add_foreign_key "issues", "people"
   add_foreign_key "legal_entity_docket_seeds", "issues"
   add_foreign_key "legal_entity_docket_seeds", "legal_entity_dockets", column: "fruit_id"
