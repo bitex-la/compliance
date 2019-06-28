@@ -342,4 +342,126 @@ RSpec.describe Issue, type: :model do
       Issue.changed_after_observation.size.should == 1
     end
   end
+
+  describe "when locks and unlock issues" do
+    let(:admin_user) { create(:admin_user) }
+    let(:other_admin_user) { create(:other_admin_user) }
+
+    interval = Issue.lock_expiration_interval_minutes
+
+    before :each do 
+      AdminUser.current_admin_user = admin_user 
+    end
+    
+    it 'can lock issue if not locked' do
+      Timecop.freeze DateTime.new(2018,01,01,13,0,0)
+      expect(basic_issue.lock_issue!).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to eq interval.from_now
+    end
+
+    it 'multiple locks not change expiration' do
+      Timecop.freeze DateTime.new(2018,01,01,13,0,0)
+      expect(basic_issue.lock_issue!).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to eq interval.from_now
+
+      expect(basic_issue.lock_issue!).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to eq interval.from_now
+    end
+
+    it 'can lock issue if it is locked by other user and expired' do
+      Timecop.freeze DateTime.new(2018,01,01,13,0,0)
+
+      expect(basic_issue.lock_issue!).to be true
+
+      Timecop.freeze DateTime.new(2018,01,01,13,20,0)
+
+      AdminUser.current_admin_user = other_admin_user
+
+      expect(basic_issue.lock_issue!).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq other_admin_user
+      expect(basic_issue.lock_expiration).to eq interval.from_now
+    end
+
+    it 'can not lock issue if is locked by other user and not expired' do
+      Timecop.freeze DateTime.new(2018,01,01,13,0,0)
+
+      expect(basic_issue.lock_issue!).to be true
+
+      lock_expiration = basic_issue.lock_expiration
+
+      Timecop.freeze DateTime.new(2018,01,01,13,5,0)
+
+      AdminUser.current_admin_user = other_admin_user
+
+      expect(basic_issue.lock_issue!).to be false
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to eq lock_expiration
+    end
+
+    it 'can unlock issue if is locked by me and not expired' do
+      expect(basic_issue.lock_issue!).to be true
+      Timecop.travel 5.minutes.from_now
+      expect(basic_issue.unlock_issue!).to be true
+      expect(basic_issue.locked).to be false
+      expect(basic_issue.lock_admin_user).to be nil
+      expect(basic_issue.lock_expiration).to be nil
+    end
+
+    it 'can not unlock issue if is locked by me and expired' do
+      expect(basic_issue.lock_issue!).to be true
+      Timecop.travel 20.minutes.from_now
+      expect(basic_issue.unlock_issue!).to be false
+    end
+
+    it 'can renew lock if is locked by me and not expired' do
+      Timecop.freeze DateTime.new(2018,01,01,13,0,0)
+      expect(basic_issue.lock_issue!).to be true
+      Timecop.freeze DateTime.new(2018,01,01,13,10,0)
+      expect(basic_issue.renew_lock!).to be true
+      expect(basic_issue.lock_expiration).to eq interval.from_now
+    end
+
+    it 'can not renew lock if is locked by me and expired' do
+      expect(basic_issue.lock_issue!).to be true
+      Timecop.travel (interval + 1.minutes).from_now
+      expect(basic_issue.renew_lock!).to be false
+    end
+
+    it 'can not save changes if locked by another user' do
+      expect(basic_issue.lock_issue!).to be true
+      AdminUser.current_admin_user = other_admin_user
+      basic_issue.defer_until = DateTime.now
+      expect(basic_issue).to_not be_valid
+      expect(basic_issue.errors.messages[:issue].first).to eq "changes in locked issues are not allowed!"
+    end
+
+    it 'can save changes if locked by another user and expired' do
+      expect(basic_issue.lock_issue!).to be true
+      Timecop.travel (interval + 1.minutes).from_now
+      AdminUser.current_admin_user = other_admin_user
+      defer = Date.today + 20.days
+      basic_issue.defer_until = defer
+      expect(basic_issue).to be_valid
+      basic_issue.save!
+      expect(basic_issue.defer_until).to eq defer
+    end
+
+    it 'save changes if locked by me user and not expired' do
+      expect(basic_issue.lock_issue!).to be true
+      Timecop.travel (interval + 1.minutes).from_now
+      defer = Date.today + 20.days
+      basic_issue.defer_until = defer
+      expect(basic_issue).to be_valid
+      basic_issue.save!
+      expect(basic_issue.defer_until).to eq defer
+    end
+  end
 end

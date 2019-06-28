@@ -46,5 +46,8 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     column(:created_at)
     column(:updated_at)
     column(:defer_until)
+    column('')  do |o|
+      link_to('Edit', edit_person_issue_url(o.person, o)) if o.editable?
+    end
   end
 end

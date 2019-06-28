@@ -56,6 +56,7 @@ describe 'a restricted admin user' do
     fulfil_new_issue_form
 
     click_button "Create Issue"
+    click_link "Edit"
 
     add_observation(observation_reason, 'Please check this guy on world check')
 
@@ -84,6 +85,8 @@ describe 'a restricted admin user' do
     within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
       click_link(issue.id)
     end
+    
+    click_link "Edit"
 
     click_link 'Docket'
 

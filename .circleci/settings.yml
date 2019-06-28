@@ -31,7 +31,7 @@ defaults: &defaults
     high:
       funding_amount: 10000
       funding_count: 10
-
+  
 production:
   <<: *defaults
 
