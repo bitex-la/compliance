@@ -58,9 +58,7 @@ ActiveAdmin.register Issue do
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe].include? x}.each do |action|
     action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
-      if action == :approve
-        next unless resource.all_workflows_performed?
-      end
+      next if action == :approve && !resource.all_workflows_performed?
       next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end

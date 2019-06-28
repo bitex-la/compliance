@@ -15,7 +15,7 @@ module ArbreHelpers
             Appsignal.instrument("render_one_of_#{relationship.to_s}") do
               instance_exec(f, context, &fields)
               if f.object.persisted? && !extra[:cant_remove]
-                unless f.object.class.name == 'Attachment'
+                unless f.object.class.name == 'Attachment' || f.object.class.name == 'Task'
                   f.template.concat(context.link_to("Remove",
                     f.object,
                     method: :delete,
