@@ -61,6 +61,7 @@ describe 'a restricted admin user' do
     add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
+    click_link "Edit"
 
     click_link 'Workflows (1)'
 
