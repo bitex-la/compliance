@@ -55,8 +55,7 @@ class Issue < ApplicationRecord
   end
 
   def self.lock_expiration_interval_minutes
-    value = Settings['lock_issues'].nil? ? 15 : 
-      Settings['lock_issues'].fetch('expiration_interval_minutes', 15)
+    value = Settings.dig('lock_issues', 'expiration_interval_minutes') || 15
     value.minutes
   end
 
