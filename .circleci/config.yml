@@ -51,4 +51,4 @@ jobs:
           path: /tmp/circleci-test-results
       - run:
           name: Trigger Build
-          command:  chmod +x .circleci/trigger_build || .circleci/trigger_build
+          command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh

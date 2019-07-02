@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 printf "Triggering an $PROJECT_TO_BUILD build on the $CIRCLE_BRANCH branch\n\n"
 
