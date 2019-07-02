@@ -18,9 +18,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Trigger Build
-          command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
-      - run:
           name: Configuring settings
           command: cp .circleci/settings.yml config/settings.yml
       - run:
