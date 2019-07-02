@@ -29,6 +29,7 @@ ActiveAdmin.register Issue do
   end
 
   action_item :edit, only: [:show] do
+    next unless resource.editable?
     link_to 'Edit', edit_person_issue_path(person, resource)
   end
 
@@ -67,8 +68,9 @@ ActiveAdmin.register Issue do
     end
 
     member_action action, method: :post do
-      resource.send("#{action}!")
-      redirect_to person_issues_path(resource.person)
+      return redirect_to person_issue_url(resource.person, resource) if resource.send("#{action}!")
+      flash[:error] = resource.errors.full_messages.join('-') unless resource.errors.full_messages.empty?
+      redirect_to edit_person_issue_url(resource.person, resource)
     end
   end
 
