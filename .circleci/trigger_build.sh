@@ -9,6 +9,4 @@ if [ "$CIRCLE_BRANCH" != "master" ] then
 
   printf "\n\nBuild triggered\n\n"
   printf "Follow the progress of the build on \nhttps://circleci.com/gh/$ORGANIZATION/$PROJECT_TO_BUILD/tree/$CIRCLE_BRANCH"
-else
-  printf "\n\nBuild not triggered\n\n"
 fi
