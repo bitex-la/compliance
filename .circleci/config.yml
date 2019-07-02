@@ -49,6 +49,6 @@ jobs:
           path: /tmp/circleci-artifacts
       - store_artifacts:
           path: /tmp/circleci-test-results
-      - run:
+      - deploy:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
