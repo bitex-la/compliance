@@ -361,13 +361,14 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue.lock_expiration).to eq interval.from_now
     end
 
-    it 'multiple locks not change expiration' do
+    it 'multiple locks change expiration' do
       Timecop.freeze DateTime.new(2018,01,01,13,0,0)
       expect(basic_issue.lock_issue!).to be true
       expect(basic_issue.locked).to be true
       expect(basic_issue.lock_admin_user).to eq admin_user
       expect(basic_issue.lock_expiration).to eq interval.from_now
 
+      Timecop.freeze DateTime.new(2018,01,01,13,5,0)
       expect(basic_issue.lock_issue!).to be true
       expect(basic_issue.locked).to be true
       expect(basic_issue.lock_admin_user).to eq admin_user

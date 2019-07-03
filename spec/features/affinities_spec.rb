@@ -41,9 +41,7 @@ describe 'an admin handling affinities' do
 
     click_link 'Complete'
     
-    within "tr[id='issue_#{issue.id}'] td[class='col col-actions']" do
-      click_link 'Edit'
-    end
+    click_link 'Edit'
     
     click_link 'Approve'
 
