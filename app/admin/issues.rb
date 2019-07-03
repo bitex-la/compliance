@@ -419,7 +419,7 @@ ActiveAdmin.register Issue do
           ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
             attributes_table_for d, :fruit
             para d.body
-            ArbreHelpers::Attachment.attachments_list self, d.fruit.try(:attachments)
+            ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
           end
         end
       end
