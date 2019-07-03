@@ -61,8 +61,7 @@ class Issue < ApplicationRecord
 
   def lock_issue!
     with_lock do
-      next true if locked_by_me?
-      next false if locked? && !lock_expired?
+      next false if locked? && !locked_by_me? && !lock_expired?
       self.locked = true
       self.lock_admin_user = AdminUser.current_admin_user
       self.lock_expiration = Issue.lock_expiration_interval_minutes.from_now
