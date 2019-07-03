@@ -5,7 +5,7 @@ module ArbreHelpers
       context.instance_eval do
         if IMAGEABLE_CONTENT_TYPES.include?(a.document_content_type) 
           div do
-            link_to image_tag(a.document.url, width: '100%'), a.document.url, target: "_blank"
+            link_to image_tag(a.document_url, width: '100%'), a.document_url, target: "_blank"
           end
           attributes_table_for a do
             row(:attachment){|o| link_to o.name, o }
@@ -16,7 +16,7 @@ module ArbreHelpers
           end
         else
           div do
-            link_to "Download (no preview available)", a.document.url,
+            link_to "Download (no preview available)", a.document_url,
               target: "_blank", class: 'button button-block'
           end
           attributes_table_for a do
