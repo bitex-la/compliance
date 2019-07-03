@@ -147,6 +147,12 @@ describe 'an admin user' do
 
     expect(issue.person.reload.enabled).to be_truthy
     assert_logging(issue.person, :enable_person, 2)
+
+    visit "/allowances/#{issue.person.allowances.first.id}"
+    
+    within '#page_title' do
+      expect(page).to have_content 'Allowance#1'
+    end
   end
 
   it 'reviews a newly created customer' do

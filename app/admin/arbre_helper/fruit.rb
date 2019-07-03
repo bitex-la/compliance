@@ -4,7 +4,7 @@ module ArbreHelpers
       context.instance_eval do
         columns do
           column span: 2 do
-            ArbreHelpers.fruit_attribute_table(self, resource)
+            ArbreHelpers::Fruit.fruit_attribute_table(self, resource)
             if resource.respond_to?(:external_link) && !resource.external_link.blank?
               h4 "External links"
               ArbreHelpers::HtmlHelper.show_links(self, resource.external_link.split(',').compact)
@@ -27,7 +27,7 @@ module ArbreHelpers
           end
 
           column do 
-            ArbreHelpers.fruit_relations_panels(self, resource)
+            ArbreHelpers::Fruit.fruit_relations_panels(self, resource)
           end 
         end  
       end
