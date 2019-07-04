@@ -28,6 +28,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :natural_docket_seed_politically_exposed_eq, as: :select, label: "Is PEP"
   filter :reason
   filter :tags_id , as: :select, collection: proc { Tag.issue }, multiple: true
+  filter :by_person_tag , as: :select, collection: proc { Tag.person }, multiple: true
   filter :created_at
   filter :updated_at
 
