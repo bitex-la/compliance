@@ -10,6 +10,7 @@ ActiveAdmin.register Observation do
 
   filter :observation_reason
   filter :scope, as: :select, collection: Observation.scopes
+  filter :by_issue_reason, as: :select, collection: IssueReason.all
   filter :created_at
   filter :updated_at
 
@@ -28,6 +29,9 @@ ActiveAdmin.register Observation do
     column(:created_at)
     column(:updated_at)
     column(:issue)
+    column "Person" do |o|
+      link_to o.issue.person.person_info, o.issue.person
+    end
   end
 end
 
