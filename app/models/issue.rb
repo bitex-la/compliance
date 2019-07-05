@@ -224,7 +224,6 @@ class Issue < ApplicationRecord
   }
 
   scope :by_person_tag, -> (*tags) { 
-    debugger
     left_outer_joins(:person => :person_taggings) 
       .where("person_taggings.tag_id IN (?)", tags)
   }
