@@ -104,7 +104,8 @@ ActiveAdmin.register Issue do
   form do |f|
     if f.object.locked? && !f.object.locked_by_me?
       div class: 'flash flash_danger' do
-        "Issue is locked by #{f.object.lock_admin_user.email}. you cannot make changes until the other user release the lock."
+        "Issue is locked by #{f.object.lock_admin_user.email} and expires in #{f.object.lock_remaining_minutes} minutes."\
+        " You cannot make changes until the other user release the lock or the lock expires."
       end
       br
     end

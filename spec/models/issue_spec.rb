@@ -376,6 +376,7 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue.locked).to be true
       expect(basic_issue.lock_admin_user).to eq admin_user
       expect(basic_issue.lock_expiration).to eq interval.from_now
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq interval
     end
 
     it 'multiple locks change expiration' do

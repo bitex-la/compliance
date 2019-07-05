@@ -92,6 +92,10 @@ class Issue < ApplicationRecord
     end
   end
 
+  def lock_remaining_minutes
+    ((lock_expiration - DateTime.now.utc) / 60).ceil
+  end
+
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
     answer! if may_answer? && observations.any? && !has_open_observations?
