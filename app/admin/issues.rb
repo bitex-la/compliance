@@ -68,9 +68,17 @@ ActiveAdmin.register Issue do
     end
 
     member_action action, method: :post do
-      return redirect_to person_issue_url(resource.person, resource) if resource.send("#{action}!")
-      flash[:error] = resource.errors.full_messages.join('-') unless resource.errors.full_messages.empty?
-      redirect_to edit_person_issue_url(resource.person, resource)
+      begin
+        resource.send("#{action}!")
+      rescue ActiveRecord::RecordInvalid => invalid
+        flash[:error] = invalid.record.errors.full_messages.join('-') unless invalid.record.errors.full_messages.empty?
+        redirect_to edit_person_issue_url(resource.person, resource)  
+      rescue AASM::InvalidTransition => e
+        flash[:error] = e.message
+        redirect_to edit_person_issue_url(resource.person, resource)  
+      else
+        redirect_to person_issue_url(resource.person, resource)
+      end
     end
   end
 
@@ -385,7 +393,8 @@ ActiveAdmin.register Issue do
 
     f.actions do
       f.action :submit
-      f.cancel_link({action: "show"})
+      f.cancel_link({action: "show"}) if resource.persisted?
+      f.cancel_link unless resource.persisted?
     end
   end
 

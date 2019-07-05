@@ -156,6 +156,16 @@ RSpec.describe Issue, type: :model do
       expect(person.enabled).to be_truthy
     end
 
+    it 'validates error on approve twice' do
+      person = create(:new_natural_person, :with_new_client_reason)
+      
+      person.issues.reload.last.approve!
+      expect(person.enabled).to be_truthy
+
+      expect {person.issues.reload.last.approve! }.to raise_error(ActiveRecord::RecordInvalid,
+        "Validation failed: no_more_updates_allowed")
+    end
+
     it 'creates deferred issues for each expiring seed' do
       person = create :empty_person
       issue = person.issues.create

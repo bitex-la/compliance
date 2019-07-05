@@ -52,7 +52,7 @@ describe 'an admin user' do
     observation = Observation.last
 
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 3)
+    assert_logging(issue, :update_entity, 4)
     assert_logging(issue.reload, :observe_issue, 1)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
@@ -93,7 +93,7 @@ describe 'an admin user' do
       expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
     end
 
-    assert_logging(issue, :update_entity, 5)
+    assert_logging(issue, :update_entity, 7)
     issue.reload.should be_answered
     observation.reload.should be_answered
 
@@ -115,7 +115,7 @@ describe 'an admin user' do
     visit "/people/#{issue.person.id}"
     
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 10)
+    assert_logging(issue, :update_entity, 15)
     expect(issue.person.enabled).to be_falsey
     assert_logging(issue.person, :enable_person, 0)
 
@@ -224,7 +224,7 @@ describe 'an admin user' do
           
     click_button 'Update Issue'
 
-    assert_logging(issue, :update_entity, 5)
+    assert_logging(issue, :update_entity, 6)
     assert_logging(issue.reload, :observe_issue, 2)
 
     Observation.where(issue: issue).count.should == 2
@@ -248,7 +248,7 @@ describe 'an admin user' do
       attributes: {reply: 'Va de vuelta el documento!!!'}
     }
 
-    assert_logging(issue, :update_entity, 6)
+    assert_logging(issue, :update_entity, 7)
     assert_logging(issue.reload, :observe_issue, 2)
 
     assert_response 200
@@ -280,7 +280,7 @@ describe 'an admin user' do
     click_link 'Approve'
 
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 10)
+    assert_logging(issue, :update_entity, 13)
     wc_observation.reload.should be_answered
     wc_observation.reply.should == 'Double checked by compliance'
     Observation.last.should be_answered
@@ -427,7 +427,7 @@ describe 'an admin user' do
     click_button "Update Issue"
     click_link "Edit"
 
-    assert_logging(issue, :update_entity, 5) 
+    assert_logging(issue, :update_entity, 7) 
     issue.reload.should be_answered
     observation.reload.should be_answered
 
@@ -536,7 +536,7 @@ describe 'an admin user' do
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
-    assert_logging(issue, :update_entity, 3)
+    assert_logging(issue, :update_entity, 4)
     
     click_link "Edit"
 
@@ -659,7 +659,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     issue.reload.should be_answered
-    assert_logging(Issue.last, :update_entity, 3)
+    assert_logging(Issue.last, :update_entity, 4)
     assert_logging(issue.reload, :observe_issue, 1)
     Observation.last.should be_answered
     click_link "Edit"
@@ -730,12 +730,12 @@ describe 'an admin user' do
       issue.should be_draft
 
       assert_logging(issue, :create_entity, 1)
-      assert_logging(issue, :update_entity, 2)
+      assert_logging(issue, :update_entity, 3)
 
       click_link "Edit"
       click_link "Approve"
       issue.reload.should be_approved
-      assert_logging(issue, :update_entity, 4)
+      assert_logging(issue, :update_entity, 6)
 
       old_domicile = Domicile.first
       new_domicile = Domicile.last
@@ -798,13 +798,13 @@ describe 'an admin user' do
       issue.should be_draft
 
       assert_logging(Issue.last, :create_entity, 1)
-      assert_logging(Issue.last, :update_entity, 2)
+      assert_logging(Issue.last, :update_entity, 3)
 
       click_link "Edit"
       click_link "Approve"
       issue.reload.should be_approved
 
-      assert_logging(Issue.last, :update_entity, 4)
+      assert_logging(Issue.last, :update_entity, 6)
 
       person.reload.domiciles.count == 2
       person.reload.identifications.count == 2
@@ -869,12 +869,12 @@ describe 'an admin user' do
 
       click_button 'Update Issue'
       assert_logging(issue, :create_entity, 1)
-      assert_logging(issue, :update_entity, 3) 
+      assert_logging(issue, :update_entity, 5) 
 
       
       click_link 'Approve'
       issue.reload.should be_approved
-      assert_logging(issue, :update_entity, 4)
+      assert_logging(issue, :update_entity, 7)
 
       person.allowances.reload
       person.identifications.reload
