@@ -283,6 +283,7 @@ class Issue < ApplicationRecord
     event :approve do
       before{ harvest_all! }
       after do
+        person.update(enabled: true) if reason == IssueReason.new_client
         log_state_change(:approve_issue)
       end
       transitions from: :draft, to: :approved

@@ -33,6 +33,27 @@ FactoryBot.define do
     end
   end
 
+  factory :full_natural_person_issue_with_new_client_reason, class: Issue do
+    reason { IssueReason.new_client }
+    after(:create) do |issue, evaluator|
+      %i(
+        full_domicile_seed 
+        full_risk_score_seed
+        full_natural_docket_seed 
+        full_natural_person_identification_seed 
+        full_argentina_invoicing_detail_seed
+        full_phone_seed
+        fixed_full_email_seed
+        full_note_seed
+        full_affinity_seed
+        salary_allowance_seed 
+        savings_allowance_seed
+      ).each do |name|
+        create name, issue: issue
+      end
+    end
+  end
+
   factory :full_natural_person_issue, class: Issue do
     after(:create) do |issue, evaluator|
       %i(
