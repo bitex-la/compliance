@@ -75,12 +75,16 @@ ActiveAdmin.register Issue do
   end
 
   controller do
-
     def scoped_collection
       super.includes :person,
         observations: [:observation_reason]
     end
 
+    def show
+      resource.unlock_issue!
+      super
+    end
+    
     def edit
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
@@ -379,7 +383,10 @@ ActiveAdmin.register Issue do
       end
     end
 
-    f.actions
+    f.actions do
+      f.action :submit
+      f.cancel_link({action: "show"})
+    end
   end
 
   show do
