@@ -155,7 +155,7 @@ ActiveAdmin.register Issue do
 
           ArbreHelpers::Form.has_many_form self, f, :issue_taggings, 
             new_button_text: "Add New Tag" do |cf, context|
-              cf.input :tag, as:  :select, collection: Tag.issue
+              cf.input :tag, as:  :select, collection: Tag.issues
           end
         end
 

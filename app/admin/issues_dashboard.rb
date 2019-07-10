@@ -27,8 +27,8 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :domicile_seeds_postal_code_or_argentina_invoicing_detail_seed_address_cont, label: "Postal Code"
   filter :natural_docket_seed_politically_exposed_eq, as: :select, label: "Is PEP"
   filter :reason
-  filter :tags_id , as: :select, collection: proc { Tag.issue }, multiple: true
-  filter :by_person_tag , as: :select, collection: proc { Tag.person }, multiple: true
+  filter :tags_id , as: :select, collection: proc { Tag.issues }, multiple: true
+  filter :by_person_tag , as: :select, collection: proc { Tag.people }, multiple: true
   filter :created_at
   filter :updated_at
 

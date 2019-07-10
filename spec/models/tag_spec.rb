@@ -44,14 +44,14 @@ RSpec.describe Tag, type: :model do
 
   it 'is in person scope' do
     tag = create(:person_tag)
-    expect(Tag.person).to include tag
-    expect(Tag.issue).to_not include tag
+    expect(Tag.people).to include tag
+    expect(Tag.issues).to_not include tag
   end
 
   it 'is in issue scope' do
     tag = create(:issue_tag)
-    expect(Tag.person).to_not include tag
-    expect(Tag.issue).to include tag
+    expect(Tag.people).to_not include tag
+    expect(Tag.issues).to include tag
   end
 
   it 'can not destroy if person_tagging exists' do
