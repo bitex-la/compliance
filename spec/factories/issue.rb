@@ -106,6 +106,10 @@ FactoryBot.define do
       end
     end
 
+    factory :new_legal_entity_issue do
+      association :person, factory: :empty_person
+    end
+
     factory :full_approved_legal_entity_issue do
       association :person, factory: :empty_person
       after(:create) do |issue|
