@@ -186,15 +186,20 @@ RSpec.describe Issue, type: :model do
       issue_notes = person.issues[-2]
       expect(issue_notes).to_not be(issue)
       expect(issue_notes.defer_until).to eq(expires_at)
+      expect(issue_notes.state).to eq('new')
       expect(issue_notes.note_seeds.first.title).to eq('title')
       expect(issue_notes.note_seeds.first.body).to eq('body')
+
+      expect(Issue.future).to include issue_notes
 
       risk_issue = person.issues.last
       expect(risk_issue).to_not be(issue)
       expect(risk_issue.defer_until).to eq(expires_at)
+      expect(risk_issue.state).to eq('new')
       expect(risk_issue.risk_score_seeds.first.score).to eq('score')
-    
       expect(risk_issue.risk_score_seeds.first.replaces).to eq(person.risk_scores.first)
+
+      expect(Issue.future).to include risk_issue
     end
   end
 
