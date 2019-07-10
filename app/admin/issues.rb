@@ -62,7 +62,7 @@ ActiveAdmin.register Issue do
   end
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
-    action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
+    action_item action, only: [:show], if: lambda { resource.send("may_#{action}?") } do
       next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end
@@ -72,13 +72,10 @@ ActiveAdmin.register Issue do
         resource.send("#{action}!")
       rescue ActiveRecord::RecordInvalid => invalid
         flash[:error] = invalid.record.errors.full_messages.join('-') unless invalid.record.errors.full_messages.empty?
-        redirect_to edit_person_issue_url(resource.person, resource)  
       rescue AASM::InvalidTransition => e
         flash[:error] = e.message
-        redirect_to edit_person_issue_url(resource.person, resource)  
-      else
-        redirect_to person_issue_url(resource.person, resource)
       end
+      redirect_to person_issue_url(resource.person, resource)
     end
   end
 
@@ -105,7 +102,7 @@ ActiveAdmin.register Issue do
     if f.object.locked? && !f.object.locked_by_me?
       div class: 'flash flash_danger' do
         "Issue is locked by #{f.object.lock_admin_user.email} and expires in #{f.object.lock_remaining_minutes} minutes."\
-        " You cannot make changes until the other user release the lock or the lock expires."
+        " You cannot make changes until the other user releases the lock or the lock expires."
       end
       br
     end
@@ -394,8 +391,7 @@ ActiveAdmin.register Issue do
 
     f.actions do
       f.action :submit
-      f.cancel_link({action: "show"}) if resource.persisted?
-      f.cancel_link unless resource.persisted?
+      f.cancel_link({action: (resource.persisted? ? :show : :index) })
     end
   end
 

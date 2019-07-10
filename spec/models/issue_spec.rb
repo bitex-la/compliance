@@ -200,6 +200,14 @@ RSpec.describe Issue, type: :model do
       expect(risk_issue.risk_score_seeds.first.replaces).to eq(person.risk_scores.first)
 
       expect(Issue.future).to include risk_issue
+
+      Timecop.travel 2.month.from_now
+
+      expect(Issue.future).to_not include issue_notes
+      expect(Issue.future).to_not include risk_issue
+
+      expect(Issue.fresh).to include issue_notes
+      expect(Issue.fresh).to include risk_issue
     end
   end
 
