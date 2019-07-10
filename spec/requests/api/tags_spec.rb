@@ -10,7 +10,7 @@ describe Tag do
 
     json_response.should == {
       data: [ 
-        type: 'tag',
+        type: 'tags',
         id: one.id.to_s,
         attributes: {
           name: one.name,
