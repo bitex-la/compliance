@@ -23,8 +23,22 @@ RSpec.describe Person, type: :model do
     expect(Person.by_person_type("legal")).to_not include person
   end
 
+  it 'is in natural scope with issue' do
+    issue = create(:new_natural_person_issue)
+    person = issue.person
+    expect(Person.by_person_type("natural")).to include person
+    expect(Person.by_person_type("legal")).to_not include person
+  end
+
   it 'is in legal scope' do
     person = create(:full_legal_entity_person)
+    expect(Person.by_person_type("natural")).to_not include person
+    expect(Person.by_person_type("legal")).to include person
+  end
+
+  it 'is in legal scope with issue' do
+    issue = create(:new_legal_entity_issue)
+    person = issue.person
     expect(Person.by_person_type("natural")).to_not include person
     expect(Person.by_person_type("legal")).to include person
   end

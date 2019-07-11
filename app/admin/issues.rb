@@ -62,25 +62,34 @@ ActiveAdmin.register Issue do
   end
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
-    action_item action, only: [:edit, :update], if: lambda { resource.send("may_#{action}?") } do
+    action_item action, only: [:show], if: lambda { resource.send("may_#{action}?") } do
       next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end
 
     member_action action, method: :post do
-      return redirect_to person_issue_url(resource.person, resource) if resource.send("#{action}!")
-      flash[:error] = resource.errors.full_messages.join('-') unless resource.errors.full_messages.empty?
-      redirect_to edit_person_issue_url(resource.person, resource)
+      begin
+        resource.send("#{action}!")
+      rescue ActiveRecord::RecordInvalid => invalid
+        flash[:error] = invalid.record.errors.full_messages.join('-') unless invalid.record.errors.full_messages.empty?
+      rescue AASM::InvalidTransition => e
+        flash[:error] = e.message
+      end
+      redirect_to person_issue_url(resource.person, resource)
     end
   end
 
   controller do
-
     def scoped_collection
       super.includes :person,
         observations: [:observation_reason]
     end
 
+    def show
+      resource.unlock_issue!
+      super
+    end
+    
     def edit
       @page_title = resource.name
       return redirect_to person_issue_url(resource.person, resource) unless resource.editable?
@@ -92,7 +101,8 @@ ActiveAdmin.register Issue do
   form do |f|
     if f.object.locked? && !f.object.locked_by_me?
       div class: 'flash flash_danger' do
-        "Issue is locked by #{f.object.lock_admin_user.email}. you cannot make changes until the other user release the lock."
+        "Issue is locked by #{f.object.lock_admin_user.email} and expires in #{f.object.lock_remaining_minutes} minutes."\
+        " You cannot make changes until the other user releases the lock or the lock expires."
       end
       br
     end
@@ -142,7 +152,7 @@ ActiveAdmin.register Issue do
 
           ArbreHelpers::Form.has_many_form self, f, :issue_taggings, 
             new_button_text: "Add New Tag" do |cf, context|
-              cf.input :tag, as:  :select, collection: Tag.issue
+              cf.input :tag, as:  :select, collection: Tag.issues
           end
         end
 
@@ -379,7 +389,10 @@ ActiveAdmin.register Issue do
       end
     end
 
-    f.actions
+    f.actions do
+      f.action :submit
+      f.cancel_link({action: (resource.persisted? ? :show : :index) })
+    end
   end
 
   show do
