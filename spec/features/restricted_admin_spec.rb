@@ -10,6 +10,7 @@ describe 'a restricted admin user' do
       admin_users
       observation_reasons
       event_logs
+      tags
     ).each do |path|
       visit "/#{path}"
       page.current_path.should == '/'
@@ -24,6 +25,7 @@ describe 'a restricted admin user' do
       expect(page).to_not have_content 'Observation Reasons'
       expect(page).to_not have_content 'Admin Users'
       expect(page).to_not have_content 'Event Logs'
+      expect(page).to_not have_content 'Tags'
 
       expect(page).to have_content 'Dashboard'
       expect(page).to have_content 'Observations'
