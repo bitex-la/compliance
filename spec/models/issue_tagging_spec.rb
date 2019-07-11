@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe IssueTagging, type: :model do
   let(:issue) { create(:basic_issue) }
   let(:tag) { create(:issue_tag) }
+  let(:person_tag) { create(:person_tag) }
 
   it 'validates non null fields' do
     invalid = IssueTagging.new
@@ -30,5 +31,19 @@ RSpec.describe IssueTagging, type: :model do
 
     expect {issue.tags << tag }.to raise_error(ActiveRecord::RecordInvalid,
       "Validation failed: Tag can't contain duplicates in the same issue")
+  end
+
+  it 'validates by_person_tag scope' do
+    expect do
+      issue.tags << tag
+    end.to change{ issue.tags.count }.by(1)
+
+    expect(Issue.by_person_tag person_tag.id).to be_empty 
+
+    expect do
+      issue.person.tags << person_tag
+    end.to change{ issue.person.tags.count }.by(1)
+    
+    expect(Issue.by_person_tag person_tag.id).to include issue
   end
 end

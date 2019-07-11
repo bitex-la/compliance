@@ -79,8 +79,14 @@ class Person < ApplicationRecord
 
   scope :by_person_type, -> (type){ 
     {
-      natural: joins(:natural_dockets),
-      legal: joins(:legal_entity_dockets)
+      natural: left_outer_joins(:natural_dockets)
+        .left_outer_joins(:issues =>  :natural_docket_seed)
+        .where("natural_docket_seeds.id is not null or natural_dockets.id is not null")
+        .distinct,
+      legal: left_outer_joins(:legal_entity_dockets)
+        .left_outer_joins(:issues =>  :legal_entity_docket_seed)
+        .where("legal_entity_docket_seeds.id is not null or legal_entity_dockets.id is not null")
+        .distinct
     }[type.to_sym]
   }
 
