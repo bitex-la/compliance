@@ -307,6 +307,42 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
     end
 
+
+    it 'can lock issue with no expiration if is not locked' do
+      pending
+      fail
+    end
+
+    it 'can not lock issue with expiration if it is locked with no expiration' do
+      pending
+      fail
+    end
+
+    it 'can unlock issue with no expiration if it is locked by me' do
+      pending
+      fail
+    end
+
+    it 'can lock issue with no expiration if it is locked by another user and expired' do
+      pending
+      fail      
+    end
+
+    it 'can not unlock issue if it is locked by another user with no expiration' do
+      pending
+      fail
+    end
+
+    it 'can not save changes if locked with no expiration by another user' do
+      pending
+      fail
+    end
+
+    it 'can save changes if locked with no expiration by me' do
+      pending
+      fail
+    end
+
     it 'fetch issue with locking information' do
       expect do
         api_create('/issues', {
