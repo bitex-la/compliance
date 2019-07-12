@@ -9,8 +9,9 @@ Rails.application.routes.draw do
         end
 
         %i{
-          lock_issue
-          unlock_issue
+          lock
+          lock_for_ever
+          unlock
           renew_lock
         }.each do |action|
           post action

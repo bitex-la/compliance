@@ -231,7 +231,7 @@ describe Issue do
   describe 'locking issues' do
     it 'can lock issue if is not locked' do
       issue = create(:basic_issue)
-      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+      api_request :post, "/issues/#{issue.id}/lock", {}, 200
       issue.reload
       expect(issue.locked).to be true
     end
@@ -246,7 +246,7 @@ describe Issue do
 
       create(:admin_user)
       
-      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 422
+      api_request :post, "/issues/#{issue.id}/lock", {}, 422
       issue.reload
       expect(issue.locked).to be true
       expect(issue.lock_admin_user).to eq admin
@@ -259,7 +259,7 @@ describe Issue do
       expect(issue.lock_issue!).to be true
       expect(issue.locked).to be true
 
-      api_request :post, "/issues/#{issue.id}/unlock_issue", {}, 200
+      api_request :post, "/issues/#{issue.id}/unlock", {}, 200
       issue.reload
       expect(issue.locked).to be false
     end
@@ -274,7 +274,7 @@ describe Issue do
 
       create(:admin_user)
       
-      api_request :post, "/issues/#{issue.id}/unlock_issue", {}, 422
+      api_request :post, "/issues/#{issue.id}/unlock", {}, 422
       issue.reload
       expect(issue.locked).to be true
       expect(issue.lock_admin_user).to eq admin
@@ -282,7 +282,7 @@ describe Issue do
 
     it 'can renew lock' do
       issue = create(:basic_issue)
-      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+      api_request :post, "/issues/#{issue.id}/lock", {}, 200
       issue.reload
       expect(issue.locked).to be true
 
@@ -309,38 +309,93 @@ describe Issue do
 
 
     it 'can lock issue with no expiration if is not locked' do
-      pending
-      fail
+      issue = create(:basic_issue)
+      api_request :post, "/issues/#{issue.id}/lock_for_ever", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_expiration).to be_nil
     end
 
     it 'can not lock issue with expiration if it is locked with no expiration' do
-      pending
-      fail
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+
+      create(:admin_user)
+      
+      api_request :post, "/issues/#{issue.id}/lock_for_ever", {}, 422
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
     end
 
     it 'can unlock issue with no expiration if it is locked by me' do
-      pending
-      fail
+      AdminUser.current_admin_user = create(:admin_user)
+
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!(false)).to be true
+      expect(issue.locked).to be true
+
+      api_request :post, "/issues/#{issue.id}/unlock", {}, 200
+      issue.reload
+      expect(issue.locked).to be false
+    end
+
+    it 'can lock issue if it is locked by another user and expired' do
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+
+      other = create(:admin_user)
+      
+      Timecop.travel 1.day.from_now
+
+      api_request :post, "/issues/#{issue.id}/lock", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq other    
     end
 
     it 'can lock issue with no expiration if it is locked by another user and expired' do
-      pending
-      fail      
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+
+      other = create(:admin_user)
+      
+      Timecop.travel 1.day.from_now
+
+      api_request :post, "/issues/#{issue.id}/lock_for_ever", {}, 200
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq other
+      expect(issue.lock_expiration).to be_nil
     end
 
     it 'can not unlock issue if it is locked by another user with no expiration' do
-      pending
-      fail
-    end
+      admin = create(:other_admin_user)
+      AdminUser.current_admin_user = admin
+      issue = create(:basic_issue)
+      expect(issue.lock_issue!(false)).to be true
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
 
-    it 'can not save changes if locked with no expiration by another user' do
-      pending
-      fail
-    end
-
-    it 'can save changes if locked with no expiration by me' do
-      pending
-      fail
+      other = create(:admin_user)
+      
+      api_request :post, "/issues/#{issue.id}/unlock", {}, 422
+      issue.reload
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin
+      expect(issue.lock_expiration).to be_nil
     end
 
     it 'fetch issue with locking information' do
@@ -355,7 +410,7 @@ describe Issue do
       issue = Issue.find(api_response.data.id)
 
       Timecop.freeze DateTime.new(2018,01,01,13,0,0)
-      api_request :post, "/issues/#{issue.id}/lock_issue", {}, 200
+      api_request :post, "/issues/#{issue.id}/lock", {}, 200
 
       api_get("/issues/#{issue.id}")
       
