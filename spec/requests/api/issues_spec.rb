@@ -47,7 +47,7 @@ describe Issue do
         .group_by{|i| i.type }
         .map{|a,b| [a, b.count ] }.to_h
         .should == {
-          "tag"=>1,  
+          "tags"=>1,
           "people"=>1
         }
     end

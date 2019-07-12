@@ -22,6 +22,12 @@ FactoryBot.define do
         create :full_natural_person_issue_with_fixed_email, person: person
       end
     end
+
+    trait :with_new_client_reason do
+      after(:create) do |person, evaluator|
+        create :full_natural_person_issue_with_new_client_reason, person: person
+      end
+    end
   end
 
   factory :light_natural_person, class: Person do

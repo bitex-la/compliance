@@ -41,7 +41,7 @@ class Issue < ApplicationRecord
   def locked_issue_cannot_changed
     return unless locked
     return if lock_expired?
-    return if lock_admin_user == AdminUser.current_admin_user
+    return if locked_by_me?
     errors.add(:issue, "changes in locked issues are not allowed!")
   end
 
@@ -90,6 +90,10 @@ class Issue < ApplicationRecord
       save!(:validate => false)
       true
     end
+  end
+
+  def lock_remaining_minutes
+    ((lock_expiration - DateTime.now.utc) / 60).ceil
   end
 
   def sync_observed_status
@@ -189,7 +193,7 @@ class Issue < ApplicationRecord
   }
 
   scope :active_states, ->(yes=true){
-    where("aasm_state #{'NOT' unless yes} IN (?)",
+    where("issues.aasm_state #{'NOT' unless yes} IN (?)",
       %i{draft new observed answered}
     )
   }
@@ -207,7 +211,11 @@ class Issue < ApplicationRecord
   }
 
 	def self.ransackable_scopes(auth_object = nil)
-	  %i(active by_person_type)
+	  %i(active by_person_type by_person_tag)
+  end
+
+  def self.ransackable_scopes_skip_sanitize_args
+    %i(by_person_tag)
   end
 
   scope :by_person_type, -> (type) { 
@@ -220,6 +228,11 @@ class Issue < ApplicationRecord
         .left_outer_joins(:person =>  :legal_entity_dockets) 
         .where("legal_entity_docket_seeds.id is not null or legal_entity_dockets.id is not null")
     end
+  }
+
+  scope :by_person_tag, -> (*tags) { 
+    left_outer_joins(:person => :person_taggings) 
+      .where("person_taggings.tag_id IN (?)", tags)
   }
 
   aasm do
@@ -277,6 +290,7 @@ class Issue < ApplicationRecord
     event :approve do
       before{ harvest_all! }
       after do
+        person.update(enabled: true) if reason == IssueReason.new_client
         log_state_change(:approve_issue)
       end
       transitions from: :draft, to: :approved, guard: :all_workflows_performed?

@@ -19,6 +19,9 @@ class Tag < ApplicationRecord
 
   ransacker :tag_type, formatter: proc {|v| tag_types[v]}
 
+  scope :people, -> { Tag.person.order(name: :asc) }
+  scope :issues, -> { Tag.issue.order(name: :asc) }
+
   private
 
   def can_destroy?

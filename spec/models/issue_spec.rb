@@ -149,6 +149,23 @@ RSpec.describe Issue, type: :model do
       expect(person.enabled).to be_falsey
     end
 
+    it 'enable person on approve if issue reason is new_client' do
+      person = create(:new_natural_person, :with_new_client_reason)
+      
+      person.issues.reload.last.approve!
+      expect(person.enabled).to be_truthy
+    end
+
+    it 'validates error on approve twice' do
+      person = create(:new_natural_person, :with_new_client_reason)
+      
+      person.issues.reload.last.approve!
+      expect(person.enabled).to be_truthy
+
+      expect {person.issues.reload.last.approve! }.to raise_error(ActiveRecord::RecordInvalid,
+        "Validation failed: no_more_updates_allowed")
+    end
+
     it 'creates deferred issues for each expiring seed' do
       person = create :empty_person
       issue = person.issues.create
@@ -169,15 +186,28 @@ RSpec.describe Issue, type: :model do
       issue_notes = person.issues[-2]
       expect(issue_notes).to_not be(issue)
       expect(issue_notes.defer_until).to eq(expires_at)
+      expect(issue_notes.state).to eq('new')
       expect(issue_notes.note_seeds.first.title).to eq('title')
       expect(issue_notes.note_seeds.first.body).to eq('body')
+
+      expect(Issue.future).to include issue_notes
 
       risk_issue = person.issues.last
       expect(risk_issue).to_not be(issue)
       expect(risk_issue.defer_until).to eq(expires_at)
+      expect(risk_issue.state).to eq('new')
       expect(risk_issue.risk_score_seeds.first.score).to eq('score')
-    
       expect(risk_issue.risk_score_seeds.first.replaces).to eq(person.risk_scores.first)
+
+      expect(Issue.future).to include risk_issue
+
+      Timecop.travel 2.month.from_now
+
+      expect(Issue.future).to_not include issue_notes
+      expect(Issue.future).to_not include risk_issue
+
+      expect(Issue.fresh).to include issue_notes
+      expect(Issue.fresh).to include risk_issue
     end
   end
 
@@ -359,6 +389,7 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue.locked).to be true
       expect(basic_issue.lock_admin_user).to eq admin_user
       expect(basic_issue.lock_expiration).to eq interval.from_now
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq interval
     end
 
     it 'multiple locks change expiration' do
