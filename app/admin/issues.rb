@@ -429,62 +429,135 @@ ActiveAdmin.register Issue do
           end
         end
 
-        if seeds = resource.note_seeds.presence
-          h3 "Note Seeds"
-          ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
-            attributes_table_for d, :fruit
-            para d.body
-            ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
+        h3 "Notes"
+
+        columns do
+          column span: 2 do
+            h3 "Current Seeds"
+            if seeds = resource.note_seeds.presence
+              ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
+                attributes_table_for d, :fruit
+                para d.body
+                ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
+              end
+            end
+          end
+          
+          column do
+            h3 "Current Fruits"
+            
+            if fruits = resource.person.notes.presence
+              ArbreHelpers::Layout.panel_only(self, fruits) do |d|
+                ArbreHelpers::Fruit.fruit_show_section(self, d)
+              end
+            end
           end
         end
       end
 
       tab :docket do
-        if seed = issue.legal_entity_docket_seed.presence
-          panel seed.name do
-            ArbreHelpers::Seed.seed_show_section(self, seed)
-          end
-        end
+        columns do
+          column span: 2 do
+            h3 "Current Seeds"
+            
+            if seed = issue.legal_entity_docket_seed.presence
+              panel seed.name do
+                ArbreHelpers::Seed.seed_show_section(self, seed)
+              end
+            end
+    
+            if seed = issue.natural_docket_seed.presence
+              panel seed.name do
+                ArbreHelpers::Seed.seed_show_section(self, seed)
+              end
+            end
 
-        if seed = issue.natural_docket_seed.presence
-          panel seed.name do
-            ArbreHelpers::Seed.seed_show_section(self, seed)
+          end
+
+          column do
+            h3 "Current Fruits"
+
+            if fruit = issue.person.legal_entity_docket.presence
+              panel fruit.name do
+                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              end
+            end
+    
+            if fruit = issue.person.natural_docket.presence
+              panel fruit.name do
+                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              end
+            end
           end
         end
       end
 
-      
-      ArbreHelpers::Seed.seed_collection_show_tab(self, "Domicile", :domicile_seeds)
-      ArbreHelpers::Seed.seed_collection_show_tab(self, "Id", :identification_seeds)
-      ArbreHelpers::Seed.seed_collection_show_tab(self, "Allowance", :allowance_seeds)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Domicile", :domicile_seeds, :domiciles)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Id", :identification_seeds, :identifications)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Allowance", :allowance_seeds, :allowances)
 
       tab "Invoicing" do
-        if seed = issue.argentina_invoicing_detail_seed.presence
-          panel seed.name do
-            ArbreHelpers::Seed.seed_show_section(self, seed, [:tax_id])
+        columns do
+          column span: 2 do
+            h3 "Current Seeds"
+            if seed = issue.argentina_invoicing_detail_seed.presence
+              panel seed.name do
+                ArbreHelpers::Seed.seed_show_section(self, seed, [:tax_id])
+              end
+            end
+    
+            if seed = issue.chile_invoicing_detail_seed.presence
+              panel seed.name do
+                ArbreHelpers::Seed.seed_show_section(self, seed)
+              end
+            end
           end
-        end
-
-        if seed = issue.chile_invoicing_detail_seed.presence
-          panel seed.name do
-            ArbreHelpers::Seed.seed_show_section(self, seed)
+          
+          column do
+            h3 "Current Fruits"
+            if fruit = issue.person.argentina_invoicing_details.presence
+              panel fruit.name do
+                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              end
+            end
+    
+            if fruit = issue.person.chile_invoicing_details.presence
+              panel fruit.name do
+                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              end
+            end
           end
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_show_tab(self, "Affinity", :affinity_seeds)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Affinity", :affinity_seeds, :affinities)
 
       tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
-        ArbreHelpers::Layout.panel_grid(self, resource.phone_seeds) do |d|
-          ArbreHelpers::Seed.seed_show_section(self, d)
-        end
+        columns do
+          column span: 2 do
+            h3 "Current Seeds"
+            ArbreHelpers::Layout.panel_only(self, resource.phone_seeds) do |d|
+              ArbreHelpers::Seed.seed_show_section(self, d)
+            end
+    
+            ArbreHelpers::Layout.panel_only(self, resource.email_seeds) do |d|
+              ArbreHelpers::Seed.seed_show_section(self, d)
+            end  
+          end
+          column do
+            h3 "Current Fruits"
+            ArbreHelpers::Layout.panel_only(self, resource.person.phones) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
 
-        ArbreHelpers::Layout.panel_grid(self, resource.email_seeds) do |d|
-          ArbreHelpers::Seed.seed_show_section(self, d)
+            ArbreHelpers::Layout.panel_only(self, resource.person.emails) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
+          end
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_show_tab(self, "Risk Score", :risk_score_seeds)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Risk Score", :risk_score_seeds, :risk_scores)
     end
   end
 end

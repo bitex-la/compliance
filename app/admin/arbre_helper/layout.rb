@@ -18,5 +18,17 @@ module ArbreHelpers
         end
       end
     end
+
+    def self.panel_only(context, objects, &block)
+      Appsignal.instrument("render_#{objects.klass.name}_grid") do
+        context.instance_eval do
+          objects.each do |o|
+            panel o.name do
+              instance_exec o, &block
+            end
+          end
+        end
+      end
+    end
   end
 end

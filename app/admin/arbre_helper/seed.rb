@@ -1,5 +1,28 @@
 module ArbreHelpers
   class Seed
+    def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits)
+      Appsignal.instrument("render_#{relation.to_s}") do
+        context.instance_eval do
+          tab "#{title} (#{resource.send(relation).count})" do
+            columns do
+              column span: 2 do
+                h3 "Current Seeds"
+                ArbreHelpers::Layout.panel_only(self, resource.send(relation)) do |d|
+                  ArbreHelpers::Seed.seed_show_section(self, d)
+                end  
+              end
+              column do
+                h3 "Current Fruits"
+                ArbreHelpers::Layout.panel_only(self, resource.person.send(fruits)) do |d|
+                  ArbreHelpers::Fruit.fruit_show_section(self, d)
+                end
+              end
+            end    
+          end
+        end
+      end
+    end
+    
     def self.seed_collection_show_tab(context, title, relation)
       Appsignal.instrument("render_#{relation.to_s}") do
         context.instance_eval do
