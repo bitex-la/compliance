@@ -9,7 +9,6 @@ describe 'a restricted admin user' do
     %w(
       admin_users
       observation_reasons
-      event_logs
     ).each do |path|
       visit "/#{path}"
       page.current_path.should == '/'
