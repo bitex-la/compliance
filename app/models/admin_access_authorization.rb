@@ -16,7 +16,8 @@ class AdminAccessAuthorization < ActiveAdmin::AuthorizationAdapter
       PhoneSeed,
       EmailSeed,
       FundDeposit,
-      Attachment
+      Attachment,
+      EventLog
     ]
   end
   
