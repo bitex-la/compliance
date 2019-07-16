@@ -31,7 +31,9 @@ RSpec.describe FundDeposit, type: :model do
         create(:full_fund_deposit, person: person, amount: 2500)
       end.to change{person.issues.count}.by(1)
       
-      expect(person.issues.last.risk_score_seeds.last).to have_attributes(
+      issue = person.issues.last 
+
+      expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'low',
         provider: 'open_compliance',
         extra_info_hash: {
@@ -41,6 +43,8 @@ RSpec.describe FundDeposit, type: :model do
           'funding_count' => 2
         } 
       )
+
+      expect(issue.reason).to eq(IssueReason.new_risk_information)
 
       expect(person.regularity).to eq PersonRegularity.low
 
@@ -74,9 +78,13 @@ RSpec.describe FundDeposit, type: :model do
       end
 
       expect(person.issues.size).to eq 2
-      expect(person.issues.last.risk_score_seeds.last).to have_attributes(
+      
+      issue = person.issues.last 
+      expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'high'
       )
+
+      expect(issue.reason).to eq(IssueReason.new_risk_information)
     end
     
     it 'person changes regularity by funding repeatedly' do
@@ -104,9 +112,12 @@ RSpec.describe FundDeposit, type: :model do
         }).not_to be_nil
       end
 
-      expect(person.issues.last.risk_score_seeds.last).to have_attributes(
+      issue = person.issues.last 
+      expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'low'
       )
+
+      expect(issue.reason).to eq(IssueReason.new_risk_information)
 
       6.times do 
         create(:alt_fund_deposit, person: person, amount:1)
@@ -130,10 +141,12 @@ RSpec.describe FundDeposit, type: :model do
       end
 
       expect(person.issues.size).to eq 2
-
-      expect(person.issues.last.risk_score_seeds.last).to have_attributes(
+      
+      issue = person.issues.last 
+      expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'high'
       )
+      expect(issue.reason).to eq(IssueReason.new_risk_information)
     end
 
     it 'none person can become high_regular by amount funded' do
