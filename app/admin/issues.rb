@@ -165,105 +165,164 @@ ActiveAdmin.register Issue do
         end
 
         h3 "Notes Seeds"
-        div class: 'note_seeds' do
-          ArbreHelpers::Form.has_many_form self, f, :note_seeds do |nf, context|
-            nf.input :body, input_html: {rows: 3}
-            nf.input :expires_at, as: :datepicker
-            ArbreHelpers::Attachment.has_many_attachments(context, nf)
+        columns do
+          column span: 2 do
+            div class: 'note_seeds' do
+              ArbreHelpers::Form.has_many_form self, f, :note_seeds do |nf, context|
+                nf.input :body, input_html: {rows: 3}
+                nf.input :expires_at, as: :datepicker
+                ArbreHelpers::Attachment.has_many_attachments(context, nf)
+              end
+            end
+          end
+          column do
+            h3 "Current Fruits"
+            if fruits = resource.person.notes.presence
+              ArbreHelpers::Layout.panel_only(self, fruits) do |d|
+                ArbreHelpers::Fruit.fruit_show_section(self, d)
+              end
+            end
           end
         end
       end
 
       tab :docket do
-        if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-          ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
-            sf.input :commercial_name
-            sf.input :legal_name
-            sf.input :industry
-            sf.input :business_description, input_html: {rows: 3}
-            Appsignal.instrument("render_country_for_docket") do
-              sf.input :country, as: :autocomplete, url: search_country_people_path
-            end
-            if resource.person.legal_entity_docket
-              sf.input :copy_attachments,
-                label: "Move existing Legal Entity Docket attachments to the new one"
-            end
-            sf.input :expires_at, as: :datepicker
-            ArbreHelpers::Attachment.has_many_attachments(self, sf)
-          end
-        end
-
-        if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-          ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-            Appsignal.instrument("rendering_first_natural_docket_fields") do
-              sf.input :first_name
-              sf.input :last_name
-              sf.input :birth_date, as: :datepicker,
-                datepicker_options: {
-                  change_year: true,
-                  change_month: true
-                }
-              sf.input :nationality, as: :autocomplete, url: search_country_people_path
-            end
-            Appsignal.instrument("rendering_association_natural_docket_fields") do
-              sf.input :gender_id, as: :select, collection: GenderKind.all
-              sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
-            end
-            Appsignal.instrument("rendering_last_natural_docket_fields") do
-              sf.input :job_title
-              sf.input :job_description
-              sf.input :politically_exposed
-              sf.input :politically_exposed_reason, input_html: {rows: 3}
-              if resource.person.natural_docket
-                sf.input :copy_attachments,
-                  label: "Move existing Natural Person Docket attachments to the new one"
+        columns do
+          column span: 2 do
+            if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
+              ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+                sf.input :commercial_name
+                sf.input :legal_name
+                sf.input :industry
+                sf.input :business_description, input_html: {rows: 3}
+                Appsignal.instrument("render_country_for_docket") do
+                  sf.input :country, as: :autocomplete, url: search_country_people_path
+                end
+                if resource.person.legal_entity_docket
+                  sf.input :copy_attachments,
+                    label: "Move existing Legal Entity Docket attachments to the new one"
+                end
+                sf.input :expires_at, as: :datepicker
+                ArbreHelpers::Attachment.has_many_attachments(self, sf)
               end
             end
-            sf.input :expires_at, as: :datepicker
-            Appsignal.instrument("rendering_has_many_attachments_on_docket") do
-              ArbreHelpers::Attachment.has_many_attachments(self, sf)
+    
+            if resource.for_person_type == :natural_person || resource.for_person_type.nil?
+              ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
+                Appsignal.instrument("rendering_first_natural_docket_fields") do
+                  sf.input :first_name
+                  sf.input :last_name
+                  sf.input :birth_date, as: :datepicker,
+                    datepicker_options: {
+                      change_year: true,
+                      change_month: true
+                    }
+                  sf.input :nationality, as: :autocomplete, url: search_country_people_path
+                end
+                Appsignal.instrument("rendering_association_natural_docket_fields") do
+                  sf.input :gender_id, as: :select, collection: GenderKind.all
+                  sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
+                end
+                Appsignal.instrument("rendering_last_natural_docket_fields") do
+                  sf.input :job_title
+                  sf.input :job_description
+                  sf.input :politically_exposed
+                  sf.input :politically_exposed_reason, input_html: {rows: 3}
+                  if resource.person.natural_docket
+                    sf.input :copy_attachments,
+                      label: "Move existing Natural Person Docket attachments to the new one"
+                  end
+                end
+                sf.input :expires_at, as: :datepicker
+                Appsignal.instrument("rendering_has_many_attachments_on_docket") do
+                  ArbreHelpers::Attachment.has_many_attachments(self, sf)
+                end
+              end
+            end
+          end
+          column do
+            h3 "Current Fruits"
+            if fruit = issue.person.legal_entity_docket.presence
+              panel fruit.name do
+                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              end
+            end
+            if fruit = issue.person.natural_docket.presence
+              panel fruit.name do
+                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              end
             end
           end
         end
       end
 
       tab "Domicile (#{resource.domicile_seeds.count})" do
-        ArbreHelpers::Form.has_many_form self, f, :domicile_seeds do |sf, context|
-          sf.input :country, as: :autocomplete, url: '/people/search_country'
-          sf.input :state
-          sf.input :city
-          sf.input :street_address
-          sf.input :street_number
-          sf.input :postal_code
-          sf.input :floor
-          sf.input :apartment
-          ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
-          sf.input :expires_at, as: :datepicker
-          ArbreHelpers::Attachment.has_many_attachments(context, sf)
+        columns do
+          column span: 2 do
+            ArbreHelpers::Form.has_many_form self, f, :domicile_seeds do |sf, context|
+              sf.input :country, as: :autocomplete, url: '/people/search_country'
+              sf.input :state
+              sf.input :city
+              sf.input :street_address
+              sf.input :street_number
+              sf.input :postal_code
+              sf.input :floor
+              sf.input :apartment
+              ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
+              sf.input :expires_at, as: :datepicker
+              ArbreHelpers::Attachment.has_many_attachments(context, sf)
+            end
+          end
+          column do
+            h3 "Current Fruits"
+            ArbreHelpers::Layout.panel_only(self, resource.person.domiciles) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
+          end
         end
       end
 
       tab "ID (#{resource.identification_seeds.count})" do
-        ArbreHelpers::Form.has_many_form self, f, :identification_seeds do |sf, context|
-          sf.input :number
-          sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
-          sf.input :issuer, as: :autocomplete, url: '/people/search_country'
-          sf.input :public_registry_authority
-          sf.input :public_registry_book
-          sf.input :public_registry_extra_data
-          ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
-          sf.input :expires_at, as: :datepicker
-          ArbreHelpers::Attachment.has_many_attachments(context, sf)
+        columns do
+          column span: 2 do
+            ArbreHelpers::Form.has_many_form self, f, :identification_seeds do |sf, context|
+              sf.input :number
+              sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
+              sf.input :issuer, as: :autocomplete, url: '/people/search_country'
+              sf.input :public_registry_authority
+              sf.input :public_registry_book
+              sf.input :public_registry_extra_data
+              ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
+              sf.input :expires_at, as: :datepicker
+              ArbreHelpers::Attachment.has_many_attachments(context, sf)
+            end
+          end
+          column do
+            h3 "Current Fruits"
+            ArbreHelpers::Layout.panel_only(self, resource.person.identifications) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
+          end
         end
       end
 
       tab "Allowance (#{resource.allowance_seeds.count})" do
-        ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
-          sf.input :amount
-          sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
-          ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
-          sf.input :expires_at, as: :datepicker
-          ArbreHelpers::Attachment.has_many_attachments(context, sf)
+        columns do
+          column span: 2 do
+            ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
+              sf.input :amount
+              sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
+              ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
+              sf.input :expires_at, as: :datepicker
+              ArbreHelpers::Attachment.has_many_attachments(context, sf)
+            end
+          end
+          column do
+            h3 "Current Fruits"
+            ArbreHelpers::Layout.panel_only(self, resource.person.allowances) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
+          end
         end
       end
 
@@ -294,6 +353,19 @@ ActiveAdmin.register Issue do
               ArbreHelpers::Replacement.fields_for_replaces self, cf, :chile_invoicing_details
               cf.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(self, cf)
+            end
+          end
+          column do
+            h3 "Current Fruits"
+            if fruit = issue.person.argentina_invoicing_details.presence
+              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
+                ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
+              end
+            end
+            if fruit = issue.person.chile_invoicing_details.presence
+              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
+                ArbreHelpers::Fruit.fruit_show_section(self, d)
+              end
             end
           end
         end
@@ -336,55 +408,78 @@ ActiveAdmin.register Issue do
       end
 
       tab "Contact (#{resource.phone_seeds.count + resource.email_seeds.count})" do
-        ArbreHelpers::Form.has_many_form self, f, :phone_seeds do |pf, context|
-          pf.input :number
-          pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
-          pf.input :country, as: :autocomplete, url: '/people/search_country'
-          pf.input :has_whatsapp
-          pf.input :has_telegram
-          pf.input :note, input_html: {rows: 3}
-          if current = context.resource.person.phones.current.presence
-            pf.input :replaces, collection: current
+        columns do
+          column span: 2 do
+            ArbreHelpers::Form.has_many_form self, f, :phone_seeds do |pf, context|
+              pf.input :number
+              pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
+              pf.input :country, as: :autocomplete, url: '/people/search_country'
+              pf.input :has_whatsapp
+              pf.input :has_telegram
+              pf.input :note, input_html: {rows: 3}
+              if current = context.resource.person.phones.current.presence
+                pf.input :replaces, collection: current
+              end
+              pf.input :expires_at, as: :datepicker
+            end
+            br
+            ArbreHelpers::Form.has_many_form self, f, :email_seeds do |ef, context|
+              ef.input :address
+              ef.input :email_kind_id, as: :select, collection: EmailKind.all
+              if current = context.resource.person.emails.current.presence
+                ef.input :replaces, collection: current
+              end
+              ef.input :expires_at, as: :datepicker
+            end
           end
-          pf.input :expires_at, as: :datepicker
-        end
-        br
-        ArbreHelpers::Form.has_many_form self, f, :email_seeds do |ef, context|
-          ef.input :address
-          ef.input :email_kind_id, as: :select, collection: EmailKind.all
-          if current = context.resource.person.emails.current.presence
-            ef.input :replaces, collection: current
+          column do
+            h3 "Current Fruits"
+            ArbreHelpers::Layout.panel_only(self, resource.person.phones) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
+            ArbreHelpers::Layout.panel_only(self, resource.person.emails) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
           end
-          ef.input :expires_at, as: :datepicker
         end
       end
 
       tab "Risk Score (#{resource.risk_score_seeds.count})" do
-        ArbreHelpers::Form.has_many_form self, f, :risk_score_seeds do |rs, context|
-          rs.input :score
-          rs.input :provider
-          rs.input :external_link
-          if current = context.resource.person.risk_scores.current.presence
-            rs.input :replaces, collection: current
-          end
-          seed = rs.object
-          if seed.persisted?     
-            ArbreHelpers::HtmlHelper.has_many_links(context, rs, 
-              seed.external_link.split(',').compact,
-              'External links') if seed.external_link 
-            begin 
-              if seed.extra_info
-                extra_info_as_json = JSON.parse(seed.extra_info)
-                ArbreHelpers::HtmlHelper.json_renderer(context, extra_info_as_json)
+        columns do
+          column span: 2 do
+            ArbreHelpers::Form.has_many_form self, f, :risk_score_seeds do |rs, context|
+              rs.input :score
+              rs.input :provider
+              rs.input :external_link
+              if current = context.resource.person.risk_scores.current.presence
+                rs.input :replaces, collection: current
               end
-            rescue JSON::ParserError
-              rs.input :extra_info, input_html: { readonly: true, disabled: true }
+              seed = rs.object
+              if seed.persisted?     
+                ArbreHelpers::HtmlHelper.has_many_links(context, rs, 
+                  seed.external_link.split(',').compact,
+                  'External links') if seed.external_link 
+                begin 
+                  if seed.extra_info
+                    extra_info_as_json = JSON.parse(seed.extra_info)
+                    ArbreHelpers::HtmlHelper.json_renderer(context, extra_info_as_json)
+                  end
+                rescue JSON::ParserError
+                  rs.input :extra_info, input_html: { readonly: true, disabled: true }
+                end
+              else
+                rs.input :extra_info 
+              end
+              rs.input :expires_at, as: :datepicker
+              ArbreHelpers::Attachment.has_many_attachments(context, rs)
             end
-          else
-            rs.input :extra_info 
           end
-          rs.input :expires_at, as: :datepicker
-          ArbreHelpers::Attachment.has_many_attachments(context, rs)
+          column do
+            h3 "Current Fruits"
+            ArbreHelpers::Layout.panel_only(self, resource.person.risk_scores) do |d|
+              ArbreHelpers::Fruit.fruit_show_section(self, d)
+            end
+          end
         end
       end
     end
@@ -430,7 +525,6 @@ ActiveAdmin.register Issue do
         end
 
         h3 "Notes"
-
         columns do
           column span: 2 do
             h3 "Current Seeds"
@@ -442,10 +536,8 @@ ActiveAdmin.register Issue do
               end
             end
           end
-          
           column do
             h3 "Current Fruits"
-            
             if fruits = resource.person.notes.presence
               ArbreHelpers::Layout.panel_only(self, fruits) do |d|
                 ArbreHelpers::Fruit.fruit_show_section(self, d)
@@ -459,30 +551,25 @@ ActiveAdmin.register Issue do
         columns do
           column span: 2 do
             h3 "Current Seeds"
-            
             if seed = issue.legal_entity_docket_seed.presence
               panel seed.name do
                 ArbreHelpers::Seed.seed_show_section(self, seed)
               end
             end
-    
             if seed = issue.natural_docket_seed.presence
               panel seed.name do
                 ArbreHelpers::Seed.seed_show_section(self, seed)
               end
             end
-
           end
 
           column do
             h3 "Current Fruits"
-
             if fruit = issue.person.legal_entity_docket.presence
               panel fruit.name do
                 ArbreHelpers::Fruit.fruit_show_section(self, fruit)
               end
             end
-    
             if fruit = issue.person.natural_docket.presence
               panel fruit.name do
                 ArbreHelpers::Fruit.fruit_show_section(self, fruit)
@@ -505,14 +592,12 @@ ActiveAdmin.register Issue do
                 ArbreHelpers::Seed.seed_show_section(self, seed, [:tax_id])
               end
             end
-    
             if seed = issue.chile_invoicing_detail_seed.presence
               panel seed.name do
                 ArbreHelpers::Seed.seed_show_section(self, seed)
               end
             end
           end
-          
           column do
             h3 "Current Fruits"
             if fruit = issue.person.argentina_invoicing_details.presence
@@ -520,7 +605,6 @@ ActiveAdmin.register Issue do
                 ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
               end
             end
-    
             if fruit = issue.person.chile_invoicing_details.presence
               ArbreHelpers::Layout.panel_only(self, fruit) do |d|
                 ArbreHelpers::Fruit.fruit_show_section(self, d)
@@ -539,7 +623,6 @@ ActiveAdmin.register Issue do
             ArbreHelpers::Layout.panel_only(self, resource.phone_seeds) do |d|
               ArbreHelpers::Seed.seed_show_section(self, d)
             end
-    
             ArbreHelpers::Layout.panel_only(self, resource.email_seeds) do |d|
               ArbreHelpers::Seed.seed_show_section(self, d)
             end  
@@ -549,7 +632,6 @@ ActiveAdmin.register Issue do
             ArbreHelpers::Layout.panel_only(self, resource.person.phones) do |d|
               ArbreHelpers::Fruit.fruit_show_section(self, d)
             end
-
             ArbreHelpers::Layout.panel_only(self, resource.person.emails) do |d|
               ArbreHelpers::Fruit.fruit_show_section(self, d)
             end

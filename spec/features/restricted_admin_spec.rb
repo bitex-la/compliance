@@ -109,11 +109,14 @@ describe 'a restricted admin user' do
         apartment: ''
       })
     end
+
     click_button "Update Issue"
-  
-    expect(page).to_not have_content 'Approve'
-    expect(page).to_not have_content 'Dismiss'
-    expect(page).to_not have_content 'Abandon'
-    expect(page).to_not have_content 'Reject'
+    
+    within(".action_item") do
+      expect(page).to_not have_selector(:link_or_button, 'Approve')
+      expect(page).to_not have_selector(:link_or_button, 'Dismiss')
+      expect(page).to_not have_selector(:link_or_button, 'Abandon')
+      expect(page).to_not have_selector(:link_or_button, 'Reject')
+    end
   end
 end
