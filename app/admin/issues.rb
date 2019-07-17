@@ -516,14 +516,14 @@ ActiveAdmin.register Issue do
           column do
             h3 "Current Fruits"
             if fruit = issue.person.argentina_invoicing_details.presence
-              panel fruit.name do
-                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
+                ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
               end
             end
     
             if fruit = issue.person.chile_invoicing_details.presence
-              panel fruit.name do
-                ArbreHelpers::Fruit.fruit_show_section(self, fruit)
+              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
+                ArbreHelpers::Fruit.fruit_show_section(self, d)
               end
             end
           end
