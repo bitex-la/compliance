@@ -16,6 +16,14 @@ module ArbreHelpers
                 ArbreHelpers::Layout.panel_only(self, resource.person.send(fruits)) do |d|
                   ArbreHelpers::Fruit.fruit_show_section(self, d)
                 end
+                h3 "Other Seeds"
+                relation.to_s.camelize.singularize.constantize
+                  .others_active_seeds(resource)
+                  .each do |o|
+                    panel o.name do
+                      ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
+                    end
+                  end
               end
             end    
           end
