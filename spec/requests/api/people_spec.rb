@@ -23,7 +23,8 @@ describe Person do
             risk: nil,
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z',
-            person_type: nil
+            person_type: nil,
+            state: 'disabled'
           },
           relationships: {
             regularity: { data: {
@@ -78,7 +79,8 @@ describe Person do
           risk: 'medium',
           created_at: '2018-01-01T00:00:00.000Z',
           updated_at: '2018-01-01T00:00:00.000Z',
-          person_type: "natural_person"
+          person_type: "natural_person",
+          state: 'enabled'
         },
         relationships: {
           regularity: { data: {
@@ -470,6 +472,7 @@ describe Person do
       }
 
       person.reload.should be_enabled
+      expect(person.state).to eq('enabled')
     end
 
     it 'responds 404 when the person does not exist' do
@@ -493,6 +496,7 @@ describe Person do
       person = Person.find(api_response.data.id)
       expect(person.tags).to include person_tag
       expect(person.enabled).to eq true
+      expect(person.state).to eq 'enabled'
       expect(person.risk).to eq "low"
     end
   end

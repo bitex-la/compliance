@@ -1,10 +1,15 @@
 class Person < ApplicationRecord
-  include Loggable, StaticModels::BelongsTo
+  include AASM
+  include Loggable
+  StaticModels::BelongsTo
 
   after_save :log_if_enabled
   after_save :expire_action_cache
-  
+  after_save :sync_status
+
   belongs_to :regularity, class_name: "PersonRegularity"
+
+  ransack_alias :state, :aasm_state
 
   HAS_MANY_REPLACEABLE = %i{
     domiciles
@@ -89,6 +94,21 @@ class Person < ApplicationRecord
         .distinct
     }[type.to_sym]
   }
+
+  scope :with_relations, -> {
+    includes(
+      nil
+    ) 
+  }
+
+  {
+    fresh: :new,
+    enabled: :enabled,
+    disabled: :disabled,
+    rejected: :rejected
+  }.each do |k,v| 
+    scope k, -> { with_relations.where('people.aasm_state=?', v) }  
+  end
 
   def self.ransackable_scopes(auth_object = nil)
     %i(by_person_type)
@@ -235,6 +255,65 @@ class Person < ApplicationRecord
       EventLogKind.update_person_regularity) if should_log
   end
 
+  aasm do
+    state :new, initial: true
+    state :enabled
+    state :disabled
+    state :rejected
+    
+    event :enable do
+      transitions from: :new, to: :enabled
+      transitions from: :disabled, to: :enabled
+      after do 
+        if !enabled
+          self.enabled = true
+          save!
+        end
+      end
+    end
+
+    event :disable do
+      transitions from: :enabled, to: :disabled
+      transitions from: :new, to: :disabled
+      after do 
+        self.enabled = false
+        save!
+      end
+    end
+
+    event :reject do
+      transitions from: :new, to: :rejected
+      transitions from: :enabled, to: :rejected
+      transitions from: :disabled, to: :rejected
+      after do 
+        if enabled
+          self.enabled = false
+          save!
+        end
+      end
+    end
+  end
+
+  def state
+    aasm_state
+  end
+
+  def state=(status)
+    self.aasm_state = status
+  end
+
+  def can_enable
+    !enabled && aasm_state != "rejected"
+  end
+
+  def can_disable
+    enabled && aasm_state != "rejected"
+  end
+
+  def can_reject
+    aasm_state != "rejected"
+  end
+
   private
 
   def expire_action_cache
@@ -245,6 +324,11 @@ class Person < ApplicationRecord
     was, is = saved_changes[:enabled]
     log_state_change(:enable_person) if !was && is
     log_state_change(:disable_person) if was && !is
+  end
+
+  def sync_status
+    enable! if enabled && aasm_state != "enabled"
+    disable! if !enabled && aasm_state == "enabled"
   end
 
   def log_state_change(verb)

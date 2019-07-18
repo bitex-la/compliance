@@ -159,7 +159,7 @@ shared_examples "docket" do |type, initial_factory|
       .should == [old_fruit.id.to_s]
 
     issue.approve!
-    person.update!(enabled: true)
+    person.enable
 
     api_get "/#{type}/#{old_fruit.id}"
 
@@ -302,7 +302,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
       replaceable_fruit_id
 
     api_request :post, "/issues/#{replacing_issue.id}/approve"
-    person.update!(enabled: true)
+    person.enable
     replacement_fruit_id = fruit_class.last.id.to_s
 
     api_get "/people/#{person.id}"

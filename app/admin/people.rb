@@ -13,11 +13,14 @@ ActiveAdmin.register Person do
   end
 
   actions :all, except: [:destroy]
-  action_item :enable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && !resource.enabled} do 
+  action_item :enable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.can_enable} do 
     link_to "Enable", [:enable, :person], method: :post
   end
-  action_item :disable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.enabled} do 
+  action_item :disable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.can_disable} do 
     link_to "Disable", [:disable, :person], method: :post
+  end
+  action_item :reject, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.can_reject} do 
+    link_to "Reject", [:reject, :person], method: :post
   end
 
   collection_action :search_person, method: :get do 
@@ -26,12 +29,17 @@ ActiveAdmin.register Person do
   end
 
   member_action :enable, method: :post do
-    resource.update!(enabled: true)
+    resource.enable
     redirect_to action: :show
   end
 
   member_action :disable, method: :post do
-    resource.update!(enabled: false)
+    resource.disable
+    redirect_to action: :show
+  end
+
+  member_action :reject, method: :post do
+    resource.reject
     redirect_to action: :show
   end
   
@@ -63,6 +71,10 @@ ActiveAdmin.register Person do
   filter :regularity
   filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
 
+  scope :fresh, default: true
+  scope :enabled
+  scope :disabled
+  scope :rejected
   scope :all
   scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
   scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
@@ -109,6 +121,7 @@ ActiveAdmin.register Person do
     column :id
     column :person_info
     column :enabled
+    column :state
     column :risk
     column :regularity
     column :person_type
@@ -125,6 +138,7 @@ ActiveAdmin.register Person do
             attributes_table_for resource do
               row :id
               row :enabled
+              row :state
               row :risk
               row :regularity
             end

@@ -66,7 +66,7 @@ describe 'an admin handling affinities' do
     person = create(:full_natural_person)
 
     related_person = person.reload.affinities.first.related_person
-    related_person.update!(enabled: true)
+    related_person.enable
     login_as admin_user
 
     click_link 'People'
