@@ -24,7 +24,7 @@ describe Person do
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z',
             person_type: nil,
-            state: 'disabled'
+            state: 'new'
           },
           relationships: {
             regularity: { data: {
@@ -559,6 +559,23 @@ describe Person do
       api_get "/people/#{person.id}"
       api_response.data.attributes.enabled.should be_falsey
       Rails.application.config.cache_store = :null_store
+    end
+  end
+
+  describe "when changing state" do
+    { enable: :new,
+      disable: :new,
+      reject: :enabled
+    }.each do |action, initial_state|
+      it "It can #{action} person" do
+        person = create(:empty_person, state: initial_state)
+        api_request :post, "/people/#{person.id}/#{action}", {}, 200
+      end
+
+      it "It cannot #{action} rejected issue" do
+        person = create(:empty_person, state: :rejected)
+        api_request :post, "/people/#{person.id}/#{action}", {}, 422
+      end
     end
   end
 end

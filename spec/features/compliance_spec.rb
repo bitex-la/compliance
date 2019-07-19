@@ -33,6 +33,7 @@ describe 'an admin user' do
 
     visit '/'
     click_link 'People'
+    click_link 'All'
     within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
       click_link 'View'
     end
@@ -302,6 +303,7 @@ describe 'an admin user' do
     login_as admin_user
 
     click_link 'People'
+    click_link 'All'
 
     within("tr[id='person_#{person.id}'] td[class='col col-actions']") do
       click_link('View')
@@ -880,6 +882,7 @@ describe 'an admin user' do
     login_as admin_user
 
     click_link 'People'
+    click_link 'All'
 
     within("#person_#{person.id} td.col.col-actions") do
       click_link('Edit')

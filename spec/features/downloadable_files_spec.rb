@@ -9,6 +9,8 @@ describe 'an admin user' do
 
     login_as admin_user
     click_link('People')
+    click_link('All')
+    
     within("#person_#{person.id} td.col.col-actions") do
       click_link('View')
     end
