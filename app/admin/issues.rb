@@ -15,7 +15,10 @@ ActiveAdmin.register Issue do
     column(:person_enabled)do |o|
       o.person.enabled
     end
-    column(:reason)
+    column(:reason) do |o| 
+      tags =  o.tags.any? ?  "(#{o.tags.pluck(:name).join(' - ')})" : "" 
+      "#{o.reason} #{tags}"
+    end
     column(:state)
     column(:created_at)
     column(:updated_at)
