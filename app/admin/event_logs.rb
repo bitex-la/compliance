@@ -1,5 +1,13 @@
 ActiveAdmin.register EventLog do
+  menu priority: 7, if: -> { !current_admin_user.is_restricted }
+  
   actions :show, :index
+
+  filter :entity_id
+  filter :entity_type
+  filter :admin_user
+  filter :verb
+  filter :created_at
 
   index do
     selectable_column
