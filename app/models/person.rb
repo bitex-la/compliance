@@ -236,7 +236,7 @@ class Person < ApplicationRecord
     should_log = regularity_id_changed?
 
     if should_log
-      issue = issues.build(state: 'new')
+      issue = issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.risk_score_seeds.build(
         score: regularity.code, 
         provider: 'open_compliance', 

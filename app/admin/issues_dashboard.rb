@@ -42,7 +42,10 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     column(:person_state)do |o|
       o.person.state
     end
-    column(:reason)
+    column(:reason) do |o| 
+      tags =  o.tags.any? ?  "(#{o.tags.pluck(:name).join(' - ')})" : "" 
+      "#{o.reason} #{tags}"
+    end
     column(:state)
     column(:created_at)
     column(:updated_at)

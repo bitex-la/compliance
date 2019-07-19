@@ -45,11 +45,6 @@ class Issue < ApplicationRecord
     errors.add(:issue, "changes in locked issues are not allowed!")
   end
 
-  def lock_expired?
-    return true if lock_expiration.nil?
-    DateTime.now >= lock_expiration 
-  end
-
   def locked_by_me?
     lock_admin_user == AdminUser.current_admin_user
   end
@@ -59,12 +54,12 @@ class Issue < ApplicationRecord
     value.minutes
   end
 
-  def lock_issue!
+  def lock_issue!(with_expiration=true)
     with_lock do
       next false if locked? && !locked_by_me? && !lock_expired?
       self.locked = true
       self.lock_admin_user = AdminUser.current_admin_user
-      self.lock_expiration = Issue.lock_expiration_interval_minutes.from_now
+      self.lock_expiration = with_expiration ? Issue.lock_expiration_interval_minutes.from_now : nil 
       save!(:validate => false)
       true
     end
@@ -82,6 +77,7 @@ class Issue < ApplicationRecord
 
   def unlock_issue!
     with_lock do
+      next false unless locked?
       next false unless locked_by_me?
       next false if lock_expired?
       self.locked = false
@@ -93,6 +89,7 @@ class Issue < ApplicationRecord
   end
 
   def lock_remaining_minutes
+    return -1 if lock_expiration.nil?
     ((lock_expiration - DateTime.now.utc) / 60).ceil
   end
 
@@ -403,6 +400,11 @@ class Issue < ApplicationRecord
   end
 
   private  
+
+  def lock_expired?
+    return false if lock_expiration.nil?
+    DateTime.now >= lock_expiration 
+  end
 
   def log_state_change(verb)
     EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))

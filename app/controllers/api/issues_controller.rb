@@ -68,15 +68,26 @@ class Api::IssuesController < Api::ApiController
   end
 
   %i{
-    lock_issue
-    unlock_issue
-    renew_lock
+    lock
+    unlock  
   }.each do |action|
     define_method(action) do
       issue = Issue.find(params[:id])
-      return jsonapi_error(422, "invalid transition") unless issue.send(action.to_s + '!')
+      return jsonapi_error(422, "invalid transition") unless issue.send(action.to_s + '_issue!')
       jsonapi_response(issue, {}, 200)
     end
+  end
+
+  def renew_lock
+    issue = Issue.find(params[:id])
+    return jsonapi_error(422, "invalid transition") unless issue.renew_lock!
+    jsonapi_response(issue, {}, 200)
+  end
+
+  def lock_for_ever
+    issue = Issue.find(params[:id])
+    return jsonapi_error(422, "invalid transition") unless issue.lock_issue!(false)
+    jsonapi_response(issue, {}, 200)
   end
 
   private
