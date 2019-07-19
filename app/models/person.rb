@@ -5,7 +5,7 @@ class Person < ApplicationRecord
 
   after_save :log_if_enabled
   after_save :expire_action_cache
-  after_save :sync_status
+  after_save :sync_bool_to_status
 
   belongs_to :regularity, class_name: "PersonRegularity"
 
@@ -326,7 +326,7 @@ class Person < ApplicationRecord
     log_state_change(:disable_person) if was && !is
   end
 
-  def sync_status
+  def sync_bool_to_status
     enable! if enabled && aasm_state != "enabled"
     disable! if !enabled && aasm_state == "enabled"
   end

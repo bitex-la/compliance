@@ -117,6 +117,7 @@ describe 'an admin user' do
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 13)
     expect(issue.person.enabled).to be_falsey
+    expect(issue.person.state).to eq('new')
     assert_logging(issue.person, :enable_person, 0)
 
     click_link 'Risk Score (1)'
@@ -134,6 +135,7 @@ describe 'an admin user' do
     click_link 'Enable'
 
     expect(issue.person.reload.enabled).to be_truthy
+    expect(issue.person.state).to eq('enabled')
     assert_logging(issue.person, :enable_person, 1)
 
     click_link 'Edit Person'
@@ -141,11 +143,13 @@ describe 'an admin user' do
     assert_logging(issue.person, :enable_person, 1)
     assert_logging(issue.person, :disable_person, 1)
     expect(issue.person.reload.enabled).to be_falsey
+    expect(issue.person.state).to eq('disabled')
 
     click_link 'Edit Person'
     click_link 'Enable'
 
     expect(issue.person.reload.enabled).to be_truthy
+    expect(issue.person.state).to eq('enabled')
     assert_logging(issue.person, :enable_person, 2)
 
     visit "/allowances/#{issue.person.allowances.first.id}"
@@ -294,6 +298,7 @@ describe 'an admin user' do
     click_link 'Enable'
 
     expect(issue.person.reload.enabled).to be_truthy
+    expect(issue.person.state).to eq('enabled')
     assert_logging(issue.person, :enable_person, 1)
   end
 
@@ -479,6 +484,7 @@ describe 'an admin user' do
     new_natural_docket.attachments.count.should == 1
 
     person.should be_enabled
+    expect(person.state).to eq('enabled')
   end
 
   it "Dismisses an issue that had only bogus data" do
@@ -499,6 +505,7 @@ describe 'an admin user' do
   it "Rejects an issue because an observation went unanswered" do
     person = create :new_natural_person, enabled: true
     person.should be_enabled
+    expect(person.state).to eq('enabled')
     issue = person.issues.reload.last
     issue.complete!
     login_as admin_user
@@ -508,6 +515,7 @@ describe 'an admin user' do
 
     issue.reload.should be_rejected
     person.reload.should be_enabled
+    expect(person.state).to eq('enabled')
     assert_logging(person, :disable_person, 0)
   end
 
@@ -545,6 +553,7 @@ describe 'an admin user' do
   it 'Handles a race condition between admin and robot observation replies' do
     person = create :new_natural_person
     person.should_not be_enabled
+    expect(person.state).to eq('new')
     wc_reason = create(:world_check_reason, subject_en: 'Run WC')
     google_reason = create(:world_check_reason, subject_en: 'Run Negative Path')
     observation_reason = create(:observation_reason)
@@ -631,6 +640,7 @@ describe 'an admin user' do
   it 'Reviews and disable a user with hits on worldcheck' do
     person = create :full_natural_person
     person.should be_enabled
+    expect(person.state).to eq('enabled')
     reason = create(:human_world_check_reason)
     issue = create(:basic_issue, person: person)
     observation = create(:robot_observation, issue: issue)
@@ -659,6 +669,7 @@ describe 'an admin user' do
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should be_enabled
+    expect(person.state).to eq('enabled')
   end
 
   it "Abandons a new person issue that was inactive" do
@@ -677,6 +688,7 @@ describe 'an admin user' do
 
     issue.reload.should be_abandoned
     person.reload.should_not be_enabled
+    expect(person.state).to eq('new')
 
     visit '/'
     click_on "Abandoned"
@@ -897,6 +909,7 @@ describe 'an admin user' do
     click_button 'Update Person'
 
     person.reload.should_not be_enabled
+    expect(person.state).to eq('disabled')
     person.risk.should == 'low'
   end
 

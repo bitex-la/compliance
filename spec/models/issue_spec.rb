@@ -147,6 +147,7 @@ RSpec.describe Issue, type: :model do
       
       person.issues.reload.last.approve!
       expect(person.enabled).to be_falsey
+      expect(person.state).to eq('new')
     end
 
     it 'enable person on approve if issue reason is new_client' do
@@ -154,6 +155,7 @@ RSpec.describe Issue, type: :model do
       
       person.issues.reload.last.approve!
       expect(person.enabled).to be_truthy
+      expect(person.state).to eq('enabled')
     end
 
     it 'validates error on approve twice' do
@@ -161,6 +163,7 @@ RSpec.describe Issue, type: :model do
       
       person.issues.reload.last.approve!
       expect(person.enabled).to be_truthy
+      expect(person.state).to eq('enabled')
 
       expect {person.issues.reload.last.approve! }.to raise_error(ActiveRecord::RecordInvalid,
         "Validation failed: no_more_updates_allowed")

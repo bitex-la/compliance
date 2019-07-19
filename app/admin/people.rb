@@ -66,7 +66,6 @@ ActiveAdmin.register Person do
   filter :natural_dockets_politically_exposed_eq, as: :select, label: "Is PEP"
   filter :created_at
   filter :updated_at
-  filter :enabled
   filter :risk
   filter :regularity
   filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
@@ -120,7 +119,6 @@ ActiveAdmin.register Person do
   index do
     column :id
     column :person_info
-    column :enabled
     column :state
     column :risk
     column :regularity
@@ -137,7 +135,6 @@ ActiveAdmin.register Person do
           column do
             attributes_table_for resource do
               row :id
-              row :enabled
               row :state
               row :risk
               row :regularity

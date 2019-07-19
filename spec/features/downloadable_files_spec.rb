@@ -5,6 +5,7 @@ describe 'an admin user' do
 
   it 'download user KYC files' do
     person = create :full_natural_person
+    
     person.should be_enabled
 
     login_as admin_user
@@ -21,6 +22,7 @@ describe 'an admin user' do
   it 'cannot download files from detail if person does not have attachments' do
     person = create(:empty_person)
     person.should_not be_enabled
+    expect(person.state).to eq('new')
 
     login_as admin_user
     click_link('People')

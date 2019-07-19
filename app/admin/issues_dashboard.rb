@@ -39,8 +39,8 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     column(:person) do |o|
       link_to o.person.person_info, o.person
     end
-    column(:person_enabled)do |o|
-      o.person.enabled
+    column(:person_state)do |o|
+      o.person.state
     end
     column(:reason)
     column(:state)
