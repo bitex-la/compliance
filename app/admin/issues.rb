@@ -194,12 +194,7 @@ ActiveAdmin.register Issue do
               end
             end
 
-            h3 "Other Seeds"
-            NoteSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [NoteSeed])
           end
         end
       end
@@ -271,18 +266,7 @@ ActiveAdmin.register Issue do
               end
             end
 
-            h3 "Other Seeds"
-            LegalEntityDocketSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
-
-            NaturalDocketSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [LegalEntityDocketSeed, NaturalDocketSeed])
           end
         end
       end
@@ -310,12 +294,7 @@ ActiveAdmin.register Issue do
               ArbreHelpers::Fruit.fruit_show_section(self, d)
             end
 
-            h3 "Other Seeds"
-            DomicileSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [DomicileSeed])
           end
         end
       end
@@ -341,12 +320,7 @@ ActiveAdmin.register Issue do
               ArbreHelpers::Fruit.fruit_show_section(self, d)
             end
 
-            h3 "Other Seeds"
-            IdentificationSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [IdentificationSeed])
           end
         end
       end
@@ -368,12 +342,7 @@ ActiveAdmin.register Issue do
               ArbreHelpers::Fruit.fruit_show_section(self, d)
             end
             
-            h3 "Other Seeds"
-            AllowanceSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [AllowanceSeed])
           end
         end
       end
@@ -420,18 +389,8 @@ ActiveAdmin.register Issue do
               end
             end
 
-            h3 "Other Seeds"
-            ArgentinaInvoicingDetailSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue, :tax_id])
-              end
-            end
-
-            ChileInvoicingDetailSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue, :tax_id])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed, 
+              ChileInvoicingDetailSeed], [:tax_id])
           end
         end
       end
@@ -460,21 +419,14 @@ ActiveAdmin.register Issue do
           column do 
             Appsignal.instrument('render_current_affinities') do
               h3 "Current affinities"
-              resource.person.all_affinities.each do |d|
-                panel d.name do
-                  attributes_table_for d do
-                    ArbreHelpers::Affinity.affinity_card(self, d)
-                  end
+              ArbreHelpers::Layout.panel_only(self, resource.person.all_affinities) do |d|
+                attributes_table_for d do
+                  ArbreHelpers::Affinity.affinity_card(self, d)
                 end
               end
             end
 
-            h3 "Other Seeds"
-            AffinitySeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [AffinitySeed])
           end
         end
       end
@@ -513,18 +465,7 @@ ActiveAdmin.register Issue do
               ArbreHelpers::Fruit.fruit_show_section(self, d)
             end
 
-            h3 "Other Seeds"
-            PhoneSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
-
-            EmailSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [PhoneSeed, EmailSeed])
           end
         end
       end
@@ -565,12 +506,7 @@ ActiveAdmin.register Issue do
               ArbreHelpers::Fruit.fruit_show_section(self, d)
             end
 
-            h3 "Other Seeds"
-            RiskScoreSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [RiskScoreSeed])
           end
         end
       end
@@ -635,13 +571,7 @@ ActiveAdmin.register Issue do
                 ArbreHelpers::Fruit.fruit_show_section(self, d)
               end
             end
-
-            h3 "Other Seeds"
-            NoteSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [NoteSeed])
           end
         end
       end
@@ -674,19 +604,8 @@ ActiveAdmin.register Issue do
                 ArbreHelpers::Fruit.fruit_show_section(self, fruit)
               end
             end
-
-            h3 "Other Seeds"
-            LegalEntityDocketSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
-
-            NaturalDocketSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [LegalEntityDocketSeed,
+              NaturalDocketSeed])
           end
         end
       end
@@ -717,24 +636,15 @@ ActiveAdmin.register Issue do
                 ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
               end
             end
+            
             if fruit = issue.person.chile_invoicing_details.presence
               ArbreHelpers::Layout.panel_only(self, fruit) do |d|
                 ArbreHelpers::Fruit.fruit_show_section(self, d)
               end
             end
 
-            h3 "Other Seeds"
-            ArgentinaInvoicingDetailSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue, :tax_id])
-              end
-            end
-            
-            ChileInvoicingDetailSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue, :tax_id])
-              end
-            end
+            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed, 
+              ChileInvoicingDetailSeed], [:tax_id])
           end
         end
       end
@@ -753,26 +663,9 @@ ActiveAdmin.register Issue do
             end  
           end
           column do
-            h3 "Current Fruits"
-            ArbreHelpers::Layout.panel_only(self, resource.person.phones) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-            ArbreHelpers::Layout.panel_only(self, resource.person.emails) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-
-            h3 "Other Seeds"
-            PhoneSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
-            
-            EmailSeed.others_active_seeds(resource).each do |o|
-              panel o.name do
-                ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-              end
-            end
+            ArbreHelpers::Fruit.current_fruits_panel(self, [resource.person.phones, 
+              resource.person.emails])
+            ArbreHelpers::Seed.others_seeds_panel(self, [PhoneSeed, EmailSeed])
           end
         end
       end

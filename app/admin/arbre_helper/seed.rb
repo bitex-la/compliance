@@ -16,14 +16,7 @@ module ArbreHelpers
                 ArbreHelpers::Layout.panel_only(self, resource.person.send(fruits)) do |d|
                   ArbreHelpers::Fruit.fruit_show_section(self, d)
                 end
-                h3 "Other Seeds"
-                relation.to_s.camelize.singularize.constantize
-                  .others_active_seeds(resource)
-                  .each do |o|
-                    panel o.name do
-                      ArbreHelpers::Seed.seed_show_section(self, o, [:issue])
-                    end
-                  end
+                ArbreHelpers::Seed.others_seeds_panel(self, [relation.to_s.camelize.singularize.constantize])
               end
             end    
           end
@@ -77,6 +70,17 @@ module ArbreHelpers
 
       context.instance_eval do
         attributes_table_for resource, :fruit, *columns, *others
+      end
+    end
+
+    def self.others_seeds_panel(context, relations, extra = [])
+      context.instance_eval do
+        h3 "Other Seeds"
+        relations.each do |o|
+          ArbreHelpers::Layout.panel_only(self, o.others_active_seeds(resource)) do |s|
+            ArbreHelpers::Seed.seed_show_section(self, s, [:issue] + extra)
+          end
+        end
       end
     end
   end

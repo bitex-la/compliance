@@ -132,5 +132,16 @@ module ArbreHelpers
         end
       end
     end
+
+    def self.current_fruits_panel(context, fruits)
+      context.instance_eval do
+        h3 "Current Fruits"
+        fruits.each do |o|
+          ArbreHelpers::Layout.panel_only(self, o) do |d|
+            ArbreHelpers::Fruit.fruit_show_section(self, d)
+          end
+        end
+      end
+    end
   end
 end
