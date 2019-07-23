@@ -119,7 +119,7 @@ ActiveAdmin.register Person do
 
   show do
     tabs do
-      tab :base do
+      ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
           column do
             attributes_table_for resource do
@@ -170,25 +170,27 @@ ActiveAdmin.register Person do
         end
       end
 
-      tab :docket do
-        if fruit = resource.legal_entity_docket
+      if fruit = resource.legal_entity_docket
+        ArbreHelpers::Layout.tab_for(self, 'Legal Entity', 'industry') do
           panel fruit.name do
             ArbreHelpers::Fruit.fruit_show_section(self, fruit)
           end
         end
-
-        if fruit = resource.natural_docket
+      end
+      
+      if fruit = resource.natural_docket
+        ArbreHelpers::Layout.tab_for(self, 'Natural', 'user') do
           panel fruit.name do
             ArbreHelpers::Fruit.fruit_show_section(self, fruit)
           end
         end
       end
 
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Domicile", :domiciles)
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Id", :identifications)
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Allowance", :allowances)
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Domicile", :domiciles, 'home')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Id", :identifications, 'id-card')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Allowance", :allowances, 'money')
 
-      tab "Invoicing" do
+      ArbreHelpers::Layout.tab_for(self, 'Invoice', 'file') do
         if fruits = resource.argentina_invoicing_details.current.presence
           h3 "Argentina Invoicing details"
           fruits.each do |fruit|
@@ -208,7 +210,7 @@ ActiveAdmin.register Person do
         end
       end
 
-      tab "Affinities" do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Affinity', :all_affinities, 'users') do
         ArbreHelpers::Layout.panel_grid(self, resource.all_affinities) do |d|
           attributes_table_for d do
             ArbreHelpers::Affinity.affinity_card(self, d)
@@ -219,18 +221,10 @@ ActiveAdmin.register Person do
         end
       end
 
-      tab "Contact (#{resource.phones.count + resource.emails.count})" do
-        
-        ArbreHelpers::Layout.panel_grid(self, resource.phones) do |d|
-          ArbreHelpers::Fruit.fruit_show_section(self, d)
-        end
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Phone", :phones, 'phone')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Email", :emails, 'envelope')
 
-        ArbreHelpers::Layout.panel_grid(self, resource.emails) do |d|
-          ArbreHelpers::Fruit.fruit_show_section(self, d)
-        end
-      end
-
-      tab "Fund Deposits" do 
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', :fund_deposits, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do
           table_for person.fund_deposits do           
             column :amount
@@ -242,7 +236,7 @@ ActiveAdmin.register Person do
         end
       end
 
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Risk Score", :risk_scores)
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Risk Score", :risk_scores, 'exclamation-triangle')
     end
   end
 end

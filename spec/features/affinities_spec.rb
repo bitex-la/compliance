@@ -48,7 +48,7 @@ describe 'an admin handling affinities' do
 
     visit "/people/#{person.id}"
 
-    click_link 'Affinities'
+    find('li[title="Affinity"] a').click
     
     expect(page).to have_content "RELATED PERSON (#{owner_one.id})"
     expect(page).to have_content "RELATED PERSON (#{owner_two.id}) 🏭: E Corp"
@@ -56,7 +56,7 @@ describe 'an admin handling affinities' do
     expect(page).to have_content "RELATED PERSON (#{payee_two.id}) ☺: Joe Doe" 
 
     click_link "(#{owner_one.id}) *☺:"
-    click_link 'Affinities'
+    find('li[title="Affinity"] a').click
 
     within("#attributes_table_affinity_4 .row.row-affinity_kind") do
       expect(page).to have_content 'owns'
@@ -104,7 +104,7 @@ describe 'an admin handling affinities' do
     click_link 'Approve'
 
     visit "/people/#{person.id}"
-    click_link 'Affinities'
+    find('li[title="Affinity"] a').click
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
       expect(page).to have_content 'payee'
@@ -145,7 +145,7 @@ describe 'an admin handling affinities' do
     click_link 'Approve'
 
     visit "/people/#{person.id}"
-    click_link 'Affinities'
+    find('li[title="Affinity"] a').click
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
       expect(page).to have_content 'stakeholder'

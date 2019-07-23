@@ -118,7 +118,7 @@ describe 'an admin user' do
     expect(issue.person.enabled).to be_falsey
     assert_logging(issue.person, :enable_person, 0)
 
-    click_link "Risk Score (1)"
+    find('li[title="Risk Score"] a').click
 
     within '.external_links' do
       expect(page).to have_content 'Link #1'
