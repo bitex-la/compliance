@@ -70,9 +70,9 @@ module Garden
 
       scope :others_active_seeds, -> (issue) { 
         joins(:issue)
-        .where('issues.id != ?', issue.id)
-          .where("issues.aasm_state IN (?)",
-        %i{new observed answered})
+          .where("issues.id != ?", issue.id)
+          .where("issues.aasm_state IN (?)",%i{new observed answered})
+          .where("issues.person_id = ?", issue.person.id)
       }
     end
 

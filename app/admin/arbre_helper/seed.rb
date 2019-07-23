@@ -7,7 +7,7 @@ module ArbreHelpers
           ArbreHelpers::Layout.tab_for(self, title, icon, count) do
             columns do
               column span: 2 do
-                h3 "Current Seeds"
+                h3 "Current #{title} Seeds"
                 seeds = resource.send(relation)
                 ArbreHelpers::Layout.panel_only(self, seeds.respond_to?('each') ? seeds : [seeds] ) do |d|
                   ArbreHelpers::Seed.seed_show_section(self, d)

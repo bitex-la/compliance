@@ -579,7 +579,7 @@ ActiveAdmin.register Issue do
         h3 "Notes"
         columns do
           column span: 2 do
-            h3 "Current Seeds"
+            h3 "Current Note Seeds"
             if seeds = resource.note_seeds.presence
               ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
                 attributes_table_for d, :fruit
