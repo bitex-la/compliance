@@ -138,7 +138,7 @@ ActiveAdmin.register Issue do
     f.input :person_id, as: :hidden
 
     tabs do
-      tab "#{fa_icon("info")}".html_safe do
+      ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
           column do
             attributes_table_for resource do
@@ -200,25 +200,23 @@ ActiveAdmin.register Issue do
       end
 
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-        tab "#{fa_icon("industry")}".html_safe do
+        ArbreHelpers::Layout.tab_for(self, 'Legal Entity', 'industry') do
           columns do
             column span: 2 do
-              if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-                ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
-                  sf.input :commercial_name
-                  sf.input :legal_name
-                  sf.input :industry
-                  sf.input :business_description, input_html: {rows: 3}
-                  Appsignal.instrument("render_country_for_docket") do
-                    sf.input :country, as: :autocomplete, url: search_country_people_path
-                  end
-                  if resource.person.legal_entity_docket
-                    sf.input :copy_attachments,
-                      label: "Move existing Legal Entity Docket attachments to the new one"
-                  end
-                  sf.input :expires_at, as: :datepicker
-                  ArbreHelpers::Attachment.has_many_attachments(self, sf)
+              ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
+                sf.input :commercial_name
+                sf.input :legal_name
+                sf.input :industry
+                sf.input :business_description, input_html: {rows: 3}
+                Appsignal.instrument("render_country_for_docket") do
+                  sf.input :country, as: :autocomplete, url: search_country_people_path
                 end
+                if resource.person.legal_entity_docket
+                  sf.input :copy_attachments,
+                    label: "Move existing Legal Entity Docket attachments to the new one"
+                end
+                sf.input :expires_at, as: :datepicker
+                ArbreHelpers::Attachment.has_many_attachments(self, sf)
               end
             end
             column do
@@ -235,40 +233,38 @@ ActiveAdmin.register Issue do
         end  
       end
       
-      if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-        tab "#{fa_icon("user")}".html_safe do
+      if resource.for_person_type == :natural_person || resource.for_person_type.nil?
+        ArbreHelpers::Layout.tab_for(self, 'Natural', 'user') do
           columns do
             column span: 2 do
-              if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-                ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-                  Appsignal.instrument("rendering_first_natural_docket_fields") do
-                    sf.input :first_name
-                    sf.input :last_name
-                    sf.input :birth_date, as: :datepicker,
-                      datepicker_options: {
-                        change_year: true,
-                        change_month: true
-                      }
-                    sf.input :nationality, as: :autocomplete, url: search_country_people_path
+              ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
+                Appsignal.instrument("rendering_first_natural_docket_fields") do
+                  sf.input :first_name
+                  sf.input :last_name
+                  sf.input :birth_date, as: :datepicker,
+                    datepicker_options: {
+                      change_year: true,
+                      change_month: true
+                    }
+                  sf.input :nationality, as: :autocomplete, url: search_country_people_path
+                end
+                Appsignal.instrument("rendering_association_natural_docket_fields") do
+                  sf.input :gender_id, as: :select, collection: GenderKind.all
+                  sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
+                end
+                Appsignal.instrument("rendering_last_natural_docket_fields") do
+                  sf.input :job_title
+                  sf.input :job_description
+                  sf.input :politically_exposed
+                  sf.input :politically_exposed_reason, input_html: {rows: 3}
+                  if resource.person.natural_docket
+                    sf.input :copy_attachments,
+                      label: "Move existing Natural Person Docket attachments to the new one"
                   end
-                  Appsignal.instrument("rendering_association_natural_docket_fields") do
-                    sf.input :gender_id, as: :select, collection: GenderKind.all
-                    sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
-                  end
-                  Appsignal.instrument("rendering_last_natural_docket_fields") do
-                    sf.input :job_title
-                    sf.input :job_description
-                    sf.input :politically_exposed
-                    sf.input :politically_exposed_reason, input_html: {rows: 3}
-                    if resource.person.natural_docket
-                      sf.input :copy_attachments,
-                        label: "Move existing Natural Person Docket attachments to the new one"
-                    end
-                  end
-                  sf.input :expires_at, as: :datepicker
-                  Appsignal.instrument("rendering_has_many_attachments_on_docket") do
-                    ArbreHelpers::Attachment.has_many_attachments(self, sf)
-                  end
+                end
+                sf.input :expires_at, as: :datepicker
+                Appsignal.instrument("rendering_has_many_attachments_on_docket") do
+                  ArbreHelpers::Attachment.has_many_attachments(self, sf)
                 end
               end
             end
@@ -286,8 +282,8 @@ ActiveAdmin.register Issue do
           end
         end
       end
-      
-      tab "#{fa_icon("home")} (#{resource.domicile_seeds.count})".html_safe do
+
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Domicile', :domicile_seeds, 'home') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :domicile_seeds do |sf, context|
@@ -315,7 +311,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab "#{fa_icon("id-card")} (#{resource.identification_seeds.count})".html_safe do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'ID', :identification_seeds, 'id-card') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :identification_seeds do |sf, context|
@@ -341,7 +337,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab "#{fa_icon("money")} (#{resource.allowance_seeds.count})".html_safe do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Allowance', :allowance_seeds, 'money') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
@@ -363,7 +359,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab "#{fa_icon("file")}".html_safe do
+      ArbreHelpers::Layout.tab_for(self, 'Invoice', 'file') do
         columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
@@ -411,7 +407,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab "#{fa_icon("users")} (#{resource.affinity_seeds.count})".html_safe do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Affinity', :affinity_seeds, 'users') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :affinity_seeds do |rf, context|
@@ -447,7 +443,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab "#{fa_icon("phone")} (#{resource.phone_seeds.count})".html_safe do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Phone', :phone_seeds, 'phone') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :phone_seeds do |pf, context|
@@ -475,7 +471,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab "#{fa_icon("envelope")} (#{resource.email_seeds.count})".html_safe do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Email', :email_seeds, 'envelope') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :email_seeds do |ef, context|
@@ -498,7 +494,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      tab "#{fa_icon("search")} (#{resource.risk_score_seeds.count})".html_safe do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Risk Score', :risk_score_seeds, 'exclamation-triangle') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :risk_score_seeds do |rs, context|
@@ -548,7 +544,7 @@ ActiveAdmin.register Issue do
 
   show do
     tabs do
-      tab "#{fa_icon("info")}".html_safe do
+      ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
           column do
             attributes_table_for resource do
@@ -616,7 +612,7 @@ ActiveAdmin.register Issue do
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Id", :identification_seeds, :identifications, 'id-card')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Allowance", :allowance_seeds, :allowances, 'money')
 
-      tab "#{fa_icon("file")}".html_safe do
+      ArbreHelpers::Layout.tab_for(self, 'Invoice', 'file') do
         columns do
           column span: 2 do
             h3 "Current Invoice Seeds"
@@ -654,7 +650,7 @@ ActiveAdmin.register Issue do
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Affinity", :affinity_seeds, :affinities, 'users')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Phone", :phone_seeds, :phones, 'phone')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Email", :email_seeds, :emails, 'envelope')
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Risk Score", :risk_score_seeds, :risk_scores, 'search')
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Risk Score", :risk_score_seeds, :risk_scores, 'exclamation-triangle')
     end
   end
 end

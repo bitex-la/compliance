@@ -25,7 +25,8 @@ describe 'an admin handling affinities' do
     issue = Issue.last
     person = issue.person
 
-    click_link 'Affinity'
+    find('li[title="Affinity"] a').click
+    
     add_affinities([owner_one, owner_two], 'owner', 0)
     add_affinities([payee_one, payee_two], 'payee', 2)
 
@@ -78,14 +79,15 @@ describe 'an admin handling affinities' do
     click_link "Add Person Information"
     click_button "Create new issue"
 
-    click_link 'Affinity'
+    find('li[title="Affinity"] a').click
     add_affinities([related_person], 'business_partner', 0)
 
     click_button 'Update Issue'
 
     expect(page).to have_selector('.validation_errors', visible: true)
   
-    click_link 'Affinity'
+    find('li[title="Affinity"] a').click
+
     click_link 'Remove'
     add_affinities([related_person], 'payee', 0)
 
@@ -126,7 +128,7 @@ describe 'an admin handling affinities' do
     click_link "Add Person Information"
     click_button "Create new issue"
 
-    click_link 'Affinity'
+    find('li[title="Affinity"] a').click
 
     add_affinities([related_person], 'stakeholder', 0)
 

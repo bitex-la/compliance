@@ -1,13 +1,13 @@
 module ArbreHelpers
   class Seed
-    def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits, icon, show_count=true)
+    def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits_relation, icon, show_count=true)
       Appsignal.instrument("render_#{relation.to_s}") do
         context.instance_eval do
-          count = show_count ? "(#{resource.send(relation).count})" : ""
-          tab "#{fa_icon(icon)} #{count}".html_safe do
+          count = show_count ? "<span class='badge-count'>#{resource.send(relation).count}</span>" : ""
+          ArbreHelpers::Layout.tab_for(self, title, icon, count) do
             columns do
               column span: 2 do
-                h3 "Current #{title} Seeds"
+                h3 "Current Seeds"
                 seeds = resource.send(relation)
                 ArbreHelpers::Layout.panel_only(self, seeds.respond_to?('each') ? seeds : [seeds] ) do |d|
                   ArbreHelpers::Seed.seed_show_section(self, d)
@@ -15,24 +15,13 @@ module ArbreHelpers
               end
               column do
                 h3 "Current Fruits"
-                ArbreHelpers::Layout.panel_only(self, resource.person.send(fruits) || []) do |d|
+                fruits = resource.person.send(fruits_relation)
+                ArbreHelpers::Layout.panel_only(self, fruits.respond_to?('each') ? fruits : [fruits].compact ) do |d|
                   ArbreHelpers::Fruit.fruit_show_section(self, d)
                 end
                 ArbreHelpers::Seed.others_seeds_panel(self, [relation.to_s.camelize.singularize.constantize])
               end
-            end    
-          end
-        end
-      end
-    end
-    
-    def self.seed_collection_show_tab(context, title, relation)
-      Appsignal.instrument("render_#{relation.to_s}") do
-        context.instance_eval do
-          tab "#{title} (#{resource.send(relation).count})" do
-            ArbreHelpers::Layout.panel_grid(self, resource.send(relation)) do |d|
-              ArbreHelpers::Seed.seed_show_section(self, d)
-            end
+            end        
           end
         end
       end

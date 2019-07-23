@@ -28,5 +28,23 @@ module ArbreHelpers
         end
       end
     end
+
+    def self.tab_for(context, title, icon, extra="", &block)
+      context.instance_eval do
+        tab "#{fa_icon(icon, class: "fa-2x")} #{extra}".html_safe , { id: "#{title.gsub(" ", "-")}-tab", 
+          html_options: { title: title } } do
+          instance_exec &block
+        end
+      end
+    end
+
+    def self.tab_with_counter_for(context, title, relation, icon, &block)
+      context.instance_eval do
+        count = "<span class='badge-count'>#{resource.send(relation).count}</span>"
+        ArbreHelpers::Layout.tab_for(self, title, icon, count) do
+          instance_exec &block
+        end
+      end
+    end
   end
 end

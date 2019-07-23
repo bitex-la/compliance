@@ -80,7 +80,7 @@ describe 'an admin user' do
 
     click_link "Edit"
     
-    click_link 'Risk Score (1)'
+    find('li[title="Risk Score"] a').click
 
     within '.external_links' do
       expect(page).to have_content 'Link #1'
@@ -118,7 +118,7 @@ describe 'an admin user' do
     expect(issue.person.enabled).to be_falsey
     assert_logging(issue.person, :enable_person, 0)
 
-    click_link 'Risk Score (1)'
+    click_link "Risk Score (1)"
 
     within '.external_links' do
       expect(page).to have_content 'Link #1'
@@ -191,18 +191,18 @@ describe 'an admin user' do
     visit "/people/#{Person.first.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{Person.first.id}/issues/#{issue.id}/edit"
 
-    click_link 'ID (1)'
+    find('li[title="ID"] a').click
     expect(page).to have_content 'Identification seed'
-    click_link 'Domicile (1)'
+    find('li[title="Domicile"] a').click
     expect(page).to have_content 'Domicile seed'
-    click_link 'Docket'
+    find('li[title="Natural"] a').click
     expect(page).to have_content 'Natural Docket'
-    click_link 'Risk Score (1)'
+    find('li[title="Risk Score"] a').click
     within '.has_many_container.risk_score_seeds' do
       expect(page).to have_content 'userId: 5'
       expect(page).to have_content 'score: green'
     end
-    click_link 'Allowance (2)'
+    find('li[title="Allowance"] a').click
     expect(page).to have_content 'Allowance seed'
 
     # Admin verify the attachment(s)
@@ -310,7 +310,7 @@ describe 'an admin user' do
     click_link "Add Person Information"
     click_button "Create new issue"
 
-    click_link "ID (0)"
+    find('li[title="ID"] a').click
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
@@ -336,7 +336,7 @@ describe 'an admin user' do
 
     find(:css, '#issue_identification_seeds_attributes_0_copy_attachments').set true
 
-    click_link "Domicile (0)"
+    find('li[title="Domicile"] a').click
     click_link "Add New Domicile seed"
 
     fill_seed('domicile', {
@@ -362,7 +362,7 @@ describe 'an admin user' do
       fill_attachment('domicile_seeds', 'zip')
     end
 
-    click_link "Allowance (0)"
+    find('li[title="Allowance"] a').click
     click_link "Add New Allowance seed"
 
     select_with_search(
@@ -384,7 +384,7 @@ describe 'an admin user' do
       fill_attachment('allowance_seeds', 'gif')
     end
 
-    click_link "Docket"
+    find('li[title="Natural"] a').click
 
     select_with_search(
       '#issue_natural_docket_seed_attributes_marital_status_id_input',
@@ -566,7 +566,7 @@ describe 'an admin user' do
 
     click_link "Edit"
 
-    click_link "Base"
+    find('li[title="Base"] a').click
     click_link "Add New Observation"
 
     select_with_search(
@@ -693,7 +693,7 @@ describe 'an admin user' do
       end
       click_link "Edit"
 
-      click_link 'Domicile (1)'
+      find('li[title="Domicile"] a').click
 
       select_with_search(
         '#issue_domicile_seeds_attributes_0_replaces_input',
@@ -750,7 +750,8 @@ describe 'an admin user' do
 
       click_link "Edit"
 
-      click_link "ID (0)"
+      find('li[title="ID"] a').click
+      
       click_link "Add New Identification seed"
       fill_seed("identification",{
         number: '123456789',
@@ -767,7 +768,8 @@ describe 'an admin user' do
         fill_attachment('identification_seeds', 'jpg')
       end
 
-      click_link "Domicile (0)"
+      find('li[title="Domicile"] a').click
+      
       click_link "Add New Domicile seed"
 
       fill_seed('domicile', {
@@ -825,12 +827,12 @@ describe 'an admin user' do
 
       page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
-      click_link "ID (1)"
+      find('li[title="ID"] a').click
       within '.has_many_container.identification_seeds' do
         find(:css, '#issue_identification_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
 
-      click_link "Allowance (2)"
+      find('li[title="Allowance"] a').click
       within '.has_many_container.allowance_seeds' do
         find(:css, '#issue_allowance_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
@@ -838,7 +840,7 @@ describe 'an admin user' do
       visit "/people/#{person.id}/issues/#{issue.id}"
       click_link "Edit"
 
-      click_link "ID (1)"
+      find('li[title="ID"] a').click
       click_link "Add New Identification seed"
       fill_seed("identification",{
         number: '123456789',
