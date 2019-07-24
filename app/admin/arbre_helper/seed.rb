@@ -1,15 +1,24 @@
 module ArbreHelpers
   class Seed
-    def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits_relation, icon, show_count=true)
+    def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits_relation, icon, text=nil)
       Appsignal.instrument("render_#{relation.to_s}") do
         context.instance_eval do
-          count = show_count ? "<span class='badge-count'>#{resource.send(relation).count}</span>" : ""
+          count = ""
+          all = [resource.send(relation)]
+          if resource.send(relation).respond_to?('count')
+            all = resource.send(relation)
+            count = "<span class='badge-count'>#{all.count}</span>"  
+          end
+
+          unless text.nil?
+            count += "<span class='icon-text-fa'>#{text}</span>"
+          end
+          
           ArbreHelpers::Layout.tab_for(self, title, icon, count) do
             columns do
               column span: 2 do
                 h3 "Current #{title} Seeds"
-                seeds = resource.send(relation)
-                ArbreHelpers::Layout.panel_only(self, seeds.respond_to?('each') ? seeds : [seeds] ) do |d|
+                ArbreHelpers::Layout.panel_only(self, all.compact) do |d|
                   ArbreHelpers::Seed.seed_show_section(self, d)
                 end  
               end

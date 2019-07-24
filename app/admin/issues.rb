@@ -390,7 +390,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Chile', 'file', 'CH') do
+      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Chile', 'file', 'CL') do
         columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
@@ -611,63 +611,18 @@ ActiveAdmin.register Issue do
       end
 
       if seed = issue.natural_docket_seed.presence
-        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Natural", :natural_docket_seed, :natural_docket, 'user', false)
+        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Natural", :natural_docket_seed, :natural_docket, 'user')
       end
 
       if seed = issue.legal_entity_docket_seed.presence
-        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Legal Entity", :legal_entity_docket_seed, :legal_entity_docket, 'industry', false)
+        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Legal Entity", :legal_entity_docket_seed, :legal_entity_docket, 'industry')
       end
 
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Domicile", :domicile_seeds, :domiciles, 'home')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Id", :identification_seeds, :identifications, 'id-card')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Allowance", :allowance_seeds, :allowances, 'money')
-
-      
-      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Argentina', 'file', 'AR') do
-        columns do
-          column span: 2 do
-            h3 "Current Invoice Seeds"
-            if seed = issue.argentina_invoicing_detail_seed.presence
-              panel seed.name do
-                ArbreHelpers::Seed.seed_show_section(self, seed, [:tax_id])
-              end
-            end
-          end
-          column do
-            h3 "Current Fruits"
-            if fruit = issue.person.argentina_invoicing_details.presence
-              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
-                ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
-              end
-            end
-            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed], [:tax_id])
-          end
-        end
-      end
-      
-      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Chile', 'file', 'CH') do
-        columns do
-          column span: 2 do
-            h3 "Current Invoice Seeds"
-            if seed = issue.chile_invoicing_detail_seed.presence
-              panel seed.name do
-                ArbreHelpers::Seed.seed_show_section(self, seed)
-              end
-            end
-          end
-          column do
-            h3 "Current Fruits"
-            if fruit = issue.person.chile_invoicing_details.presence
-              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
-                ArbreHelpers::Fruit.fruit_show_section(self, d)
-              end
-            end
-
-            ArbreHelpers::Seed.others_seeds_panel(self, [ChileInvoicingDetailSeed], [:tax_id])
-          end
-        end
-      end
-      
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Invoice Argentina", :argentina_invoicing_detail_seed, :argentina_invoicing_details, 'file', 'AR')
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Invoice Chile", :chile_invoicing_detail_seed, :chile_invoicing_details, 'file', 'CL')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Affinity", :affinity_seeds, :affinities, 'users')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Phone", :phone_seeds, :phones, 'phone')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Email", :email_seeds, :emails, 'envelope')

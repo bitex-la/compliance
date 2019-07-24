@@ -55,9 +55,11 @@ describe 'an admin handling affinities' do
     expect(page).to have_content "RELATED PERSON (#{payee_one.id})"
     expect(page).to have_content "RELATED PERSON (#{payee_two.id}) ☺: Joe Doe" 
 
-    click_link "(#{owner_one.id}) *☺:"
+    visit "/people/#{owner_one.id}"
+    #click_link "(#{owner_one.id}) *☺:"
+    
     find('li[title="Affinity"] a').click
-
+    
     within("#attributes_table_affinity_4 .row.row-affinity_kind") do
       expect(page).to have_content 'owns'
     end

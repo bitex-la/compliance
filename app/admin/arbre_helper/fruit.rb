@@ -78,11 +78,20 @@ module ArbreHelpers
       end
     end
 
-    def self.fruit_collection_show_tab(context, title, relation, icon, show_count=true)
+    def self.fruit_collection_show_tab(context, title, relation, icon, text=nil)
       Appsignal.instrument("render_#{relation.to_s}") do
         context.instance_eval do
-          all = resource.send(relation).current.order("created_at DESC")
-          count = show_count ? "<span class='badge-count'>#{resource.send(relation).count}</span>" : ""
+          count = ""
+          all = [resource.send(relation)]
+          if resource.send(relation).respond_to?('current')
+            all = resource.send(relation).current.order("created_at DESC")
+            count = "<span class='badge-count'>#{all.count}</span>"  
+          end
+
+          unless text.nil?
+            count += "<span class='icon-text-fa'>#{text}</span>"
+          end
+          
           ArbreHelpers::Layout.tab_for(self, title, icon, count) do
             ArbreHelpers::Layout.panel_grid(self, all) do |d|
               ArbreHelpers::Fruit.fruit_show_section(self, d)
