@@ -46,5 +46,14 @@ module ArbreHelpers
         end
       end
     end
+
+    def self.tab_with_text_for(context, title, icon, text, &block)
+      context.instance_eval do
+        text = "<span class='icon-text-fa'>#{text}</span>"
+        ArbreHelpers::Layout.tab_for(self, title, icon, text) do
+          instance_exec &block
+        end
+      end
+    end
   end
 end

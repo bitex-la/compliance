@@ -223,6 +223,8 @@ RSpec.describe Issue, type: :model do
 
       issue3.complete!
       expect(NoteSeed.others_active_seeds(issue)).to include issue3.reload.note_seeds.first
+
+      expect(NoteSeed.others_active_seeds(issue)).to_not include issue.reload.note_seeds.first
     end
   end
 

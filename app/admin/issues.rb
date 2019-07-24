@@ -359,7 +359,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_for(self, 'Invoice', 'file') do
+      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Argentina', 'file', 'AR') do
         columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
@@ -376,6 +376,22 @@ ActiveAdmin.register Issue do
               ArbreHelpers::Attachment.has_many_attachments(self, af)
             end
           end
+          
+          column do
+            h3 "Current Fruits"
+            if fruit = issue.person.argentina_invoicing_details.presence
+              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
+                ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
+              end
+            end
+            
+            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed], [:tax_id])
+          end
+        end
+      end
+
+      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Chile', 'file', 'CH') do
+        columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
               cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
@@ -390,19 +406,13 @@ ActiveAdmin.register Issue do
           end
           column do
             h3 "Current Fruits"
-            if fruit = issue.person.argentina_invoicing_details.presence
-              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
-                ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
-              end
-            end
             if fruit = issue.person.chile_invoicing_details.presence
               ArbreHelpers::Layout.panel_only(self, fruit) do |d|
                 ArbreHelpers::Fruit.fruit_show_section(self, d)
               end
             end
 
-            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed, 
-              ChileInvoicingDetailSeed], [:tax_id])
+            ArbreHelpers::Seed.others_seeds_panel(self, [ChileInvoicingDetailSeed], [:tax_id])
           end
         end
       end
@@ -612,18 +622,14 @@ ActiveAdmin.register Issue do
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Id", :identification_seeds, :identifications, 'id-card')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Allowance", :allowance_seeds, :allowances, 'money')
 
-      ArbreHelpers::Layout.tab_for(self, 'Invoice', 'file') do
+      
+      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Argentina', 'file', 'AR') do
         columns do
           column span: 2 do
             h3 "Current Invoice Seeds"
             if seed = issue.argentina_invoicing_detail_seed.presence
               panel seed.name do
                 ArbreHelpers::Seed.seed_show_section(self, seed, [:tax_id])
-              end
-            end
-            if seed = issue.chile_invoicing_detail_seed.presence
-              panel seed.name do
-                ArbreHelpers::Seed.seed_show_section(self, seed)
               end
             end
           end
@@ -634,19 +640,34 @@ ActiveAdmin.register Issue do
                 ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
               end
             end
-            
+            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed], [:tax_id])
+          end
+        end
+      end
+      
+      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Chile', 'file', 'CH') do
+        columns do
+          column span: 2 do
+            h3 "Current Invoice Seeds"
+            if seed = issue.chile_invoicing_detail_seed.presence
+              panel seed.name do
+                ArbreHelpers::Seed.seed_show_section(self, seed)
+              end
+            end
+          end
+          column do
+            h3 "Current Fruits"
             if fruit = issue.person.chile_invoicing_details.presence
               ArbreHelpers::Layout.panel_only(self, fruit) do |d|
                 ArbreHelpers::Fruit.fruit_show_section(self, d)
               end
             end
 
-            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed, 
-              ChileInvoicingDetailSeed], [:tax_id])
+            ArbreHelpers::Seed.others_seeds_panel(self, [ChileInvoicingDetailSeed], [:tax_id])
           end
         end
       end
-
+      
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Affinity", :affinity_seeds, :affinities, 'users')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Phone", :phone_seeds, :phones, 'phone')
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Email", :email_seeds, :emails, 'envelope')

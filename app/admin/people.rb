@@ -190,8 +190,8 @@ ActiveAdmin.register Person do
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Id", :identifications, 'id-card')
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Allowance", :allowances, 'money')
 
-      ArbreHelpers::Layout.tab_for(self, 'Invoice', 'file') do
-        if fruits = resource.argentina_invoicing_details.current.presence
+      if fruits = resource.argentina_invoicing_details.current.presence
+        ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Argentina', 'file', 'AR') do
           h3 "Argentina Invoicing details"
           fruits.each do |fruit|
             ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
@@ -199,8 +199,10 @@ ActiveAdmin.register Person do
             end
           end
         end
+      end
 
-        if fruits = resource.chile_invoicing_details.current.presence
+      if fruits = resource.chile_invoicing_details.current.presence
+        ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Chile', 'file', 'CH') do
           h3 "Chile Invoicing details"
           fruits.each do |fruit|
             ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
