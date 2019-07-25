@@ -16,7 +16,7 @@ ActiveAdmin.register Person do
 
   %i(enable disable reject).each do |event|
     action_item event, only: [:edit, :show, :update] do
-      next if !current_admin_user.is_restricted && resource.may_fire?(event)
+      next if !current_admin_user.is_restricted && resource.send("may_#{event}?")
       link_to event.to_s.humanize, [event, :person], method: :post
     end
 
