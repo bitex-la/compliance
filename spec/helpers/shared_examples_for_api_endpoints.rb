@@ -159,7 +159,7 @@ shared_examples "docket" do |type, initial_factory|
       .should == [old_fruit.id.to_s]
 
     issue.approve!
-    person.enable
+    person.enable!
 
     api_get "/#{type}/#{old_fruit.id}"
 
