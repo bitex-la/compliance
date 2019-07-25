@@ -16,12 +16,12 @@ ActiveAdmin.register Person do
 
   %i(enable disable reject).each do |event|
     action_item event, only: [:edit, :show, :update] do
-      next if !current_admin_user.is_restricted && resource.send("may_#{event}?")
+      next unless !current_admin_user.is_restricted && resource.send("may_#{event}?")
       link_to event.to_s.humanize, [event, :person], method: :post
     end
 
     member_action event, method: :post do
-      resource.fire!(event)
+      resource.send("#{event}!")
       redirect_to action: :show
     end
   end
