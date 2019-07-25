@@ -359,7 +359,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Argentina', 'file', 'AR') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Invoice Argentina', :argentina_invoicing_detail_seed, 'file', 'AR') do
         columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
@@ -390,7 +390,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_with_text_for(self, 'Invoice Chile', 'file', 'CL') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Invoice Chile', :chile_invoicing_detail_seed, 'file', 'CL') do
         columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
@@ -599,22 +599,17 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            if fruits = resource.person.notes.presence
-              ArbreHelpers::Layout.panel_only(self, fruits) do |d|
-                ArbreHelpers::Fruit.fruit_show_section(self, d)
-              end
-            end
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.notes)
             ArbreHelpers::Seed.others_seeds_panel(self, [NoteSeed])
           end
         end
       end
 
-      if seed = issue.natural_docket_seed.presence
+      if issue.natural_docket_seed.presence
         ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Natural", :natural_docket_seed, :natural_docket, 'user')
       end
 
-      if seed = issue.legal_entity_docket_seed.presence
+      if issue.legal_entity_docket_seed.presence
         ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Legal Entity", :legal_entity_docket_seed, :legal_entity_docket, 'industry')
       end
 

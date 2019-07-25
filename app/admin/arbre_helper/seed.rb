@@ -1,64 +1,51 @@
 module ArbreHelpers
   class Seed
     def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits_relation, icon, text=nil)
-      Appsignal.instrument("render_#{relation.to_s}") do
-        context.instance_eval do
-          count = ""
-          all = [resource.send(relation)]
-          if resource.send(relation).respond_to?('count')
-            all = resource.send(relation)
-            count = "<span class='badge-count'>#{all.count}</span>"  
-          end
+      context.instance_eval do
+        items = resource.send(relation)
+        all = items.try(:count) ? items : [items].compact
+        
+        ArbreHelpers::Layout.tab_with_counter_for(self, title, all.count, icon, text) do
+          columns do
+            column span: 2 do
+              h3 "Current #{title} Seeds"
+              ArbreHelpers::Layout.panel_only(self, all) do |d|
+                ArbreHelpers::Seed.seed_show_section(self, d)
+              end  
+            end
 
-          unless text.nil?
-            count += "<span class='icon-text-fa'>#{text}</span>"
-          end
-          
-          ArbreHelpers::Layout.tab_for(self, title, icon, count) do
-            columns do
-              column span: 2 do
-                h3 "Current #{title} Seeds"
-                ArbreHelpers::Layout.panel_only(self, all.compact) do |d|
-                  ArbreHelpers::Seed.seed_show_section(self, d)
-                end  
-              end
-              column do
-                h3 "Current Fruits"
-                fruits = resource.person.send(fruits_relation)
-                ArbreHelpers::Layout.panel_only(self, fruits.respond_to?('each') ? fruits : [fruits].compact ) do |d|
-                  ArbreHelpers::Fruit.fruit_show_section(self, d)
-                end
-                ArbreHelpers::Seed.others_seeds_panel(self, [relation.to_s.camelize.singularize.constantize])
-              end
-            end        
-          end
+            column do
+              fruits = resource.person.send(fruits_relation)
+              ArbreHelpers::Fruit.current_fruits_panel(self,
+                fruits.try?('count') ? fruits : [fruits].compact)
+              ArbreHelpers::Seed.others_seeds_panel(self, [relation.to_s.camelize.singularize.constantize])
+            end
+          end        
         end
       end
     end
 
     def self.seed_show_section(context, seed, others = [])
-      Appsignal.instrument("render_#{seed.class.name}") do
-        context.instance_eval do
-          ArbreHelpers::Seed.seed_attributes_table self, seed, others
-          if seed.respond_to?(:external_link) && !seed.external_link.blank?
-            h4 "External links"
-            ArbreHelpers::HtmlHelper.show_links(self, seed.external_link.split(',').compact)
-          end
-          if seed.respond_to? :extra_info 
-            h4 "Extra info"
-            begin 
-              if seed.extra_info
-                extra_info_as_json = JSON.parse(seed.extra_info)
-                ArbreHelpers::HtmlHelper.extra_info_renderer(self, extra_info_as_json)
-              end
-            rescue JSON::ParserError
-              span seed.extra_info
+      context.instance_eval do
+        ArbreHelpers::Seed.seed_attributes_table self, seed, others
+        if seed.respond_to?(:external_link) && !seed.external_link.blank?
+          h4 "External links"
+          ArbreHelpers::HtmlHelper.show_links(self, seed.external_link.split(',').compact)
+        end
+        if seed.respond_to? :extra_info 
+          h4 "Extra info"
+          begin 
+            if seed.extra_info
+              extra_info_as_json = JSON.parse(seed.extra_info)
+              ArbreHelpers::HtmlHelper.extra_info_renderer(self, extra_info_as_json)
             end
+          rescue JSON::ParserError
+            span seed.extra_info
           end
-          attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
-          attachments.each do |a|
-            ArbreHelpers::Attachment.preview(self, a)
-          end
+        end
+        attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
+        attachments.each do |a|
+          ArbreHelpers::Attachment.preview(self, a)
         end
       end
     end

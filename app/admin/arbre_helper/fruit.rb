@@ -79,66 +79,54 @@ module ArbreHelpers
     end
 
     def self.fruit_collection_show_tab(context, title, relation, icon, text=nil)
-      Appsignal.instrument("render_#{relation.to_s}") do
-        context.instance_eval do
-          count = ""
-          all = [resource.send(relation)]
-          if resource.send(relation).respond_to?('current')
-            all = resource.send(relation).current.order("created_at DESC")
-            count = "<span class='badge-count'>#{all.count}</span>"  
-          end
-
-          unless text.nil?
-            count += "<span class='icon-text-fa'>#{text}</span>"
-          end
-          
-          ArbreHelpers::Layout.tab_for(self, title, icon, count) do
-            ArbreHelpers::Layout.panel_grid(self, all) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
+      context.instance_eval do
+        items = resource.send(relation)
+        all = items.try(:current).try(:order, 'created_at DESC') || [items].compact
+        
+        ArbreHelpers::Layout.tab_with_counter_for(self, title, all.count, icon, text) do
+          ArbreHelpers::Layout.panel_grid(self, all) do |d|
+            ArbreHelpers::Fruit.fruit_show_section(self, d)
           end
         end
       end
     end
 
     def self.fruit_show_section(context, fruit, others = [])
-      Appsignal.instrument("render_#{fruit.class.name}") do
-        context.instance_eval do
-          columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
-          columns = columns.map{|c| c.gsub(/_id$/,'') } -
-            %w(id person issue created_at updated_at replaces extra_info external_link)
-          attributes_table_for fruit do
-            row(:show){|o| link_to o.name, o }
-            columns.each do |n|
-              row(n)
-            end
-            others.each do |o|
-              row(o)
-            end
-            if fruit.replaces
-              row(:replaces)
-            end
-            row(:created_at)
-            row(:issue)
+      context.instance_eval do
+        columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
+        columns = columns.map{|c| c.gsub(/_id$/,'') } -
+          %w(id person issue created_at updated_at replaces extra_info external_link)
+        attributes_table_for fruit do
+          row(:show){|o| link_to o.name, o }
+          columns.each do |n|
+            row(n)
           end
-          if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
-            h4 "External links"
-            ArbreHelpers::HtmlHelper.show_links(self, fruit.external_link.split(',').compact)
+          others.each do |o|
+            row(o)
           end
-          if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
-            h4 "Extra info"
-            begin 
-              if fruit.extra_info
-                extra_info_as_json = JSON.parse(fruit.extra_info)
-                ArbreHelpers::HtmlHelper.extra_info_renderer(self, extra_info_as_json)
-              end
-            rescue JSON::ParserError
-              span fruit.extra_info
+          if fruit.replaces
+            row(:replaces)
+          end
+          row(:created_at)
+          row(:issue)
+        end
+        if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
+          h4 "External links"
+          ArbreHelpers::HtmlHelper.show_links(self, fruit.external_link.split(',').compact)
+        end
+        if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
+          h4 "Extra info"
+          begin 
+            if fruit.extra_info
+              extra_info_as_json = JSON.parse(fruit.extra_info)
+              ArbreHelpers::HtmlHelper.extra_info_renderer(self, extra_info_as_json)
             end
+          rescue JSON::ParserError
+            span fruit.extra_info
           end
-          fruit.attachments.each do |a|
-            ArbreHelpers::Attachment.preview(self, a)
-          end
+        end
+        fruit.attachments.each do |a|
+          ArbreHelpers::Attachment.preview(self, a)
         end
       end
     end
@@ -146,10 +134,12 @@ module ArbreHelpers
     def self.current_fruits_panel(context, fruits)
       context.instance_eval do
         h3 "Current Fruits"
-        fruits.each do |o|
-          ArbreHelpers::Layout.panel_only(self, o) do |d|
-            ArbreHelpers::Fruit.fruit_show_section(self, d)
+        if fruits.any?
+          ArbreHelpers::Layout.panel_only(self, fruits) do |f|
+            ArbreHelpers::Fruit.fruit_show_section(self, f)
           end
+        else
+          div("No items available", class: 'with-bootstrap alert alert-info')
         end
       end
     end

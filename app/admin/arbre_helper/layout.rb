@@ -36,19 +36,11 @@ module ArbreHelpers
       end
     end
 
-    def self.tab_with_counter_for(context, title, relation, icon, &block)
+    def self.tab_with_counter_for(context, title, count, icon, icon_text, &block)
       context.instance_eval do
-        count = "<span class='badge-count'>#{resource.send(relation).count}</span>"
-        ArbreHelpers::Layout.tab_for(self, title, icon, count) do
-          instance_exec &block
-        end
-      end
-    end
-
-    def self.tab_with_text_for(context, title, icon, text, &block)
-      context.instance_eval do
-        text = "<span class='icon-text-fa'>#{text}</span>"
-        ArbreHelpers::Layout.tab_for(self, title, icon, text) do
+        count_tag = "<span class='badge-count'>#{count}</span>"
+        count_tag << "<span class='icon-text-fa'>#{icon_text}</span>" if icon_text
+        ArbreHelpers::Layout.tab_for(self, title, icon, count_tag) do
           instance_exec &block
         end
       end
