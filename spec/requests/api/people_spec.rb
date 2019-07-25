@@ -563,17 +563,15 @@ describe Person do
   end
 
   describe "when changing state" do
-    { enable: :new,
-      disable: :new,
-      reject: :enabled
-    }.each do |action, initial_state|
+    %i{enable disable reject}.each do |action|
       it "It can #{action} person" do
-        person = create(:empty_person, state: initial_state)
+        person = create(:empty_person)
         api_request :post, "/people/#{person.id}/#{action}", {}, 200
       end
 
       it "It cannot #{action} rejected issue" do
-        person = create(:empty_person, state: :rejected)
+        person = create(:empty_person)
+        person.reject!
         api_request :post, "/people/#{person.id}/#{action}", {}, 422
       end
     end

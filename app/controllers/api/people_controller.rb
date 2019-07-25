@@ -22,7 +22,7 @@ class Api::PeopleController < Api::ApiController
 
     mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [:tags],
-      people: [:enabled, :risk, :state, :tags, id: nil ],
+      people: [:enabled, :risk, :tags, id: nil ],
       tags: []
 
     return jsonapi_422(nil) unless mapper.data

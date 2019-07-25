@@ -5,7 +5,6 @@ class Person < ApplicationRecord
 
   after_save :log_if_enabled
   after_save :expire_action_cache
-  after_save :sync_bool_to_status
 
   belongs_to :regularity, class_name: "PersonRegularity"
 
@@ -265,10 +264,8 @@ class Person < ApplicationRecord
       transitions from: :new, to: :enabled
       transitions from: :disabled, to: :enabled
       after do 
-        if !enabled
-          self.enabled = true
-          save!
-        end
+        self['enabled'] = true
+        save!
       end
     end
 
@@ -276,7 +273,7 @@ class Person < ApplicationRecord
       transitions from: :enabled, to: :disabled
       transitions from: :new, to: :disabled
       after do 
-        self.enabled = false
+        self['enabled'] = false
         save!
       end
     end
@@ -286,10 +283,8 @@ class Person < ApplicationRecord
       transitions from: :enabled, to: :rejected
       transitions from: :disabled, to: :rejected
       after do 
-        if enabled
-          self.enabled = false
-          save!
-        end
+        self['enabled'] = false
+        save!
       end
     end
   end
@@ -298,16 +293,21 @@ class Person < ApplicationRecord
     aasm_state
   end
 
-  def state=(status)
-    self.aasm_state = status
+  def enabled
+    return aasm_state == "enabled"
+  end
+
+  def enabled=(value)
+    enable if value && can_enable
+    disable if !value && can_disable
   end
 
   def can_enable
-    !enabled && aasm_state != "rejected"
+    !enabled && can_reject
   end
 
   def can_disable
-    enabled && aasm_state != "rejected"
+    enabled && can_reject
   end
 
   def can_reject
@@ -324,11 +324,6 @@ class Person < ApplicationRecord
     was, is = saved_changes[:enabled]
     log_state_change(:enable_person) if !was && is
     log_state_change(:disable_person) if was && !is
-  end
-
-  def sync_bool_to_status
-    enable! if enabled && aasm_state != "enabled"
-    disable! if !enabled && aasm_state == "enabled"
   end
 
   def log_state_change(verb)
