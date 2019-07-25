@@ -261,30 +261,20 @@ class Person < ApplicationRecord
     state :rejected
     
     event :enable do
-      transitions from: :new, to: :enabled
-      transitions from: :disabled, to: :enabled
-      after do 
-        self['enabled'] = true
-        save!
+      transitions from: [:new, :disabled], to: :enabled do
+        after{ self['enabled'] = true }
       end
     end
 
     event :disable do
-      transitions from: :enabled, to: :disabled
-      transitions from: :new, to: :disabled
-      after do 
-        self['enabled'] = false
-        save!
+      transitions from: [:enabled, :new], to: :disabled do
+        after{ self['enabled'] = false }
       end
     end
 
     event :reject do
-      transitions from: :new, to: :rejected
-      transitions from: :enabled, to: :rejected
-      transitions from: :disabled, to: :rejected
-      after do 
-        self['enabled'] = false
-        save!
+      transitions from: [:new, :enabled, :disabled], to: :rejected do
+        after{ self['enabled'] = false }
       end
     end
   end
@@ -298,20 +288,8 @@ class Person < ApplicationRecord
   end
 
   def enabled=(value)
-    enable if value && can_enable
-    disable if !value && can_disable
-  end
-
-  def can_enable
-    !enabled && can_reject
-  end
-
-  def can_disable
-    enabled && can_reject
-  end
-
-  def can_reject
-    aasm_state != "rejected"
+    enable if value && may_enable?
+    disable if !value && may_disable?
   end
 
   private

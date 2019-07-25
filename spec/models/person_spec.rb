@@ -78,18 +78,16 @@ RSpec.describe Person, type: :model do
   it 'Add state changes to event log when enable/disable' do 
     person = create(:empty_person)
     assert_logging(person, :enable_person, 0)
-    1.times do
-      person.enable
-    end
+
+    10.times{ person.enable! rescue nil }
     assert_logging(person, :enable_person, 1)
-    expect(person.state).to eq("enabled")
-    expect(person.enabled).to eq(true)
-    1.times do
-      person.disable
-    end
+    expect(person).to be_enabled
+    expect(person.enabled).to eq(true) # Backwards compatible state
+
+    10.times{ person.disable! rescue nil }
     assert_logging(person, :disable_person, 1)
-    expect(person.state).to eq("disabled")
-    expect(person.enabled).to eq(false)
+    expect(person).to be_disabled
+    expect(person.enabled).to eq(false) # Backwards compatible state
   end 
   
   it 'shows only observations for meaningful issues' do 

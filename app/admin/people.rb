@@ -13,14 +13,17 @@ ActiveAdmin.register Person do
   end
 
   actions :all, except: [:destroy]
-  action_item :enable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.can_enable} do 
-    link_to "Enable", [:enable, :person], method: :post
-  end
-  action_item :disable, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.can_disable} do 
-    link_to "Disable", [:disable, :person], method: :post
-  end
-  action_item :reject, only: [:edit, :show, :update], if: -> {!current_admin_user.is_restricted && resource.can_reject} do 
-    link_to "Reject", [:reject, :person], method: :post
+
+  %i(enable disable reject).each do |event|
+    action_item event, only: [:edit, :show, :update] do
+      next if !current_admin_user.is_restricted && resource.may_fire?(event)
+      link_to event.to_s.humanize, [event, :person], method: :post
+    end
+
+    member_action event, method: :post do
+      resource.fire!(event)
+      redirect_to action: :show
+    end
   end
 
   collection_action :search_person, method: :get do 
@@ -28,21 +31,6 @@ ActiveAdmin.register Person do
     render json: Person.suggest(keyword)
   end
 
-  member_action :enable, method: :post do
-    resource.enable
-    redirect_to action: :show
-  end
-
-  member_action :disable, method: :post do
-    resource.disable
-    redirect_to action: :show
-  end
-
-  member_action :reject, method: :post do
-    resource.reject
-    redirect_to action: :show
-  end
-  
   collection_action :search_country, method: :get do 
     keyword = params[:term]
     render json: I18n.t('countries').invert
