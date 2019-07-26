@@ -47,6 +47,18 @@ class Api::PeopleController < Api::ApiController
     end
   end
 
+  Person.aasm.events.map(&:name).each do |action|
+    define_method(action) do
+      person = Person.find(params[:id])
+      begin
+        person.aasm.fire!(action)
+        jsonapi_response(person, {}, 200)
+      rescue AASM::InvalidTransition => e
+				jsonapi_error(422, "invalid transition")
+      end
+    end
+  end
+
   protected
 
   def path_for_show

@@ -1,10 +1,14 @@
 class Person < ApplicationRecord
-  include Loggable, StaticModels::BelongsTo
+  include AASM
+  include Loggable
+  StaticModels::BelongsTo
 
   after_save :log_if_enabled
   after_save :expire_action_cache
-  
+
   belongs_to :regularity, class_name: "PersonRegularity"
+
+  ransack_alias :state, :aasm_state
 
   HAS_MANY_REPLACEABLE = %i{
     domiciles
@@ -89,6 +93,21 @@ class Person < ApplicationRecord
         .distinct
     }[type.to_sym]
   }
+
+  scope :with_relations, -> {
+    includes(
+      nil
+    ) 
+  }
+
+  {
+    fresh: :new,
+    enabled: :enabled,
+    disabled: :disabled,
+    rejected: :rejected
+  }.each do |k,v| 
+    scope k, -> { with_relations.where('people.aasm_state=?', v) }  
+  end
 
   def self.ransackable_scopes(auth_object = nil)
     %i(by_person_type)
@@ -233,6 +252,44 @@ class Person < ApplicationRecord
 
     EventLog.log_entity!(self, AdminUser.current_admin_user, 
       EventLogKind.update_person_regularity) if should_log
+  end
+
+  aasm do
+    state :new, initial: true
+    state :enabled
+    state :disabled
+    state :rejected
+    
+    event :enable do
+      transitions from: [:new, :disabled], to: :enabled do
+        after{ self['enabled'] = true }
+      end
+    end
+
+    event :disable do
+      transitions from: [:enabled, :new], to: :disabled do
+        after{ self['enabled'] = false }
+      end
+    end
+
+    event :reject do
+      transitions from: [:new, :enabled, :disabled], to: :rejected do
+        after{ self['enabled'] = false }
+      end
+    end
+  end
+
+  def state
+    aasm_state
+  end
+
+  def enabled
+    return aasm_state == "enabled"
+  end
+
+  def enabled=(value)
+    enable if value && may_enable?
+    disable if !value && may_disable?
   end
 
   private

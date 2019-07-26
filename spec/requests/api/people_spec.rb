@@ -23,7 +23,8 @@ describe Person do
             risk: nil,
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z',
-            person_type: nil
+            person_type: nil,
+            state: 'new'
           },
           relationships: {
             regularity: { data: {
@@ -78,7 +79,8 @@ describe Person do
           risk: 'medium',
           created_at: '2018-01-01T00:00:00.000Z',
           updated_at: '2018-01-01T00:00:00.000Z',
-          person_type: "natural_person"
+          person_type: "natural_person",
+          state: 'enabled'
         },
         relationships: {
           regularity: { data: {
@@ -470,6 +472,7 @@ describe Person do
       }
 
       person.reload.should be_enabled
+      expect(person.state).to eq('enabled')
     end
 
     it 'responds 404 when the person does not exist' do
@@ -493,6 +496,7 @@ describe Person do
       person = Person.find(api_response.data.id)
       expect(person.tags).to include person_tag
       expect(person.enabled).to eq true
+      expect(person.state).to eq 'enabled'
       expect(person.risk).to eq "low"
     end
   end
@@ -555,6 +559,21 @@ describe Person do
       api_get "/people/#{person.id}"
       api_response.data.attributes.enabled.should be_falsey
       Rails.application.config.cache_store = :null_store
+    end
+  end
+
+  describe "when changing state" do
+    %i{enable disable reject}.each do |action|
+      it "It can #{action} person" do
+        person = create(:empty_person)
+        api_request :post, "/people/#{person.id}/#{action}", {}, 200
+      end
+
+      it "It cannot #{action} rejected issue" do
+        person = create(:empty_person)
+        person.reject!
+        api_request :post, "/people/#{person.id}/#{action}", {}, 422
+      end
     end
   end
 end
