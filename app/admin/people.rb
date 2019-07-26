@@ -184,7 +184,7 @@ ActiveAdmin.register Person do
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Invoice Argentina", :argentina_invoicing_details, 'file', 'AR')
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Invoice Chile", :chile_invoicing_details, 'file', 'CL')      
       
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Affinity', :all_affinities, 'users') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Affinity', resource.all_affinities.count, 'users') do
         ArbreHelpers::Layout.panel_grid(self, resource.all_affinities) do |d|
           attributes_table_for d do
             ArbreHelpers::Affinity.affinity_card(self, d)
@@ -199,7 +199,7 @@ ActiveAdmin.register Person do
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Email", :emails, 'envelope')
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Risk Score", :risk_scores, 'exclamation-triangle')
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', :fund_deposits, 'university') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', person.fund_deposits.count, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do
           table_for person.fund_deposits do           
             column :amount

@@ -133,9 +133,10 @@ module ArbreHelpers
 
     def self.current_fruits_panel(context, fruits)
       context.instance_eval do
+        all = fruits.try(:count) ? fruits : [fruits].compact
         h3 "Current Fruits"
-        if fruits.any?
-          ArbreHelpers::Layout.panel_only(self, fruits) do |f|
+        if all.any?
+          ArbreHelpers::Layout.panel_only(self, all) do |f|
             ArbreHelpers::Fruit.fruit_show_section(self, f)
           end
         else

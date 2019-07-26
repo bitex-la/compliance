@@ -36,7 +36,7 @@ module ArbreHelpers
       end
     end
 
-    def self.tab_with_counter_for(context, title, count, icon, icon_text, &block)
+    def self.tab_with_counter_for(context, title, count, icon, icon_text=nil, &block)
       context.instance_eval do
         count_tag = "<span class='badge-count'>#{count}</span>"
         count_tag << "<span class='icon-text-fa'>#{icon_text}</span>" if icon_text

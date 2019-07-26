@@ -187,20 +187,14 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            if fruits = resource.person.notes.presence
-              ArbreHelpers::Layout.panel_only(self, fruits) do |d|
-                ArbreHelpers::Fruit.fruit_show_section(self, d)
-              end
-            end
-
-            ArbreHelpers::Seed.others_seeds_panel(self, [NoteSeed])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.notes)
+            ArbreHelpers::Seed.others_seeds_panel(self, NoteSeed)
           end
         end
       end
 
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-        ArbreHelpers::Layout.tab_for(self, 'Legal Entity', 'industry') do
+        ArbreHelpers::Layout.tab_with_counter_for(self, 'Legal Entity', resource.legal_entity_docket_seed ? 1 : 0 , 'industry') do
           columns do
             column span: 2 do
               ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
@@ -220,21 +214,15 @@ ActiveAdmin.register Issue do
               end
             end
             column do
-              h3 "Current Fruits"
-              if fruit = issue.person.legal_entity_docket.presence
-                panel fruit.name do
-                  ArbreHelpers::Fruit.fruit_show_section(self, fruit)
-                end
-              end
-              
-              ArbreHelpers::Seed.others_seeds_panel(self, [LegalEntityDocketSeed])
+              ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.legal_entity_docket)
+              ArbreHelpers::Seed.others_seeds_panel(self, LegalEntityDocketSeed)
             end
           end
         end  
       end
       
       if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-        ArbreHelpers::Layout.tab_for(self, 'Natural', 'user') do
+        ArbreHelpers::Layout.tab_with_counter_for(self, 'Natural', resource.natural_docket_seed ? 1 : 0, 'user') do
           columns do
             column span: 2 do
               ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
@@ -269,21 +257,14 @@ ActiveAdmin.register Issue do
               end
             end
             column do
-              h3 "Current Fruits"
-        
-              if fruit = issue.person.natural_docket.presence
-                panel fruit.name do
-                  ArbreHelpers::Fruit.fruit_show_section(self, fruit)
-                end
-              end
-  
-              ArbreHelpers::Seed.others_seeds_panel(self, [NaturalDocketSeed])
+              ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.natural_docket)
+              ArbreHelpers::Seed.others_seeds_panel(self, NaturalDocketSeed)
             end
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Domicile', :domicile_seeds, 'home') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Domicile', resource.domicile_seeds.count, 'home') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :domicile_seeds do |sf, context|
@@ -301,17 +282,13 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            ArbreHelpers::Layout.panel_only(self, resource.person.domiciles) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-
-            ArbreHelpers::Seed.others_seeds_panel(self, [DomicileSeed])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.domiciles)
+            ArbreHelpers::Seed.others_seeds_panel(self, DomicileSeed)
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'ID', :identification_seeds, 'id-card') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'ID', resource.identification_seeds.count, 'id-card') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :identification_seeds do |sf, context|
@@ -327,17 +304,13 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            ArbreHelpers::Layout.panel_only(self, resource.person.identifications) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-
-            ArbreHelpers::Seed.others_seeds_panel(self, [IdentificationSeed])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.identifications)
+            ArbreHelpers::Seed.others_seeds_panel(self, IdentificationSeed)
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Allowance', :allowance_seeds, 'money') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Allowance', resource.allowance_seeds.count, 'money') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
@@ -349,17 +322,13 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            ArbreHelpers::Layout.panel_only(self, resource.person.allowances) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-            
-            ArbreHelpers::Seed.others_seeds_panel(self, [AllowanceSeed])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.allowances)
+            ArbreHelpers::Seed.others_seeds_panel(self, AllowanceSeed)
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Invoice Argentina', :argentina_invoicing_detail_seed, 'file', 'AR') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Invoice Argentina', resource.argentina_invoicing_detail_seed ? 1:0, 'file', 'AR') do
         columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
@@ -378,19 +347,13 @@ ActiveAdmin.register Issue do
           end
           
           column do
-            h3 "Current Fruits"
-            if fruit = issue.person.argentina_invoicing_details.presence
-              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
-                ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
-              end
-            end
-            
-            ArbreHelpers::Seed.others_seeds_panel(self, [ArgentinaInvoicingDetailSeed], [:tax_id])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.argentina_invoicing_details)
+            ArbreHelpers::Seed.others_seeds_panel(self, ArgentinaInvoicingDetailSeed, [:tax_id])
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Invoice Chile', :chile_invoicing_detail_seed, 'file', 'CL') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Invoice Chile', resource.chile_invoicing_detail_seed ? 1:0, 'file', 'CL') do
         columns do 
           column do
             ArbreHelpers::Form.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
@@ -405,19 +368,13 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            if fruit = issue.person.chile_invoicing_details.presence
-              ArbreHelpers::Layout.panel_only(self, fruit) do |d|
-                ArbreHelpers::Fruit.fruit_show_section(self, d)
-              end
-            end
-
-            ArbreHelpers::Seed.others_seeds_panel(self, [ChileInvoicingDetailSeed], [:tax_id])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.chile_invoicing_details)
+            ArbreHelpers::Seed.others_seeds_panel(self, ChileInvoicingDetailSeed, [:tax_id])
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Affinity', :affinity_seeds, 'users') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Affinity', resource.affinity_seeds.count, 'users') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :affinity_seeds do |rf, context|
@@ -448,12 +405,12 @@ ActiveAdmin.register Issue do
               end
             end
 
-            ArbreHelpers::Seed.others_seeds_panel(self, [AffinitySeed])
+            ArbreHelpers::Seed.others_seeds_panel(self, AffinitySeed)
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Phone', :phone_seeds, 'phone') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Phone', resource.phone_seeds.count, 'phone') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :phone_seeds do |pf, context|
@@ -471,17 +428,13 @@ ActiveAdmin.register Issue do
             
           end
           column do
-            h3 "Current Fruits"
-            ArbreHelpers::Layout.panel_only(self, resource.person.phones) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-        
-            ArbreHelpers::Seed.others_seeds_panel(self, [PhoneSeed])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.phones)
+            ArbreHelpers::Seed.others_seeds_panel(self, PhoneSeed)
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Email', :email_seeds, 'envelope') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Email', resource.email_seeds.count, 'envelope') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :email_seeds do |ef, context|
@@ -494,17 +447,13 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            ArbreHelpers::Layout.panel_only(self, resource.person.emails) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-
-            ArbreHelpers::Seed.others_seeds_panel(self, [EmailSeed])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.emails)
+            ArbreHelpers::Seed.others_seeds_panel(self, EmailSeed)
           end
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Risk Score', :risk_score_seeds, 'exclamation-triangle') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Risk Score', resource.risk_score_seeds.count, 'exclamation-triangle') do
         columns do
           column span: 2 do
             ArbreHelpers::Form.has_many_form self, f, :risk_score_seeds do |rs, context|
@@ -535,12 +484,8 @@ ActiveAdmin.register Issue do
             end
           end
           column do
-            h3 "Current Fruits"
-            ArbreHelpers::Layout.panel_only(self, resource.person.risk_scores) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-
-            ArbreHelpers::Seed.others_seeds_panel(self, [RiskScoreSeed])
+            ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.risk_scores)
+            ArbreHelpers::Seed.others_seeds_panel(self, RiskScoreSeed)
           end
         end
       end
@@ -596,21 +541,23 @@ ActiveAdmin.register Issue do
                 para d.body
                 ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
               end
+            else
+              div("No items available", class: 'with-bootstrap alert alert-info')
             end
           end
           column do
             ArbreHelpers::Fruit.current_fruits_panel(self, resource.person.notes)
-            ArbreHelpers::Seed.others_seeds_panel(self, [NoteSeed])
+            ArbreHelpers::Seed.others_seeds_panel(self, NoteSeed)
           end
         end
       end
-
-      if issue.natural_docket_seed.presence
-        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Natural", :natural_docket_seed, :natural_docket, 'user')
-      end
-
-      if issue.legal_entity_docket_seed.presence
+      
+      if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Legal Entity", :legal_entity_docket_seed, :legal_entity_docket, 'industry')
+      end
+      
+      if resource.for_person_type == :natural_person || resource.for_person_type.nil?
+        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Natural", :natural_docket_seed, :natural_docket, 'user')
       end
 
       ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Domicile", :domicile_seeds, :domiciles, 'home')

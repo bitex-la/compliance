@@ -9,16 +9,19 @@ module ArbreHelpers
           columns do
             column span: 2 do
               h3 "Current #{title} Seeds"
-              ArbreHelpers::Layout.panel_only(self, all) do |d|
-                ArbreHelpers::Seed.seed_show_section(self, d)
-              end  
+              if all.any?
+                ArbreHelpers::Layout.panel_only(self, all) do |d|
+                  ArbreHelpers::Seed.seed_show_section(self, d)
+                end
+              else
+                div("No items available", class: 'with-bootstrap alert alert-info')
+              end
             end
-
             column do
               fruits = resource.person.send(fruits_relation)
               ArbreHelpers::Fruit.current_fruits_panel(self,
-                fruits.try?('count') ? fruits : [fruits].compact)
-              ArbreHelpers::Seed.others_seeds_panel(self, [relation.to_s.camelize.singularize.constantize])
+                fruits.try('count') ? fruits : [fruits].compact)
+              ArbreHelpers::Seed.others_seeds_panel(self, relation.to_s.camelize.singularize.constantize)
             end
           end        
         end
@@ -60,13 +63,16 @@ module ArbreHelpers
       end
     end
 
-    def self.others_seeds_panel(context, relations, extra = [])
+    def self.others_seeds_panel(context, relation, extra = [])
       context.instance_eval do
         h3 "Other Seeds"
-        relations.each do |o|
-          ArbreHelpers::Layout.panel_only(self, o.others_active_seeds(resource)) do |s|
+        seeds = relation.others_active_seeds(resource)
+        if seeds.any?
+          ArbreHelpers::Layout.panel_only(self, seeds) do |s|
             ArbreHelpers::Seed.seed_show_section(self, s, [:issue] + extra)
           end
+        else
+          div("No items available", class: 'with-bootstrap alert alert-info')
         end
       end
     end
