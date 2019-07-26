@@ -45,5 +45,15 @@ module ArbreHelpers
         end
       end
     end
+
+    def self.alert(context, text, type)
+      context.instance_eval do
+        div class: 'with-bootstrap' do
+          div class: "alert alert-#{type}" do
+            text
+          end
+        end
+      end
+    end
   end
 end

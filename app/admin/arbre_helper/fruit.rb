@@ -93,23 +93,30 @@ module ArbreHelpers
 
     def self.fruit_show_section(context, fruit, others = [])
       context.instance_eval do
-        columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
-        columns = columns.map{|c| c.gsub(/_id$/,'') } -
-          %w(id person issue created_at updated_at replaces extra_info external_link)
-        attributes_table_for fruit do
-          row(:show){|o| link_to o.name, o }
-          columns.each do |n|
-            row(n)
+        if fruit.class.name == "Affinity"
+          attributes_table_for fruit do
+            ArbreHelpers::Affinity.affinity_card(self, fruit)
           end
-          others.each do |o|
-            row(o)
+        else
+          columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
+          columns = columns.map{|c| c.gsub(/_id$/,'') } -
+            %w(id person issue created_at updated_at replaces extra_info external_link)
+          attributes_table_for fruit do
+            row(:show){|o| link_to o.name, o }
+            columns.each do |n|
+              row(n)
+            end
+            others.each do |o|
+              row(o)
+            end
+            if fruit.replaces
+              row(:replaces)
+            end
+            row(:created_at)
+            row(:issue)
           end
-          if fruit.replaces
-            row(:replaces)
-          end
-          row(:created_at)
-          row(:issue)
         end
+        
         if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
           h4 "External links"
           ArbreHelpers::HtmlHelper.show_links(self, fruit.external_link.split(',').compact)
@@ -131,16 +138,17 @@ module ArbreHelpers
       end
     end
 
-    def self.current_fruits_panel(context, fruits)
+    def self.current_fruits_panel(context, fruits_relation)
       context.instance_eval do
+        fruits = resource.person.send(fruits_relation)
         all = fruits.try(:count) ? fruits : [fruits].compact
         h3 "Current Fruits"
         if all.any?
           ArbreHelpers::Layout.panel_only(self, all) do |f|
             ArbreHelpers::Fruit.fruit_show_section(self, f)
-          end
+          end          
         else
-          div("No items available", class: 'with-bootstrap alert alert-info')
+          ArbreHelpers::Layout.alert(self, "No items available", "info")
         end
       end
     end

@@ -2,28 +2,41 @@ module ArbreHelpers
   class Seed
     def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits_relation, icon, text=nil)
       context.instance_eval do
+        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(context, title, relation, fruits_relation, icon, text) do
+          h3 "Current #{title} Seeds"
+          items = resource.send(relation)
+          all = items.try(:count) ? items : [items].compact
+          if all.any?
+            ArbreHelpers::Layout.panel_only(self, all) do |d|
+              ArbreHelpers::Seed.seed_show_section(self, d)
+            end
+          else
+            ArbreHelpers::Layout.alert(self, "No items available", "info")
+          end
+        end
+      end
+    end
+
+    def self.show_full_seed(context, relation, fruits_relation, &block)
+      context.instance_eval do
+        columns do
+          column span: 2 do
+            instance_exec &block
+          end
+          column do
+            ArbreHelpers::Fruit.current_fruits_panel(self, fruits_relation)
+            ArbreHelpers::Seed.others_seeds_panel(self, relation.to_s.camelize.singularize.constantize)
+          end
+        end
+      end
+    end
+
+    def self.seed_collection_and_fruits_edit_tab(context, title, relation, fruits_relation, icon, text=nil, &block )
+      context.instance_eval do
         items = resource.send(relation)
         all = items.try(:count) ? items : [items].compact
-        
         ArbreHelpers::Layout.tab_with_counter_for(self, title, all.count, icon, text) do
-          columns do
-            column span: 2 do
-              h3 "Current #{title} Seeds"
-              if all.any?
-                ArbreHelpers::Layout.panel_only(self, all) do |d|
-                  ArbreHelpers::Seed.seed_show_section(self, d)
-                end
-              else
-                div("No items available", class: 'with-bootstrap alert alert-info')
-              end
-            end
-            column do
-              fruits = resource.person.send(fruits_relation)
-              ArbreHelpers::Fruit.current_fruits_panel(self,
-                fruits.try('count') ? fruits : [fruits].compact)
-              ArbreHelpers::Seed.others_seeds_panel(self, relation.to_s.camelize.singularize.constantize)
-            end
-          end        
+          ArbreHelpers::Seed.show_full_seed(self, relation, fruits_relation, &block)
         end
       end
     end
@@ -72,7 +85,7 @@ module ArbreHelpers
             ArbreHelpers::Seed.seed_show_section(self, s, [:issue] + extra)
           end
         else
-          div("No items available", class: 'with-bootstrap alert alert-info')
+          ArbreHelpers::Layout.alert(self, "No items available", "info")
         end
       end
     end
