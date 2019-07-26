@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
   namespace :api do
-    resources :people, only: [:create, :show, :index, :update]
+    resources :people, only: [:create, :show, :index, :update] do
+      member do
+        Person.aasm.events.map(&:name).each do |action|
+          post action
+        end
+      end
+    end
 
     resources :issues, only: [:create, :show, :index, :update] do
       member do

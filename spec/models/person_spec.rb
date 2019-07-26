@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Person, type: :model do
   let(:person) { create(:full_natural_person) }
+  let(:empty_person) { create(:empty_person) }
 
   it 'is valid without issues' do
     expect(Person.new).to be_valid
@@ -77,14 +78,16 @@ RSpec.describe Person, type: :model do
   it 'Add state changes to event log when enable/disable' do 
     person = create(:empty_person)
     assert_logging(person, :enable_person, 0)
-    2.times do
-      person.update(enabled: true)
-    end
+
+    10.times{ person.enable! rescue nil }
     assert_logging(person, :enable_person, 1)
-    2.times do
-      person.update(enabled: false)
-    end
+    expect(person).to be_enabled
+    expect(person.enabled).to eq(true) # Backwards compatible state
+
+    10.times{ person.disable! rescue nil }
     assert_logging(person, :disable_person, 1)
+    expect(person).to be_disabled
+    expect(person.enabled).to eq(false) # Backwards compatible state
   end 
   
   it 'shows only observations for meaningful issues' do 
@@ -130,6 +133,31 @@ RSpec.describe Person, type: :model do
         .to include({:id=>3, :suggestion=>"(3) ☺: Joe Doe - 2545566"})
 
       expect(Person.suggest('80932388')).to be_empty
+    end
+  end
+
+  describe 'when transitioning' do
+    it 'defaults to new' do
+      person = build(:empty_person)
+      expect(person).to have_state(:new)
+    end
+
+    %i(new disabled).each do |state|
+      it "goes from #{state} to enabled on enable" do
+        expect(empty_person).to transition_from(state).to(:enabled).on_event(:enable)
+      end
+    end
+
+    %i(new enabled).each do |state|
+      it "goes from #{state} to disabled on disable" do
+        expect(empty_person).to transition_from(state).to(:disabled).on_event(:disable)
+      end
+    end
+  
+    %i(new enabled disabled).each do |state|
+      it "goes from #{state} to rejected on reject" do
+        expect(empty_person).to transition_from(state).to(:rejected).on_event(:reject)
+      end
     end
   end
 end
