@@ -212,6 +212,23 @@ RSpec.describe Issue, type: :model do
       expect(Issue.fresh).to include issue_notes
       expect(Issue.fresh).to include risk_issue
     end
+
+    it 'gets others active seeds' do
+      person = create(:empty_person)
+      issue = create(:full_natural_person_issue_with_fixed_email, person: person)
+      issue2 = create(:full_natural_person_issue_with_fixed_email, person: person)
+      issue3 = create(:full_natural_person_issue_with_fixed_email, person: person)
+      
+      issue2.complete!
+      
+      expect(NoteSeed.others_active_seeds(issue)).to include issue2.reload.note_seeds.first
+      expect(NoteSeed.others_active_seeds(issue)).to_not include issue3.reload.note_seeds.first
+
+      issue3.complete!
+      expect(NoteSeed.others_active_seeds(issue)).to include issue3.reload.note_seeds.first
+
+      expect(NoteSeed.others_active_seeds(issue)).to_not include issue.reload.note_seeds.first
+    end
   end
 
   describe "when transitioning" do
