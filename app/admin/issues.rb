@@ -167,14 +167,6 @@ ActiveAdmin.register Issue do
           end
         end
 
-        h3 "Observations"
-        ArbreHelpers::Form.has_many_form self, f, :observations, cant_remove: true do |sf|
-          sf.input :observation_reason
-          sf.input :scope, as: :select
-          sf.input :note, input_html: {rows: 3}
-          sf.input :reply, input_html: {rows: 3}
-        end
-
         h3 "Notes"
         ArbreHelpers::Seed.show_full_seed(self, :note_seeds, :notes) do
           div class: 'note_seeds' do
@@ -187,6 +179,11 @@ ActiveAdmin.register Issue do
         end
       end
 
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Observations', resource.observations.count, 'bell') do
+        h3 "Observations"
+        ArbreHelpers::Observation.has_many_observations(self, f, :observations)
+      end
+
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, "Legal Entity", :legal_entity_docket_seed, :legal_entity_docket, 'industry') do
           ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
@@ -194,23 +191,14 @@ ActiveAdmin.register Issue do
             sf.input :legal_name
             sf.input :industry
             sf.input :business_description, input_html: {rows: 3}
-            Appsignal.instrument("render_country_for_docket") do
-              sf.input :country, as: :autocomplete, url: search_country_people_path
-            end
+            sf.input :country, as: :autocomplete, url: search_country_people_path
+            
             if resource.person.legal_entity_docket
               sf.input :copy_attachments,
                 label: "Move existing Legal Entity Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
-            
-            h3 'Observations'
-            ArbreHelpers::Form.has_many_form self, sf, :observations, cant_remove: true do |sfo|
-              sfo.input :observation_reason
-              sfo.input :scope, as: :select
-              sfo.input :note, input_html: {rows: 3}
-              sfo.input :reply, input_html: {rows: 3}
-            end
-            
+            ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
             ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
         end  
@@ -219,34 +207,27 @@ ActiveAdmin.register Issue do
       if resource.for_person_type == :natural_person || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, "Natural Person", :natural_docket_seed, :natural_docket, 'user') do
           ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
-            Appsignal.instrument("rendering_first_natural_docket_fields") do
-              sf.input :first_name
-              sf.input :last_name
-              sf.input :birth_date, as: :datepicker,
-                datepicker_options: {
-                  change_year: true,
-                  change_month: true
-                }
-              sf.input :nationality, as: :autocomplete, url: search_country_people_path
-            end
-            Appsignal.instrument("rendering_association_natural_docket_fields") do
-              sf.input :gender_id, as: :select, collection: GenderKind.all
-              sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
-            end
-            Appsignal.instrument("rendering_last_natural_docket_fields") do
-              sf.input :job_title
-              sf.input :job_description
-              sf.input :politically_exposed
-              sf.input :politically_exposed_reason, input_html: {rows: 3}
-              if resource.person.natural_docket
-                sf.input :copy_attachments,
-                  label: "Move existing Natural Person Docket attachments to the new one"
-              end
+            sf.input :first_name
+            sf.input :last_name
+            sf.input :birth_date, as: :datepicker,
+              datepicker_options: {
+                change_year: true,
+                change_month: true
+              }
+            sf.input :nationality, as: :autocomplete, url: search_country_people_path
+            sf.input :gender_id, as: :select, collection: GenderKind.all
+            sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
+            sf.input :job_title
+            sf.input :job_description
+            sf.input :politically_exposed
+            sf.input :politically_exposed_reason, input_html: {rows: 3}
+            if resource.person.natural_docket
+              sf.input :copy_attachments,
+                label: "Move existing Natural Person Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
-            Appsignal.instrument("rendering_has_many_attachments_on_docket") do
-              ArbreHelpers::Attachment.has_many_attachments(self, sf)
-            end
+            ArbreHelpers::Observation.has_many_observations(self, sf, :observations,true)
+            ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
         end
       end
@@ -263,6 +244,7 @@ ActiveAdmin.register Issue do
           sf.input :apartment
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
           sf.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, sf, :observations,true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
@@ -277,6 +259,7 @@ ActiveAdmin.register Issue do
           sf.input :public_registry_extra_data
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
           sf.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, sf, :observations,true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
@@ -287,6 +270,7 @@ ActiveAdmin.register Issue do
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
           sf.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, sf, :observations,true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
       end
@@ -303,6 +287,7 @@ ActiveAdmin.register Issue do
           ArbreHelpers::Replacement.fields_for_replaces self, af,
             :argentina_invoicing_details
           af.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, af, :observations,true)
           ArbreHelpers::Attachment.has_many_attachments(self, af)
         end
       end
@@ -316,6 +301,7 @@ ActiveAdmin.register Issue do
           cf.input :comuna
           ArbreHelpers::Replacement.fields_for_replaces self, cf, :chile_invoicing_details
           cf.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, cf, :observations,true)
           ArbreHelpers::Attachment.has_many_attachments(self, cf)
         end
       end
@@ -336,6 +322,7 @@ ActiveAdmin.register Issue do
           end
           ArbreHelpers::Replacement.fields_for_replaces context, rf, :affinities
           rf.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, rf, :observations,true)
           ArbreHelpers::Attachment.has_many_attachments(context, rf)
         end
       end
@@ -352,6 +339,7 @@ ActiveAdmin.register Issue do
             pf.input :replaces, collection: current
           end
           pf.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, pf, :observations,true)
         end
       end
 
@@ -363,6 +351,7 @@ ActiveAdmin.register Issue do
             ef.input :replaces, collection: current
           end
           ef.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, ef, :observations,true)
         end
       end
 
@@ -391,6 +380,7 @@ ActiveAdmin.register Issue do
             rs.input :extra_info 
           end
           rs.input :expires_at, as: :datepicker
+          ArbreHelpers::Observation.has_many_observations(self, rs, :observations,true)
           ArbreHelpers::Attachment.has_many_attachments(context, rs)
         end
       end
@@ -426,16 +416,6 @@ ActiveAdmin.register Issue do
           end
         end
 
-        if observations = resource.observations.presence
-          h3 "Observations"
-          ArbreHelpers::Layout.panel_grid(self, observations) do |d|
-            attributes_table_for d, :observation_reason, :scope, :created_at, :updated_at
-            para d.note
-            strong "Reply:"
-            span d.reply
-          end
-        end
-
         h3 "Notes"
         ArbreHelpers::Seed.show_full_seed(self, :note_seeds, :notes) do
           h3 "Current Note Seeds"
@@ -451,6 +431,15 @@ ActiveAdmin.register Issue do
         end
       end
       
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Observations', resource.observations.count, 'bell') do
+        if observations = resource.observations.presence
+          h3 "Issue Observations"
+          ArbreHelpers::Observation.show_observations(self, observations.select { |o| o.observable.nil?} )
+          h3 "Seeds Observations"
+          ArbreHelpers::Observation.show_observations(self, observations.select { |o| !o.observable.nil?} )
+        end
+      end
+
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, "Legal Entity", :legal_entity_docket_seed, :legal_entity_docket, 'industry')
       end

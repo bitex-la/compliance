@@ -59,7 +59,7 @@ class Observation < ApplicationRecord
     joins(:issue) 
       .where(issues: {reason_id: reason})
   }
-
+  
   aasm do
     state :new, initial: true     
     state :answered

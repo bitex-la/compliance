@@ -59,6 +59,9 @@ module ArbreHelpers
             span seed.extra_info
           end
         end
+        
+        ArbreHelpers::Observation.show_observations(self, seed.observations, true)
+
         attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
         attachments.each do |a|
           ArbreHelpers::Attachment.preview(self, a)
