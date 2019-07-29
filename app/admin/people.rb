@@ -118,7 +118,7 @@ ActiveAdmin.register Person do
 
   show do
     tabs do
-      tab :base do
+      ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
           column do
             attributes_table_for resource do
@@ -169,67 +169,25 @@ ActiveAdmin.register Person do
         end
       end
 
-      tab :docket do
-        if fruit = resource.legal_entity_docket
-          panel fruit.name do
-            ArbreHelpers::Fruit.fruit_show_section(self, fruit)
-          end
-        end
-
-        if fruit = resource.natural_docket
-          panel fruit.name do
-            ArbreHelpers::Fruit.fruit_show_section(self, fruit)
-          end
-        end
+      if fruit = resource.legal_entity_docket
+        ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Legal Entity", :legal_entity_docket, 'industry')
+      end
+      
+      if fruit = resource.natural_docket
+        ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Natural Person", :natural_docket, 'user')
       end
 
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Domicile", :domiciles)
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Id", :identifications)
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Allowance", :allowances)
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Domicile", :domiciles, 'home')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Id", :identifications, 'id-card')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Allowance", :allowances, 'money')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Invoice Argentina", :argentina_invoicing_details, 'file', 'AR')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Invoice Chile", :chile_invoicing_details, 'file', 'CL')      
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Affinity", :all_affinities, 'users')      
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Phone", :phones, 'phone')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Email", :emails, 'envelope')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Risk Score", :risk_scores, 'exclamation-triangle')
 
-      tab "Invoicing" do
-        if fruits = resource.argentina_invoicing_details.current.presence
-          h3 "Argentina Invoicing details"
-          fruits.each do |fruit|
-            ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d, [:tax_id])
-            end
-          end
-        end
-
-        if fruits = resource.chile_invoicing_details.current.presence
-          h3 "Chile Invoicing details"
-          fruits.each do |fruit|
-            ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
-          end
-        end
-      end
-
-      tab "Affinities" do
-        ArbreHelpers::Layout.panel_grid(self, resource.all_affinities) do |d|
-          attributes_table_for d do
-            ArbreHelpers::Affinity.affinity_card(self, d)
-          end
-          d.attachments.each do |a|
-            ArbreHelpers::Attachment.preview(self, a)
-          end
-        end
-      end
-
-      tab "Contact (#{resource.phones.count + resource.emails.count})" do
-        
-        ArbreHelpers::Layout.panel_grid(self, resource.phones) do |d|
-          ArbreHelpers::Fruit.fruit_show_section(self, d)
-        end
-
-        ArbreHelpers::Layout.panel_grid(self, resource.emails) do |d|
-          ArbreHelpers::Fruit.fruit_show_section(self, d)
-        end
-      end
-
-      tab "Fund Deposits" do 
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', person.fund_deposits.count, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do
           table_for person.fund_deposits do           
             column :amount
@@ -240,8 +198,6 @@ ActiveAdmin.register Person do
           end
         end
       end
-
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Risk Score", :risk_scores)
     end
   end
 end

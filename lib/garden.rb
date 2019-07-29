@@ -75,6 +75,13 @@ module Garden
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
       end
+
+      scope :others_active_seeds, -> (issue) { 
+        joins(:issue)
+          .where("issues.id != ?", issue.id)
+          .where("issues.aasm_state IN (?)",%i{new observed answered})
+          .where("issues.person_id = ?", issue.person.id)
+      }
     end
 
     def harvest!
@@ -127,6 +134,8 @@ module Garden
       new_issue.add_seeds_replacing([fruit])
       new_issue.save!
     end
+
+    
   end
 
   module Fruit

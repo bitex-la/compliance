@@ -78,22 +78,26 @@ module ArbreHelpers
       end
     end
 
-    def self.fruit_collection_show_tab(context, title, relation)
-      Appsignal.instrument("render_#{relation.to_s}") do
-        context.instance_eval do
-          all = resource.send(relation).current.order("created_at DESC")
-          tab "#{title} (#{all.count})" do
-            ArbreHelpers::Layout.panel_grid(self, all) do |d|
-              ArbreHelpers::Fruit.fruit_show_section(self, d)
-            end
+    def self.fruit_collection_show_tab(context, title, relation, icon, text=nil)
+      context.instance_eval do
+        items = resource.send(relation)
+        all = items.try(:current).try(:order, 'created_at DESC') || [items].compact
+        
+        ArbreHelpers::Layout.tab_with_counter_for(self, title, all.count, icon, text) do
+          ArbreHelpers::Layout.panel_grid(self, all) do |d|
+            ArbreHelpers::Fruit.fruit_show_section(self, d)
           end
         end
       end
     end
 
     def self.fruit_show_section(context, fruit, others = [])
-      Appsignal.instrument("render_#{fruit.class.name}") do
-        context.instance_eval do
+      context.instance_eval do
+        if fruit.class.name == "Affinity"
+          attributes_table_for fruit do
+            ArbreHelpers::Affinity.affinity_card(self, fruit)
+          end
+        else
           columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
           columns = columns.map{|c| c.gsub(/_id$/,'') } -
             %w(id person issue created_at updated_at replaces extra_info external_link)
@@ -111,24 +115,40 @@ module ArbreHelpers
             row(:created_at)
             row(:issue)
           end
-          if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
-            h4 "External links"
-            ArbreHelpers::HtmlHelper.show_links(self, fruit.external_link.split(',').compact)
-          end
-          if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
-            h4 "Extra info"
-            begin 
-              if fruit.extra_info
-                extra_info_as_json = JSON.parse(fruit.extra_info)
-                ArbreHelpers::HtmlHelper.extra_info_renderer(self, extra_info_as_json)
-              end
-            rescue JSON::ParserError
-              span fruit.extra_info
+        end
+        
+        if fruit.respond_to?(:external_link) && !fruit.external_link.blank?
+          h4 "External links"
+          ArbreHelpers::HtmlHelper.show_links(self, fruit.external_link.split(',').compact)
+        end
+        if fruit.respond_to?(:extra_info)  && !fruit.extra_info.nil?
+          h4 "Extra info"
+          begin 
+            if fruit.extra_info
+              extra_info_as_json = JSON.parse(fruit.extra_info)
+              ArbreHelpers::HtmlHelper.extra_info_renderer(self, extra_info_as_json)
             end
+          rescue JSON::ParserError
+            span fruit.extra_info
           end
-          fruit.attachments.each do |a|
-            ArbreHelpers::Attachment.preview(self, a)
-          end
+        end
+        fruit.attachments.each do |a|
+          ArbreHelpers::Attachment.preview(self, a)
+        end
+      end
+    end
+
+    def self.current_fruits_panel(context, fruits_relation)
+      context.instance_eval do
+        fruits = resource.person.send(fruits_relation)
+        all = fruits.try(:count) ? fruits : [fruits].compact
+        h3 "Current Fruits"
+        if all.any?
+          ArbreHelpers::Layout.panel_only(self, all) do |f|
+            ArbreHelpers::Fruit.fruit_show_section(self, f)
+          end          
+        else
+          ArbreHelpers::Layout.alert(self, "No items available", "info")
         end
       end
     end
