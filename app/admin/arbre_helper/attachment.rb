@@ -33,25 +33,19 @@ module ArbreHelpers
     end
 
     def self.has_many_attachments(context, form)
-      Appsignal.instrument("render_has_many_attachments") do
-        ArbreHelpers::Form.has_many_form context, form, :attachments do |af, ctx|
-          Appsignal.instrument("render_one_of_has_many_attachments") do
-            a = af.object
-            if a.persisted?
-              af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
-              Appsignal.instrument("concat_attachment_preview") do
-                af.template.concat(
-                  Arbre::Context.new({}, af.template){
-                    ArbreHelpers::Attachment.preview(self, a)
-                  }.to_s
-                )
-              end
-            else
-              af.input :document, as: :file, label: "Attachment"
-            end
-          end
+      ArbreHelpers::Form.has_many_form context, form, :attachments do |af, ctx|  
+        a = af.object
+        if a.persisted?
+          af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
+          af.template.concat(
+            Arbre::Context.new({}, af.template){
+              ArbreHelpers::Attachment.preview(self, a)
+            }.to_s
+          )
+        else
+          af.input :document, as: :file, label: "Attachment"
         end
-      end
+      end  
     end
 
     def self.attachments_list(context, attachments)

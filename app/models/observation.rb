@@ -17,12 +17,14 @@ class Observation < ApplicationRecord
   
   belongs_to :issue
   belongs_to :observation_reason, optional: true
+  belongs_to :observable, polymorphic: true, optional: true
 
   before_save  :check_for_answer
   after_save :preserve_previous_reply_if_not_nil
   after_commit :sync_issue_observed_status
 
   validate :validate_scope_integrity
+  validate :validate_issue_correspondence
 
   def self.ransackable_scopes(auth_object = nil)
 	  %i(by_issue_reason)
@@ -101,6 +103,12 @@ class Observation < ApplicationRecord
     if scope != observation_reason.try(:scope)
       errors.add(:scope, "Observation and Observation reason scope must match")
     end
+  end
+
+  def validate_issue_correspondence
+    return unless observable
+    return if observable.issue == issue
+    errors.add(:observable, "Issue and observable issue must match")
   end
 
   def self.included_for

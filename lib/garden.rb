@@ -36,9 +36,16 @@ module Garden
       belongs_to :fruit, class_name: naming.fruit, optional: true
       has_many :attachments, as: :attached_to_seed
 
+      has_many :observations, as: :observable
+
       before_validation do 
         attachments.each do |a|
           a.attached_to_seed = self if a.attached_to.nil?
+        end
+        
+        observations.each do |o|
+          o.observable = self unless o.observable 
+          o.issue = o.observable.issue unless o.issue
         end
       end
 
@@ -63,6 +70,7 @@ module Garden
       end
 
       accepts_nested_attributes_for :attachments, :allow_destroy => true
+      accepts_nested_attributes_for :observations, :allow_destroy => true
 
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')

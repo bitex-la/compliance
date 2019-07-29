@@ -200,6 +200,15 @@ ActiveAdmin.register Issue do
                 label: "Move existing Legal Entity Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
+            
+            h3 'Observations'
+            ArbreHelpers::Form.has_many_form self, sf, :observations, cant_remove: true do |sfo|
+              sfo.input :observation_reason
+              sfo.input :scope, as: :select
+              sfo.input :note, input_html: {rows: 3}
+              sfo.input :reply, input_html: {rows: 3}
+            end
+            
             ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
         end
