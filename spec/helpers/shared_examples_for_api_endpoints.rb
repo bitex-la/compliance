@@ -17,12 +17,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
     initial_relations = instance_exec(&relations_proc)
     issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
 
-    server_sent_relations = {
-      person: {data: {id: person.id.to_s, type: 'people'}},
-      attachments: {data: []},
-      fruit: {data: nil},
-    }
-
     api_create "/#{seed_type}", {
       type: seed_type,
       attributes: initial_attrs,

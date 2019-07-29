@@ -24,7 +24,8 @@ class Api::NaturalDocketSeedsController < Api::SeedController
         :attachments,
         :copy_attachments,
         :issue,
-        :expires_at
+        :expires_at,
+        :observations
       ]
   end
 end
