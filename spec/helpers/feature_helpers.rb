@@ -191,7 +191,7 @@ module FeatureHelpers
   end
 
   def add_observation(index = 0, reason, note)
-    find('li[title="Base"] a').click  
+    find('li[title="Observation"] a').click  
     click_link "Add New Observation"
   
     select_with_search(

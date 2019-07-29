@@ -74,6 +74,8 @@ describe 'an admin user' do
     issue.should be_observed
     observation.should be_new
 
+    find('li[title="Observation"] a').click
+
     fill_in 'issue[observations_attributes][0][reply]',
       with: '0 hits go ahead!!!'
 
@@ -105,6 +107,8 @@ describe 'an admin user' do
     
     issue.reload.should be_observed
     assert_logging(issue.reload, :observe_issue, 2)
+
+    find('li[title="Observation"] a').click
 
     fill_in 'issue[observations_attributes][1][reply]',
       with: '0 hits at 2018-06-07'
@@ -274,6 +278,8 @@ describe 'an admin user' do
 
     click_link "Edit"
 
+    find('li[title="Observation"] a').click
+
     fill_in 'issue[observations_attributes][0][reply]',
       with: 'Double checked by compliance'
 
@@ -426,6 +432,7 @@ describe 'an admin user' do
     issue.should be_observed
     observation.should be_new
 
+    find('li[title="Observation"] a').click
     fill_in 'issue[observations_attributes][0][reply]',
       with: '0 hits go ahead!!!'
     click_button "Update Issue"
@@ -444,6 +451,8 @@ describe 'an admin user' do
     click_link "Edit"
 
     assert_logging(issue.reload, :observe_issue, 2)
+
+    find('li[title="Observation"] a').click
 
     fill_in 'issue[observations_attributes][1][reply]',
       with: '0 hits go ahead!!!'
@@ -538,6 +547,7 @@ describe 'an admin user' do
     page.current_path.should ==
       "/people/#{person.id}/issues/#{issue.id}/edit"
 
+    find('li[title="Observation"] a').click
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]', with: 'No hits'
     click_button 'Update Issue'
@@ -577,7 +587,7 @@ describe 'an admin user' do
 
     click_link "Edit"
 
-    find('li[title="Base"] a').click
+    find('li[title="Observation"] a').click
     click_link "Add New Observation"
 
     select_with_search(
@@ -618,12 +628,15 @@ describe 'an admin user' do
       attributes: {reply: 'Ok'}
     }
 
+    find('li[title="Observation"] a').click
+
     fill_in 'issue[observations_attributes][0][reply]',
       with: 'No hits'
 
     click_button 'Update Issue'
     click_link "Edit"
 
+    find('li[title="Observation"] a').click
     fill_in 'issue[observations_attributes][2][reply]',
       with: 'ID is ok'
     
@@ -658,6 +671,7 @@ describe 'an admin user' do
 
     page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
+    find('li[title="Observation"] a').click
     # Admin replies that there is not hits on worldcheck
     fill_in 'issue[observations_attributes][0][reply]',
       with: '1 hits'

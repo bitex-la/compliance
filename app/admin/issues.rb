@@ -179,7 +179,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Observations', resource.observations.count, 'bell') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Observation', resource.observations.count, 'bell') do
         h3 "Observations"
         ArbreHelpers::Observation.has_many_observations(self, f, :observations)
       end
@@ -431,7 +431,7 @@ ActiveAdmin.register Issue do
         end
       end
       
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Observations', resource.observations.count, 'bell') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Observation', resource.observations.count, 'bell') do
         if observations = resource.observations.presence
           h3 "Issue Observations"
           ArbreHelpers::Observation.show_observations(self, observations.select { |o| o.observable.nil?} )
