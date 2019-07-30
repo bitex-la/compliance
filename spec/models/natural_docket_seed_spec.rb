@@ -69,4 +69,21 @@ RSpec.describe NaturalDocketSeed, type: :model do
     issue = Issue.new(person: person)
     create(:strange_natural_docket_seed, issue: issue)
   end
+
+  it 'can add observation to seed' do
+    create(:human_world_check_reason)
+    seed = create(:full_natural_docket_seed_with_issue)
+    
+    expect do
+      obs = seed.observations.build()
+      obs.observation_reason = ObservationReason.first
+      obs.scope = :admin
+      seed.save!  
+    end.to change{ seed.observations.count }.by(1)
+
+    first = seed.observations.first 
+    expect(first.observation_reason).to eq(ObservationReason.first)
+    expect(first.scope).to eq("admin")
+    expect(first.observable).to eq(seed)
+  end
 end
