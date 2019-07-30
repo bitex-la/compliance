@@ -52,4 +52,17 @@ RSpec.describe Observation, type: :model do
     expect(obv).to have_state(:answered)
     assert_logging(obv, :update_entity, 3)
   end
+
+  it "prevents save an observation if seed's issue do not match observation issue" do
+    issue = create(:basic_issue)
+    issue2 = create(:basic_issue)
+    seed = issue.allowance_seeds.build
+    seed.amount = 1000.50
+    seed.kind_id = Currency.all.first.id
+    obs = seed.observations.build
+    obs.issue = issue2
+    
+    expect { issue.save! }.to raise_error(ActiveRecord::RecordInvalid,
+      "Validation failed: Allowance seeds observations observable Issue and observable issue must match")
+  end
 end

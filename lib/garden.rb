@@ -72,6 +72,12 @@ module Garden
       accepts_nested_attributes_for :attachments, :allow_destroy => true
       accepts_nested_attributes_for :observations, :allow_destroy => true
 
+      before_destroy :destroy_observations
+
+      def destroy_observations
+        observations.destroy_all
+      end
+
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
       end

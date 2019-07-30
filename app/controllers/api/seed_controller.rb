@@ -15,7 +15,6 @@ class Api::SeedController < Api::FruitController
   end
 
   def destroy
-    resource.observations.destroy_all if resource.respond_to?('observations') 
     resource.destroy
     render body: nil, status: 204
   end

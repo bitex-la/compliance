@@ -31,4 +31,21 @@ RSpec.describe ArgentinaInvoicingDetailSeed, type: :model do
     expect(first.scope).to eq("admin")
     expect(first.observable).to eq(valid_seed)
   end
+
+  it 'can remove a seed and observations' do
+    create(:human_world_check_reason)
+    valid_seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+    
+    obs = valid_seed.observations.build()
+    obs.observation_reason = ObservationReason.first
+    obs.scope = :admin
+    valid_seed.save!
+
+    issue = valid_seed.issue
+    expect(issue.observations.count).to eq(1)
+
+    expect do
+      valid_seed.destroy!
+    end.to change{ issue.observations.count }.by(-1)
+  end
 end

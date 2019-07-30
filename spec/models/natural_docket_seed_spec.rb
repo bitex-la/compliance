@@ -72,18 +72,35 @@ RSpec.describe NaturalDocketSeed, type: :model do
 
   it 'can add observation to seed' do
     create(:human_world_check_reason)
-    seed = create(:full_natural_docket_seed_with_issue)
+    valid_seed = create(:full_natural_docket_seed_with_issue)
     
     expect do
-      obs = seed.observations.build()
+      obs = valid_seed.observations.build()
       obs.observation_reason = ObservationReason.first
       obs.scope = :admin
-      seed.save!  
-    end.to change{ seed.observations.count }.by(1)
+      valid_seed.save!  
+    end.to change{ valid_seed.observations.count }.by(1)
 
-    first = seed.observations.first 
+    first = valid_seed.observations.first 
     expect(first.observation_reason).to eq(ObservationReason.first)
     expect(first.scope).to eq("admin")
-    expect(first.observable).to eq(seed)
+    expect(first.observable).to eq(valid_seed)
+  end
+
+  it 'can remove a seed and observations' do
+    create(:human_world_check_reason)
+    valid_seed = create(:full_natural_docket_seed_with_issue)
+
+    obs = valid_seed.observations.build()
+    obs.observation_reason = ObservationReason.first
+    obs.scope = :admin
+    valid_seed.save!
+
+    issue = valid_seed.issue
+    expect(issue.observations.count).to eq(1)
+
+    expect do
+      valid_seed.destroy!
+    end.to change{ issue.observations.count }.by(-1)
   end
 end
