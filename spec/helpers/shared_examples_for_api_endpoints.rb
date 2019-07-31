@@ -8,6 +8,35 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   initial_expires_seed = "#{initial_factory}_expires_seed"
 
+  it "Creates seed with observation" do
+    issue = create(:basic_issue)
+    person = issue.person
+
+    initial_attrs = attributes_for(initial_expires_seed)
+
+    initial_relations = instance_exec(&relations_proc)
+    issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
+
+    api_create "/#{seed_type}", {
+      type: seed_type,
+      attributes: initial_attrs,
+      relationships: issue_relation.merge(initial_relations)
+    }
+
+    id = api_response.data.id
+
+    seed = seed_type.to_s.camelize.singularize.constantize.find(id)
+
+    create(:human_world_check_reason)
+    obs = seed.observations.build()
+    obs.observation_reason = ObservationReason.first
+    obs.scope = :admin
+    seed.save!
+
+    api_get "/#{seed_type}/#{seed.id}"
+    expect(api_response.data.relationships.observations.data.first.id).to eq(obs.id.to_s)
+  end
+
   it "Creates an expiring seed" do
     issue = create(:basic_issue)
     person = issue.person
