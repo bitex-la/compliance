@@ -170,22 +170,22 @@ ActiveAdmin.register Person do
       end
 
       if fruit = resource.legal_entity_docket
-        ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Legal Entity", :legal_entity_docket, 'industry')
+        ArbreHelpers::Fruit.fruit_collection_show_tab(self, :legal_entity_docket, 'industry')
       end
       
       if fruit = resource.natural_docket
-        ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Natural Person", :natural_docket, 'user')
+        ArbreHelpers::Fruit.fruit_collection_show_tab(self, :natural_docket, 'user')
       end
 
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Domicile", :domiciles, 'home')
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Id", :identifications, 'id-card')
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Allowance", :allowances, 'money')
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Invoice Argentina", :argentina_invoicing_details, 'file', 'AR')
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Invoice Chile", :chile_invoicing_details, 'file', 'CL')      
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Affinity", :all_affinities, 'users')      
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Phone", :phones, 'phone')
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Email", :emails, 'envelope')
-      ArbreHelpers::Fruit.fruit_collection_show_tab(self, "Risk Score", :risk_scores, 'exclamation-triangle')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :domiciles, 'home')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :identifications, 'id-card')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :allowances, 'money')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :argentina_invoicing_details, 'file', 'AR')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :chile_invoicing_details, 'file', 'CL')      
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :all_affinities, 'users')      
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :phones, 'phone')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :emails, 'envelope')
+      ArbreHelpers::Fruit.fruit_collection_show_tab(self, :risk_scores, 'exclamation-triangle')
 
       ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', person.fund_deposits.count, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do

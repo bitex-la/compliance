@@ -1,9 +1,9 @@
 module ArbreHelpers
   class Seed
-    def self.seed_collection_and_fruits_show_tab(context, title, relation, fruits_relation, icon, text=nil)
+    def self.seed_collection_and_fruits_show_tab(context, seed, relation, fruits_relation, icon, text=nil)
       context.instance_eval do
-        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(context, title, relation, fruits_relation, icon, text) do
-          h3 "Current #{title} Seeds"
+        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(context, seed, relation, fruits_relation, icon, text) do
+          h3 "Current Seeds"
           items = resource.send(relation)
           all = items.try(:count) ? items : [items].compact
           if all.any?
@@ -31,11 +31,11 @@ module ArbreHelpers
       end
     end
 
-    def self.seed_collection_and_fruits_edit_tab(context, title, relation, fruits_relation, icon, text=nil, &block )
+    def self.seed_collection_and_fruits_edit_tab(context, seed, relation, fruits_relation, icon, text=nil, &block )
       context.instance_eval do
         items = resource.send(relation)
         all = items.try(:count) ? items : [items].compact
-        ArbreHelpers::Layout.tab_with_counter_for(self, title, all.count, icon, text) do
+        ArbreHelpers::Layout.tab_with_counter_for(self, fruits_relation.to_s.humanize, all.count, icon, text) do
           ArbreHelpers::Seed.show_full_seed(self, relation, fruits_relation, &block)
         end
       end
