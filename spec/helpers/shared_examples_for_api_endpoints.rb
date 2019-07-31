@@ -8,7 +8,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   initial_expires_seed = "#{initial_factory}_expires_seed"
 
-  it "Creates seed with observation" do
+  it "Gets seed with observation" do
     issue = create(:basic_issue)
     person = issue.person
 

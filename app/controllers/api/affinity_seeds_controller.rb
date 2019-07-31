@@ -14,12 +14,10 @@ class Api::AffinitySeedsController < Api::SeedController
       affinity_seeds: [
         :affinity_kind_code,
         :related_person,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,
-        :expires_at,
-        :observations
+        :expires_at
       ]
   end
 end

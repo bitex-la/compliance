@@ -17,12 +17,10 @@ class Api::DomicileSeedsController < Api::SeedController
         :postal_code,
         :floor,
         :apartment,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,
-        :expires_at,
-        :observations
+        :expires_at
       ]
   end
 end

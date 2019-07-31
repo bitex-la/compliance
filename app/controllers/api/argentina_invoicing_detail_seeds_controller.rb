@@ -18,12 +18,10 @@ class Api::ArgentinaInvoicingDetailSeedsController < Api::SeedController
         :full_name,
         :country,
         :address,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,
-        :expires_at,
-        :observations
+        :expires_at
       ]
   end
 end

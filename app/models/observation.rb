@@ -89,7 +89,19 @@ class Observation < ApplicationRecord
   def name
     "Observation##{id} #{state}: #{observation_reason.try(:name)}"
   end
-  
+
+  def self.observables
+    all = []
+    %w(domicile phone email note
+      affinity identification natural_docket
+      risk_score legal_entity_docket allowance
+      argentina_invoicing_detail chile_invoicing_detail
+    ).each do |a|
+      all += ["#{a}_seeds"]
+    end
+    all
+  end
+
   private
 
   def preserve_previous_reply_if_not_nil

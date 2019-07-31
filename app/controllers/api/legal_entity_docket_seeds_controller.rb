@@ -16,11 +16,9 @@ class Api::LegalEntityDocketSeedsController < Api::SeedController
         :country,
         :commercial_name,
         :legal_name,
-        :attachments,
         :copy_attachments,
         :issue,
-        :expires_at,
-        :observations
+        :expires_at
       ]
   end
 end

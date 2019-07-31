@@ -16,12 +16,10 @@ class Api::ChileInvoicingDetailSeedsController < Api::SeedController
         :giro,
         :ciudad,
         :comuna,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,
-        :expires_at,
-        :observations
+        :expires_at
       ]
   end
 end

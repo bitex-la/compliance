@@ -15,12 +15,10 @@ class Api::RiskScoreSeedsController < Api::SeedController
         :provider,
         :extra_info,
         :external_link,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,
-        :expires_at,
-        :observations
+        :expires_at
       ]
   end
 end
