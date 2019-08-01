@@ -3,12 +3,20 @@ module ArbreHelpers
     def self.has_many_observations(context, form, relation, read_only=false)
       ArbreHelpers::Form.has_many_form context, form, relation, cant_remove: true do |sfo, ctx|  
         if sfo.object.persisted? && read_only
-          sfo.input :observation_reason, input_html: { readonly: true, disabled: true }
-        else
-          sfo.input :observable, as: :select ,
-            input_html: { readonly: true, disabled: true } ,
-            collection: [sfo.object.observable] unless sfo.object.observable.nil?
-          
+          sfo.template.concat(
+            Arbre::Context.new({}, sfo.template){
+              ArbreHelpers::Observation.show_observation(self, sfo.object, true)
+            }.to_s
+          )
+        else          
+          observable = sfo.object.observable
+          unless observable.nil?
+            sfo.template.concat("<li>".html_safe) 
+            sfo.template.concat("<label>Observable</label>".html_safe)
+            sfo.template.concat context.link_to(observable.name, observable)
+            sfo.template.concat('</li>'.html_safe)
+          end
+
           sfo.input :observation_reason
           sfo.input :scope, as: :select
           sfo.input :note, input_html: {rows: 3}
@@ -20,9 +28,11 @@ module ArbreHelpers
     def self.show_observation(context, observation, read_only=false)
       context.instance_eval do
         if read_only
-          attributes_table_for observation, :observation_reason
+          attributes_table_for a do
+            row(:observation){|o| link_to observation.name, observation }
+          end
         else
-          attributes_table_for observation, :observation_reason, :scope, :created_at, :updated_at, :observable
+          attributes_table_for observation, :observable, :observation_reason, :scope, :created_at, :updated_at
           para observation.note
           strong "Reply:"
           span observation.reply
