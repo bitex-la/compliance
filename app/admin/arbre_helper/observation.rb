@@ -42,17 +42,15 @@ module ArbreHelpers
 
     def self.show_observations(context, observations, read_only=false)
       context.instance_eval do
-        ArbreHelpers::Layout.panel_grid(self, observations) do |d|
-          ArbreHelpers::Observation.show_observation(self, d, read_only)
-        end  
-      end
-    end
-
-    def self.show_seed_observations(context, observations)
-      context.instance_eval do
-        ArbreHelpers::Layout.alert(self, 
-          "The seed has #{observations.count} observation#{ (observations.count > 1 ? 's' : '')}",
-          "info") if observations.any?
+        if read_only
+          observations.each do |o|
+            ArbreHelpers::Observation.show_observation(self, o, read_only)
+          end
+        else
+          ArbreHelpers::Layout.panel_only(self, observations) do |d|
+            ArbreHelpers::Observation.show_observation(self, d, read_only)
+          end 
+        end
       end
     end
   end
