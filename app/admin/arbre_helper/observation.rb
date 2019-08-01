@@ -40,16 +40,35 @@ module ArbreHelpers
       end
     end
 
+    def self.show_observations_history(context, observations)
+      context.instance_eval do
+        if observations.any?
+          ArbreHelpers::Layout.panel_only(self, observations) do |d|
+            attributes_table_for d, :issue, :observable, :observation_reason, :scope, :created_at, :updated_at
+            para d.note
+            strong "Reply:"
+            span d.reply
+          end  
+        else
+          ArbreHelpers::Layout.alert(self, "No items available", "info")
+        end
+      end
+    end
+
     def self.show_observations(context, observations, read_only=false)
       context.instance_eval do
-        if read_only
-          observations.each do |o|
-            ArbreHelpers::Observation.show_observation(self, o, read_only)
-          end
+        if observations.any?
+          if read_only
+            observations.each do |o|
+              ArbreHelpers::Observation.show_observation(self, o, read_only)
+            end
+          else
+            ArbreHelpers::Layout.panel_only(self, observations) do |d|
+              ArbreHelpers::Observation.show_observation(self, d, read_only)
+            end 
+          end  
         else
-          ArbreHelpers::Layout.panel_only(self, observations) do |d|
-            ArbreHelpers::Observation.show_observation(self, d, read_only)
-          end 
+          ArbreHelpers::Layout.alert(self, "No items available", "info")
         end
       end
     end

@@ -180,8 +180,16 @@ ActiveAdmin.register Issue do
       end
 
       ArbreHelpers::Layout.tab_with_counter_for(self, 'Observations', resource.observations.count, 'bell') do
-        h3 "Observations"
-        ArbreHelpers::Observation.has_many_observations(self, f, :observations)
+        columns do
+          column span: 2 do
+            h3 "Observations"
+            ArbreHelpers::Observation.has_many_observations(self, f, :observations)
+          end
+          column do
+            h3 "Observations history"
+            ArbreHelpers::Observation.show_observations_history(self, Observation.history(resource) )
+          end
+        end
       end
 
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
@@ -432,11 +440,17 @@ ActiveAdmin.register Issue do
       end
       
       ArbreHelpers::Layout.tab_with_counter_for(self, 'Observations', resource.observations.count, 'bell') do
-        if observations = resource.observations.presence
-          h3 "Issue Observations"
-          ArbreHelpers::Observation.show_observations(self, observations.select { |o| o.observable.nil?} )
-          h3 "Seeds Observations"
-          ArbreHelpers::Observation.show_observations(self, observations.select { |o| !o.observable.nil?} )
+        columns do
+          column span: 2 do
+            h3 "Issue Observations"
+            ArbreHelpers::Observation.show_observations(self, resource.observations.select { |o| o.observable.nil?} )
+            h3 "Seeds Observations"
+            ArbreHelpers::Observation.show_observations(self, resource.observations.select { |o| !o.observable.nil?} )
+          end
+          column do
+            h3 "Observations history"
+            ArbreHelpers::Observation.show_observations_history(self, Observation.history(resource) )
+          end
         end
       end
 

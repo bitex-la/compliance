@@ -60,11 +60,17 @@ module ArbreHelpers
           end
         end
         
+        h4 "Observations"
         ArbreHelpers::Observation.show_observations(self, seed.observations, true)
 
+        h4 "Attachments"
         attachments = seed.fruit ? seed.fruit.attachments : seed.attachments
-        attachments.each do |a|
-          ArbreHelpers::Attachment.preview(self, a)
+        if attachments.any?
+          attachments.each do |a|
+            ArbreHelpers::Attachment.preview(self, a)
+          end
+        else
+          ArbreHelpers::Layout.alert(self, "No items available", "info")
         end
       end
     end

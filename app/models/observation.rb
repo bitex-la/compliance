@@ -59,6 +59,13 @@ class Observation < ApplicationRecord
     joins(:issue) 
       .where(issues: {reason_id: reason})
   }
+
+  scope :history, -> (issue) { 
+    joins(:issue)
+      .where("issues.id != ?", issue.id)
+      .where("issues.person_id = ?", issue.person.id)
+      .order('created_at DESC')
+  }
   
   aasm do
     state :new, initial: true     

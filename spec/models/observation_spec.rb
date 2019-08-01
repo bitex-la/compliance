@@ -65,4 +65,62 @@ RSpec.describe Observation, type: :model do
     expect { issue.save! }.to raise_error(ActiveRecord::RecordInvalid,
       "Validation failed: Allowance seeds observations observable Issue and observable issue must match")
   end
+
+  it "observation from another issue with same person appears in history scope" do
+    create(:human_world_check_reason)
+    issue = create(:basic_issue)
+    seed = issue.allowance_seeds.build
+    seed.amount = 1000.50
+    seed.kind_id = Currency.all.first.id
+    obs = seed.observations.build
+    obs.observation_reason = ObservationReason.first
+    obs.scope = :admin
+    issue.save!
+
+    issue2 = create(:basic_issue, person: issue.person)
+    seed = issue2.allowance_seeds.build
+    seed.amount = 1000.50
+    seed.kind_id = Currency.all.first.id
+    obs2 = seed.observations.build
+    obs2.observation_reason = ObservationReason.first
+    obs2.scope = :admin
+    issue2.save!
+    expect(Observation.history(issue)).to include obs2
+  end
+
+  it "observation from same issue do not appears in history scope" do
+    create(:human_world_check_reason)
+    issue = create(:basic_issue)
+    seed = issue.allowance_seeds.build
+    seed.amount = 1000.50
+    seed.kind_id = Currency.all.first.id
+    obs = seed.observations.build
+    obs.observation_reason = ObservationReason.first
+    obs.scope = :admin
+    issue.save!
+
+    expect(Observation.history(issue)).to_not include obs
+  end
+
+  it "observation from onother person do not appears in history scope" do
+    create(:human_world_check_reason)
+    issue = create(:basic_issue)
+    seed = issue.allowance_seeds.build
+    seed.amount = 1000.50
+    seed.kind_id = Currency.all.first.id
+    obs = seed.observations.build
+    obs.observation_reason = ObservationReason.first
+    obs.scope = :admin
+    issue.save!
+
+    issue2 = create(:basic_issue)
+    seed = issue2.allowance_seeds.build
+    seed.amount = 1000.50
+    seed.kind_id = Currency.all.first.id
+    obs2 = seed.observations.build
+    obs2.observation_reason = ObservationReason.first
+    obs2.scope = :admin
+    issue2.save!
+    expect(Observation.history(issue)).to_not include obs2
+  end
 end
