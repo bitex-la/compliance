@@ -1,10 +1,11 @@
 module ArbreHelpers
   class Seed
-    def self.seed_collection_and_fruits_show_tab(context, icon, seed, relation, fruits_relation, text=nil)
+    def self.seed_collection_and_fruits_show_tab(context, icon, seed, fruits_relation, text=nil)
       context.instance_eval do
-        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(context, icon, seed, relation, fruits_relation, text) do
+        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(context, icon, seed, fruits_relation, text) do
           h3 "Current Seeds"
-          items = resource.send(relation)
+          seed_relation = seed.naming.seed_plural
+          items = resource.try(seed_relation) || resource.try(seed_relation.singularize)
           all = items.try(:count) ? items : [items].compact
           if all.any?
             ArbreHelpers::Layout.panel_only(self, all) do |d|
@@ -17,7 +18,7 @@ module ArbreHelpers
       end
     end
 
-    def self.show_full_seed(context, relation, fruits_relation, &block)
+    def self.show_full_seed(context, seed, fruits_relation, &block)
       context.instance_eval do
         columns do
           column span: 2 do
@@ -25,18 +26,19 @@ module ArbreHelpers
           end
           column do
             ArbreHelpers::Fruit.current_fruits_panel(self, fruits_relation)
-            ArbreHelpers::Seed.others_seeds_panel(self, relation.to_s.camelize.singularize.constantize)
+            ArbreHelpers::Seed.others_seeds_panel(self, seed)
           end
         end
       end
     end
 
-    def self.seed_collection_and_fruits_edit_tab(context, icon, seed, relation, fruits_relation, text=nil, &block)
+    def self.seed_collection_and_fruits_edit_tab(context, icon, seed, fruits_relation, text=nil, &block)
       context.instance_eval do
-        items = resource.send(relation)
+        seed_relation = seed.naming.seed_plural
+        items = resource.try(seed_relation) || resource.try(seed_relation.singularize)
         all = items.try(:count) ? items : [items].compact
         ArbreHelpers::Layout.tab_with_counter_for(self, fruits_relation.to_s.humanize, all.count, icon, text) do
-          ArbreHelpers::Seed.show_full_seed(self, relation, fruits_relation, &block)
+          ArbreHelpers::Seed.show_full_seed(self, seed, fruits_relation, &block)
         end
       end
     end
