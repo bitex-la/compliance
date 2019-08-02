@@ -146,6 +146,7 @@ RSpec.describe Issue, type: :model do
       person = create :new_natural_person
       
       person.issues.reload.last.approve!
+      person.reload
       expect(person.enabled).to be_falsey
       expect(person.state).to eq('new')
     end
@@ -154,6 +155,7 @@ RSpec.describe Issue, type: :model do
       person = create(:new_natural_person, :with_new_client_reason)
       
       person.issues.reload.last.approve!
+      person.reload
       expect(person.enabled).to be_truthy
       expect(person.state).to eq('enabled')
     end
