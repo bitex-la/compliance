@@ -80,10 +80,16 @@ describe Person do
             risk: nil,
             external_id: 123,
             api_token: Person.last.api_token,
-            created_at: 1514764800,
-            updated_at: 1514764800
+            created_at: '2018-01-01T00:00:00.000Z',
+            updated_at: '2018-01-01T00:00:00.000Z',
+            person_type: nil,
+            state: 'new'
           },
           relationships: {
+            regularity: { data: {
+              id: '1', 
+              type: 'regularities'
+            }},
             issues: {data: []},
             domiciles: {data: []},
             identifications: {data: []},
@@ -99,9 +105,18 @@ describe Person do
             affinities: {data: []},
             risk_scores: {data: []},
             attachments: {data: []},
+            tags: {data: []}
           }
         },
-        included: []
+        included: [{ 
+          id: '1',
+          type: 'regularities', 
+          attributes: { 
+            code: 'none', 
+            funding_amount: 0, 
+            funding_count:0 
+          }
+        }]
       }
     end
 
