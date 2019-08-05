@@ -21,7 +21,8 @@ class Api::ArgentinaInvoicingDetailSeedsController < Api::EntityController
         :attachments,
         :copy_attachments,
         :replaces,
-        :issue
+        :issue,
+        :expires_at
       ]
   end
 end

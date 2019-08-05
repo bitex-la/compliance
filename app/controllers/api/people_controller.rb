@@ -18,17 +18,20 @@ class Api::PeopleController < Api::ApiController
   end
 
   def create
-    person = if params["data"]
-      mapper = JsonapiMapper.doc_unsafe!(
-        params.permit!.to_h, [:people], people: %I[external_id])
+    return jsonapi_response Person.create, {}, 201 if params[:data].nil?
 
-      mapper.data.save
-      mapper.data
+    mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [:tags],
+      people: [:enabled, :risk, :tags, :external_id,  id: nil ],
+      tags: []
+
+    return jsonapi_422(nil) unless mapper.data
+
+    if mapper.save_all
+      jsonapi_response mapper.data,{}, 201
     else
-      Person.create
+      json_response mapper.all_errors, 422
     end
-
-    jsonapi_response person, {}, 201
   end
 
   def update
@@ -41,6 +44,18 @@ class Api::PeopleController < Api::ApiController
       jsonapi_response mapper.data, {}, 200
     else
       json_response mapper.all_errors, 422
+    end
+  end
+
+  Person.aasm.events.map(&:name).each do |action|
+    define_method(action) do
+      person = Person.find(params[:id])
+      begin
+        person.aasm.fire!(action)
+        jsonapi_response(person, {}, 200)
+      rescue AASM::InvalidTransition => e
+				jsonapi_error(422, "invalid transition")
+      end
     end
   end
 

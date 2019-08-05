@@ -17,8 +17,11 @@ module FastJsonapiCandy
 
     class_methods do
       def derive_seed_serializer!
-        klass = Class.new
-        Object.const_set(@naming.seed_serializer, klass)
+        klass = @naming.seed_serializer.safe_constantize
+        unless klass
+          klass =  Class.new 
+          Object.const_set(@naming.seed_serializer, klass)     
+        end
         klass.class_eval{
           include FastJsonapiCandy::Seed
         }
@@ -74,6 +77,7 @@ module FastJsonapiCandy
 
       if attrs = naming.serializer.constantize.attributes_to_serialize
         attributes *attrs.try(:keys)
+        attributes :expires_at
       else
         raise "Cannot derive #{name} as seed has no attributes."
       end
@@ -116,7 +120,7 @@ module FastJsonapiCandy
           updated_at
         ).each do |attr|
           attribute attr do |obj|
-            obj.send(attr).to_i
+            obj.send(attr)
           end
         end
       end

@@ -24,26 +24,39 @@ class Observation < ApplicationRecord
 
   validate :validate_scope_integrity
 
+  def self.ransackable_scopes(auth_object = nil)
+	  %i(by_issue_reason)
+  end
+
+  def self.ransackable_scopes_skip_sanitize_args
+    %i(by_issue_reason)
+  end
+
   scope :admin_pending, -> { 
     joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
     .where(scope: 'admin', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :robot_pending, -> { 
     joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
     .where(scope: 'robot', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
 
   scope :client_pending, -> { 
     joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed']})
+    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
     .where(scope: 'client', aasm_state: 'new')
       .includes(:issue, :observation_reason)
   } 
+
+  scope :by_issue_reason, -> (reason) {   
+    joins(:issue) 
+      .where(issues: {reason_id: reason})
+  }
 
   aasm do
     state :new, initial: true     

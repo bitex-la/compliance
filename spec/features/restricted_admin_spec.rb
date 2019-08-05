@@ -9,7 +9,7 @@ describe 'a restricted admin user' do
     %w(
       admin_users
       observation_reasons
-      event_logs
+      tags
     ).each do |path|
       visit "/#{path}"
       page.current_path.should == '/'
@@ -24,6 +24,7 @@ describe 'a restricted admin user' do
       expect(page).to_not have_content 'Observation Reasons'
       expect(page).to_not have_content 'Admin Users'
       expect(page).to_not have_content 'Event Logs'
+      expect(page).to_not have_content 'Tags'
 
       expect(page).to have_content 'Dashboard'
       expect(page).to have_content 'Observations'
@@ -56,6 +57,7 @@ describe 'a restricted admin user' do
     fulfil_new_issue_form
 
     click_button "Create Issue"
+    click_link "Edit"
 
     add_observation(observation_reason, 'Please check this guy on world check')
 
@@ -77,8 +79,10 @@ describe 'a restricted admin user' do
     within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
       click_link(issue.id)
     end
+    
+    click_link "Edit"
 
-    click_link 'Docket'
+    find('li[title="Natural Person"] a').click
 
     fill_seed('natural_docket', {
       first_name: 'Joe',
@@ -86,8 +90,8 @@ describe 'a restricted admin user' do
       birth_date: "1975-01-15"
     }, false)
     
-    
-    click_link 'Domicile (1)'
+ 
+    find('li[title="Domicile"] a').click
     
     select_with_search(
       '#issue_domicile_seeds_attributes_0_replaces_input',
@@ -106,11 +110,14 @@ describe 'a restricted admin user' do
         apartment: ''
       })
     end
+
     click_button "Update Issue"
-  
-    expect(page).to_not have_content 'Approve'
-    expect(page).to_not have_content 'Dismiss'
-    expect(page).to_not have_content 'Abandon'
-    expect(page).to_not have_content 'Reject'
+    
+    within(".action_item") do
+      expect(page).to_not have_selector(:link_or_button, 'Approve')
+      expect(page).to_not have_selector(:link_or_button, 'Dismiss')
+      expect(page).to_not have_selector(:link_or_button, 'Abandon')
+      expect(page).to_not have_selector(:link_or_button, 'Reject')
+    end
   end
 end

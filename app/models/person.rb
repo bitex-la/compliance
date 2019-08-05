@@ -1,12 +1,19 @@
 class Person < ApplicationRecord
+  include AASM
   include Loggable
+  StaticModels::BelongsTo
 
   after_save :log_if_enabled
   after_save :expire_action_cache
+  
   before_validation do
     self.api_token ||= SecureRandom.hex(40)
   end
   
+  belongs_to :regularity, class_name: "PersonRegularity"
+
+  ransack_alias :state, :aasm_state
+
   HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
@@ -38,6 +45,10 @@ class Person < ApplicationRecord
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
 
+  has_many :person_taggings
+  has_many :tags, through: :person_taggings
+  accepts_nested_attributes_for :person_taggings, allow_destroy: true
+
   def replaceable_fruits
     %i[
       natural_dockets
@@ -53,10 +64,6 @@ class Person < ApplicationRecord
   end
 
   enum risk: %i(low medium high)
-
-  def person_email
-    emails.last.try(:address)
-  end
 
   def natural_docket
     natural_dockets.last
@@ -74,17 +81,91 @@ class Person < ApplicationRecord
     end
   end
 
-  def name
-    name =
-      if (docket = natural_dockets.last)
-        [docket.first_name, docket.last_name].join(' ')
-      elsif (docket = legal_entity_dockets.last)
-        docket.legal_name || docket.commercial_name
-      else
-        person_email
-      end
+  def self.person_types
+    %i(natural legal)
+  end
 
-    "人 #{id}: #{name}"
+  scope :by_person_type, -> (type){ 
+    {
+      natural: left_outer_joins(:natural_dockets)
+        .left_outer_joins(:issues =>  :natural_docket_seed)
+        .where("natural_docket_seeds.id is not null or natural_dockets.id is not null")
+        .distinct,
+      legal: left_outer_joins(:legal_entity_dockets)
+        .left_outer_joins(:issues =>  :legal_entity_docket_seed)
+        .where("legal_entity_docket_seeds.id is not null or legal_entity_dockets.id is not null")
+        .distinct
+    }[type.to_sym]
+  }
+
+  scope :with_relations, -> {
+    includes(
+      nil
+    ) 
+  }
+
+  {
+    fresh: :new,
+    enabled: :enabled,
+    disabled: :disabled,
+    rejected: :rejected
+  }.each do |k,v| 
+    scope k, -> { with_relations.where('people.aasm_state=?', v) }  
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    %i(by_person_type)
+  end
+
+  def name
+    "(#{id}) #{person_info_name || person_info_email}"
+  end
+
+  def person_info 
+    [ "(#{id})",
+      person_info_name,
+      person_info_email,
+      person_info_phone
+    ].join(" ").strip
+  end
+
+  def person_info_name
+    case person_type
+      when :natural_person
+        "☺: #{natural_dockets.last.name_body}"
+      when :legal_entity
+        "🏭: #{legal_entity_dockets.last.name_body}"
+      else
+        if found = issues.map(&:natural_docket_seed).compact.last
+          "*☺: #{found.name_body}"
+        elsif found = issues.map(&:legal_entity_docket_seed).compact.last
+          "*🏭: #{found.name_body}"
+        end
+    end
+  end
+
+  def person_info_email
+    template = "%s✉: %s"
+
+    if found = emails.last.try(:address)
+      template % [nil, found]
+    elsif found = issues.all.map{|i| i.email_seeds.first&.address }
+      .compact.last
+      template % ['*', found]
+    end
+  end
+
+  def person_info_phone
+    phone, from_seed = if found = phones.last
+      found
+    elsif found = issues.all.map{|i| i.phone_seeds.first }.compact.last
+      [found, "*"]
+    end
+
+    return unless phone
+
+    has_whatsapp = phone.has_whatsapp ? "✓" : "⨯"
+    "#{from_seed}☎: #{phone.number} #{from_seed}WA: #{has_whatsapp}"
   end
 
   def fruits
@@ -138,7 +219,7 @@ class Person < ApplicationRecord
       {entity: 'NaturalDocketSeed', field: 'last_name', matcher: 'cont', id: 'issue.person_id', suggestion: ['issue.person.name', 'first_name', 'last_name']}
     ].each do |d|
       result = result.concat(d[:entity].constantize
-        .order(updated_at: :desc)
+        .order(updated_at: :desc, id: :desc)
         .page(page).per(per_page)
         .send(:ransack, {"#{d[:field]}_#{d[:matcher]}" => keyword})
         .result.map{|x| {
@@ -147,6 +228,72 @@ class Person < ApplicationRecord
         }})
     end
     result.uniq[0..per_page]
+  end
+
+  def refresh_person_regularity!
+    sum, count = fund_deposits.pluck(Arel.sql('sum(exchange_rate_adjusted_amount), count(*)')).first
+    
+    self.regularity = PersonRegularity.all.reverse
+      .find {|x| x.applies? sum,count} 
+
+    should_log = regularity_id_changed?
+
+    if should_log
+      issue = issues.build(state: 'new', reason: IssueReason.new_risk_information)
+      issue.risk_score_seeds.build(
+        score: regularity.code, 
+        provider: 'open_compliance', 
+        extra_info: {
+          regularity_funding_amount: regularity.funding_amount.to_d,
+          regularity_funding_count: regularity.funding_count,
+          funding_total_amount: sum.to_d,
+          funding_count: count
+        }.to_json
+      )
+    end 
+
+    save!
+
+    EventLog.log_entity!(self, AdminUser.current_admin_user, 
+      EventLogKind.update_person_regularity) if should_log
+  end
+
+  aasm do
+    state :new, initial: true
+    state :enabled
+    state :disabled
+    state :rejected
+    
+    event :enable do
+      transitions from: [:new, :disabled], to: :enabled do
+        after{ self['enabled'] = true }
+      end
+    end
+
+    event :disable do
+      transitions from: [:enabled, :new], to: :disabled do
+        after{ self['enabled'] = false }
+      end
+    end
+
+    event :reject do
+      transitions from: [:new, :enabled, :disabled], to: :rejected do
+        after{ self['enabled'] = false }
+      end
+    end
+  end
+
+  def state
+    aasm_state
+  end
+
+  def enabled
+    return aasm_state == "enabled"
+  end
+
+  def enabled=(value)
+    enable if value && may_enable?
+    disable if !value && may_disable?
   end
 
   private
@@ -162,7 +309,7 @@ class Person < ApplicationRecord
   end
 
   def log_state_change(verb)
-    Event::EventLogger.call(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+    EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))
   end
 
   def self.eager_person_entities
@@ -211,7 +358,8 @@ class Person < ApplicationRecord
       :argentina_invoicing_details, 
       :chile_invoicing_details, 
       :notes, 
-      :attachments
+      :attachments,
+      :regularity
     ]
   end
 end

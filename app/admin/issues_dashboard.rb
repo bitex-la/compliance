@@ -12,6 +12,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   scope :dismissed
   scope :approved
   scope :changed_after_observation
+  scope :future
   scope :all
 
   filter :email_seeds_address_cont, label: "Email"
@@ -19,27 +20,38 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :natural_docket_seed_first_name_cont, label: "First Name"
   filter :natural_docket_seed_last_name_cont,  label: "Last Name"
   filter :legal_entity_docket_seed_legal_name_or_legal_entity_docket_seed_commercial_name_cont, label: "Company Name"
+  filter :by_person_type, as: :select, collection: Person.person_types
   filter :note_seeds_title_or_note_seeds_body_cont, label: "Notes"
   filter :domicile_seeds_street_address_or_argentina_invoicing_detail_seed_address_cont, label: "Street Address"
   filter :domicile_seeds_street_number_or_argentina_invoicing_detail_seed_address_cont, label: "Street Number"
   filter :domicile_seeds_postal_code_or_argentina_invoicing_detail_seed_address_cont, label: "Postal Code"
   filter :natural_docket_seed_politically_exposed_eq, as: :select, label: "Is PEP"
+  filter :reason
+  filter :tags_id , as: :select, collection: proc { Tag.issues }, multiple: true
+  filter :by_person_tag , as: :select, collection: proc { Tag.people }, multiple: true
   filter :created_at
   filter :updated_at
-
 
   index title: '案 Issues Dashboard' do
     column(:id)  do |o|
       link_to o.id, [o.person, o]
     end
     column(:person) do |o|
-      link_to o.person.person_email, o.person
+      link_to o.person.person_info, o.person
     end
-    column(:person_enabled)do |o|
-      o.person.enabled
+    column(:person_state)do |o|
+      o.person.state
+    end
+    column(:reason) do |o| 
+      tags =  o.tags.any? ?  "(#{o.tags.pluck(:name).join(' - ')})" : "" 
+      "#{o.reason} #{tags}"
     end
     column(:state)
     column(:created_at)
     column(:updated_at)
+    column(:defer_until)
+    column('')  do |o|
+      link_to('Edit', edit_person_issue_url(o.person, o)) if o.editable?
+    end
   end
 end

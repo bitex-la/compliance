@@ -49,6 +49,15 @@ module Garden
         errors.add(:base, 'no_more_updates_allowed')
       end
 
+      validate :expires_at_cannot_be_in_the_past
+
+      def expires_at_cannot_be_in_the_past
+        return if expires_at.nil?
+        validation_date = created_at.try(:to_date) || Date.today
+        return if expires_at >= validation_date
+        errors.add(:expires_at, "can't be in the past")
+      end
+
       if column_names.include?('replaces_id')
         belongs_to :replaces, class_name: naming.fruit, optional: true
       end
@@ -58,11 +67,18 @@ module Garden
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
       end
+
+      scope :others_active_seeds, -> (issue) { 
+        joins(:issue)
+          .where("issues.id != ?", issue.id)
+          .where("issues.aasm_state IN (?)",%i{new observed answered})
+          .where("issues.person_id = ?", issue.person.id)
+      }
     end
 
     def harvest!
       fruit = self.class.naming.fruit.constantize.new(attributes.except(
-        *%w(id created_at updated_at issue_id fruit_id replaces_id copy_attachments)
+        *%w(id created_at updated_at issue_id fruit_id replaces_id copy_attachments expires_at)
       ))
       fruit.person = issue.person
       update!(fruit: fruit)
@@ -100,8 +116,18 @@ module Garden
         old_fruits.update_all(replaced_by_id: fruit.id)
       end
 
+      create_deferred_issue(fruit) unless expires_at.nil?
+
       fruit
     end
+
+    def create_deferred_issue(fruit)
+      new_issue = issue.person.issues.create(defer_until: expires_at, state: 'new')
+      new_issue.add_seeds_replacing([fruit])
+      new_issue.save!
+    end
+
+    
   end
 
   module Fruit

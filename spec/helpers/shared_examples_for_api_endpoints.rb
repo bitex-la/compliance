@@ -6,6 +6,33 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   later_seed = "#{later_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
 
+  initial_expires_seed = "#{initial_factory}_expires_seed"
+
+  it "Creates an expiring seed" do
+    issue = create(:basic_issue)
+    person = issue.person
+
+    initial_attrs = attributes_for(initial_expires_seed)
+
+    initial_relations = instance_exec(&relations_proc)
+    issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
+
+    server_sent_relations = {
+      person: {data: {id: person.id.to_s, type: 'people'}},
+      attachments: {data: []},
+      fruit: {data: nil},
+    }
+
+    api_create "/#{seed_type}", {
+      type: seed_type,
+      attributes: initial_attrs,
+      relationships: issue_relation.merge(initial_relations)
+    }
+
+    seed = api_response.data
+    expect(Date.parse(seed.attributes.expires_at)).to eq(initial_attrs[:expires_at])
+  end
+
   it "Destroy a #{seed_type}" do
     seed = create(initial_seed, issue: create(:basic_issue))
     api_destroy "/#{seed_type}/#{seed.id}"
@@ -208,8 +235,10 @@ shared_examples "docket" do |type, initial_factory|
       .should == [old_fruit.id.to_s]
 
     issue.approve!
+    person.enable!
 
     api_get "/#{type}/#{old_fruit.id}"
+
     json_response[:data][:relationships].should >= {
       person: {data: {id: person.id.to_s, type: "people"}},
       replaced_by: {data: {id: new_fruit_id, type: type.to_s}},
@@ -217,6 +246,7 @@ shared_examples "docket" do |type, initial_factory|
     }
 
     api_get "/#{type}/#{new_fruit_id}"
+    
     json_response[:data][:relationships].should >= {
       person: {data: {id: person.id.to_s, type: "people"}},
       replaced_by: {data: nil},
@@ -224,6 +254,7 @@ shared_examples "docket" do |type, initial_factory|
     }
 
     api_get "/#{seed_type}/#{seed.id}"
+    
     json_response[:data][:relationships].should >= {
       issue: {data: {id: issue.id.to_s, type: "issues"}},
       person: {data: {id: person.id.to_s, type: "people"}},
@@ -232,6 +263,7 @@ shared_examples "docket" do |type, initial_factory|
 
     # The person now has the new fruit
     api_get "/people/#{person.id}"
+    
     json_response[:data][:relationships]
       .map { |k, v| v[:data] }.flatten.compact
       .select { |d| d[:type] == type.to_s }
@@ -346,6 +378,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
       replaceable_fruit_id
 
     api_request :post, "/issues/#{replacing_issue.id}/approve"
+    person.enable!
     replacement_fruit_id = fruit_class.last.id.to_s
 
     api_get "/people/#{person.id}"

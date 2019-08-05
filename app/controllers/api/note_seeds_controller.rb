@@ -17,7 +17,8 @@ class Api::NoteSeedsController < Api::EntityController
         :copy_attachments,
         :replaces,
         :issue,
-        :private
+        :private,
+        :expires_at
       ]
   end
 end

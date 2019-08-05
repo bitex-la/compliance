@@ -1,6 +1,11 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.11.0"
 
+unless ENV['compliance_host']
+  puts "Invoke setting compliance_host environment var"
+  exit
+end
+
 app_name = "compliance"
 set :application, "compliance"
 set :repo_url, "git@github.com:bitex-la/compliance.git"
@@ -17,7 +22,7 @@ set :puma_preload_app, true
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 
-set :linked_files, %w{ .env config/database.yml config/secrets.yml}
+set :linked_files, %w{ config/settings.yml }
 set :linked_dirs, %w{log tmp/cache tmp/pids}
 
 set(:ssh_options, fetch(:ssh_options, { }).merge!(
@@ -47,8 +52,15 @@ namespace :deploy do
   desc "Make sure local git is in sync with remote."
   task :check_revision do
     on roles(:app) do
-      unless `git rev-parse HEAD` == `git rev-parse origin/master`
-        puts "WARNING: HEAD is not the same as origin/master"
+      branch = if fetch(:stage) == :production
+        set(:branch, 'master')
+      else
+        ask(:branch, `git branch`.match(/\* (\S+)\s/m)[1])
+      end
+      
+      branch = fetch(:branch)
+      unless `git rev-parse HEAD` == `git rev-parse origin/#{branch}`
+        puts "WARNING: local #{branch} is not the same as origin/#{branch}"
         puts "Run `git push` to sync changes."
         exit
       end

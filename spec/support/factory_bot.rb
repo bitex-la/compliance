@@ -30,6 +30,14 @@ module FactoryBot
                 association :issue, factory: :basic_issue
               end
             end
+
+            factory("#{factory_name}_expires_seed", class: seed_class) do
+              expires_at { 1.year.from_now.to_date }
+              factory "#{factory_name}_expires_seed_with_issue" do
+                association :issue, factory: :basic_issue
+                expires_at { 1.year.from_now.to_date }
+              end
+            end
             
             factory factory_name do 
               after(:create) do |resource, evaluator|

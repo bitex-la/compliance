@@ -1,10 +1,25 @@
 Rails.application.routes.draw do
   namespace :api do
-    resources :people, only: [:create, :show, :index, :update]
+    resources :people, only: [:create, :show, :index, :update] do
+      member do
+        Person.aasm.events.map(&:name).each do |action|
+          post action
+        end
+      end
+    end
 
     resources :issues, only: [:create, :show, :index, :update] do
       member do
         Issue.aasm.events.map(&:name).each do |action|
+          post action
+        end
+
+        %i{
+          lock
+          lock_for_ever
+          unlock
+          renew_lock
+        }.each do |action|
           post action
         end
       end
@@ -41,6 +56,7 @@ Rails.application.routes.draw do
       email_seeds
       note_seeds
       affinity_seeds
+      tags
     ).each do |entities|
       resources entities, except: [:new, :edit]
     end
@@ -52,6 +68,13 @@ Rails.application.routes.draw do
       observations
     ).each do |entities|
       resources entities, only: [:show, :index, :create, :update]
+    end
+
+    %i(
+      person_taggings
+      issue_taggings
+    ).each do |entities|
+      resources entities, except: [:new, :edit, :update]
     end
 
     resource :system do
@@ -86,5 +109,9 @@ Rails.application.routes.draw do
   end
 
   devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self) rescue ActiveAdmin::DatabaseHitDuringLoad
+  begin 
+    ActiveAdmin.routes(self)
+  rescue ActiveAdmin::DatabaseHitDuringLoad
+    puts "Ignoring database hit during load"
+  end
 end

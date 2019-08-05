@@ -83,10 +83,13 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
+
   config.before(:each) do
+    AdminUser.current_admin_user = nil
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
   end
+  
   config.after(:each) do
     Timecop.return
     DatabaseCleaner.clean

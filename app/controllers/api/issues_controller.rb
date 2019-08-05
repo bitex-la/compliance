@@ -1,11 +1,11 @@
 class Api::IssuesController < Api::ApiController
   def index
-    scope = Issue
+    scope = Issue.current
       .includes(*build_eager_load_list)
       .order(updated_at: :desc)
       .ransack(params[:filter])
       .result
-
+      
     page, per_page = Util::PageCalculator.call(params, 0, 3)
     issues = scope.page(page).per(per_page)
 
@@ -25,15 +25,31 @@ class Api::IssuesController < Api::ApiController
 
   def create
     mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [ :people ],
-      issues: [ :person, id: nil ],
-      people: []
+      [ :people , :tags],
+      issues: [:reason_code, :defer_until, :person, :tags, id: nil ],
+      people: [],
+      tags: []
 
     return jsonapi_422 unless mapper.data
 
     if mapper.save_all
       jsonapi_response mapper.data,
         {include: params[:include] || Issue.included_for}, 201
+    else
+      json_response mapper.all_errors, 422
+    end
+  end
+
+  def update
+    mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
+      [],
+      issues: [ :defer_until, id: params[:id] ]
+      
+    return jsonapi_422(nil) unless mapper.data
+
+    if mapper.save_all
+      jsonapi_response mapper.data,
+        {include: params[:include] || Issue.included_for}, 200
     else
       json_response mapper.all_errors, 422
     end
@@ -49,6 +65,29 @@ class Api::IssuesController < Api::ApiController
 				jsonapi_error(422, "invalid transition")
       end
     end
+  end
+
+  %i{
+    lock
+    unlock  
+  }.each do |action|
+    define_method(action) do
+      issue = Issue.find(params[:id])
+      return jsonapi_error(422, "invalid transition") unless issue.send(action.to_s + '_issue!')
+      jsonapi_response(issue, {}, 200)
+    end
+  end
+
+  def renew_lock
+    issue = Issue.find(params[:id])
+    return jsonapi_error(422, "invalid transition") unless issue.renew_lock!
+    jsonapi_response(issue, {}, 200)
+  end
+
+  def lock_for_ever
+    issue = Issue.find(params[:id])
+    return jsonapi_error(422, "invalid transition") unless issue.lock_issue!(false)
+    jsonapi_response(issue, {}, 200)
   end
 
   private

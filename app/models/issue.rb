@@ -1,13 +1,97 @@
 class Issue < ApplicationRecord
   include AASM
   include Loggable
+  StaticModels::BelongsTo
+
   belongs_to :person, optional: true
   validates :person, presence: true
+  belongs_to :reason, class_name: "IssueReason"
+
+  has_many :issue_taggings
+  has_many :tags, through: :issue_taggings
+  accepts_nested_attributes_for :issue_taggings, allow_destroy: true
 
   ransack_alias :state, :aasm_state
 
+  before_validation do 
+    self.defer_until ||= Date.today
+    self.reason ||= IssueReason.further_clarification
+  end
+
   after_save :sync_observed_status
   after_save :log_if_needed
+  validate :defer_until_cannot_be_in_the_past
+
+  def defer_until_cannot_be_in_the_past
+    validation_date = created_at.try(:to_date) || Date.today
+    return if defer_until >= validation_date
+    errors.add(:defer_until, "can't be in the past")
+  end
+
+  validate :reason_cannot_change
+
+  def reason_cannot_change
+    return unless reason_id_changed? && persisted?
+    errors.add(:reason, "change reason is not allowed!")
+  end
+
+  belongs_to :lock_admin_user, class_name: "AdminUser", foreign_key: "lock_admin_user_id", optional: true
+  validate :locked_issue_cannot_changed
+
+  def locked_issue_cannot_changed
+    return unless locked
+    return if lock_expired?
+    return if locked_by_me?
+    errors.add(:issue, "changes in locked issues are not allowed!")
+  end
+
+  def locked_by_me?
+    lock_admin_user == AdminUser.current_admin_user
+  end
+
+  def self.lock_expiration_interval_minutes
+    value = Settings.dig('lock_issues', 'expiration_interval_minutes') || 15
+    value.minutes
+  end
+
+  def lock_issue!(with_expiration=true)
+    with_lock do
+      next false if locked? && !locked_by_me? && !lock_expired?
+      self.locked = true
+      self.lock_admin_user = AdminUser.current_admin_user
+      self.lock_expiration = with_expiration ? Issue.lock_expiration_interval_minutes.from_now : nil 
+      save!(:validate => false)
+      true
+    end
+  end
+
+  def renew_lock!
+    with_lock do
+      next false unless locked_by_me?
+      next false if lock_expired?
+      self.lock_expiration = Issue.lock_expiration_interval_minutes.from_now
+      save!(:validate => false)
+      true
+    end
+  end
+
+  def unlock_issue!
+    with_lock do
+      next false unless locked?
+      next false unless locked_by_me?
+      next false if lock_expired?
+      self.locked = false
+      self.lock_admin_user = nil
+      self.lock_expiration = nil
+      save!(:validate => false)
+      true
+    end
+  end
+
+  def lock_remaining_minutes
+    return -1 if lock_expiration.nil?
+    ((lock_expiration - DateTime.now.utc) / 60).ceil
+  end
 
   def sync_observed_status
     observe! if may_observe? && has_open_observations?
@@ -75,21 +159,15 @@ class Issue < ApplicationRecord
       *HAS_ONE
     ) 
   }
-  scope :draft, -> { 
-    with_relations.where('issues.aasm_state=?', 'draft')
-  }
 
-  scope :fresh, -> { 
-    with_relations.where('issues.aasm_state=?', 'new')
-  }
-
-  scope :answered, -> { 
-    with_relations.where('issues.aasm_state=?', 'answered')
-  }
-
-  scope :observed, -> { 
-    with_relations.where('issues.aasm_state=?', 'observed')
-  }
+  {
+    draft: :draft,
+    fresh: :new,
+    answered: :answered,
+    observed: :observed
+  }.each do |k,v| 
+    scope k, -> { current.with_relations.where('issues.aasm_state=?', v) }  
+  end
 
   scope :changed_after_observation, -> {
     where = []
@@ -101,19 +179,58 @@ class Issue < ApplicationRecord
     end
 
     observed
+      .current
       .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
       .where(where.join(" OR "))
       .where("observations.reply IS NULL OR observations.reply = ''")
   }
 
   scope :active, ->(yes=true){
-    where("aasm_state #{'NOT' unless yes} IN (?)",
-      %i(draft new observed answered))
+    current.active_states
+  }
+
+  scope :active_states, ->(yes=true){
+    where("issues.aasm_state #{'NOT' unless yes} IN (?)",
+      %i{draft new observed answered}
+    )
+  }
+
+  scope :future_all, -> { 
+    where('defer_until > ?', Date.today)
+  }
+
+  scope :future, -> { 
+    active_states.where('defer_until > ?', Date.today)
+  }
+  
+  scope :current, -> { 
+    where('defer_until <= ?', Date.today)
   }
 
 	def self.ransackable_scopes(auth_object = nil)
-	  %i(active)
+	  %i(active by_person_type by_person_tag)
   end
+
+  def self.ransackable_scopes_skip_sanitize_args
+    %i(by_person_tag)
+  end
+
+  scope :by_person_type, -> (type) { 
+    if type == "natural"
+      left_outer_joins(:natural_docket_seed) 
+        .left_outer_joins(:person =>  :natural_dockets) 
+        .where("natural_docket_seeds.id is not null or natural_dockets.id is not null")
+    elsif type == "legal"
+      left_outer_joins(:legal_entity_docket_seed) 
+        .left_outer_joins(:person =>  :legal_entity_dockets) 
+        .where("legal_entity_docket_seeds.id is not null or legal_entity_dockets.id is not null")
+    end
+  }
+
+  scope :by_person_tag, -> (*tags) { 
+    left_outer_joins(:person => :person_taggings) 
+      .where("person_taggings.tag_id IN (?)", tags)
+  }
 
   aasm do
     state :draft, initial: true
@@ -158,9 +275,6 @@ class Issue < ApplicationRecord
     end
 
     event :reject do
-      after do
-        person.update(enabled: false) unless person.nil?
-      end
       transitions from:  :draft, to: :rejected
       transitions from: :new, to: :rejected
       transitions from: :observed, to: :rejected
@@ -173,7 +287,7 @@ class Issue < ApplicationRecord
     event :approve do
       before{ harvest_all! }
       after do
-        person.update(enabled: true)
+        person.enable! if reason == IssueReason.new_client
         log_state_change(:approve_issue)
       end
       transitions from: :draft, to: :approved
@@ -290,8 +404,13 @@ class Issue < ApplicationRecord
 
   private  
 
+  def lock_expired?
+    return false if lock_expiration.nil?
+    DateTime.now >= lock_expiration 
+  end
+
   def log_state_change(verb)
-    Event::EventLogger.call(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+    EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))
   end
 
   def self.eager_issue_entities
@@ -364,7 +483,8 @@ class Issue < ApplicationRecord
       :identification_seeds,
       :'identification_seeds.attachments',
       :observations,
-      :'observations.observation_reason'
+      :'observations.observation_reason',
+      :tags
     ]
   end
 
