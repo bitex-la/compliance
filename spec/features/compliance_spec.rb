@@ -97,7 +97,7 @@ describe 'an admin user' do
     click_button "Update Issue"
     click_link "Edit"
 
-    click_link 'Workflows (1)'
+    find('li[title="Workflows"] a').click
     expect(page).to have_content("workflow completed at 50%")
     
     task_two.start!
@@ -114,7 +114,7 @@ describe 'an admin user' do
     click_button "Update Issue"
     click_link "Edit"
 
-    click_link 'Workflows (1)'
+    find('li[title="Workflows"] a').click
     expect(page).to have_content("workflow completed at 100%")
 
     click_link "Cancel"

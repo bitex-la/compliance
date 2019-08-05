@@ -80,7 +80,7 @@ module FeatureHelpers
   end
 
   def fulfil_new_issue_form
-    find('li[title="Workflow"] a').click
+    find('li[title="Workflows"] a').click
     click_link "Add New Workflow"
 
     select_with_search(

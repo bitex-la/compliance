@@ -64,7 +64,7 @@ describe 'a restricted admin user' do
     click_button "Update Issue"
     click_link "Edit"
 
-    click_link 'Workflows (1)'
+    find('li[title="Workflows"] a').click
 
     within '.has_many_container.workflows' do
       click_link 'Mark as finished'
@@ -121,7 +121,7 @@ describe 'a restricted admin user' do
 
     click_button "Update Issue"
     
-    within(".action_item") do
+    within(".action_items") do
       expect(page).to_not have_selector(:link_or_button, 'Approve')
       expect(page).to_not have_selector(:link_or_button, 'Dismiss')
       expect(page).to_not have_selector(:link_or_button, 'Abandon')
