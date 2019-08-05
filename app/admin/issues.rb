@@ -193,7 +193,7 @@ ActiveAdmin.register Issue do
       end
 
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'industry', LegalEntityDocketSeed, :legal_entity_docket) do
+        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'industry', LegalEntityDocketSeed) do
           ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
             sf.input :commercial_name
             sf.input :legal_name
@@ -213,7 +213,7 @@ ActiveAdmin.register Issue do
       end
       
       if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'user', NaturalDocketSeed, :natural_docket) do
+        ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'user', NaturalDocketSeed) do
           ArbreHelpers::Form.has_one_form self, f, "Natural Docket", :natural_docket_seed do |sf|
             sf.input :first_name
             sf.input :last_name
@@ -240,7 +240,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'home', DomicileSeed, :domiciles) do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'home', DomicileSeed) do
         ArbreHelpers::Form.has_many_form self, f, :domicile_seeds do |sf, context|
           sf.input :country, as: :autocomplete, url: '/people/search_country'
           sf.input :state
@@ -257,7 +257,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'id-card', IdentificationSeed, :identifications) do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'id-card', IdentificationSeed) do
         ArbreHelpers::Form.has_many_form self, f, :identification_seeds do |sf, context|
           sf.input :number
           sf.input :identification_kind_id, as: :select, collection: IdentificationKind.all
@@ -272,7 +272,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'money', AllowanceSeed, :allowances) do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'money', AllowanceSeed) do
         ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
           sf.input :amount
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
@@ -283,7 +283,7 @@ ActiveAdmin.register Issue do
         end
       end
      
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'file', ArgentinaInvoicingDetailSeed, :argentina_invoicing_details, 'AR') do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'file', ArgentinaInvoicingDetailSeed, text: 'AR') do
         ArbreHelpers::Form.has_one_form self, f, "Argentina Invoicing Detail", :argentina_invoicing_detail_seed do |af|
           af.input :vat_status_id, as: :select, collection: VatStatusKind.all
           af.input :tax_id
@@ -300,7 +300,7 @@ ActiveAdmin.register Issue do
         end
       end
     
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'file', ChileInvoicingDetailSeed, :chile_invoicing_details, 'CL') do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'file', ChileInvoicingDetailSeed, text: 'CL') do
         ArbreHelpers::Form.has_one_form self, f, "Chile Invoicing Detail", :chile_invoicing_detail_seed do |cf|
           cf.input :vat_status_id, as: :select, collection: VatStatusKind.all
           cf.input :tax_id
@@ -314,7 +314,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'users', AffinitySeed, :all_affinities) do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'users', AffinitySeed, fruit: 'all_affinities') do
         ArbreHelpers::Form.has_many_form self, f, :affinity_seeds do |rf, context|
           rf.input :affinity_kind_id, as: :select, collection: AffinityKind.all
           if rf.object.related_person_id.nil?
@@ -335,7 +335,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'phone', PhoneSeed, :phones) do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'phone', PhoneSeed) do
         ArbreHelpers::Form.has_many_form self, f, :phone_seeds do |pf, context|
           pf.input :number
           pf.input :phone_kind_id, as: :select, collection: PhoneKind.all
@@ -351,7 +351,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'envelope', EmailSeed, :emails) do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'envelope', EmailSeed) do
         ArbreHelpers::Form.has_many_form self, f, :email_seeds do |ef, context|
           ef.input :address
           ef.input :email_kind_id, as: :select, collection: EmailKind.all
@@ -363,7 +363,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'exclamation-triangle', RiskScoreSeed, :risk_scores) do
+      ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'exclamation-triangle', RiskScoreSeed) do
         ArbreHelpers::Form.has_many_form self, f, :risk_score_seeds do |rs, context|
           rs.input :score
           rs.input :provider
@@ -455,22 +455,22 @@ ActiveAdmin.register Issue do
       end
 
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
-        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'industry', LegalEntityDocketSeed, :legal_entity_docket)
+        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'industry', LegalEntityDocketSeed)
       end
       
       if resource.for_person_type == :natural_person || resource.for_person_type.nil?
-        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'user', NaturalDocketSeed, :natural_docket)
+        ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'user', NaturalDocketSeed)
       end
 
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'home', DomicileSeed, :domiciles)
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'id-card', IdentificationSeed, :identifications)
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'money', AllowanceSeed, :allowances)
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'file', ArgentinaInvoicingDetailSeed, :argentina_invoicing_details, 'AR')
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'file', ChileInvoicingDetailSeed, :chile_invoicing_details, 'CL')
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'users', AffinitySeed, :all_affinities)
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'phone', PhoneSeed, :phones)
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'envelope', EmailSeed, :emails)
-      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'exclamation-triangle', RiskScoreSeed, :risk_scores)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'home', DomicileSeed)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'id-card', IdentificationSeed)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'money', AllowanceSeed)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'file', ArgentinaInvoicingDetailSeed, text: 'AR')
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'file', ChileInvoicingDetailSeed, text: 'CL')
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'users', AffinitySeed, fruit: 'all_affinities')
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'phone', PhoneSeed)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'envelope', EmailSeed)
+      ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'exclamation-triangle', RiskScoreSeed)
     end
   end
 end

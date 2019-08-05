@@ -143,7 +143,7 @@ module ArbreHelpers
 
     def self.current_fruits_panel(context, fruits_relation)
       context.instance_eval do
-        fruits = resource.person.send(fruits_relation)
+        fruits = resource.person.send(fruits_relation) || resource.person.send(fruits_relation.singularize)
         all = fruits.try(:count) ? fruits : [fruits].compact
         h3 "Current Fruits"
         if all.any?
