@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :empty_person, class: Person do
-    enabled { false }
-    
+
     trait :with_issue do
       after(:create) do |person, evaluator|
         create :basic_issue, person: person
@@ -10,7 +9,6 @@ FactoryBot.define do
   end
 
   factory :new_natural_person, class: Person do
-    enabled { false }
     risk { nil }
 
     after(:create) do |person, evaluator|
@@ -31,9 +29,9 @@ FactoryBot.define do
   end
 
   factory :light_natural_person, class: Person do
-    enabled { true }
     risk { :medium }
     after(:create) do |person, evaluator|
+      person.enable!
       create :basic_issue, person: person, aasm_state: 'approved'
       %i(
         full_natural_person_identification
@@ -46,10 +44,10 @@ FactoryBot.define do
   end
 
   factory :full_natural_person, class: Person do
-    enabled { true }
     risk { :medium }
 
     after(:create) do |person, evaluator|
+      person.enable!
       # A full natural person should have at least the issue that created it.
       # Here we start with a basic issue for this person, then the full
       # factories inject their seeds into the basic_issue in their after :create
@@ -102,10 +100,10 @@ FactoryBot.define do
   end
 
   factory :full_legal_entity_person, class: Person do
-    enabled { true }
     risk { :medium }
 
     after(:create) do |person, evaluator|
+      person.enable!
       # A full natural person should have at least the issue that created it.
       # Here we start with a basic issue for this person, then the full
       # factories inject their seeds into the basic_issue in their after :create

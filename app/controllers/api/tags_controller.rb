@@ -14,4 +14,10 @@ class Api::TagsController < Api::SeedController
       ]
     )
   end
+
+  private
+
+  def allow_restricted_user
+    false
+  end
 end

@@ -895,3 +895,22 @@ body.active_admin{
   margin-top: 0px;
   margin-bottom: 5px;
 }
+
+span.badge-count {
+  background-color: #00a0c0;
+  color: #FAFAFA;
+  padding: 1px 2px;
+  border-radius: 180px;
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  text-shadow: none;
+} 
+
+span.icon-text-fa {
+  color: #FAFAFA;
+  top: 14px;
+  right: 16px;
+  position: absolute;
+  text-shadow: none;
+}

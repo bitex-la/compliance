@@ -73,6 +73,25 @@ describe Tag do
     api_get "/tags/#{one.id}", {}, 404
   end
 
+  it 'restricted user is not allowed' do
+    restricted_admin = create(:restricted_admin_user)
+    AdminUser.current_admin_user = restricted_admin
+    
+    one = create(:person_tag)
+
+    api_get "/tags", {}, 403
+    api_destroy "/tags/#{one.id}", 403
+    api_create "/tags", {
+      type: 'tags',
+      attributes: attributes_for(:alt_person_tag)
+    }, 403
+    api_update "/tags/#{one.id}", {
+      type: 'tags',
+      id: one.id,
+      attributes: {name: 'new-name'}
+    }, 403
+  end
+
   describe 'when using filters' do
     it 'filters by name' do
       one = create(:person_tag)

@@ -35,6 +35,7 @@ describe 'an admin user' do
 
     visit '/'
     click_link 'People'
+    click_link 'All'
     within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
       click_link 'View'
     end
@@ -71,7 +72,7 @@ describe 'an admin user' do
     issue.natural_docket_seed.should == NaturalDocketSeed.last
     issue.should be_draft
     
-    click_link 'Risk Score (1)'
+    find('li[title="Risk Score"] a').click
 
     within '.external_links' do
       expect(page).to have_content 'Link #1'
@@ -126,9 +127,10 @@ describe 'an admin user' do
     issue.reload.should be_approved
     assert_logging(issue, :update_entity, 13)
     expect(issue.person.enabled).to be_falsey
+    expect(issue.person.state).to eq('new')
     assert_logging(issue.person, :enable_person, 0)
 
-    click_link 'Risk Score (1)'
+    find('li[title="Risk Score"] a').click
 
     within '.external_links' do
       expect(page).to have_content 'Link #1'
@@ -143,6 +145,7 @@ describe 'an admin user' do
     click_link 'Enable'
 
     expect(issue.person.reload.enabled).to be_truthy
+    expect(issue.person.state).to eq('enabled')
     assert_logging(issue.person, :enable_person, 1)
     
     click_link 'Edit Person'
@@ -150,11 +153,13 @@ describe 'an admin user' do
     assert_logging(issue.person, :enable_person, 1)
     assert_logging(issue.person, :disable_person, 1)
     expect(issue.person.reload.enabled).to be_falsey
+    expect(issue.person.state).to eq('disabled')
 
     click_link 'Edit Person'
     click_link 'Enable'
 
     expect(issue.person.reload.enabled).to be_truthy
+    expect(issue.person.state).to eq('enabled')
     assert_logging(issue.person, :enable_person, 2)
 
     visit "/allowances/#{issue.person.allowances.first.id}"
@@ -201,18 +206,18 @@ describe 'an admin user' do
     visit "/people/#{Person.first.id}/issues/#{issue.id}/edit"
     page.current_path.should == "/people/#{Person.first.id}/issues/#{issue.id}/edit"
 
-    click_link 'ID (1)'
+    find('li[title="ID"] a').click
     expect(page).to have_content 'Identification seed'
-    click_link 'Domicile (1)'
+    find('li[title="Domicile"] a').click
     expect(page).to have_content 'Domicile seed'
-    click_link 'Docket'
+    find('li[title="Natural Person"] a').click
     expect(page).to have_content 'Natural Docket'
-    click_link 'Risk Score (1)'
+    find('li[title="Risk Score"] a').click
     within '.has_many_container.risk_score_seeds' do
       expect(page).to have_content 'userId: 5'
       expect(page).to have_content 'score: green'
     end
-    click_link 'Allowance (2)'
+    find('li[title="Allowance"] a').click
     expect(page).to have_content 'Allowance seed'
 
     # Admin verify the attachment(s)
@@ -303,6 +308,7 @@ describe 'an admin user' do
     click_link 'Enable'
 
     expect(issue.person.reload.enabled).to be_truthy
+    expect(issue.person.state).to eq('enabled')
     assert_logging(issue.person, :enable_person, 1)
   end
 
@@ -312,6 +318,7 @@ describe 'an admin user' do
     login_as admin_user
 
     click_link 'People'
+    click_link 'All'
 
     within("tr[id='person_#{person.id}'] td[class='col col-actions']") do
       click_link('View')
@@ -320,7 +327,7 @@ describe 'an admin user' do
     click_link "Add Person Information"
     click_button "Create new issue"
 
-    click_link "ID (0)"
+    find('li[title="ID"] a').click
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
@@ -346,7 +353,7 @@ describe 'an admin user' do
 
     find(:css, '#issue_identification_seeds_attributes_0_copy_attachments').set true
 
-    click_link "Domicile (0)"
+    find('li[title="Domicile"] a').click
     click_link "Add New Domicile seed"
 
     fill_seed('domicile', {
@@ -372,7 +379,7 @@ describe 'an admin user' do
       fill_attachment('domicile_seeds', 'zip')
     end
 
-    click_link "Allowance (0)"
+    find('li[title="Allowance"] a').click
     click_link "Add New Allowance seed"
 
     select_with_search(
@@ -394,7 +401,7 @@ describe 'an admin user' do
       fill_attachment('allowance_seeds', 'gif')
     end
 
-    click_link "Docket"
+    find('li[title="Natural Person"] a').click
 
     select_with_search(
       '#issue_natural_docket_seed_attributes_marital_status_id_input',
@@ -487,6 +494,7 @@ describe 'an admin user' do
     new_natural_docket.attachments.count.should == 1
 
     person.should be_enabled
+    expect(person.state).to eq('enabled')
   end
 
   it "Dismisses an issue that had only bogus data" do
@@ -507,6 +515,7 @@ describe 'an admin user' do
   it "Rejects an issue because an observation went unanswered" do
     person = create :new_natural_person, enabled: true
     person.should be_enabled
+    expect(person.state).to eq('enabled')
     issue = person.issues.reload.last
     issue.complete!
     login_as admin_user
@@ -516,6 +525,7 @@ describe 'an admin user' do
 
     issue.reload.should be_rejected
     person.reload.should be_enabled
+    expect(person.state).to eq('enabled')
     assert_logging(person, :disable_person, 0)
   end
 
@@ -553,6 +563,7 @@ describe 'an admin user' do
   it 'Handles a race condition between admin and robot observation replies' do
     person = create :new_natural_person
     person.should_not be_enabled
+    expect(person.state).to eq('new')
     wc_reason = create(:world_check_reason, subject_en: 'Run WC')
     google_reason = create(:world_check_reason, subject_en: 'Run Negative Path')
     observation_reason = create(:observation_reason)
@@ -576,7 +587,7 @@ describe 'an admin user' do
 
     click_link "Edit"
 
-    click_link "Base"
+    find('li[title="Base"] a').click
     click_link "Add New Observation"
 
     select_with_search(
@@ -639,6 +650,7 @@ describe 'an admin user' do
   it 'Reviews and disable a user with hits on worldcheck' do
     person = create :full_natural_person
     person.should be_enabled
+    expect(person.state).to eq('enabled')
     reason = create(:human_world_check_reason)
     issue = create(:basic_issue, person: person)
     observation = create(:robot_observation, issue: issue)
@@ -667,6 +679,7 @@ describe 'an admin user' do
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should be_enabled
+    expect(person.state).to eq('enabled')
   end
 
   it "Abandons a new person issue that was inactive" do
@@ -685,6 +698,7 @@ describe 'an admin user' do
 
     issue.reload.should be_abandoned
     person.reload.should_not be_enabled
+    expect(person.state).to eq('new')
 
     visit '/'
     click_on "Abandoned"
@@ -703,7 +717,7 @@ describe 'an admin user' do
       end
       click_link "Edit"
 
-      click_link 'Domicile (1)'
+      find('li[title="Domicile"] a').click
 
       select_with_search(
         '#issue_domicile_seeds_attributes_0_replaces_input',
@@ -758,7 +772,8 @@ describe 'an admin user' do
 
       click_link "Edit"
 
-      click_link "ID (0)"
+      find('li[title="ID"] a').click
+      
       click_link "Add New Identification seed"
       fill_seed("identification",{
         number: '123456789',
@@ -775,7 +790,8 @@ describe 'an admin user' do
         fill_attachment('identification_seeds', 'jpg')
       end
 
-      click_link "Domicile (0)"
+      find('li[title="Domicile"] a').click
+      
       click_link "Add New Domicile seed"
 
       fill_seed('domicile', {
@@ -833,12 +849,12 @@ describe 'an admin user' do
 
       page.current_path.should == "/people/#{person.id}/issues/#{issue.id}/edit"
 
-      click_link "ID (1)"
+      find('li[title="ID"] a').click
       within '.has_many_container.identification_seeds' do
         find(:css, '#issue_identification_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
 
-      click_link "Allowance (2)"
+      find('li[title="Allowance"] a').click
       within '.has_many_container.allowance_seeds' do
         find(:css, '#issue_allowance_seeds_attributes_0_attachments_attributes_0__destroy').set true
       end
@@ -846,7 +862,7 @@ describe 'an admin user' do
       visit "/people/#{person.id}/issues/#{issue.id}"
       click_link "Edit"
 
-      click_link "ID (1)"
+      find('li[title="ID"] a').click
       click_link "Add New Identification seed"
       fill_seed("identification",{
         number: '123456789',
@@ -888,6 +904,7 @@ describe 'an admin user' do
     login_as admin_user
 
     click_link 'People'
+    click_link 'All'
 
     within("#person_#{person.id} td.col.col-actions") do
       click_link('Edit')
@@ -902,6 +919,7 @@ describe 'an admin user' do
     click_button 'Update Person'
 
     person.reload.should_not be_enabled
+    expect(person.state).to eq('disabled')
     person.risk.should == 'low'
   end
 

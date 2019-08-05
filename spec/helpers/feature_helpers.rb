@@ -80,7 +80,7 @@ module FeatureHelpers
   end
 
   def fulfil_new_issue_form
-    click_link 'Workflows (0)'
+    find('li[title="Workflow"] a').click
     click_link "Add New Workflow"
 
     select_with_search(
@@ -90,7 +90,8 @@ module FeatureHelpers
 
     fill_in "issue[workflows_attributes][0][workflow_type]", with: 'onboarding'
 
-    click_link 'ID (0)'
+    find('li[title="ID"] a').click
+    
     click_link "Add New Identification seed"
     fill_seed("identification",{
       number: '123456789',
@@ -107,7 +108,7 @@ module FeatureHelpers
       fill_attachment('identification_seeds', 'jpg', true, 0, 0, true)
     end
 
-    click_link 'Contact (0)'
+    find('li[title="Email"] a').click
     click_link "Add New Email seed"
     fill_seed("email",{
       address: 'tester@rspec.org',
@@ -118,6 +119,7 @@ module FeatureHelpers
       'work'
     )
 
+    find('li[title="Phone"] a').click
     click_link "Add New Phone seed"
     fill_seed("phone",{
       number: '+541145250470',
@@ -130,7 +132,7 @@ module FeatureHelpers
       'main'
     )
 
-    click_link 'Domicile (0)' 
+    find('li[title="Domicile"] a').click 
     click_link "Add New Domicile seed"
 
     fill_seed('domicile', {
@@ -148,7 +150,7 @@ module FeatureHelpers
       fill_attachment('domicile_seeds', 'zip', true, 0, 0, true)
     end
 
-    click_link 'Allowance (0)' 
+    find('li[title="Allowance"] a').click 
     click_link "Add New Allowance seed"
 
     select_with_search(
@@ -165,7 +167,7 @@ module FeatureHelpers
       fill_attachment('allowance_seeds', 'gif', true, 0, 0, true)
     end
 
-    click_link 'Docket' 
+    find('li[title="Natural Person"] a').click 
     fill_seed("natural_docket", {
       nationality: 'AR',
       first_name: "Lionel",
@@ -193,7 +195,7 @@ module FeatureHelpers
       fill_attachment('natural_docket_seed', 'png', false)
     end
 
-    click_link 'Risk Score (0)' 
+    find('li[title="Risk Score"] a').click  
     click_link "Add New Risk score seed"
 
     fill_seed('risk_score', {
@@ -210,7 +212,7 @@ module FeatureHelpers
   end
 
   def add_observation(index = 0, reason, note)
-    click_link "Base"
+    find('li[title="Base"] a').click  
     click_link "Add New Observation"
   
     select_with_search(

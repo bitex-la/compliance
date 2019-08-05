@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
   namespace :api do
-    resources :people, only: [:create, :show, :index, :update]
+    resources :people, only: [:create, :show, :index, :update] do
+      member do
+        Person.aasm.events.map(&:name).each do |action|
+          post action
+        end
+      end
+    end
 
     resources :issues, only: [:create, :show, :index, :update] do
       member do
@@ -9,8 +15,9 @@ Rails.application.routes.draw do
         end
 
         %i{
-          lock_issue
-          unlock_issue
+          lock
+          lock_for_ever
+          unlock
           renew_lock
         }.each do |action|
           post action

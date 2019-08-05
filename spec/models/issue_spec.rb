@@ -146,14 +146,18 @@ RSpec.describe Issue, type: :model do
       person = create :new_natural_person
       
       person.issues.reload.last.approve!
+      person.reload
       expect(person.enabled).to be_falsey
+      expect(person.state).to eq('new')
     end
 
     it 'enable person on approve if issue reason is new_client' do
       person = create(:new_natural_person, :with_new_client_reason)
       
       person.issues.reload.last.approve!
+      person.reload
       expect(person.enabled).to be_truthy
+      expect(person.state).to eq('enabled')
     end
 
     it 'validates error on approve twice' do
@@ -161,6 +165,7 @@ RSpec.describe Issue, type: :model do
       
       person.issues.reload.last.approve!
       expect(person.enabled).to be_truthy
+      expect(person.state).to eq('enabled')
 
       expect {person.issues.reload.last.approve! }.to raise_error(ActiveRecord::RecordInvalid,
         "Validation failed: no_more_updates_allowed")
@@ -208,6 +213,23 @@ RSpec.describe Issue, type: :model do
 
       expect(Issue.fresh).to include issue_notes
       expect(Issue.fresh).to include risk_issue
+    end
+
+    it 'gets others active seeds' do
+      person = create(:empty_person)
+      issue = create(:full_natural_person_issue_with_fixed_email, person: person)
+      issue2 = create(:full_natural_person_issue_with_fixed_email, person: person)
+      issue3 = create(:full_natural_person_issue_with_fixed_email, person: person)
+      
+      issue2.complete!
+      
+      expect(NoteSeed.others_active_seeds(issue)).to include issue2.reload.note_seeds.first
+      expect(NoteSeed.others_active_seeds(issue)).to_not include issue3.reload.note_seeds.first
+
+      issue3.complete!
+      expect(NoteSeed.others_active_seeds(issue)).to include issue3.reload.note_seeds.first
+
+      expect(NoteSeed.others_active_seeds(issue)).to_not include issue.reload.note_seeds.first
     end
   end
 
@@ -486,8 +508,105 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue.defer_until).to eq defer
     end
 
-    it 'save changes if locked by me user and not expired' do
+    it 'can save changes if locked by me and not expired' do
       expect(basic_issue.lock_issue!).to be true
+      Timecop.travel (interval + 1.minutes).from_now
+      defer = Date.today + 20.days
+      basic_issue.defer_until = defer
+      expect(basic_issue).to be_valid
+      basic_issue.save!
+      expect(basic_issue.defer_until).to eq defer
+    end
+
+    it 'can lock issue with no expiration if is not locked' do
+      expect(basic_issue.lock_issue!(false)).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+    end
+
+    it 'can not lock issue with expiration if it is locked with no expiration' do
+      expect(basic_issue.lock_issue!(false)).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+
+      AdminUser.current_admin_user = other_admin_user
+      expect(basic_issue.lock_issue!(false)).to be false
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+
+      Timecop.travel (interval + 1.minutes).from_now
+      expect(basic_issue.lock_issue!(false)).to be false
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+    end
+
+    it 'can unlock issue with no expiration if it is locked by me' do
+      expect(basic_issue.lock_issue!(false)).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+
+      expect(basic_issue.unlock_issue!).to be true
+      expect(basic_issue.locked).to be false
+      expect(basic_issue.lock_admin_user).to be_nil
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+    end
+
+    it 'can lock issue with no expiration if it is locked by another user and expired' do
+      expect(basic_issue.lock_issue!).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+
+      AdminUser.current_admin_user = other_admin_user
+      expect(basic_issue.lock_issue!(false)).to be false
+
+      Timecop.travel (interval + 1.minutes).from_now
+
+      expect(basic_issue.lock_issue!(false)).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq other_admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+    end
+
+    it 'can not unlock issue if it is locked by another user with no expiration' do
+      expect(basic_issue.lock_issue!(false)).to be true
+      expect(basic_issue.locked).to be true
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+
+      AdminUser.current_admin_user = other_admin_user
+      expect(basic_issue.unlock_issue!).to be false
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+
+      Timecop.travel (interval + 1.minutes).from_now
+      expect(basic_issue.unlock_issue!).to be false
+      expect(basic_issue.lock_admin_user).to eq admin_user
+      expect(basic_issue.lock_expiration).to be_nil
+      expect(basic_issue.lock_remaining_minutes.minutes).to eq -1.minutes
+    end
+
+    it 'can not save changes if locked with no expiration by another user' do
+      expect(basic_issue.lock_issue!(false)).to be true
+      AdminUser.current_admin_user = other_admin_user
+      basic_issue.defer_until = DateTime.now
+      expect(basic_issue).to_not be_valid
+      expect(basic_issue.errors.messages[:issue].first).to eq "changes in locked issues are not allowed!"
+    end
+
+    it 'can save changes if locked with no expiration by me' do
+      expect(basic_issue.lock_issue!(false)).to be true
       Timecop.travel (interval + 1.minutes).from_now
       defer = Date.today + 20.days
       basic_issue.defer_until = defer
