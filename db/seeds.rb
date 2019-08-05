@@ -107,19 +107,4 @@ unless Rails.env.production?
     body_pt: 'Por favor, verifique os resultados openfactura',
     scope: 2
   )
-
-  worldcheck_robot_task = TaskType.create!(
-    name: 'Run a robot worldcheck screening',
-    description: 'Person a person screening in worldcheck'
-  )
-
-  google_robot_task = TaskType.create!(
-    name: 'Run a google search for a person',
-    description: 'Perform a serpapi search for a person'
-  )
-
-  openfactura_robot_task = TaskType.create!(
-    name: 'Run openfactura check for person RUT',
-    description: 'Sanitize person information using openfactura data'
-  )
 end

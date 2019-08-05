@@ -587,9 +587,8 @@ ActiveRecord::Schema.define(version: 2019_07_18_173803) do
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false, null: false
     t.integer "risk"
-    t.string "aasm_state"
-    t.integer "regularity_id", default: 1, null: false
     t.string "aasm_state", default: "new", null: false
+    t.integer "regularity_id", default: 1, null: false
     t.index ["aasm_state"], name: "index_people_on_aasm_state"
   end
 
