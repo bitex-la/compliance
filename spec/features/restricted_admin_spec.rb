@@ -82,7 +82,7 @@ describe 'a restricted admin user' do
     
     click_link "Edit"
 
-    find('li[title="Natural docket"] a').click
+    find('li[title="Natural dockets"] a').click
 
     fill_seed('natural_docket', {
       first_name: 'Joe',

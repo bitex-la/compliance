@@ -146,7 +146,7 @@ module FeatureHelpers
       fill_attachment('allowance_seeds', 'gif', true, 0, 0, true)
     end
 
-    find('li[title="Natural docket"] a').click 
+    find('li[title="Natural dockets"] a').click 
     fill_seed("natural_docket", {
       nationality: 'AR',
       first_name: "Lionel",

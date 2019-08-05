@@ -78,12 +78,15 @@ module ArbreHelpers
       end
     end
 
-    def self.fruit_collection_show_tab(context, relation, icon, text=nil)
+    def self.fruit_collection_show_tab(context, relation, icon, extra={})
       context.instance_eval do
+        text = extra[:text]
+        title = extra[:title] || relation.to_s.humanize
+
         items = resource.send(relation)
         all = items.try(:current).try(:order, 'created_at DESC') || [items].compact
         
-        ArbreHelpers::Layout.tab_with_counter_for(self, relation.to_s.humanize, all.count, icon, text) do
+        ArbreHelpers::Layout.tab_with_counter_for(self, title, all.count, icon, text) do
           ArbreHelpers::Layout.panel_grid(self, all) do |d|
             ArbreHelpers::Fruit.fruit_show_section(self, d)
           end

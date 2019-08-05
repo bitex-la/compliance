@@ -204,7 +204,7 @@ describe 'an admin user' do
     expect(page).to have_content 'Identification seed'
     find('li[title="Domiciles"] a').click
     expect(page).to have_content 'Domicile seed'
-    find('li[title="Natural docket"] a').click
+    find('li[title="Natural dockets"] a').click
     expect(page).to have_content 'Natural Docket'
     find('li[title="Risk scores"] a').click
     within '.has_many_container.risk_score_seeds' do
@@ -397,7 +397,7 @@ describe 'an admin user' do
       fill_attachment('allowance_seeds', 'gif')
     end
 
-    find('li[title="Natural docket"] a').click
+    find('li[title="Natural dockets"] a').click
 
     select_with_search(
       '#issue_natural_docket_seed_attributes_marital_status_id_input',

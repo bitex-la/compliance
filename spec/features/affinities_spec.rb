@@ -27,7 +27,7 @@ describe 'an admin handling affinities' do
     issue = Issue.last
     person = issue.person
 
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
     
     add_affinities([owner_one, owner_two], 'owner', 0)
     add_affinities([payee_one, payee_two], 'payee', 2)
@@ -50,7 +50,7 @@ describe 'an admin handling affinities' do
 
     visit "/people/#{person.id}"
 
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
     
     expect(page).to have_content "RELATED PERSON (#{owner_one.id})"
     expect(page).to have_content "RELATED PERSON (#{owner_two.id}) 🏭: E Corp"
@@ -59,7 +59,7 @@ describe 'an admin handling affinities' do
 
     visit "/people/#{owner_one.id}"
     
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
     
     within("#attributes_table_affinity_4 .row.row-affinity_kind") do
       expect(page).to have_content 'owns'
@@ -83,14 +83,14 @@ describe 'an admin handling affinities' do
     click_link "Add Person Information"
     click_button "Create new issue"
 
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
     add_affinities([related_person], 'business_partner', 0)
 
     click_button 'Update Issue'
 
     expect(page).to have_selector('.validation_errors', visible: true)
   
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
 
     click_link 'Remove'
     add_affinities([related_person], 'payee', 0)
@@ -108,7 +108,7 @@ describe 'an admin handling affinities' do
     click_link 'Approve'
 
     visit "/people/#{person.id}"
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
       expect(page).to have_content 'payee'
@@ -133,7 +133,7 @@ describe 'an admin handling affinities' do
     click_link "Add Person Information"
     click_button "Create new issue"
 
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
 
     add_affinities([related_person], 'stakeholder', 0)
 
@@ -150,7 +150,7 @@ describe 'an admin handling affinities' do
     click_link 'Approve'
 
     visit "/people/#{person.id}"
-    find('li[title="All affinities"] a').click
+    find('li[title="Affinities"] a').click
 
     within("#attributes_table_affinity_#{Affinity.last.id}") do
       expect(page).to have_content 'stakeholder'

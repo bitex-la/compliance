@@ -37,7 +37,7 @@ module ArbreHelpers
         seed_relation = seed.naming.seed_plural
         items = resource.try(seed_relation) || resource.try(seed_relation.singularize)
         all = items.try(:count) ? items : [items].compact
-        ArbreHelpers::Layout.tab_with_counter_for(self, fruits_relation.to_s.humanize, all.count, icon, text) do
+        ArbreHelpers::Layout.tab_with_counter_for(self, seed.naming.plural.humanize, all.count, icon, text) do
           ArbreHelpers::Seed.show_full_seed(self, seed, fruits_relation, &block)
         end
       end
