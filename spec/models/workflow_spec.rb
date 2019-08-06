@@ -12,6 +12,14 @@ RSpec.describe Workflow, type: :model do
     expect(basic_workflow).to be_valid
   end
 
+  it 'deletes workflow removes all tasks' do
+    task = create(:basic_task)
+    expect(Task.count).to eq(1)
+    workflow = task.workflow.reload
+    workflow.destroy!
+    expect(Task.count).to eq(0)
+  end
+
   describe 'when transitioning' do 
     it 'defaults to new' do
       expect(basic_workflow).to have_state(:new)

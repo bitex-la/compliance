@@ -17,6 +17,12 @@ class Workflow < ApplicationRecord
   has_many :tasks
   accepts_nested_attributes_for :tasks, allow_destroy: true
 
+  before_destroy :destroy_tasks
+
+  def destroy_tasks
+    tasks.destroy_all
+  end
+
   scope :running, -> {
     joins(:issue)
     .where(aasm_state: 'started')

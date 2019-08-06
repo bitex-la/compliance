@@ -188,7 +188,7 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows',resource.workflows.count , 'arrows-alt') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
         ArbreHelpers::Form.has_many_form self, f, :workflows do |wf, context|
           wf.template.concat(
             Arbre::Context.new({}, wf.template){
@@ -469,7 +469,7 @@ ActiveAdmin.register Issue do
         end
       end
       
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows',resource.workflows.count , 'arrows-alt') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
         ArbreHelpers::Layout.panel_grid(self, resource.workflows) do |workflow|
           ArbreHelpers::Workflow.render_workflow_progress(self, 'Workflow', workflow)
           ArbreHelpers::Seed.seed_attributes_table self, workflow
