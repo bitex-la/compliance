@@ -587,8 +587,8 @@ ActiveRecord::Schema.define(version: 2019_07_18_173803) do
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false, null: false
     t.integer "risk"
-    t.string "aasm_state", default: "new", null: false
     t.integer "regularity_id", default: 1, null: false
+    t.string "aasm_state", default: "new", null: false
     t.index ["aasm_state"], name: "index_people_on_aasm_state"
   end
 
@@ -699,10 +699,8 @@ ActiveRecord::Schema.define(version: 2019_07_18_173803) do
     t.datetime "updated_at", null: false
     t.integer "max_retries", default: 0
     t.integer "current_retries", default: 0
-    t.bigint "task_type_id"
     t.text "output"
     t.string "task_type"
-    t.index ["task_type_id"], name: "index_tasks_on_task_type_id"
     t.index ["workflow_id"], name: "index_tasks_on_workflow_id"
   end
 
