@@ -98,15 +98,11 @@ class Observation < ApplicationRecord
   end
 
   def self.observables
-    all = []
-    %w(domicile phone email note
+    %w(domicile phone email
       affinity identification natural_docket
       risk_score legal_entity_docket allowance
       argentina_invoicing_detail chile_invoicing_detail
-    ).each do |a|
-      all += ["#{a}_seeds"]
-    end
-    all
+    ).map{|a| "#{a}_seeds" }
   end
 
   private
