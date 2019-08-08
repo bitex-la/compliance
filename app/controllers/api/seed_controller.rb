@@ -14,7 +14,7 @@ class Api::SeedController < Api::FruitController
     map_and_save(200)
   end
 
-  def destroy 
+  def destroy
     resource.destroy
     render body: nil, status: 204
   end

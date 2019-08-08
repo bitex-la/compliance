@@ -1,7 +1,6 @@
 require 'rails_helper'
-require 'helpers/shared_examples_for_models'
 
-RSpec.describe ArgentinaInvoicingDetailSeed, type: :model do
+describe ArgentinaInvoicingDetailSeed do
   %i(tax_id full_name address country).each do |attr|
     it { is_expected.to strip_attribute attr }
   end
@@ -15,4 +14,6 @@ RSpec.describe ArgentinaInvoicingDetailSeed, type: :model do
     address: '   Jujuy 3421',
     country: 'AR '
   }
+
+  it_behaves_like 'observable', :full_argentina_invoicing_detail_seed_with_issue
 end

@@ -14,7 +14,6 @@ class Api::IdentificationSeedsController < Api::SeedController
         :identification_kind_code,
         :number,
         :issuer,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

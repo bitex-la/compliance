@@ -44,6 +44,7 @@ module FastJsonapiCandy
       belongs_to :fruit, record_type: naming.plural,
         serializer: naming.serializer
       build_has_many :attachments
+      build_has_many :observations
 
       if attrs = naming.serializer.constantize.attributes_to_serialize
         attributes *attrs.try(:keys)

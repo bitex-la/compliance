@@ -21,7 +21,6 @@ class Api::NaturalDocketSeedsController < Api::SeedController
         :job_description,
         :politically_exposed,
         :politically_exposed_reason,
-        :attachments,
         :copy_attachments,
         :issue,
         :expires_at

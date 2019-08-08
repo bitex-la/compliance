@@ -13,7 +13,6 @@ class Api::EmailSeedsController < Api::SeedController
       email_seeds: [
         :address,
         :email_kind_code,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

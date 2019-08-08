@@ -17,7 +17,6 @@ class Api::PhoneSeedsController < Api::SeedController
         :has_whatsapp,
         :has_telegram,
         :note,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

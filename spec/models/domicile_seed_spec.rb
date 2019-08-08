@@ -9,6 +9,8 @@ RSpec.describe DomicileSeed, type: :model do
       country: 'CO'
   )}
 
+  it_behaves_like 'observable'
+
   %i(country state city street_address street_number
     postal_code floor apartment
   ).each do |attr|

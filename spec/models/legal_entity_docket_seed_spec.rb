@@ -1,7 +1,6 @@
 require 'rails_helper'
-require 'helpers/shared_examples_for_models'
 
-RSpec.describe LegalEntityDocketSeed, type: :model do
+describe LegalEntityDocketSeed do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { 
     create(:legal_entity_docket_seed, 
@@ -14,6 +13,8 @@ RSpec.describe LegalEntityDocketSeed, type: :model do
   ).each do |attr|
     it { is_expected.to strip_attribute attr }
   end
+
+  it_behaves_like 'observable'
 
   it_behaves_like 'whitespaced_seed', described_class.new, {
     industry: 'Fintech  ',

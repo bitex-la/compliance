@@ -17,12 +17,14 @@ class Observation < ApplicationRecord
   
   belongs_to :issue
   belongs_to :observation_reason, optional: true
+  belongs_to :observable, polymorphic: true, optional: true
 
   before_save  :check_for_answer
   after_save :preserve_previous_reply_if_not_nil
   after_commit :sync_issue_observed_status
 
   validate :validate_scope_integrity
+  validate :validate_issue_correspondence
 
   def self.ransackable_scopes(auth_object = nil)
 	  %i(by_issue_reason)
@@ -58,6 +60,13 @@ class Observation < ApplicationRecord
       .where(issues: {reason_id: reason})
   }
 
+  scope :history, -> (issue) { 
+    joins(:issue)
+      .where("issues.id != ?", issue.id)
+      .where("issues.person_id = ?", issue.person.id)
+      .order('created_at DESC')
+  }
+  
   aasm do
     state :new, initial: true     
     state :answered
@@ -87,7 +96,15 @@ class Observation < ApplicationRecord
   def name
     "Observation##{id} #{state}: #{observation_reason.try(:name)}"
   end
-  
+
+  def self.observables
+    %w(domicile phone email
+      affinity identification natural_docket
+      risk_score legal_entity_docket allowance
+      argentina_invoicing_detail chile_invoicing_detail
+    ).map{|a| "#{a}_seeds" }
+  end
+
   private
 
   def preserve_previous_reply_if_not_nil
@@ -101,6 +118,12 @@ class Observation < ApplicationRecord
     if scope != observation_reason.try(:scope)
       errors.add(:scope, "Observation and Observation reason scope must match")
     end
+  end
+
+  def validate_issue_correspondence
+    return unless observable
+    return if observable.issue == issue
+    errors.add(:observable, "Issue and observable issue must match")
   end
 
   def self.included_for
