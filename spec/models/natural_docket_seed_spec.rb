@@ -1,7 +1,6 @@
 require 'rails_helper'
-require 'helpers/shared_examples_for_models'
 
-RSpec.describe NaturalDocketSeed, type: :model do
+describe NaturalDocketSeed do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { 
     create(:natural_docket_seed, 
@@ -10,6 +9,8 @@ RSpec.describe NaturalDocketSeed, type: :model do
       gender: GenderKind.find_by_code('female'),
       marital_status: MaritalStatusKind.find_by_code('single')
   )}
+
+  it_behaves_like 'observable', :full_natural_docket_seed_with_issue
 
   %i(first_name last_name nationality
     job_title job_description

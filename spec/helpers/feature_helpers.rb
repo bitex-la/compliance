@@ -90,7 +90,7 @@ module FeatureHelpers
 
     fill_in "issue[workflows_attributes][0][workflow_type]", with: 'onboarding'
 
-    find('li[title="ID"] a').click
+    find('li[title="Identifications"] a').click
     
     click_link "Add New Identification seed"
     fill_seed("identification",{
@@ -108,7 +108,7 @@ module FeatureHelpers
       fill_attachment('identification_seeds', 'jpg', true, 0, 0, true)
     end
 
-    find('li[title="Email"] a').click
+    find('li[title="Emails"] a').click
     click_link "Add New Email seed"
     fill_seed("email",{
       address: 'tester@rspec.org',
@@ -119,7 +119,7 @@ module FeatureHelpers
       'work'
     )
 
-    find('li[title="Phone"] a').click
+    find('li[title="Phones"] a').click
     click_link "Add New Phone seed"
     fill_seed("phone",{
       number: '+541145250470',
@@ -132,7 +132,7 @@ module FeatureHelpers
       'main'
     )
 
-    find('li[title="Domicile"] a').click 
+    find('li[title="Domiciles"] a').click 
     click_link "Add New Domicile seed"
 
     fill_seed('domicile', {
@@ -150,7 +150,7 @@ module FeatureHelpers
       fill_attachment('domicile_seeds', 'zip', true, 0, 0, true)
     end
 
-    find('li[title="Allowance"] a').click 
+    find('li[title="Allowances"] a').click 
     click_link "Add New Allowance seed"
 
     select_with_search(
@@ -167,7 +167,7 @@ module FeatureHelpers
       fill_attachment('allowance_seeds', 'gif', true, 0, 0, true)
     end
 
-    find('li[title="Natural Person"] a').click 
+    find('li[title="Natural dockets"] a').click 
     fill_seed("natural_docket", {
       nationality: 'AR',
       first_name: "Lionel",
@@ -195,7 +195,7 @@ module FeatureHelpers
       fill_attachment('natural_docket_seed', 'png', false)
     end
 
-    find('li[title="Risk Score"] a').click  
+    find('li[title="Risk scores"] a').click  
     click_link "Add New Risk score seed"
 
     fill_seed('risk_score', {
@@ -212,7 +212,7 @@ module FeatureHelpers
   end
 
   def add_observation(index = 0, reason, note)
-    find('li[title="Base"] a').click  
+    find('li[title="Observations"] a').click  
     click_link "Add New Observation"
   
     select_with_search(

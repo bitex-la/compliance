@@ -2,7 +2,7 @@ class DestroyableSeedAdmin
   def self.register(klass)
     ActiveAdmin.register klass do
       menu false
-      actions :destroy
+      actions :destroy, :show
 
       controller do
         def destroy

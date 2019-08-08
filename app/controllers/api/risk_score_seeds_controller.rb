@@ -15,7 +15,6 @@ class Api::RiskScoreSeedsController < Api::SeedController
         :provider,
         :extra_info,
         :external_link,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

@@ -90,7 +90,7 @@ describe 'a restricted admin user' do
     
     click_link "Edit"
 
-    find('li[title="Natural Person"] a').click
+    find('li[title="Natural dockets"] a').click
 
     fill_seed('natural_docket', {
       first_name: 'Joe',
@@ -99,7 +99,7 @@ describe 'a restricted admin user' do
     }, false)
     
  
-    find('li[title="Domicile"] a').click
+    find('li[title="Domiciles"] a').click
     
     select_with_search(
       '#issue_domicile_seeds_attributes_0_replaces_input',

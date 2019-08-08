@@ -8,4 +8,6 @@ RSpec.describe EmailSeed, type: :model do
     address: ' lazy@copypaste.com ',
     email_kind_code: :invoicing
   }
+
+  it_behaves_like 'observable', :full_email_seed_with_issue
 end

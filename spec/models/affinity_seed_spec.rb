@@ -1,12 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe AffinitySeed, type: :model do
+describe AffinitySeed do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { 
     create(:affinity_seed, 
       related_person: create(:empty_person),
       affinity_kind: AffinityKind.find_by_code('spouse')
   )}
+
+  it_behaves_like 'observable'
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
