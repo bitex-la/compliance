@@ -88,37 +88,37 @@ RSpec.describe Issue, type: :model do
       expect(empty_issue).to transition_from(:draft).to(:new).on_event(:complete)
     end
 
-    %i(draft new answered).each do |state|
+    %i(draft new answered observed).each do |state|
       it "goes from #{state} to observed on observe" do
         expect(empty_issue).to transition_from(state).to(:observed).on_event(:observe)
       end
     end
 
-    %i(observed).each do |state|
+    %i(observed answered).each do |state|
       it "goes from #{state} to answered on answer" do
         expect(empty_issue).to transition_from(state).to(:answered).on_event(:answer)
       end
     end
 
-    %i(new answered observed).each do |state|
+    %i(new answered observed dismissed).each do |state|
       it "goes from #{state} to dismissed on dismiss" do
         expect(empty_issue).to transition_from(state).to(:dismissed).on_event(:dismiss)
       end
     end
 
-    %i(new observed answered).each do |state|
+    %i(new observed answered rejected).each do |state|
       it "goes from #{state} to rejected on reject" do
         expect(empty_issue).to transition_from(state).to(:rejected).on_event(:reject)
       end
     end
 
-    %i(new answered).each do |state|
+    %i(new answered approved).each do |state|
       it "goes from #{state} to approved on approve" do
         expect(empty_issue).to transition_from(state).to(:approved).on_event(:approve) 
       end
     end
 
-    %i(new observed answered).each do |state|
+    %i(new observed answered abandoned).each do |state|
       it "goes from #{state} to abandoned on abandon" do
         expect(empty_issue).to transition_from(state).to(:abandoned).on_event(:abandon)
       end

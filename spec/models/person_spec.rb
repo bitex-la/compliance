@@ -142,19 +142,19 @@ RSpec.describe Person, type: :model do
       expect(person).to have_state(:new)
     end
 
-    %i(new disabled).each do |state|
+    %i(new disabled enabled).each do |state|
       it "goes from #{state} to enabled on enable" do
         expect(empty_person).to transition_from(state).to(:enabled).on_event(:enable)
       end
     end
 
-    %i(new enabled).each do |state|
+    %i(new enabled disabled).each do |state|
       it "goes from #{state} to disabled on disable" do
         expect(empty_person).to transition_from(state).to(:disabled).on_event(:disable)
       end
     end
   
-    %i(new enabled disabled).each do |state|
+    %i(new enabled disabled rejected).each do |state|
       it "goes from #{state} to rejected on reject" do
         expect(empty_person).to transition_from(state).to(:rejected).on_event(:reject)
       end
