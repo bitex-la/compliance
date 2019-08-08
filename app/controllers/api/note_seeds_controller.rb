@@ -13,7 +13,6 @@ class Api::NoteSeedsController < Api::EntityController
       note_seeds: [
         :title,
         :body,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

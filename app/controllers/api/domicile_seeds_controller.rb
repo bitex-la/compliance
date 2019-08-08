@@ -17,7 +17,6 @@ class Api::DomicileSeedsController < Api::EntityController
         :postal_code,
         :floor,
         :apartment,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

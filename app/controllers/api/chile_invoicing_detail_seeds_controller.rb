@@ -16,7 +16,6 @@ class Api::ChileInvoicingDetailSeedsController < Api::EntityController
         :giro,
         :ciudad,
         :comuna,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

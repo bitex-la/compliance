@@ -1,13 +1,14 @@
 require 'rails_helper'
-require 'helpers/shared_examples_for_models'
 
-RSpec.describe IdentificationSeed, type: :model do
+describe IdentificationSeed do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { 
     create(:identification_seed, 
       identification_kind: IdentificationKind.find_by_code('national_id'),
       issuer: 'CO'
   )}
+
+  it_behaves_like 'observable'
 
   %i(number issuer public_registry_authority 
   public_registry_book public_registry_extra_data).each do |attr|

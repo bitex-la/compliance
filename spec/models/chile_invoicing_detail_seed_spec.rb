@@ -1,7 +1,6 @@
 require 'rails_helper'
-require 'helpers/shared_examples_for_models'
 
-RSpec.describe ChileInvoicingDetailSeed, type: :model do
+describe ChileInvoicingDetailSeed do
   %i(tax_id giro ciudad comuna).each do |attr|
     it { is_expected.to strip_attribute attr }
   end
@@ -13,4 +12,6 @@ RSpec.describe ChileInvoicingDetailSeed, type: :model do
     comuna: 'Las condes',
     vat_status_code: :inscripto
   }
+
+  it_behaves_like 'observable', :full_chile_invoicing_detail_seed_with_issue
 end

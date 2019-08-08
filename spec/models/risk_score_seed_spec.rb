@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe RiskScoreSeed, type: :model do
+describe RiskScoreSeed do
   let(:invalid_seed) { described_class.new }
   let(:valid_seed) {
     create(:risk_score_seed,
@@ -14,4 +14,6 @@ RSpec.describe RiskScoreSeed, type: :model do
   it 'is valid with an issue' do
     expect(valid_seed).to be_valid
   end
+
+  it_behaves_like 'observable'
 end

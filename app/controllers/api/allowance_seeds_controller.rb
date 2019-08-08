@@ -14,7 +14,6 @@ class Api::AllowanceSeedsController < Api::EntityController
         :weight,
         :amount,
         :kind_code,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

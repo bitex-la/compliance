@@ -78,8 +78,11 @@ module ArbreHelpers
       end
     end
 
-    def self.fruit_collection_show_tab(context, title, relation, icon, text=nil)
+    def self.fruit_collection_show_tab(context, relation, icon, extra={})
       context.instance_eval do
+        text = extra[:text]
+        title = extra[:title] || relation.to_s.humanize
+
         items = resource.send(relation)
         all = items.try(:current).try(:order, 'created_at DESC') || [items].compact
         
@@ -140,7 +143,7 @@ module ArbreHelpers
 
     def self.current_fruits_panel(context, fruits_relation)
       context.instance_eval do
-        fruits = resource.person.send(fruits_relation)
+        fruits = resource.person.send(fruits_relation) || resource.person.send(fruits_relation.singularize)
         all = fruits.try(:count) ? fruits : [fruits].compact
         h3 "Current Fruits"
         if all.any?

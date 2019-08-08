@@ -18,7 +18,6 @@ class Api::ArgentinaInvoicingDetailSeedsController < Api::EntityController
         :full_name,
         :country,
         :address,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,

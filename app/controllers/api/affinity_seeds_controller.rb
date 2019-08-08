@@ -14,7 +14,6 @@ class Api::AffinitySeedsController < Api::EntityController
       affinity_seeds: [
         :affinity_kind_code,
         :related_person,
-        :attachments,
         :copy_attachments,
         :replaces,
         :issue,
