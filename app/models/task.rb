@@ -17,26 +17,24 @@ class Task < ApplicationRecord
     state :failed
 
     event :start do
-      transitions from: :new, to: :started
+      transitions from: [:new, :started], to: :started
       after do
         workflow.start! if workflow.may_start?
       end
     end
 
     event :finish do 
-      transitions from: :started, to: :performed, guard: :has_an_output?
-      transitions from: :retried, to: :performed, guard: :has_an_output?
+      transitions from: [:started, :retried, :performed], to: :performed, guard: :has_an_output?
     end
 
     event :fail do
-      transitions from: :started, to: :failed
-      transitions from: :retried, to: :failed
+      transitions from: [:started, :retried, :failed], to: :failed
     end
 
     event :retry do
-      transitions from: :failed, to: :retried do
+      transitions from: [:failed, :retried], to: :retried do
         guard do
-          can_retry?
+          can_retry? && aasm.from_state != :retried
         end
       end
       after do
@@ -47,10 +45,6 @@ class Task < ApplicationRecord
 
   def state
     aasm_state
-  end
-
-  def state=(status)
-    self.aasm_state = status
   end
 
   def can_retry?

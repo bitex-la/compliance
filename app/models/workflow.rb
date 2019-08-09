@@ -41,20 +41,19 @@ class Workflow < ApplicationRecord
     state :dismissed
 
     event :start do 
-      transitions from: :new, to: :started
+      transitions from: [:new, :started], to: :started
     end
 
     event :fail do
-      transitions from: :started, to: :failed
+      transitions from: [:started, :failed], to: :failed
     end
 
     event :dismiss do
-      transitions from: :new, to: :dismissed
-      transitions from: :started, to: :dismissed
+      transitions from: [:new, :started], to: :dismissed
     end
 
     event :finish do
-      transitions from: :started, to: :performed
+      transitions from: [:started, :performed], to: :performed
     end
   end
 
@@ -64,10 +63,6 @@ class Workflow < ApplicationRecord
 
   def state
     aasm_state
-  end
-
-  def state=(status)
-    self.aasm_state = status
   end
 
   def all_tasks_performed?
