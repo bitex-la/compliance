@@ -213,7 +213,8 @@ describe Issue do
       issue = create(:basic_issue, person: person)
 
       2.times do 
-        create(:basic_workflow, issue: issue, state: 'started')
+        w = create(:basic_workflow, issue: issue)
+        w.start!
       end
 
       api_request :post, "/issues/#{issue.id}/approve", {}, 422

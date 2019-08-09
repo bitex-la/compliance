@@ -54,7 +54,7 @@ describe Task do
 
   describe 'destroying a task' do
     it 'allow to destroy a task' do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
 
       api_destroy "/tasks/#{task.id}", 204
       
@@ -66,7 +66,7 @@ describe Task do
 
   describe 'updating a task' do
     it 'can update task attributes' do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
 
       api_update "/tasks/#{task.id}", {
         type: 'tasks',
@@ -80,7 +80,7 @@ describe Task do
     end
 
     it 'cannot modify task state from update' do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
 
       Task.aasm.states.map(&:name).each do |state|
         api_update "/tasks/#{task.id}", {
@@ -95,12 +95,12 @@ describe Task do
 
   describe 'when changing state' do
     it "can start a task" do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
       api_request :post, "/tasks/#{task.id}/start", {}, 200
     end
 
     it "can finish a task from started state" do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
       api_request :post, "/tasks/#{task.id}/finish", {}, 422
 
       api_request :post, "/tasks/#{task.id}/start", {}, 200
@@ -115,7 +115,7 @@ describe Task do
     end
 
     it "can finish a task from retried state" do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
       api_request :post, "/tasks/#{task.id}/finish", {}, 422
 
       api_request :post, "/tasks/#{task.id}/start", {}, 200
@@ -134,7 +134,7 @@ describe Task do
     end
 
     it "can fail from started state" do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
       api_request :post, "/tasks/#{task.id}/fail", {}, 422
       
       api_request :post, "/tasks/#{task.id}/start", {}, 200
@@ -142,7 +142,7 @@ describe Task do
     end
 
     it "can fail from retried state" do
-      task = create(:basic_task, state: 'new')
+      task = create(:basic_task)
       api_request :post, "/tasks/#{task.id}/fail", {}, 422
       
       api_request :post, "/tasks/#{task.id}/start", {}, 200
