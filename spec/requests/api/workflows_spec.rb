@@ -135,7 +135,7 @@ describe Workflow do
         }
         api_request :post, "/tasks/#{task_two.id}/finish", {}, 200
 
-        api_request :post, "/workflows/#{workflow.id}/finish", {}, 422
+        api_request :post, "/workflows/#{workflow.id}/finish", {}, 200
         
         expect(workflow.reload).to have_state(:performed)
       end
