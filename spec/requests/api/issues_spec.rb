@@ -198,7 +198,9 @@ describe Issue do
         issue = create(:basic_issue, state: initial_state, person: person)
         api_request :post, "/issues/#{issue.id}/#{action}", {}, 200
       end
+    end
 
+    %i(complete observe answer dismiss reject abandon).each do |action|
       it "It cannot #{action} approved issue" do
         issue = create(:basic_issue, state: :approved, person: person)
         api_request :post, "/issues/#{issue.id}/#{action}", {}, 422

@@ -568,7 +568,9 @@ describe Person do
         person = create(:empty_person)
         api_request :post, "/people/#{person.id}/#{action}", {}, 200
       end
+    end
 
+    %i{enable disable}.each do |action|
       it "It cannot #{action} rejected issue" do
         person = create(:empty_person)
         person.reject!

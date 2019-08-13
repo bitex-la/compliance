@@ -94,8 +94,8 @@ class Issue < ApplicationRecord
   end
 
   def sync_observed_status
-    observe! if may_observe? && has_open_observations?
-    answer! if may_answer? && observations.any? && !has_open_observations?
+    observe! if may_observe? && has_open_observations? && aasm_state != "observed"
+    answer! if may_answer? && observations.any? && !has_open_observations? && aasm_state != "answered"
   end
 
   def log_if_needed
@@ -240,65 +240,56 @@ class Issue < ApplicationRecord
     state :abandoned
 
     event :complete do
-      transitions from: :draft, to: :new
+      transitions from: [:draft, :new], to: :new
     end
 
     event :observe do
-      transitions  from: :draft, to: :observed
-      transitions from: :new, to: :observed
-      transitions from: :answered, to: :observed
+      transitions  from: [:draft, :new, :answered, :observed], to: :observed
     end
 
     event :answer do
-      transitions from: :observed, to: :answered
-      
       # Admins and migrations may create "already answered" observations.
-      transitions from: :draft, to: :answered
-      transitions from: :new, to: :answered
-
+      transitions from: [:observed, :draft, :new, :answered], to: :answered
+    
       after do 
-        log_state_change(:answer_issue)
+        log_state_change(:answer_issue) if aasm.from_state != :answered
       end
     end
 
     event :dismiss do
-      transitions  from: :draft, to: :dismissed
-      transitions from: :new, to: :dismissed
-      transitions from: :answered, to: :dismissed
-      transitions from: :observed, to: :dismissed
+      transitions from: [:draft, :new, :answered, :observed, :dismissed], to: :dismissed
+
       after do 
-        log_state_change(:dismiss_issue)
+        log_state_change(:dismiss_issue) if aasm.from_state != :dismissed
       end
     end
 
     event :reject do
-      transitions from:  :draft, to: :rejected
-      transitions from: :new, to: :rejected
-      transitions from: :observed, to: :rejected
-      transitions from: :answered, to: :rejected
+      transitions from: [:draft, :new, :observed, :answered, :rejected], to: :rejected
+
       after do 
-        log_state_change(:reject_issue)
+        log_state_change(:reject_issue) if aasm.from_state != :rejected
       end
     end
 
     event :approve do
-      before{ harvest_all! }
+      before{ harvest_all! if aasm.from_state != :approved }
+      
+      transitions from: [:draft, :new, :answered, :approved], to: :approved
+
       after do
-        person.enable! if reason == IssueReason.new_client
-        log_state_change(:approve_issue)
+        if aasm.from_state != :approved
+          person.enable! if reason == IssueReason.new_client
+          log_state_change(:approve_issue)
+        end
       end
-      transitions from: :draft, to: :approved
-      transitions from: :new, to: :approved
-      transitions from: :answered, to: :approved
     end
 
     event :abandon do
-      transitions from: :draft, to: :abandoned
-      transitions from: :new, to: :abandoned
-      transitions from: :observed, to: :abandoned
-      transitions from: :answered, to: :abandoned
+      transitions from: [:draft, :new, :observed, :answered, :abandoned], to: :abandoned
+      
       after do 
-        log_state_change(:abandon_issue)
+        log_state_change(:abandon_issue) if aasm.from_state != :abandoned
       end
     end
   end
