@@ -79,16 +79,18 @@ module FeatureHelpers
     end
   end
 
-  def fulfil_new_issue_form
-    find('li[title="Workflows"] a').click
-    click_link "Add New Workflow"
+  def fulfil_new_issue_form(with_workflows=false)
+    if (with_workflows)
+      find('li[title="Workflows"] a').click
+      click_link "Add New Workflow"
 
-    select_with_search(
-      '#issue_workflows_attributes_0_scope_input',
-      'Robot'
-    )
+      select_with_search(
+        '#issue_workflows_attributes_0_scope_input',
+        'Robot'
+      )
 
-    fill_in "issue[workflows_attributes][0][workflow_type]", with: 'onboarding'
+      fill_in "issue[workflows_attributes][0][workflow_type]", with: 'onboarding'
+    end
 
     find('li[title="Identifications"] a').click
     

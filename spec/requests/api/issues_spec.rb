@@ -191,7 +191,20 @@ describe Issue do
       answer: :observed,
       dismiss: :new,
       reject: :new,
-     # approve: :new,
+      approve: :new,
+      abandon: :new
+    }.each do |action, initial_state|
+      it "It can #{action} issue" do
+        issue = create(:basic_issue, state: initial_state, person: person)
+        api_request :post, "/issues/#{issue.id}/#{action}", {}, 200
+      end
+    end
+
+    { complete: :draft,
+      observe: :new,
+      answer: :observed,
+      dismiss: :new,
+      reject: :new,
       abandon: :new
     }.each do |action, initial_state|
       it "It can #{action} issue" do

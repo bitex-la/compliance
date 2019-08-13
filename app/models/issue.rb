@@ -280,7 +280,7 @@ class Issue < ApplicationRecord
       
       transitions from: [:draft, :new, :answered, :approved], to: :approved, guard: :all_workflows_performed?
 
-      after do
+      after do 
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)

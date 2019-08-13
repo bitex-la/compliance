@@ -48,14 +48,34 @@ unless Rails.env.production?
     scope: 2
   )
 
+  on_demand_google = ObservationReason.create!(
+    subject_en: 'Admin must run a manual Google on demand review',
+    body_en: 'Please go to Google and check the customer',
+    subject_es: 'Admin debe correr una revisión manual en Google por demanda',
+    body_es: 'Por favor vaya a Google y haga una revisión manual',
+    subject_pt: 'O administrador deve executar uma revisão manual do Google sob demanda',
+    body_pt: 'Por favor, vá para Google e verifique o cliente',
+    scope: 2
+  )
+ 
+  on_demand_worldcheck = ObservationReason.create!(
+    subject_en: 'Admin must run a manual Worldcheck on demand review',
+    body_en: 'Please go to Worlcheck and check the customer',
+    subject_es: 'Admin debe correr una revisión manual en Worldcheck por demanda',
+    body_es: 'Por favor vaya a Worldcheck y haga una revisión manual',
+    subject_pt: 'O administrador deve executar uma revisão manual do Worldcheck sob demanda',
+    body_pt: 'Por favor, vá para Worlcheck e verifique o cliente',
+    scope: 2
+  )
+
   risk_score_alert = ObservationReason.create!(
-  subject_en: 'Risk score alert',
-  body_en: 'New score assessment',
-  subject_es: 'Alerta de score de riesgo',
-  body_es: 'Nuevo score de riesgo',
-  subject_pt: 'Alerta de pontuação de risco',
-  body_pt: 'Nova avaliação de pontuação',
-  scope: 2
+    subject_en: 'Risk score alert',
+    body_en: 'New score assessment',
+    subject_es: 'Alerta de score de riesgo',
+    body_es: 'Nuevo score de riesgo',
+    subject_pt: 'Alerta de pontuação de risco',
+    body_pt: 'Nova avaliação de pontuação',
+    scope: 2
   )
 
   ilegible_id = ObservationReason.create!(
