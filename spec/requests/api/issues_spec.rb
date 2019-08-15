@@ -200,11 +200,45 @@ describe Issue do
       end
     end
 
+    { complete: :draft,
+      observe: :new,
+      answer: :observed,
+      dismiss: :new,
+      reject: :new,
+      abandon: :new
+    }.each do |action, initial_state|
+      it "It can #{action} issue" do
+        issue = create(:basic_issue, 
+          state: initial_state, 
+          person: person,
+          workflows: [create(:basic_workflow)])
+
+        api_request :post, "/issues/#{issue.id}/#{action}", {}, 200
+      end
+    end
+
     %i(complete observe answer dismiss reject abandon).each do |action|
       it "It cannot #{action} approved issue" do
         issue = create(:basic_issue, state: :approved, person: person)
         api_request :post, "/issues/#{issue.id}/#{action}", {}, 422
       end
+    end
+
+    it 'cannot approve issue if workflows are pending' do 
+      issue = create(:basic_issue, person: person)
+
+      2.times do 
+        w = create(:basic_workflow, issue: issue)
+        w.start!
+      end
+
+      api_request :post, "/issues/#{issue.id}/approve", {}, 422
+      
+      api_request :post, "/workflows/#{Workflow.first.id}/finish", {}, 200
+      api_request :post, "/issues/#{issue.id}/approve", {}, 422
+      
+      api_request :post, "/workflows/#{Workflow.last.id}/finish", {}, 200
+      api_request :post, "/issues/#{issue.id}/approve", {}, 200
     end
   end
 

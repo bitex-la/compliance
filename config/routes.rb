@@ -66,10 +66,25 @@ Rails.application.routes.draw do
       attachments
       observation_reasons
       observations
+      workflows
     ).each do |entities|
       resources entities, only: [:show, :index, :create, :update]
     end
 
+    %i(
+      workflows
+      tasks
+    ).each do |entities|
+      resources entities, except: [:new, :edit] do
+        member do
+          entities.to_s.classify.constantize
+            .aasm.events.map(&:name).each do |action|
+              post action
+            end
+        end
+      end
+    end
+    
     %i(
       person_taggings
       issue_taggings

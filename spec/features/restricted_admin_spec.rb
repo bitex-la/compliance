@@ -62,6 +62,53 @@ describe 'a restricted admin user' do
     add_observation(observation_reason, 'Please check this guy on world check')
 
     click_button "Update Issue"
+    click_link "Edit"
+
+    expect(page).to_not have_content 'Approve'
+    expect(page).to_not have_content 'Dismiss'
+    expect(page).to_not have_content 'Abandon'
+    expect(page).to_not have_content 'Reject'
+  end
+
+  it 'can create a natural person and it issue, but cannot approve, reject, dismiss or abandon it with workflows' do
+    observation_reason = create(:human_world_check_reason)
+    login_as restricted_user
+
+    click_link 'People'
+    click_link 'New Person'
+    click_button 'Create Person'
+
+    visit '/'
+    click_link 'People'
+    within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
+      click_link 'View'
+    end
+
+    click_link 'Edit Person'
+
+    expect(page).to_not have_content 'Enable'
+    expect(page).to_not have_content 'Disable'
+    
+    click_link 'View Person Issues'
+    click_link 'New'
+    
+    fulfil_new_issue_form true
+
+    click_button "Create Issue"
+    click_link "Edit"
+
+    add_observation(observation_reason, 'Please check this guy on world check')
+
+    click_button "Update Issue"
+    click_link "Edit"
+
+    find('li[title="Workflows"] a').click
+
+    within '.has_many_container.workflows' do
+      click_link 'Mark as finished'
+    end
+    
+    expect(page).to have_content 'Only admins with full access can do this action'
 
     expect(page).to_not have_content 'Approve'
     expect(page).to_not have_content 'Dismiss'
@@ -113,7 +160,7 @@ describe 'a restricted admin user' do
 
     click_button "Update Issue"
     
-    within(".action_item") do
+    within(".action_items") do
       expect(page).to_not have_selector(:link_or_button, 'Approve')
       expect(page).to_not have_selector(:link_or_button, 'Dismiss')
       expect(page).to_not have_selector(:link_or_button, 'Abandon')

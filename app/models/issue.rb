@@ -145,6 +145,9 @@ class Issue < ApplicationRecord
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
 
+  has_many :workflows
+  accepts_nested_attributes_for :workflows, allow_destroy: true
+
   has_many :observations
   accepts_nested_attributes_for :observations,
     reject_if: proc { |attr| attr['scope'].blank? || attr['observation_reason_id'].blank? }
@@ -275,9 +278,9 @@ class Issue < ApplicationRecord
     event :approve do
       before{ harvest_all! if aasm.from_state != :approved }
       
-      transitions from: [:draft, :new, :answered, :approved], to: :approved
+      transitions from: [:draft, :new, :answered, :approved], to: :approved, guard: :all_workflows_performed?
 
-      after do
+      after do 
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
@@ -305,6 +308,11 @@ class Issue < ApplicationRecord
       count += send(relation).count unless send(relation).blank?
     end
     count
+  end
+
+  def all_workflows_performed?
+    return true if workflows.empty?
+    workflows.all? {|workflow| workflow.performed?} 
   end
 
   def state
