@@ -692,6 +692,29 @@ ActiveRecord::Schema.define(version: 2019_07_26_202002) do
     t.index ["tag_type", "name"], name: "index_tags_on_tag_type_and_name", unique: true
   end
 
+  create_table "tasks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "workflow_id"
+    t.string "aasm_state"
+    t.integer "index"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "max_retries", default: 0
+    t.integer "current_retries", default: 0
+    t.text "output"
+    t.string "task_type"
+    t.index ["workflow_id"], name: "index_tasks_on_workflow_id"
+  end
+
+  create_table "workflows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "scope"
+    t.string "aasm_state"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "issue_id"
+    t.string "workflow_type"
+    t.index ["issue_id"], name: "index_workflows_on_issue_id"
+  end
+
   add_foreign_key "affinities", "affinities", column: "replaced_by_id"
   add_foreign_key "affinities", "affinity_seeds"
   add_foreign_key "affinities", "people"
@@ -771,4 +794,6 @@ ActiveRecord::Schema.define(version: 2019_07_26_202002) do
   add_foreign_key "risk_scores", "issues"
   add_foreign_key "risk_scores", "people"
   add_foreign_key "risk_scores", "risk_scores", column: "replaced_by_id"
+  add_foreign_key "tasks", "workflows"
+  add_foreign_key "workflows", "issues"
 end

@@ -375,6 +375,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
     }
 
     api_request :post, "/issues/#{issue.id}/approve"
+ 
     replaceable_fruit_id = fruit_class.last.id.to_s
 
     api_get "/people/#{person.id}"

@@ -67,6 +67,7 @@ ActiveAdmin.register Issue do
 
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
     action_item action, only: [:show], if: lambda { resource.send("may_#{action}?") } do
+      next if action == :approve && !resource.all_workflows_performed?
       next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
       link_to action.to_s.titleize, [action, :person, :issue], method: :post
     end
@@ -194,6 +195,32 @@ ActiveAdmin.register Issue do
         end
       end
 
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
+        ArbreHelpers::Form.has_many_form self, f, :workflows do |wf, context|
+          wf.template.concat(
+            Arbre::Context.new({}, wf.template){
+              li do
+                ArbreHelpers::Workflow.render_workflow_progress(self, "workflow", wf.object)
+              end
+            }.to_s
+          )
+          wf.input :scope
+          wf.input :workflow_type
+          if !wf.object.new_record?
+            wf.input :state, input_html: { disabled: wf.object.persisted? } 
+            if wf.object.may_finish? || wf.object.may_start?
+              wf.template.concat(
+                Arbre::Context.new({}, wf.template){
+                  li do
+                    link_to 'Mark as finished', [:finish, wf.object], class: 'button', method: :post
+                  end
+              }.to_s)
+            end
+          end  
+          ArbreHelpers::Task.has_many_tasks(context, wf)
+        end
+      end
+      
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'industry', LegalEntityDocketSeed) do
           ArbreHelpers::Form.has_one_form self, f, "Legal Entity Docket", :legal_entity_docket_seed do |sf|
@@ -455,7 +482,24 @@ ActiveAdmin.register Issue do
           end
         end
       end
-
+      
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
+        ArbreHelpers::Layout.panel_grid(self, resource.workflows) do |workflow|
+          ArbreHelpers::Workflow.render_workflow_progress(self, 'Workflow', workflow)
+          ArbreHelpers::Seed.seed_attributes_table self, workflow
+          h3 class: 'light_header' do
+            "Tasks"
+          end
+          table_for workflow.tasks, {class: 'tasks'} do
+            column :id {|t| link_to t.id, [workflow, t]}
+            column :task_type {|t| link_to t.try(:task_type), [workflow, t]}
+            column :state
+            column :current_retries
+            column :max_retries
+          end
+        end       
+      end  
+      
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_show_tab(self, 'industry', LegalEntityDocketSeed)
       end
