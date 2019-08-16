@@ -227,7 +227,7 @@ describe 'an admin user' do
       expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
     end
 
-    assert_logging(issue, :update_entity, 4)
+    assert_logging(issue, :update_entity, 5)
     issue.reload.should be_draft
 
     expect(page).to_not have_content("Approve")
@@ -267,7 +267,7 @@ describe 'an admin user' do
     visit "/people/#{issue.person.id}"
     
     issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 13)
+    assert_logging(issue, :update_entity, 17)
     expect(issue.person.enabled).to be_falsey
     expect(issue.person.state).to eq('new')
     assert_logging(issue.person, :enable_person, 0)
