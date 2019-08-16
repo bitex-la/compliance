@@ -14,9 +14,12 @@ ActiveAdmin.register Person do
 
   actions :all, except: [:destroy]
 
-  %i(enable disable reject).each do |event|
+  { enable: "enabled",
+    disable: "disabled",
+    reject: "rejected",
+  }.each do |event, state|
     action_item event, only: [:edit, :show, :update] do
-      next unless !current_admin_user.is_restricted && resource.send("may_#{event}?")
+      next unless !current_admin_user.is_restricted && resource.send("may_#{event}?") && resource.state != state
       link_to event.to_s.humanize, [event, :person], method: :post
     end
 
