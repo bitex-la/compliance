@@ -1,4 +1,4 @@
-class Api::ObservationsController < Api::SeedController
+class Api::ObservationsController < Api::EntityController
   def resource_class
     Observation
   end

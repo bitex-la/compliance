@@ -1,4 +1,4 @@
-class Api::TagsController < Api::SeedController
+class Api::TagsController < Api::EntityController
   def resource_class
     Tag
   end

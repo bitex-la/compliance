@@ -1,4 +1,4 @@
-class Api::PhonesController < Api::FruitController
+class Api::PhonesController < Api::ReadOnlyEntityController
   def resource_class
     Phone
   end

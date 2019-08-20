@@ -1,4 +1,4 @@
-class Api::IssueTaggingsController < Api::SeedController
+class Api::IssueTaggingsController < Api::EntityController
   def resource_class
     IssueTagging
   end

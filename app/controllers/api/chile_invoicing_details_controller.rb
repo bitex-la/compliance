@@ -1,4 +1,4 @@
-class Api::ChileInvoicingDetailsController < Api::FruitController
+class Api::ChileInvoicingDetailsController < Api::ReadOnlyEntityController
   def resource_class
     ChileInvoicingDetail
   end

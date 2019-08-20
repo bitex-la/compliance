@@ -1,4 +1,4 @@
-class Api::AttachmentsController < Api::SeedController
+class Api::AttachmentsController < Api::EntityController
   def resource_class
     Attachment
   end

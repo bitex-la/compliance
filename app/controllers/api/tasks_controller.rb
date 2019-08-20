@@ -1,4 +1,4 @@
-class Api::TasksController < Api::SeedController
+class Api::TasksController < Api::EntityController
   def resource_class
     Task
   end

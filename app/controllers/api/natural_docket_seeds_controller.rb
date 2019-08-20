@@ -1,4 +1,4 @@
-class Api::NaturalDocketSeedsController < Api::SeedController
+class Api::NaturalDocketSeedsController < Api::EntityController
   def resource_class
     NaturalDocketSeed
   end

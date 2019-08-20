@@ -1,4 +1,4 @@
-class Api::WorkflowsController < Api::SeedController
+class Api::WorkflowsController < Api::EntityController
   def resource_class
     Workflow
   end
