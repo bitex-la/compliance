@@ -21,6 +21,13 @@ RSpec.describe Workflow, type: :model do
   end
 
   describe 'when transitioning' do 
+    let(:admin_user) { create(:admin_user) }
+    let(:other_admin_user) { create(:other_admin_user) }
+
+    before :each do 
+      AdminUser.current_admin_user = admin_user 
+    end
+
     it 'defaults to new' do
       expect(basic_workflow).to have_state(:new)
     end
@@ -42,7 +49,7 @@ RSpec.describe Workflow, type: :model do
       end
     end
 
-    it 'can mark a workflow as performed even if tasks are pending' do
+    it 'cannot mark a workflow as performed if tasks are pending' do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
@@ -53,11 +60,13 @@ RSpec.describe Workflow, type: :model do
       basic_workflow.tasks.first.finish!
       expect(basic_workflow).to have_state(:started)
 
-      basic_workflow.reload.finish!
+      expect { basic_workflow.reload.finish! }.to raise_error(AASM::InvalidTransition,
+        "Event 'finish' cannot transition from 'started'. Failed callback(s): [:all_tasks_performed?].")
 
       basic_workflow.tasks[1..-1]
         .each {|task| task.start!; task.update!(output: 'all clear!') ; task.finish!}
 
+      basic_workflow.reload.finish!
       expect(basic_workflow).to have_state(:performed)   
     end
 
@@ -97,6 +106,58 @@ RSpec.describe Workflow, type: :model do
         expect(task.current_retries).to eq 3
         expect(task).to have_state(:failed)
       end
+      expect(basic_workflow).to have_state(:started)
+    end
+
+    it 'lock issue when workflow starts and unlock on finish' do
+      3.times do 
+        create(:basic_task, workflow: basic_workflow)
+      end
+
+      issue = basic_workflow.issue
+  
+      expect(issue.locked).to be false
+      expect(issue.lock_admin_user).to be nil
+      expect(issue.lock_expiration).to be nil
+
+      basic_workflow.reload.tasks.each {|task| task.start!}
+
+      expect(basic_workflow).to have_state(:started)
+
+      issue.reload    
+      expect(issue.locked).to be true
+      expect(issue.lock_admin_user).to eq admin_user
+      expect(issue.lock_expiration).to be nil
+
+      basic_workflow.tasks.each {|task| task.update!(output: 'all clear!') ; task.finish!}
+
+      basic_workflow.reload.finish!
+
+      issue.reload
+      expect(issue.locked).to be false
+      expect(issue.lock_admin_user).to be nil
+      expect(issue.lock_expiration).to be nil
+    end
+
+    it 'cannot starts a workflow if the issue is locked by another user' do
+      issue = basic_workflow.issue
+      expect(issue.lock_issue!).to be true
+
+      AdminUser.current_admin_user = other_admin_user
+
+      create(:basic_task, workflow: basic_workflow)
+
+      expect { basic_workflow.reload.tasks.first.start! }.to raise_error(AASM::InvalidTransition,
+        "Event 'start' cannot transition from 'new'. Failed callback(s): [:lock_issue!].")
+
+      AdminUser.current_admin_user = admin_user
+
+      expect(issue.unlock_issue!).to be true
+
+      AdminUser.current_admin_user = other_admin_user
+
+      basic_workflow.reload.tasks.first.start!
+
       expect(basic_workflow).to have_state(:started)
     end
   end

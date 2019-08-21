@@ -17,10 +17,7 @@ class Task < ApplicationRecord
     state :failed
 
     event :start do
-      transitions from: [:new, :started], to: :started
-      after do
-        workflow.start! if workflow.may_start?
-      end
+      transitions from: [:new, :started], to: :started, guard: :start_workflow!
     end
 
     event :finish do 
@@ -41,6 +38,11 @@ class Task < ApplicationRecord
         self.update!(current_retries: self.current_retries + 1) if can_retry?
       end
     end
+  end
+
+  def start_workflow!
+    return true if workflow.state == "started"
+    workflow.start!
   end
 
   def state
