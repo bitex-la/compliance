@@ -1,4 +1,4 @@
-class Api::DomicilesController < Api::FruitController
+class Api::DomicilesController < Api::ReadOnlyEntityController
   def resource_class
     Domicile
   end

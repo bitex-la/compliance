@@ -1,4 +1,4 @@
-class Api::FundDepositsController < Api::SeedController
+class Api::FundDepositsController < Api::EntityController
   def resource_class
     FundDeposit
   end

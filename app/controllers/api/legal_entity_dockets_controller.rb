@@ -1,4 +1,4 @@
-class Api::LegalEntityDocketsController < Api::FruitController
+class Api::LegalEntityDocketsController < Api::ReadOnlyEntityController
   def resource_class
     LegalEntityDocket
   end

@@ -1,4 +1,4 @@
-class Api::EmailsController < Api::FruitController
+class Api::EmailsController < Api::ReadOnlyEntityController
   def resource_class
     Email
   end

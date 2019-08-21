@@ -261,13 +261,13 @@ class Person < ApplicationRecord
     state :rejected
     
     event :enable do
-      transitions from: [:new, :disabled, :enabled], to: :enabled do
+      transitions from: [:new, :disabled, :rejected, :enabled], to: :enabled do
         after{ self['enabled'] = true }
       end
     end
 
     event :disable do
-      transitions from: [:enabled, :new, :disabled], to: :disabled do
+      transitions from: [:enabled, :new, :rejected, :disabled], to: :disabled do
         after{ self['enabled'] = false }
       end
     end

@@ -38,7 +38,7 @@ class Workflow < ApplicationRecord
     state :dismissed
 
     event :start do 
-      transitions from: [:new, :started], to: :started
+      transitions from: [:new, :started], to: :started, guard: :lock_issue!
     end
 
     event :fail do
@@ -46,12 +46,19 @@ class Workflow < ApplicationRecord
     end
 
     event :dismiss do
-      transitions from: [:new, :started], to: :dismissed
+      transitions from: [:new, :started, :dismissed], to: :dismissed
     end
 
     event :finish do
-      transitions from: [:started, :performed], to: :performed
+      transitions from: [:started, :performed], to: :performed, guard: :all_tasks_performed?
+      after do 
+        issue.unlock_issue! if aasm.from_state != :performed
+      end
     end
+  end
+
+  def lock_issue!
+    issue.lock_issue!(false)
   end
 
   def name

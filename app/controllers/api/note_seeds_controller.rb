@@ -1,4 +1,4 @@
-class Api::NoteSeedsController < Api::SeedController
+class Api::NoteSeedsController < Api::EntityController
   def resource_class
     NoteSeed
   end

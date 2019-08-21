@@ -1,4 +1,4 @@
-class Api::PersonTaggingsController < Api::SeedController
+class Api::PersonTaggingsController < Api::EntityController
   def resource_class
     PersonTagging
   end

@@ -25,7 +25,7 @@ class Api::PeopleController < Api::ApiController
       people: [:enabled, :risk, :tags, id: nil ],
       tags: []
 
-    return jsonapi_422(nil) unless mapper.data
+    return jsonapi_422 unless mapper.data
 
     if mapper.save_all
       jsonapi_response mapper.data,{}, 201
@@ -38,7 +38,7 @@ class Api::PeopleController < Api::ApiController
     mapper = JsonapiMapper.doc_unsafe!(
       params.permit!.to_h, [:people], people: %I[enabled risk])
 
-    return jsonapi_422(nil) unless mapper.data
+    return jsonapi_422 unless mapper.data
 
     if mapper.data.save
       jsonapi_response mapper.data, {}, 200
@@ -50,7 +50,9 @@ class Api::PeopleController < Api::ApiController
   Person.aasm.events.map(&:name).each do |action|
     define_method(action) do
       person = Person.find(params[:id])
-      begin
+      begin        
+        return jsonapi_error(422, "invalid transition") unless can_run_transition(person, action)
+
         person.aasm.fire!(action)
         jsonapi_response(person, {}, 200)
       rescue AASM::InvalidTransition => e
@@ -60,6 +62,10 @@ class Api::PeopleController < Api::ApiController
   end
 
   protected
+
+  def can_run_transition(person, action)
+    !((action == :enable || action == :disable) && person.state == "rejected")
+  end
 
   def path_for_show
     "person/show/#{params[:id]}?#{params.permit!.to_query}"

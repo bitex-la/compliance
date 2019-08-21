@@ -1,4 +1,4 @@
-class Api::RiskScoreSeedsController < Api::SeedController
+class Api::RiskScoreSeedsController < Api::EntityController
   def resource_class
     RiskScoreSeed
   end
