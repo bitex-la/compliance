@@ -1,10 +1,7 @@
 class Workflow < ApplicationRecord
   include AASM
   include Loggable
-  include Parametrizable
-
-  before_validation -> { to_underscore('workflow_type') }, on: [:create, :update]
-
+  
   def self.scopes
     %i(robot admin)
   end

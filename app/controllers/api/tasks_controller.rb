@@ -10,7 +10,7 @@ class Api::TasksController < Api::SeedController
         task.aasm.fire!(action)
         jsonapi_response(task, {}, 200)
       rescue AASM::InvalidTransition => e
-				jsonapi_error(422, "invalid transition")
+        jsonapi_error(422, "invalid transition")
       end
     end
   end
