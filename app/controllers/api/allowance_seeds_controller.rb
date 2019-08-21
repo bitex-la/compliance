@@ -1,4 +1,4 @@
-class Api::AllowanceSeedsController < Api::SeedController
+class Api::AllowanceSeedsController < Api::EntityController
   def resource_class
     AllowanceSeed
   end

@@ -1,4 +1,4 @@
-class Api::FruitController < Api::ApiController
+class Api::ReadOnlyEntityController < Api::ApiController
   def index
     collection = resource_class
       .order(updated_at: :desc)

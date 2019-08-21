@@ -1,4 +1,4 @@
-class Api::EmailSeedsController < Api::SeedController
+class Api::EmailSeedsController < Api::EntityController
   def resource_class
     EmailSeed
   end

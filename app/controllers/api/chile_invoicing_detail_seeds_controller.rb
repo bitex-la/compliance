@@ -1,4 +1,4 @@
-class Api::ChileInvoicingDetailSeedsController < Api::SeedController
+class Api::ChileInvoicingDetailSeedsController < Api::EntityController
   def resource_class
     ChileInvoicingDetailSeed
   end

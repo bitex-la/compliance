@@ -1,4 +1,4 @@
-class Api::AffinitySeedsController < Api::SeedController
+class Api::AffinitySeedsController < Api::EntityController
   def resource_class
     AffinitySeed
   end

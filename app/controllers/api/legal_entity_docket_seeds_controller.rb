@@ -1,4 +1,4 @@
-class Api::LegalEntityDocketSeedsController < Api::SeedController
+class Api::LegalEntityDocketSeedsController < Api::EntityController
   def resource_class
     LegalEntityDocketSeed
   end
