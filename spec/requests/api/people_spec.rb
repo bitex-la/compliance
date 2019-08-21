@@ -571,7 +571,7 @@ describe Person do
     end
 
     %i{enable disable}.each do |action|
-      it "It cannot #{action} rejected issue" do
+      it "It cannot #{action} rejected person" do
         person = create(:empty_person)
         person.reject!
         api_request :post, "/people/#{person.id}/#{action}", {}, 422

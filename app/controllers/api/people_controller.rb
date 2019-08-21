@@ -50,7 +50,9 @@ class Api::PeopleController < Api::ApiController
   Person.aasm.events.map(&:name).each do |action|
     define_method(action) do
       person = Person.find(params[:id])
-      begin
+      begin        
+        return jsonapi_error(422, "invalid transition") unless can_run_transition(person, action)
+
         person.aasm.fire!(action)
         jsonapi_response(person, {}, 200)
       rescue AASM::InvalidTransition => e
@@ -60,6 +62,10 @@ class Api::PeopleController < Api::ApiController
   end
 
   protected
+
+  def can_run_transition(person, action)
+    !((action == :enable || action == :disable) && person.state == "rejected")
+  end
 
   def path_for_show
     "person/show/#{params[:id]}?#{params.permit!.to_query}"
