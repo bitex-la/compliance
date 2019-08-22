@@ -61,7 +61,7 @@ RSpec.describe Workflow, type: :model do
       expect(basic_workflow).to have_state(:started)
 
       expect { basic_workflow.reload.finish! }.to raise_error(AASM::InvalidTransition,
-        "Event 'finish' cannot transition from 'started'. Failed callback(s): [:all_tasks_performed?].")
+        "Event 'finish' cannot transition from 'started'. Failed callback(s): [:all_task_in_final_state?].")
 
       basic_workflow.tasks[1..-1]
         .each {|task| task.start!; task.update!(output: 'all clear!') ; task.finish!}
