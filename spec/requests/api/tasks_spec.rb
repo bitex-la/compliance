@@ -119,10 +119,9 @@ describe Task do
       api_request :post, "/tasks/#{task.id}/finish", {}, 422
 
       api_request :post, "/tasks/#{task.id}/start", {}, 200
-      api_request :post, "/tasks/#{task.id}/fail", {}, 200
       api_request :post, "/tasks/#{task.id}/finish", {}, 422
 
-      api_request :post, "/tasks/#{task.id}/retry", {}, 200
+      api_request :post, "/tasks/#{task.id}/failure", {}, 200
       api_request :post, "/tasks/#{task.id}/finish", {}, 422
 
       api_update "/tasks/#{task.id}", {
@@ -146,8 +145,8 @@ describe Task do
       api_request :post, "/tasks/#{task.id}/fail", {}, 422
       
       api_request :post, "/tasks/#{task.id}/start", {}, 200
+      api_request :post, "/tasks/#{task.id}/failure", {}, 200
       api_request :post, "/tasks/#{task.id}/fail", {}, 200
-      api_request :post, "/tasks/#{task.id}/retry", {}, 200
       api_request :post, "/tasks/#{task.id}/fail", {}, 200
     end
   end

@@ -15,6 +15,16 @@ class Api::TasksController < Api::EntityController
     end
   end
 
+  def failure
+    task = Task.find(params[:id])
+    begin
+      task.failure!
+      jsonapi_response(task, {}, 200)
+    rescue AASM::InvalidTransition => e
+      jsonapi_error(422, "invalid transition")
+    end
+  end
+
   protected
     def get_mapper
       JsonapiMapper.doc_unsafe! params.permit!.to_h,

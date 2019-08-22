@@ -84,6 +84,12 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    resources :tasks, except: [:new, :edit] do
+      member do
+        post :failure
+      end
+    end
     
     %i(
       person_taggings
