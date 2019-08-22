@@ -91,15 +91,15 @@ RSpec.describe Workflow, type: :model do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
-      basic_workflow.reload.tasks.each {|task| task.start!; task.fail!}
+      basic_workflow.reload.tasks.each {|task| task.start!}
       expect(basic_workflow).to have_state(:started)
 
       basic_workflow.tasks.each do |task|
         expect(task.can_retry?).to be_truthy
       end
 
-      3.times do 
-        basic_workflow.tasks.each {|task| task.retry!; task.fail!}
+      4.times do 
+        basic_workflow.tasks.each {|task| task.failure!}
       end
 
       basic_workflow.tasks.each do |task|

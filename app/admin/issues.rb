@@ -457,7 +457,7 @@ ActiveAdmin.register Issue do
           h3 "Current Note Seeds"
           if seeds = resource.note_seeds.presence
             ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
-              attributes_table_for d, :fruit
+              attributes_table_for d, :fruit, :created_at, :updated_at
               para d.body
               ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
             end

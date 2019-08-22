@@ -70,7 +70,7 @@ class Workflow < ApplicationRecord
   end
 
   def all_task_in_final_state?
-    tasks.all? {|task| task.performed? || (task.failed? && !task.can_retry?)}
+    tasks.all? {|task| task.performed? || task.failed?}
   end
 
   def all_tasks_performed?

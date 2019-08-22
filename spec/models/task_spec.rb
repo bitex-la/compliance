@@ -42,8 +42,7 @@ RSpec.describe Task, type: :model do
 
     it "goes from retried to performed on finish" do
       basic_task.start!
-      basic_task.fail!
-      basic_task.retry!
+      basic_task.failure!
       expect do
         basic_task.finish!
       end.to raise_error AASM::InvalidTransition
@@ -53,26 +52,25 @@ RSpec.describe Task, type: :model do
     end
 
     it 'goes from failed to retried on retry' do
-      expect(basic_task)
+      expect do
+        expect(basic_task)
         .to transition_from(:failed).to(:retried).on_event(:retry)
+      end.to raise_error AASM::InvalidTransition
     end
 
     it 'goes to retry while do not reach max_retries' do
       basic_task.start!
-      basic_task.fail!
-      basic_task.retry!
+      basic_task.failure!
       expect(basic_task.reload.current_retries).to eq 1
 
       2.times do |i|
-        basic_task.fail!
-        basic_task.retry!
+        basic_task.failure!
         expect(basic_task.reload.current_retries).to eq i + 2
       end
 
-      expect do   
-        basic_task.fail!
-        basic_task.retry!
-      end.to raise_error AASM::InvalidTransition
+      basic_task.failure!
+      
+      expect(basic_task.state).to eq("failed")
     end
   end
 end
