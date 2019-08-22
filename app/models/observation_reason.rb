@@ -5,8 +5,8 @@ class ObservationReason < ApplicationRecord
   scope :for_admin,  -> { where('scope = ?', 1) }
   scope :for_robot,  -> { where('scope = ?', 2) }
 
-	ransacker("scope",
-		formatter: proc { |v| scopes[v] }
+  ransacker("scope",
+    formatter: proc { |v| scopes[v] }
   ){|parent| parent.table["scope"] }
 
 

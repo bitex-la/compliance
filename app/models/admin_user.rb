@@ -7,7 +7,7 @@ class AdminUser < ApplicationRecord
   has_one_time_password
   attr_accessor :otp
 
-  has_secure_token :api_token	
+  has_secure_token :api_token
   after_initialize :set_api_token
 
   private

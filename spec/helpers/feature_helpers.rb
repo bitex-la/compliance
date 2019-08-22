@@ -9,11 +9,11 @@ module FeatureHelpers
   def fill_seed(kind, attributes, has_many = true, index = 0)
     attributes.each do |key, value|
       if has_many
-      	fill_in "issue[#{kind}_seeds_attributes][#{index}][#{key}]",
-	  with: value
+        fill_in "issue[#{kind}_seeds_attributes][#{index}][#{key}]",
+    with: value
       else
         fill_in "issue[#{kind}_seed_attributes][#{key}]",
-	  with: value
+    with: value
       end
     end
   end
@@ -52,10 +52,10 @@ module FeatureHelpers
     related_ones.each_with_index do |related, index|
       click_link "Add New Affinity seed"
 
-      address =  if related.reload.enabled	
-        related.emails.first.address	
-      else	
-        related.issues.first.email_seeds.first.address	
+      address =  if related.reload.enabled
+        related.emails.first.address
+      else
+        related.issues.first.email_seeds.first.address
       end
 
       select_with_search(

@@ -252,15 +252,15 @@ describe Issue do
 
       api_get "/issues/?filter[active]=true"
       api_response.data.map{|i| i.id.to_i}.to_set.should ==
-				[four.id, five.id, six.id].to_set
+        [four.id, five.id, six.id].to_set
 
       api_get "/issues/?filter[active]=false"
       api_response.data.map{|i| i.id.to_i}.to_set.should ==
-				[one.id, two.id, three.id].to_set
+        [one.id, two.id, three.id].to_set
 
       api_get "/issues/?filter[state_eq]=approved"
       api_response.data.map{|i| i.id.to_i}.to_set.should ==
-				[one.id, two.id, three.id].to_set
+        [one.id, two.id, three.id].to_set
     end
   end
 

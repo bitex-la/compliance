@@ -1,10 +1,7 @@
 class Workflow < ApplicationRecord
   include AASM
   include Loggable
-  include Parametrizable
-
-  before_validation -> { to_underscore('workflow_type') }, on: [:create, :update]
-
+  
   def self.scopes
     %i(robot admin)
   end
@@ -53,7 +50,7 @@ class Workflow < ApplicationRecord
     end
 
     event :finish do
-      transitions from: [:started, :performed], to: :performed, guard: :all_tasks_performed?
+      transitions from: [:started, :performed], to: :performed, guard: :all_task_in_final_state?
       after do 
         issue.unlock_issue! if aasm.from_state != :performed
       end
@@ -70,6 +67,10 @@ class Workflow < ApplicationRecord
 
   def state
     aasm_state
+  end
+
+  def all_task_in_final_state?
+    tasks.all? {|task| task.performed? || (task.failed? && !task.can_retry?)}
   end
 
   def all_tasks_performed?

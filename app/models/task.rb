@@ -1,10 +1,7 @@
 class Task < ApplicationRecord
   include AASM
   include Loggable
-  include Parametrizable
-
-  before_validation -> { to_underscore('task_type') }, on: [:create, :update]
-
+  
   belongs_to :workflow
 
   ransack_alias :state, :aasm_state

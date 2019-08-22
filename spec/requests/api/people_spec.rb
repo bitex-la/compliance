@@ -256,7 +256,7 @@ describe Person do
             person: {data: {id: person.id.to_s, type: "people"}},
             replaced_by: {data: nil},
             seed: { data: {
-	            type: "natural_docket_seeds",
+              type: "natural_docket_seeds",
               id: issue.natural_docket_seed.id.to_s
             }},
             attachments: {
@@ -324,7 +324,7 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	      type: "phone_seeds",
+          type: "phone_seeds",
               id: issue.phone_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -366,7 +366,7 @@ describe Person do
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
             seed: { data: {
-	            type: "affinity_seeds",
+              type: "affinity_seeds",
               id: issue.affinity_seeds.last.id.to_s
             }},
             replaced_by: {data: nil},
@@ -383,7 +383,7 @@ describe Person do
           }
         },
         {
-	        id: person.argentina_invoicing_details.first.id.to_s,
+          id: person.argentina_invoicing_details.first.id.to_s,
           type: "argentina_invoicing_details",
           attributes:
           {
