@@ -45,7 +45,7 @@ class Api::IssuesController < Api::ApiController
       [],
       issues: [ :defer_until, id: params[:id] ]
       
-    return jsonapi_422(nil) unless mapper.data
+    return jsonapi_422 unless mapper.data
 
     if mapper.save_all
       jsonapi_response mapper.data,
@@ -62,7 +62,7 @@ class Api::IssuesController < Api::ApiController
         issue.aasm.fire!(action)
         jsonapi_response(issue, {}, 200)
       rescue AASM::InvalidTransition => e
-				jsonapi_error(422, "invalid transition")
+        jsonapi_error(422, "invalid transition")
       end
     end
   end

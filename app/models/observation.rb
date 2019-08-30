@@ -27,7 +27,7 @@ class Observation < ApplicationRecord
   validate :validate_issue_correspondence
 
   def self.ransackable_scopes(auth_object = nil)
-	  %i(by_issue_reason)
+    %i(by_issue_reason)
   end
 
   def self.ransackable_scopes_skip_sanitize_args

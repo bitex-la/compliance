@@ -1,4 +1,4 @@
-class Api::TasksController < Api::SeedController
+class Api::TasksController < Api::EntityController
   def resource_class
     Task
   end
@@ -10,8 +10,18 @@ class Api::TasksController < Api::SeedController
         task.aasm.fire!(action)
         jsonapi_response(task, {}, 200)
       rescue AASM::InvalidTransition => e
-				jsonapi_error(422, "invalid transition")
+        jsonapi_error(422, "invalid transition")
       end
+    end
+  end
+
+  def failure
+    task = Task.find(params[:id])
+    begin
+      task.failure!
+      jsonapi_response(task, {}, 200)
+    rescue AASM::InvalidTransition => e
+      jsonapi_error(422, "invalid transition")
     end
   end
 

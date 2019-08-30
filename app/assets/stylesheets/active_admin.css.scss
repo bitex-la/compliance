@@ -283,28 +283,28 @@ body.active_admin{
     margin: 00
   }
 
-	form {
-		fieldset.actions{
-				input[type=submit]{
-					padding: 15px 20px;
-					font-size: 1.2em;
-					border-radius: 10px;
-				}
-				.cancel {
-					padding-top: 10px;
-				}
-			}
-		.note_seeds > fieldset > ol > li.text.input {
-			label {
-				display: none;
-			}
+  form {
+    fieldset.actions{
+      input[type=submit]{
+        padding: 15px 20px;
+        font-size: 1.2em;
+        border-radius: 10px;
+        }
+        .cancel {
+          padding-top: 10px;
+        }
+      }
+    .note_seeds > fieldset > ol > li.text.input {
+      label {
+        display: none;
+      }
 
-			textarea {
-				box-sizing: border-box;
-				width: 100%;
-			}
-		}
-	}
+      textarea {
+        box-sizing: border-box;
+        width: 100%;
+      }
+    }
+  }
 
   fieldset, .has_many_container {
     > h3 {
@@ -342,17 +342,17 @@ body.active_admin{
       font-size: 0.9em;
       line-height: 0.9em;
 
-			background-color: #FFFFFF;
-			background-image: linear-gradient(180deg, #FFFFFF, #E7E7E7);
-			box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 0 rgba(255, 255, 255, 0.8) inset;
-			border: solid 1px #c7c7c7;
-			border-color: #c7c7c7;
-			border-top-color: #d3d3d3;
-			border-right-color: #c7c7c7;
-			border-bottom-color: #c2c2c2;
-			border-left-color: #c7c7c7;
-			text-shadow: #fff 0 1px 0;
-			color: #5E6469;
+      background-color: #FFFFFF;
+      background-image: linear-gradient(180deg, #FFFFFF, #E7E7E7);
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 0 rgba(255, 255, 255, 0.8) inset;
+      border: solid 1px #c7c7c7;
+      border-color: #c7c7c7;
+      border-top-color: #d3d3d3;
+      border-right-color: #c7c7c7;
+      border-bottom-color: #c2c2c2;
+      border-left-color: #c7c7c7;
+      text-shadow: #fff 0 1px 0;
+      color: #5E6469;
     }
 
     li.has_many_container.tasks {
@@ -360,10 +360,10 @@ body.active_admin{
         float: none;
         width: auto;
         padding: 10px;
-				margin: 5px 0 10px 0;
-				ol li.file.input {
-					padding: 0;
-				}
+        margin: 5px 0 10px 0;
+        ol li.file.input {
+          padding: 0;
+        }
 
         .attributes_table.attachment table{
           margin-bottom: 0;
@@ -371,47 +371,46 @@ body.active_admin{
       }
 
       .has_many_remove {
-				top: 0px;
-			}
+        top: 0px;
+      }
     }
 
     li.has_many_container.attachments, li.has_many_container.observations{
-			padding: 10px;
+      padding: 10px;
 
       background: #eee;
 
-			.has_many_remove {
-				top: 9px;
-			}
+      .has_many_remove {
+        top: 9px;
+      }
 
-			.has_many_add {
-				display: inline;
-				padding: 5px 10px;
-				margin: 5px 0;
-
-				font-size: 1.0em;
-				line-height: 12px;
-				background-color: #FFFFFF;
-				background-image: linear-gradient(180deg, #FFFFFF, #E7E7E7);
-				box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 0 rgba(255, 255, 255, 0.8) inset;
-				border: solid 1px #c7c7c7;
-				border-color: #c7c7c7;
-				border-top-color: #d3d3d3;
-				border-right-color: #c7c7c7;
-				border-bottom-color: #c2c2c2;
-				border-left-color: #c7c7c7;
-				text-shadow: #fff 0 1px 0;
-				color: #5E6469;
-			}
+      .has_many_add {
+        display: inline;
+        padding: 5px 10px;
+        margin: 5px 0;
+        font-size: 1.0em;
+        line-height: 12px;
+        background-color: #FFFFFF;
+        background-image: linear-gradient(180deg, #FFFFFF, #E7E7E7);
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 0 rgba(255, 255, 255, 0.8) inset;
+        border: solid 1px #c7c7c7;
+        border-color: #c7c7c7;
+        border-top-color: #d3d3d3;
+        border-right-color: #c7c7c7;
+        border-bottom-color: #c2c2c2;
+        border-left-color: #c7c7c7;
+        text-shadow: #fff 0 1px 0;
+        color: #5E6469;
+      }
 
       fieldset {
         float: none;
         width: auto;
         padding: 10px;
-				margin: 5px 0 10px 0;
-				ol li.file.input {
-					padding: 0;
-				}
+        margin: 5px 0 10px 0;
+        ol li.file.input {
+          padding: 0;
+        }
 
         .attributes_table.attachment table{
           margin-bottom: 0;
@@ -422,21 +421,21 @@ body.active_admin{
         float: right;
         padding: 0 0 5px 0;
 
-				label {
-					display: block;
-					padding-left: 15px;
-					text-indent: -15px;
-				}
-				input {
-					width: 13px;
-					height: 13px;
-					padding: 0;
-					margin: 0 5px 0 0;
-					vertical-align: bottom;
-					position: relative;
-					top: -1px;
-					*overflow: hidden;
-				}
+      label {
+        display: block;
+        padding-left: 15px;
+        text-indent: -15px;
+      }
+      input {
+        width: 13px;
+        height: 13px;
+        padding: 0;
+        margin: 0 5px 0 0;
+        vertical-align: bottom;
+        position: relative;
+        top: -1px;
+        *overflow: hidden;
+        }
       }
     }
   }
@@ -816,12 +815,12 @@ body.active_admin{
 }
 
 .meter { 
-	height: 20px;  /* Can be anything */
-	position: relative;
-	-moz-border-radius: 25px;
-	-webkit-border-radius: 25px;
-	border-radius: 25px;
-	box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3);
+  height: 20px;  /* Can be anything */
+  position: relative;
+  -moz-border-radius: 25px;
+  -webkit-border-radius: 25px;
+  border-radius: 25px;
+  box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3);
 }
 
 .meter > span {

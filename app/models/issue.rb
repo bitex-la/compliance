@@ -189,7 +189,7 @@ class Issue < ApplicationRecord
   }
 
   scope :active, ->(yes=true){
-    current.active_states
+    current.active_states(yes)
   }
 
   scope :active_states, ->(yes=true){
@@ -210,8 +210,8 @@ class Issue < ApplicationRecord
     where('defer_until <= ?', Date.today)
   }
 
-	def self.ransackable_scopes(auth_object = nil)
-	  %i(active by_person_type by_person_tag)
+  def self.ransackable_scopes(auth_object = nil)
+    %i(active by_person_type by_person_tag)
   end
 
   def self.ransackable_scopes_skip_sanitize_args

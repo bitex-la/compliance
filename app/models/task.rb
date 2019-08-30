@@ -1,10 +1,7 @@
 class Task < ApplicationRecord
   include AASM
   include Loggable
-  include Parametrizable
-
-  before_validation -> { to_underscore('task_type') }, on: [:create, :update]
-
+  
   belongs_to :workflow
 
   ransack_alias :state, :aasm_state
@@ -17,10 +14,7 @@ class Task < ApplicationRecord
     state :failed
 
     event :start do
-      transitions from: [:new, :started], to: :started
-      after do
-        workflow.start! if workflow.may_start?
-      end
+      transitions from: [:new, :started], to: :started, guard: :start_workflow!
     end
 
     event :finish do 
@@ -32,14 +26,22 @@ class Task < ApplicationRecord
     end
 
     event :retry do
-      transitions from: [:failed, :retried], to: :retried do
+      transitions from: [:started, :retried], to: :retried do
         guard do
-          can_retry? && aasm.from_state != :retried
+          can_retry?
         end
       end
       after do
         self.update!(current_retries: self.current_retries + 1) if can_retry?
       end
+    end
+  end
+
+  def failure!
+    if may_retry?
+      retry!
+    else
+      fail!
     end
   end
 
@@ -53,5 +55,12 @@ class Task < ApplicationRecord
 
   def has_an_output?
     !output.blank?
+  end
+
+  private
+
+  def start_workflow!
+    return true if workflow.state == "started"
+    workflow.start!
   end
 end

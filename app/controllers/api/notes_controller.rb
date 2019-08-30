@@ -1,4 +1,4 @@
-class Api::NotesController < Api::FruitController
+class Api::NotesController < Api::ReadOnlyEntityController
   def resource_class
     Note
   end

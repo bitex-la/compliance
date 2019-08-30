@@ -1,4 +1,4 @@
-class Api::EntityController < Api::FruitController
+class Api::EntityController < Api::ReadOnlyEntityController
   def create
     map_and_save(201)
   end

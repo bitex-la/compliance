@@ -1,4 +1,4 @@
-class Api::WorkflowsController < Api::SeedController
+class Api::WorkflowsController < Api::EntityController
   def resource_class
     Workflow
   end
@@ -10,7 +10,7 @@ class Api::WorkflowsController < Api::SeedController
         workflow.aasm.fire!(action)
         jsonapi_response(workflow, {}, 200)
       rescue AASM::InvalidTransition => e
-				jsonapi_error(422, "invalid transition")
+        jsonapi_error(422, "invalid transition")
       end
     end
   end
