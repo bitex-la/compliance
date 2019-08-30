@@ -1,5 +1,5 @@
 ActiveAdmin.register Attachment do
-  menu priority: 6
+  menu false
 
   IMAGEABLE_CONTENT_TYPES ||= [
     'image/jpeg', 
