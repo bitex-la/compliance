@@ -3,7 +3,7 @@ class Api::TasksController < Api::EntityController
     Task
   end
 
-  Task.aasm.events.map(&:name).each do |action|
+  Task.aasm.events.map(&:name).reject{|x| [:retry].include? x}.each do |action|
     define_method(action) do
       task = Task.find(params[:id])
       begin

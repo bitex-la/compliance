@@ -68,7 +68,7 @@ class Workflow < ApplicationRecord
   def state
     aasm_state
   end
-
+  
   def all_task_in_final_state?
     tasks.all? {|task| task.performed? || task.failed?}
   end
@@ -76,7 +76,7 @@ class Workflow < ApplicationRecord
   def all_tasks_performed?
     tasks.all? {|task| task.performed?}
   end
-
+  
   def any_task_failed?
     tasks.any? {|task| task.failed? && !task.can_retry?}
   end

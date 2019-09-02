@@ -73,12 +73,24 @@ Rails.application.routes.draw do
 
     %i(
       workflows
-      tasks
     ).each do |entities|
       resources entities, except: [:new, :edit] do
         member do
           entities.to_s.classify.constantize
             .aasm.events.map(&:name).each do |action|
+              post action
+            end
+        end
+      end
+    end
+
+    %i(
+      tasks
+    ).each do |entities|
+      resources entities, except: [:new, :edit] do
+        member do
+          entities.to_s.classify.constantize
+            .aasm.events.map(&:name).reject{|x| [:retry].include? x}.each do |action|
               post action
             end
         end

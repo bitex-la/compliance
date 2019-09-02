@@ -6,5 +6,5 @@ class WorkflowSerializer
   build_belongs_to :issue
   build_has_many :tasks
 
-  attributes *%i(state scope workflow_type)
+  attributes *%i(state scope workflow_type all_task_in_final_state?)
 end
