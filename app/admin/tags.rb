@@ -1,5 +1,5 @@
 ActiveAdmin.register Tag do
-  menu if: -> { !current_admin_user.is_restricted }
+  menu if: -> { !current_admin_user.is_restricted? }
 
   filter :name
   filter :tag_type, as: :select, collection: Tag.tag_types

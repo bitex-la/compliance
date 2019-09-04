@@ -1,5 +1,5 @@
 ActiveAdmin.register EventLog do
-  menu priority: 7, if: -> { !current_admin_user.is_restricted }
+  menu priority: 7, if: -> { !current_admin_user.is_restricted? }
   
   actions :show, :index
 

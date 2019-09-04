@@ -1,29 +1,61 @@
 ActiveAdmin.register AdminUser do
-  menu priority: 3, if: -> { !current_admin_user.is_restricted }
-  permit_params :email, :password, :password_confirmation, :is_restricted
+  menu priority: 3, if: -> { current_admin_user.is_super_admin? }
+  permit_params :email, :password, :password_confirmation
 
-  action_item :restrict, only: [:show, :edit, :update], if: -> {!current_admin_user.is_restricted && !resource.is_restricted} do 
-    link_to "Restrict", [:restrict, :admin_user], method: :post
+  action_item :restrict, only: [:show, :edit, :update], if: -> {current_admin_user.is_super_admin? && 
+      current_admin_user != resource && 
+      !resource.is_restricted?} do 
+    link_to "Restrict access", [:restrict, :admin_user], method: :post
   end
-  action_item :give_full_access, only: [:show, :edit, :update], if: -> {!current_admin_user.is_restricted && resource.is_restricted} do 
-    link_to "Give full access", [:give_full_access, :admin_user], method: :post
+
+  action_item :give_admin_access, only: [:show, :edit, :update], if: -> {current_admin_user.is_super_admin? && 
+    current_admin_user != resource &&
+    !resource.is_admin?} do 
+    link_to "Admin access", [:give_admin_access, :admin_user], method: :post
+  end
+
+  action_item :give_super_admin_access, only: [:show, :edit, :update], if: -> {current_admin_user.is_super_admin? && 
+    !resource.is_super_admin?} do 
+    link_to "Super admin access", [:give_super_admin_access, :admin_user], method: :post
   end
 
   member_action :restrict, method: :post do
-    resource.update!(is_restricted: true)
+    resource.update!(role_type: "restricted")
     redirect_to action: :show
   end
 
-  member_action :give_full_access, method: :post do
-    resource.update!(is_restricted: false)
+  member_action :give_admin_access, method: :post do
+    resource.update!(role_type: "admin")
     redirect_to action: :show
+  end
+
+  member_action :give_super_admin_access, method: :post do
+    resource.update!(role_type: "super_admin")
+    redirect_to action: :show
+  end
+
+  controller do
+    def destroy
+      if !current_admin_user.is_super_admin?
+        flash[:error] = "Don't have permission to do this action"
+        redirect_to action: :index
+        return
+      end
+
+      if current_admin_user == resource
+        flash[:error] = "can't delete himself"
+        redirect_to action: :index
+        return
+      end
+      super
+    end
   end
 
   index do
     selectable_column
     id_column
     column :email
-    column :is_restricted
+    column :role_type
     column :otp_enabled
     column :current_sign_in_at
     column :sign_in_count
@@ -32,7 +64,7 @@ ActiveAdmin.register AdminUser do
   end
 
   filter :email
-  filter :is_restricted
+  filter :role_type, as: :select, collection: AdminUser.role_types
   filter :otp_enabled
   filter :current_sign_in_at
   filter :sign_in_count

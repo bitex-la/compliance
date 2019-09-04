@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe 'a restricted admin user' do
   let(:restricted_user) { create(:restricted_admin_user) }
+  let(:admin_user) { create(:admin_user) }
 
   it 'gets redirected trying to access to forbidden paths' do
     login_as restricted_user
@@ -29,6 +30,26 @@ describe 'a restricted admin user' do
       expect(page).to have_content 'Dashboard'
       expect(page).to have_content 'Observations'
       expect(page).to have_content 'People'
+    end
+  end
+
+  it 'admin user gets redirected trying to access to forbidden paths' do
+    login_as admin_user
+
+    %w(
+      admin_users
+    ).each do |path|
+      visit "/#{path}"
+      page.current_path.should == '/'
+      expect(page).to have_content 'You are not authorized to perform this action.'
+    end
+  end
+
+  it 'admin user cannot see restricted menu items' do
+    login_as admin_user
+
+    within '.header' do
+      expect(page).to_not have_content 'Admin Users'
     end
   end
 

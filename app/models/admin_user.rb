@@ -1,4 +1,6 @@
 class AdminUser < ApplicationRecord
+  enum role_type: [:restricted, :admin, :super_admin]
+  
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, 
@@ -9,6 +11,18 @@ class AdminUser < ApplicationRecord
 
   has_secure_token :api_token
   after_initialize :set_api_token
+
+  def is_restricted?
+    role_type == "restricted"
+  end
+
+  def is_admin?
+    role_type == "admin"
+  end
+  
+  def is_super_admin?
+    role_type == "super_admin"
+  end
 
   private
   
