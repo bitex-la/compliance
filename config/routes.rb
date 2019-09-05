@@ -89,8 +89,8 @@ Rails.application.routes.draw do
     ).each do |entities|
       resources entities, except: [:new, :edit] do
         member do
-          entities.to_s.classify.constantize
-            .aasm.events.map(&:name).reject{|x| [:retry].include? x}.each do |action|
+          (entities.to_s.classify.constantize
+            .aasm.events.map(&:name) - [:retry]).each do |action|
               post action
             end
         end
