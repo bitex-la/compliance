@@ -38,7 +38,7 @@ class Task < ApplicationRecord
   end
 
   def failure!
-    if may_retry?
+    if can_retry?
       retry!
     else
       fail!
@@ -51,6 +51,10 @@ class Task < ApplicationRecord
 
   def can_retry?
     current_retries < max_retries
+  end
+
+  def can_execute?
+    state == 'new' || (state == 'retried' && can_retry?)
   end
 
   def has_an_output?

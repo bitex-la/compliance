@@ -41,6 +41,7 @@ RSpec.describe Task, type: :model do
     end
 
     it "goes from retried to performed on finish" do
+      expect(basic_task).to be_can_execute
       basic_task.start!
       basic_task.failure!
       expect do
@@ -64,12 +65,13 @@ RSpec.describe Task, type: :model do
       expect(basic_task.reload.current_retries).to eq 1
 
       2.times do |i|
+        expect(basic_task.can_execute?).to be true
         basic_task.failure!
         expect(basic_task.reload.current_retries).to eq i + 2
       end
 
       basic_task.failure!
-      
+      expect(basic_task.can_execute?).to be false
       expect(basic_task.state).to eq("failed")
     end
   end
