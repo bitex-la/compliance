@@ -19,11 +19,13 @@ ActiveAdmin.register Person do
     reject: "rejected",
   }.each do |event, state|
     action_item event, only: [:edit, :show, :update] do
-      next unless !current_admin_user.is_restricted? && resource.send("may_#{event}?") && resource.state != state
-      link_to event.to_s.humanize, [event, :person], method: :post
+      if authorized?(event, resource) && resource.send("may_#{event}?") && resource.state != state
+        link_to event.to_s.humanize, [event, :person], method: :post
+      end
     end
 
     member_action event, method: :post do
+      authorize!(event, resource)
       resource.send("#{event}!")
       redirect_to action: :show
     end

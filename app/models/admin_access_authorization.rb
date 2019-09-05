@@ -22,7 +22,20 @@ class AdminAccessAuthorization < ActiveAdmin::AuthorizationAdapter
   def admin_allowed_actions
     actions = {
       Issue => [:complete, :approve, :reject, :dismiss, :abandon],
-      Person => [:enable, :disable, :download_files]
+      Person => [:enable, :disable, :reject, :download_files],
+      AdminUser => [:read],
+      EventLog => [:view_menu],
+      ObservationReason => [:view_menu],
+      Tag => [:view_menu],
+      Workflow => [:finish],
+    }
+    actions.default = []
+    actions
+  end
+
+  def restricted_allowed_actions
+    actions = {
+      AdminUser => [:read]
     }
     actions.default = []
     actions
@@ -58,12 +71,10 @@ class AdminAccessAuthorization < ActiveAdmin::AuthorizationAdapter
 
     if user.is_admin?
       return true if [:read, :create, :update].include?(action) && admin_allowed_classes.include?(klass)
-      
-      return true if admin_allowed_actions[klass].include?(action)
-      
-      return false
+      return admin_allowed_actions[klass].include?(action)
     end 
-
+    
     return true if [:read, :create, :update].include?(action) && restricted_allowed_classes.include?(klass)
+    restricted_allowed_actions[klass].include?(action)
   end
 end

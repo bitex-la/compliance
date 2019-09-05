@@ -129,7 +129,7 @@ describe 'a restricted admin user' do
       click_link 'Mark as finished'
     end
     
-    expect(page).to have_content 'Only admins with full access can do this action'
+    expect(page).to have_content 'You are not authorized to perform this action'
 
     expect(page).to_not have_content 'Approve'
     expect(page).to_not have_content 'Dismiss'
