@@ -1,5 +1,6 @@
 ActiveAdmin.register ObservationReason do
-  menu priority: 4, if: -> { !current_admin_user.is_restricted }
+  menu priority: 4
+  
   actions :all, except: :destroy
 
   index do

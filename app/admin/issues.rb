@@ -68,11 +68,14 @@ ActiveAdmin.register Issue do
   Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
     action_item action, only: [:show], if: lambda { resource.send("may_#{action}?") } do
       next if action == :approve && !resource.all_workflows_performed?
-      next if Issue.restricted_actions.include?(action) && current_admin_user.is_restricted?
-      link_to action.to_s.titleize, [action, :person, :issue], method: :post
+
+      if authorized?(action, resource)
+        link_to action.to_s.titleize, [action, :person, :issue], method: :post
+      end
     end
 
     member_action action, method: :post do
+      authorize!(action, resource)
       begin
         resource.send("#{action}!")
       rescue ActiveRecord::RecordInvalid => invalid
