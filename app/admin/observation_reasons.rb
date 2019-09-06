@@ -1,5 +1,6 @@
 ActiveAdmin.register ObservationReason do
-  menu priority: 4, if: -> { authorized?(:view_menu, ObservationReason) }
+  menu priority: 4
+  
   actions :all, except: :destroy
 
   index do

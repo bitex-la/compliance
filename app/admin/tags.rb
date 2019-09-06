@@ -1,5 +1,5 @@
 ActiveAdmin.register Tag do
-  menu if: -> { authorized?(:view_menu, Tag) }
+  menu
 
   filter :name
   filter :tag_type, as: :select, collection: Tag.tag_types

@@ -44,6 +44,14 @@ ActiveAdmin.register AdminUser do
       super
     end
 
+    def show
+      if current_admin_user != resource && !current_admin_user.is_super_admin?
+        redirect_to admin_user_url(current_admin_user)
+        return
+      end
+      super
+    end
+    
     def destroy
       authorize!(:destroy, resource)
 

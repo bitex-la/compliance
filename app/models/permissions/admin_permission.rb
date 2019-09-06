@@ -26,12 +26,11 @@ module Permissions
         Issue => [:complete, :approve, :reject, :dismiss, :abandon],
         Person => [:enable, :disable, :reject, :download_files],
         AdminUser => [:read],
-        EventLog => [:view_menu],
-        ObservationReason => [:view_menu],
-        Tag => [:view_menu, :destroy],
+        Tag => [:destroy],
         Workflow => [:finish],
         PersonTagging => [:destroy],
-        IssueTagging => [:destroy]
+        IssueTagging => [:destroy],
+        EventLog => [:view_menu]
       }
       actions.default = []
       actions
