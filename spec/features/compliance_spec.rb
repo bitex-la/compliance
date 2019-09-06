@@ -2,23 +2,24 @@ require 'rails_helper'
 
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
+  let(:super_admin_user) { create(:super_admin_user) }
   
   it 'restrict another admin user' do 
     restricted_user = create(:admin_user)
-    login_as admin_user
+    login_as super_admin_user
 
-    expect(restricted_user.is_restricted).to be_falsey
+    expect(restricted_user.is_restricted?).to be_falsey
     click_link 'Admin Users'
 
     within "tr[id='admin_user_#{AdminUser.first.id}'] td[class='col col-actions']" do
       click_link 'Edit'
     end
 
-    click_link 'Restrict'
-    expect(restricted_user.reload.is_restricted).to be_truthy
+    click_link 'Restrict access'
+    expect(restricted_user.reload.is_restricted?).to be_truthy
 
-    click_link 'Give full access'
-    expect(restricted_user.reload.is_restricted).to be_falsey
+    click_link 'Admin access'
+    expect(restricted_user.reload.is_restricted?).to be_falsey
   end
 
   it 'creates a new natural person and its issue via admin' do

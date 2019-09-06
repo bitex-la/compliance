@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user, otp_enabled: true) }
+  let(:super_admin_user) { create(:super_admin_user, otp_enabled: true) }
 
   it 'cannot login without otp if otp is enabled' do
     visit admin_user_session_path
@@ -13,19 +14,19 @@ describe 'an admin user' do
   end
 
   it 'can enable OTP and login with 2FA' do
-    admin_user.update_column('otp_enabled', false)
+    super_admin_user.update_column('otp_enabled', false)
 
-    login_as admin_user
+    login_as super_admin_user
 
     click_link 'Admin Users'
 
-    within "tr[id='admin_user_#{admin_user.id}'] td[class='col col-actions']" do
+    within "tr[id='admin_user_#{super_admin_user.id}'] td[class='col col-actions']" do
       click_link 'View'
     end
 
     within '#otp_sidebar_section' do
       expect(page).to have_content 'Otp'
-      expect(page).to have_content admin_user.otp_secret_key
+      expect(page).to have_content super_admin_user.otp_secret_key
     end
     
     click_link 'Enable OTP'
@@ -39,9 +40,9 @@ describe 'an admin user' do
 
     click_link 'Logout'
 
-    fill_in 'admin_user[email]', with: admin_user.email
-    fill_in 'admin_user[password]', with: admin_user.password
-    fill_in 'admin_user[otp]', with: admin_user.otp_code
+    fill_in 'admin_user[email]', with: super_admin_user.email
+    fill_in 'admin_user[password]', with: super_admin_user.password
+    fill_in 'admin_user[otp]', with: super_admin_user.otp_code
     click_button 'Login'
 
     within '.flash_notice' do
@@ -50,7 +51,7 @@ describe 'an admin user' do
 
     click_link 'Admin Users'
     
-    within "tr[id='admin_user_#{admin_user.id}'] td[class='col col-actions']" do
+    within "tr[id='admin_user_#{super_admin_user.id}'] td[class='col col-actions']" do
       click_link 'View'
     end
 
@@ -60,6 +61,6 @@ describe 'an admin user' do
 
     click_link 'Disable OTP'
 
-    expect(admin_user.reload.otp_enabled).to be_falsey
+    expect(super_admin_user.reload.otp_enabled).to be_falsey
   end
 end
