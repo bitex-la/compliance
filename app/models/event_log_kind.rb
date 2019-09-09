@@ -14,7 +14,8 @@ class EventLogKind
     [10, :abandon_issue],
     [11, :enable_person],
     [12, :disable_person],
-    [13, :update_person_regularity]
+    [13, :update_person_regularity],
+    [14, :download_attachments]
   ]
 
   def name
