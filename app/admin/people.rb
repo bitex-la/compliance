@@ -87,6 +87,7 @@ ActiveAdmin.register Person do
 
   member_action :download_files, method: :post do
     files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
+    EventLog.log_entity!(resource, AdminUser.current_admin_user, EventLogKind.download_attachments)
     zipline(files, "person_#{resource.id}_kyc_files.zip")
   end
 

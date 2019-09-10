@@ -3,7 +3,8 @@ unless Rails.env.production?
     email: 'admin@example.com',
     password: 'password',
     password_confirmation: 'password',
-    api_token: 'my_secure_api_token'
+    api_token: 'my_secure_api_token',
+    role_type: 'super_admin'
   )
 
   ############# CREATE SUPPORT ENTITIES #################
