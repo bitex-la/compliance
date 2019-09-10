@@ -6,7 +6,7 @@ Rails.application.routes.draw do
           post action
         end
 
-        get :download_profile
+        post :download_profile
       end
     end
 
