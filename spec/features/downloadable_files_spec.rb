@@ -16,7 +16,7 @@ describe 'an admin user' do
       click_link('View')
     end
     page.current_path.should == "/people/#{person.id}"
-    click_link('Download Files')
+    click_link('Download Profile')
   end
 
   it 'cannot download files from detail if person does not have attachments' do
@@ -30,6 +30,6 @@ describe 'an admin user' do
       click_link('View')
     end
     page.current_path.should == "/people/#{person.id}"
-    page.should_not have_content 'Download Files'
+    page.should_not have_content 'Download Profile'
   end
 end

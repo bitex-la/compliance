@@ -15,7 +15,7 @@ class EventLogKind
     [11, :enable_person],
     [12, :disable_person],
     [13, :update_person_regularity],
-    [14, :download_attachments]
+    [14, :download_profile]
   ]
 
   def name
