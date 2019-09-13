@@ -19,5 +19,8 @@ class Currency
     [14,  :cny,  'chinese_yuan',       2         ],
     [15,  :inr,  'indian_rupee',       2         ],
     [16,  :vef,  'venezuelan_bolivar', 2         ],
+    [17,  :aud,  'australian_dollar',  2         ],
+    [18,  :gbp,  'pound_sterling',     2         ],
+    [19,  :hkd,  'hong_kong_dollar',   2         ],
   ]
 end
