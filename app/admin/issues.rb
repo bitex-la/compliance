@@ -65,11 +65,16 @@ ActiveAdmin.register Issue do
     redirect_to edit_person_issue_url(person, issue)
   end
 
-  Issue.aasm.events.map(&:name).reject{|x| [:observe, :answer].include? x}.each do |action|
-    action_item action, only: [:show], if: lambda { resource.send("may_#{action}?") } do
+  { approve: "approved",
+    complete: "new",
+    dismiss: "dismissed",
+    reject: "rejected",
+    abandon: "abandoned"
+  }.each do |action, state|
+    action_item action, only: [:show] do
       next if action == :approve && !resource.all_workflows_performed?
 
-      if authorized?(action, resource)
+      if authorized?(action, resource) && resource.send("may_#{action}?") && resource.state != state
         link_to action.to_s.titleize, [action, :person, :issue], method: :post
       end
     end
