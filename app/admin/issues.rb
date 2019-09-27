@@ -181,6 +181,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers::Seed.show_full_seed(self, NoteSeed, :notes) do
           div class: 'note_seeds' do
             ArbreHelpers::Form.has_many_form self, f, :note_seeds do |nf, context|
+              nf.input :public 
               nf.input :body, input_html: {rows: 3}
               nf.input :expires_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(context, nf)
@@ -465,7 +466,7 @@ ActiveAdmin.register Issue do
           h3 "Current Note Seeds"
           if seeds = resource.note_seeds.presence
             ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
-              attributes_table_for d, :fruit, :created_at, :updated_at
+              attributes_table_for d, :public,  :fruit, :created_at, :updated_at
               para d.body
               ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
             end

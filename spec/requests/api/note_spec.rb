@@ -7,7 +7,7 @@ describe Note do
     :full_note_with_person,
     :alt_full_note_with_person,
     {title_cont: 'oh'},
-    'title,person',
+    'title,public,person',
     'person,seed'
 
   it_behaves_like 'jsonapi show and index',
@@ -15,7 +15,7 @@ describe Note do
     :full_note_seed_with_issue,
     :alt_full_note_seed_with_issue,
     {title_cont: 'oh'},
-    'title,issue',
+    'title,public,issue',
     'issue,attachments'
 
   it_behaves_like 'seed',

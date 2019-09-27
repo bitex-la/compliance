@@ -170,7 +170,7 @@ ActiveAdmin.register Person do
           ArbreHelpers::Layout.panel_grid(self, fruits) do |d|
             para d.body
             ArbreHelpers::Attachment.attachments_list self, d.attachments
-            attributes_table_for d, :issue, :created_at
+            attributes_table_for d, :public, :issue, :created_at
           end
         end
       end
