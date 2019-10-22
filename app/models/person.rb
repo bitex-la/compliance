@@ -3,7 +3,9 @@ class Person < ApplicationRecord
   include Loggable
   StaticModels::BelongsTo
 
+  after_create :log_state_new
   after_save :log_if_enabled
+  after_save :log_state_changes
   after_save :expire_action_cache
 
   belongs_to :regularity, class_name: "PersonRegularity"
@@ -97,7 +99,7 @@ class Person < ApplicationRecord
   scope :with_relations, -> {
     includes(
       nil
-    ) 
+    )
   }
 
   {
@@ -105,8 +107,8 @@ class Person < ApplicationRecord
     enabled: :enabled,
     disabled: :disabled,
     rejected: :rejected
-  }.each do |k,v| 
-    scope k, -> { with_relations.where('people.aasm_state=?', v) }  
+  }.each do |k, v|
+    scope k, -> { with_relations.where('people.aasm_state=?', v) }
   end
 
   def self.ransackable_scopes(auth_object = nil)
@@ -117,7 +119,7 @@ class Person < ApplicationRecord
     "(#{id}) #{person_info_name || person_info_email}"
   end
 
-  def person_info 
+  def person_info
     [ "(#{id})",
       person_info_name,
       person_info_email,
@@ -219,7 +221,7 @@ class Person < ApplicationRecord
         .page(page).per(per_page)
         .send(:ransack, {"#{d[:field]}_#{d[:matcher]}" => keyword})
         .result.map{|x| {
-          id: x.instance_eval(d[:id]), 
+          id: x.instance_eval(d[:id]),
           suggestion: d[:suggestion].map{|e| x.instance_eval(e)}.join(' - ')
         }})
     end
@@ -228,7 +230,7 @@ class Person < ApplicationRecord
 
   def refresh_person_regularity!
     sum, count = fund_deposits.pluck(Arel.sql('sum(exchange_rate_adjusted_amount), count(*)')).first
-    
+
     self.regularity = PersonRegularity.all.reverse
       .find {|x| x.applies? sum,count} 
 
@@ -238,7 +240,7 @@ class Person < ApplicationRecord
       issue = issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.risk_score_seeds.build(
         score: regularity.code, 
-        provider: 'open_compliance', 
+        provider: 'open_compliance',
         extra_info: {
           regularity_funding_amount: regularity.funding_amount.to_d,
           regularity_funding_count: regularity.funding_count,
@@ -246,7 +248,7 @@ class Person < ApplicationRecord
           funding_count: count
         }.to_json
       )
-    end 
+    end
 
     save!
 
@@ -259,22 +261,22 @@ class Person < ApplicationRecord
     state :enabled
     state :disabled
     state :rejected
-    
+
     event :enable do
       transitions from: [:new, :disabled, :rejected, :enabled], to: :enabled do
-        after{ self['enabled'] = true }
+        after { self['enabled'] = true }
       end
     end
 
     event :disable do
       transitions from: [:enabled, :new, :rejected, :disabled], to: :disabled do
-        after{ self['enabled'] = false }
+        after { self['enabled'] = false }
       end
     end
 
     event :reject do
       transitions from: [:new, :enabled, :disabled, :rejected], to: :rejected do
-        after{ self['enabled'] = false }
+        after { self['enabled'] = false }
       end
     end
   end
@@ -284,7 +286,7 @@ class Person < ApplicationRecord
   end
 
   def enabled
-    return aasm_state == "enabled"
+    aasm_state == "enabled"
   end
 
   def enabled=(value)
@@ -302,6 +304,14 @@ class Person < ApplicationRecord
     was, is = saved_changes[:enabled]
     log_state_change(:enable_person) if !was && is
     log_state_change(:disable_person) if was && !is
+  end
+
+  def log_state_changes
+    log_state_change("person_#{aasm_state}".to_sym) if aasm.from_state != aasm.to_state
+  end
+
+  def log_state_new
+    log_state_change(:person_new)
   end
 
   def log_state_change(verb)
