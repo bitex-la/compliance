@@ -114,7 +114,7 @@ ActiveAdmin.setup do |config|
   # roots for each namespace.
   #
   # Default:
-  config.root_to = 'dashboards#index'
+  config.root_to =  'routes#root'
 
   # == Admin Comments
   #

@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 module Permissions
   class RestrictedPermission < PermissionBase
     def allowed_classes
       [
-        Issue, 
-        Person, 
-        Observation, 
-        NaturalDocketSeed, 
+        Issue,
+        Person,
+        Observation,
+        NaturalDocketSeed,
         LegalEntityDocketSeed,
         DomicileSeed,
         IdentificationSeed,
