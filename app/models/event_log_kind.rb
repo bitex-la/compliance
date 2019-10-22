@@ -15,7 +15,11 @@ class EventLogKind
     [11, :enable_person],
     [12, :disable_person],
     [13, :update_person_regularity],
-    [14, :download_attachments]
+    [14, :download_attachments],
+    [15, :person_new],
+    [16, :person_enabled],
+    [17, :person_disabled],
+    [18, :person_rejected]
   ]
 
   def name
