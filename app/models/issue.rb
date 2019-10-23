@@ -463,7 +463,7 @@ class Issue < ApplicationRecord
       :affinity_seeds,
       :'affinity_seeds.attachments',
       :identification_seeds,
-      :'identifications_seeds.attachments',
+      :'identification_seeds.attachments',
       :observations,
       :'observations.observation_reason',
       :tags
