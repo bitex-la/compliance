@@ -114,7 +114,7 @@ ActiveAdmin.setup do |config|
   # roots for each namespace.
   #
   # Default:
-  config.root_to =  'routes#root'
+  config.root_to =  'redirect#root'
 
   # == Admin Comments
   #
