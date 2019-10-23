@@ -15,7 +15,7 @@ describe 'an admin user' do
       click_link 'Edit'
     end
 
-    click_link 'Restrict access'
+    click_link 'Restricted access'
     expect(restricted_user.reload.is_restricted?).to be_truthy
 
     click_link 'Admin access'
