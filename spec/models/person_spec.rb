@@ -75,20 +75,45 @@ RSpec.describe Person, type: :model do
     ]
   end
 
-  it 'Add state changes to event log when enable/disable' do 
+  it 'Add state changes to event log when enable/disable' do
     person = create(:empty_person)
     assert_logging(person, :enable_person, 0)
 
-    10.times{ person.enable! rescue nil }
+    10.times { person.enable! rescue nil }
     assert_logging(person, :enable_person, 1)
     expect(person).to be_enabled
     expect(person.enabled).to eq(true) # Backwards compatible state
 
-    10.times{ person.disable! rescue nil }
+    10.times { person.disable! rescue nil }
     assert_logging(person, :disable_person, 1)
     expect(person).to be_disabled
     expect(person.enabled).to eq(false) # Backwards compatible state
-  end 
+  end
+
+  it 'Add state changes to event log when state machine changes' do
+    person = create(:empty_person)
+    assert_logging(person, :person_new, 1)
+
+    10.times { person.enable! }
+    assert_logging(person, :person_enabled, 1)
+    expect(person).to be_enabled
+    expect(person.enabled).to eq(true) # Backwards compatible state
+
+    10.times { person.disable! }
+    assert_logging(person, :person_disabled, 1)
+    expect(person).to be_disabled
+    expect(person.enabled).to eq(false) # Backwards compatible state
+
+    10.times { person.enable! }
+    assert_logging(person, :person_enabled, 2)
+    expect(person).to be_enabled
+    expect(person.enabled).to eq(true) # Backwards compatible state
+
+    10.times { person.reject! }
+    assert_logging(person, :person_rejected, 1)
+    expect(person).to be_rejected
+    expect(person.enabled).to eq(false) # Backwards compatible state
+  end
   
   it 'shows only observations for meaningful issues' do 
     one = create(:basic_issue, person: person)
