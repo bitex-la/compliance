@@ -92,6 +92,18 @@ ActiveAdmin.register Person do
   end
 
   form do |f|
+    if resource.issues.empty?
+      div class: 'flash flash_danger' do
+        "This person has no created issues. Please create a new issue to add information."
+      end
+      br
+    elsif resource.issues.find { |issue| issue.editable? }
+      div class: 'flash flash_danger' do
+        "This person has pending issues."
+      end
+      br
+    end
+    
     f.inputs 'Basics' do
       f.input :risk, as:  :select, collection: %w(low medium high)
     end
@@ -123,6 +135,18 @@ ActiveAdmin.register Person do
   end
 
   show do
+    if resource.issues.empty?
+      div class: 'flash flash_danger' do
+        "This person has no created issues. Please create a new issue to add information."
+      end
+      br
+    elsif resource.issues.find { |issue| issue.editable? }
+      div class: 'flash flash_danger' do
+        "This person has pending issues."
+      end
+      br
+    end
+    
     tabs do
       ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
