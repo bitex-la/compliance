@@ -13,6 +13,10 @@ class Issue < ApplicationRecord
 
   ransack_alias :state, :aasm_state
 
+  ransacker :reason_code, formatter: proc { |v| IssueReason.find_by_code(v.to_sym).id } do |parent|
+    parent.table[:reason_id]
+  end
+
   before_validation do 
     self.defer_until ||= Date.today
     self.reason ||= IssueReason.further_clarification
