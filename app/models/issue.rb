@@ -13,7 +13,7 @@ class Issue < ApplicationRecord
 
   ransack_alias :state, :aasm_state
 
-  ransacker :reason_code, formatter: proc { |v| IssueReason.find_by_code(v.to_sym).id } do |parent|
+  ransacker :reason_code, formatter: proc { |v| IssueReason.find_by_code(v.to_sym)&.id } do |parent|
     parent.table[:reason_id]
   end
 
