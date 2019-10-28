@@ -261,6 +261,13 @@ describe Issue do
       api_get "/issues/?filter[state_eq]=approved"
       api_response.data.map{|i| i.id.to_i}.to_set.should ==
         [one.id, two.id, three.id].to_set
+
+      api_get "/issues/?filter[reason_code_eq]=further_clarification"
+      api_response.data.map{|i| i.id.to_i}.to_set.should ==
+        [one.id, two.id, three.id].to_set
+
+      api_get "/issues/?filter[reason_code_eq]=invalid_code"
+      expect(api_response.data).to be_empty
     end
   end
 
