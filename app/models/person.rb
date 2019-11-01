@@ -294,6 +294,10 @@ class Person < ApplicationRecord
     disable if !value && may_disable?
   end
 
+  def generate_pdf_profile
+    PersonProfile.generate_pdf(self)
+  end
+
   private
 
   def expire_action_cache

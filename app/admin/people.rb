@@ -79,16 +79,58 @@ ActiveAdmin.register Person do
     link_to 'View Person Issues', person_issues_path(person)
   end
 
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+  
+
+  
+  
   action_item :download_attachments, only: :show do
     if resource.all_attachments.any?
       link_to :download_files.to_s.titleize, [:download_files, :person], method: :post
     end
   end
 
+  action_item :download_profile_link, only: :show do
+    link_to :download_profile.to_s.titleize, [:download_profile, :person], method: :post
+  end
+
   member_action :download_files, method: :post do
     files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
     EventLog.log_entity!(resource, AdminUser.current_admin_user, EventLogKind.download_attachments)
     zipline(files, "person_#{resource.id}_kyc_files.zip")
+  end
+
+  member_action :download_profile, method: :post do
+    
+    #EventLog.log_entity!(resource, AdminUser.current_admin_user, EventLogKind.download_attachments)
+    
+    pdf = resource.generate_pdf_profile
+
+    send_data(
+      pdf.render,
+      filename: "test.pdf",
+      type: 'application/pdf',
+      disposition: 'inline'
+    )
+
   end
 
   form do |f|

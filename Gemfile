@@ -61,6 +61,9 @@ gem 'yajl-ruby', require: 'yajl'
 
 gem 'hashie'
 
+gem 'prawn'
+gem 'prawn-table'
+
 group :development, :test do 
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rubocop'
