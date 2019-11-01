@@ -12,6 +12,43 @@ ActiveAdmin.register Person do
         .where(id: params[:id])
         .first!
     end
+
+    def process_download_profile(kind)
+      EventLog.log_entity!(resource, AdminUser.current_admin_user, kind)
+      
+      zip_name = "person_#{resource.id}_kyc_files.zip"
+      headers['Content-Disposition'] = "attachment; filename=\"#{zip_name.gsub '"', '\"'}\""
+  
+      zip_tricks_stream do |zip|
+        files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
+        files.each do |f, name|
+          zip.write_deflated_file(name) do |sink|
+            if f.options[:storage] == :filesystem
+              stream = File.open(f.path)
+              IO.copy_stream(stream, sink)
+              stream.close
+            else
+              the_remote_uri = URI(file.expiring_url)
+              Net::HTTP.get_response(the_remote_uri) do |response|
+                response.read_body do |chunk|
+                  sink << chunk
+                end
+              end
+            end
+          end  
+        end
+  
+        pdf = if kind == EventLogKind.download_profile_basic 
+                resource.generate_pdf_profile(false, false)
+              else
+                resource.generate_pdf_profile(true, true)
+              end 
+
+        zip.write_deflated_file('profile.pdf') do |sink|
+          sink << pdf.render
+        end
+      end
+    end
   end
 
   actions :all, except: [:destroy]
@@ -81,42 +118,12 @@ ActiveAdmin.register Person do
     link_to 'View Person Issues', person_issues_path(person)
   end
 
-  action_item :download_profile, only: :show do
-    if resource.all_attachments.any?
-      link_to :download_profile.to_s.titleize, [:download_profile, :person], method: :post
-    end
+  member_action :download_profile_basic, method: :post do
+    process_download_profile EventLogKind.download_profile_basic
   end
 
-  member_action :download_profile, method: :post do
-    EventLog.log_entity!(resource, AdminUser.current_admin_user, EventLogKind.download_profile)
-    
-    zip_name = "person_#{resource.id}_kyc_files.zip"
-    headers['Content-Disposition'] = "attachment; filename=\"#{zip_name.gsub '"', '\"'}\""
-
-    zip_tricks_stream do |zip|
-      files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
-      files.each do |f, name|
-        zip.write_deflated_file(name) do |sink|
-          if f.options[:storage] == :filesystem
-            stream = File.open(f.path)
-            IO.copy_stream(stream, sink)
-            stream.close
-          else
-            the_remote_uri = URI(file.expiring_url)
-            Net::HTTP.get_response(the_remote_uri) do |response|
-              response.read_body do |chunk|
-                sink << chunk
-              end
-            end
-          end
-        end  
-      end
-
-      pdf = resource.generate_pdf_profile true, true
-      zip.write_deflated_file('profile.pdf') do |sink|
-        sink << pdf.render
-      end
-    end
+  member_action :download_profile_full, method: :post do
+    process_download_profile EventLogKind.download_profile_full
   end
 
   form do |f|
@@ -150,7 +157,12 @@ ActiveAdmin.register Person do
     actions
   end
 
-  show do
+  show as: :grid, columns: 2 do    
+    dropdown_menu 'Download Profile', class: 'dropdown_menu dropdown_other_actions' do
+      item 'Basic', download_profile_basic_person_path, method: :post
+      item 'Full', download_profile_full_person_path, method: :post
+    end
+    br
     tabs do
       ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
