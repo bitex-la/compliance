@@ -499,6 +499,15 @@ describe Person do
       expect(person.state).to eq 'enabled'
       expect(person.risk).to eq "low"
     end
+
+    it 'downloads profile' do
+      person = create :full_natural_person
+      api_get "/people/#{person.id}/download_profile", {}, 200
+
+      expect(response.header["Content-Disposition"]).to eq 'attachment; filename="person_1_kyc_files.zip"'
+      expect(response.header["Content-type"]).to eq 'application/zip'
+      expect(response.header["Content-length"]).to eq '95130163'
+    end
   end
 
   describe 'when using filters' do
