@@ -507,7 +507,6 @@ describe Person do
 
       expect(response.header["Content-Disposition"]).to eq 'attachment; filename="person_1_kyc_files.zip"'
       expect(response.header["Content-type"]).to eq 'application/zip'
-      expect(response.header["Content-length"]).to eq '95130163'
     end
   end
 

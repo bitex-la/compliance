@@ -229,6 +229,13 @@ module FeatureHelpers
     fill_in "issue[observations_attributes][#{index}][note]",
       with: note
   end
+
+  def open_download_profile_actions_menu(item)
+    within ".dropdown_menu.dropdown_other_actions" do
+      click_link 'Download Profile'
+      click_link item
+    end
+  end
 end
 
 RSpec.configuration.include FeatureHelpers, type: :feature

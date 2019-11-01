@@ -2,7 +2,6 @@ ActiveAdmin.register Person do
   includes :emails, :legal_entity_dockets, :natural_dockets
 
   controller do
-    include Zipline
     include ActionController::Live
     include ZipTricks::RailsStreaming
 

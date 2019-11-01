@@ -1,5 +1,6 @@
 class Api::PeopleController < Api::ApiController
-  include Zipline
+  include ZipTricks::RailsStreaming
+
   caches_action :show, expires_in: 2.minutes, cache_path: :path_for_show
 
   def index
@@ -64,12 +65,47 @@ class Api::PeopleController < Api::ApiController
 
   def download_profile
     person = Person.find(params[:id])
-    files = person.all_attachments.map { |a| [a.document, a.document_file_name] }
-    EventLog.log_entity!(person, AdminUser.current_admin_user, EventLogKind.download_profile)
-    zipline(files, "person_#{person.id}_kyc_files.zip")
+    process_download_profile person, EventLogKind.download_profile_basic
   end
 
   protected
+
+  def process_download_profile(resource, kind)
+    EventLog.log_entity!(resource, AdminUser.current_admin_user, kind)
+
+    zip_name = "person_#{resource.id}_kyc_files.zip"
+    headers['Content-Disposition'] = "attachment; filename=\"#{zip_name.gsub '"', '\"'}\""
+
+    zip_tricks_stream do |zip|
+      files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
+      files.each do |f, name|
+        zip.write_deflated_file(name) do |sink|
+          if f.options[:storage] == :filesystem
+            stream = File.open(f.path)
+            IO.copy_stream(stream, sink)
+            stream.close
+          else
+            the_remote_uri = URI(file.expiring_url)
+            Net::HTTP.get_response(the_remote_uri) do |response|
+              response.read_body do |chunk|
+                sink << chunk
+              end
+            end
+          end
+        end
+      end
+
+      pdf = if kind == EventLogKind.download_profile_basic
+              resource.generate_pdf_profile(false, false)
+            else
+              resource.generate_pdf_profile(true, true)
+            end
+
+      zip.write_deflated_file('profile.pdf') do |sink|
+        sink << pdf.render
+      end
+    end
+  end
 
   def can_run_transition(person, action)
     !((action == :enable || action == :disable) && person.state == "rejected")
