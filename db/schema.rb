@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_04_131844) do
+ActiveRecord::Schema.define(version: 2019_09_27_175710) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -531,6 +531,7 @@ ActiveRecord::Schema.define(version: 2019_09_04_131844) do
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.boolean "public", default: false, null: false
     t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
@@ -545,6 +546,7 @@ ActiveRecord::Schema.define(version: 2019_09_04_131844) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.boolean "public", default: false, null: false
     t.index ["issue_id"], name: "index_notes_on_issue_id"
     t.index ["person_id"], name: "index_notes_on_person_id"
     t.index ["replaced_by_id"], name: "index_notes_on_replaced_by_id"

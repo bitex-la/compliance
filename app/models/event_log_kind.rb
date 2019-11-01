@@ -19,7 +19,8 @@ class EventLogKind
     [15, :person_new],
     [16, :person_enabled],
     [17, :person_disabled],
-    [18, :person_rejected]
+    [18, :person_rejected],
+    [19, :download_profile]
   ]
 
   def name

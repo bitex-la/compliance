@@ -5,6 +5,8 @@ Rails.application.routes.draw do
         Person.aasm.events.map(&:name).each do |action|
           post action
         end
+
+        get :download_profile
       end
     end
 
