@@ -414,6 +414,7 @@ describe Person do
         { type: "notes",
           id: person.notes.first.id.to_s,
           attributes: {
+            public: false,
             title:  'my nickname',
             body:   'Please call me by my nickname: Mr. Bond',
             created_at: '2018-01-01T00:00:00.000Z',
