@@ -3,10 +3,12 @@
 class PersonProfile
   class PdfGenerator
     Prawn::Font::AFM.hide_m17n_warning = true
-    attr_accessor :person
+    attr_accessor :person, :include_affinities, :include_risk_scores
 
-    def initialize(person)
+    def initialize(person, include_affinities, include_risk_scores)
       self.person = person
+      self.include_affinities = include_affinities
+      self.include_risk_scores = include_risk_scores
     end
 
     def nice_table(pdf, rows, headings: [], totals: [])
@@ -147,13 +149,13 @@ class PersonProfile
     end
 
     def render_notes(pdf, person)
-      if person.notes.empty?
+      if person.public_notes.empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      person.notes.each do |n| #TODO only public notes
+      person.public_notes.each do |n|
         nice_table(pdf, [
           ["Number: #{n.body}"]
           ]
@@ -237,11 +239,15 @@ class PersonProfile
         pdf.text("Notes", styles: [:bold], size: 18)
         render_notes(pdf, person)
 
-        pdf.text("Affinities", styles: [:bold], size: 18)
-        render_affinities(pdf, person)
+        if include_affinities
+          pdf.text("Affinities", styles: [:bold], size: 18)
+          render_affinities(pdf, person)
+        end
 
-        pdf.text("Risk Scores", styles: [:bold], size: 18)
-        render_risk_scores(pdf, person)
+        if include_risk_scores
+          pdf.text("Risk Scores", styles: [:bold], size: 18)
+          render_risk_scores(pdf, person)
+        end
 
         pdf.number_pages "<page>/<total>", {
           at: [pdf.bounds.right - 150, 5],
@@ -254,7 +260,7 @@ class PersonProfile
     end
   end
 
-  def self.generate_pdf(person)
-    PdfGenerator.new(person).generate
+  def self.generate_pdf(person, include_affinities, include_risk_scores)
+    PdfGenerator.new(person, include_affinities, include_risk_scores).generate
   end
 end

@@ -201,6 +201,10 @@ class Person < ApplicationRecord
     Affinity.where("person_id = ? OR related_person_id = ?", id, id)
   end
 
+  def public_notes
+    Note.where("person_id = ? AND public = true", id)
+  end
+
   def self.suggest(keyword, page = 1, per_page = 20)
     result = Array.new
     [
@@ -294,8 +298,8 @@ class Person < ApplicationRecord
     disable if !value && may_disable?
   end
 
-  def generate_pdf_profile
-    PersonProfile.generate_pdf(self)
+  def generate_pdf_profile(include_affinities = false, include_risk_scores = false)
+    PersonProfile.generate_pdf(self, include_affinities, include_risk_scores)
   end
 
   private
