@@ -1,7 +1,7 @@
 ActiveAdmin.register Observation do
   menu priority: 2
 
-  actions :all, :except => [:destroy]
+  actions :all, :except => [:destroy, :new]
 
   scope :admin_pending, default: true
   scope :robot_pending
@@ -13,6 +13,12 @@ ActiveAdmin.register Observation do
   filter :by_issue_reason, as: :select, collection: IssueReason.all
   filter :created_at
   filter :updated_at
+
+  controller do
+    def related_person
+      resource.issue.person.id
+    end
+  end
 
   index do
     column "" do |o|

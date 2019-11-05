@@ -73,6 +73,7 @@ ActiveAdmin.register AdminUser do
     column :otp_enabled
     column :current_sign_in_at
     column :sign_in_count
+    column :max_people_allowed
     column :created_at
     actions
   end
@@ -102,6 +103,7 @@ ActiveAdmin.register AdminUser do
       f.input :email
       f.input :password
       f.input :password_confirmation
+      f.input :max_people_allowed
     end
     f.actions
   end

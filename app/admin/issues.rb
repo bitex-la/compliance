@@ -109,6 +109,10 @@ ActiveAdmin.register Issue do
       resource.lock_issue!
       super
     end
+
+    def related_person
+      params[:person_id]
+    end
   end
 
   form do |f|

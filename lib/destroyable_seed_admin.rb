@@ -11,6 +11,10 @@ class DestroyableSeedAdmin
             f.html { redirect_to edit_person_issue_url(issue.person, issue) }
           end
         end
+
+        def related_person
+          resource.issue.person.id
+        end
       end
     end
   end

@@ -4,7 +4,13 @@ class FruitAdmin
       menu false
       actions :all, :except => [:edit, :destroy]
 
-      show do 
+      controller do
+        def related_person
+          resource.issue.person.id
+        end
+      end
+
+      show do
         ArbreHelpers::Fruit.fruit_show_page(self)
       end
     end

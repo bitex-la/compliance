@@ -10,6 +10,10 @@ ActiveAdmin.register Person do
         .where(id: params[:id])
         .first!
     end
+
+    def related_person
+      params[:id]
+    end
   end
 
   actions :all, except: [:destroy]
@@ -72,11 +76,11 @@ ActiveAdmin.register Person do
   scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
 
   action_item :add_person_information, only: %i(show edit) do
-    link_to 'Add Person Information', new_with_fruits_person_issues_path(person)
+    link_to 'Add Person Information', new_with_fruits_person_issues_path(resource)
   end
 
   action_item :view_person_issues, only: %i(show edit) do
-    link_to 'View Person Issues', person_issues_path(person)
+    link_to 'View Person Issues', person_issues_path(resource)
   end
 
   action_item :download_profile, only: :show do
@@ -193,9 +197,9 @@ ActiveAdmin.register Person do
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, :emails, 'envelope')
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, :risk_scores, 'exclamation-triangle')
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', person.fund_deposits.count, 'university') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', resource.fund_deposits.count, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do
-          table_for person.fund_deposits do           
+          table_for resource.fund_deposits do           
             column :amount
             column :currency
             column :exchange_rate_adjusted_amount
