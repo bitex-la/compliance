@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_request
+    return if AdminUser.current_admin_user.nil?
     return if action_name == 'index'
 
     limit = AdminUser.current_admin_user.max_people_allowed
