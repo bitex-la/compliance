@@ -20,7 +20,7 @@ ActiveAdmin.register Attachment do
 
   controller do
     def related_person
-      resource.person.id
+      resource.person_id
     end
   end
 

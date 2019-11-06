@@ -6,7 +6,7 @@ class FruitAdmin
 
       controller do
         def related_person
-          resource.issue.person.id
+          resource.issue.person_id
         end
       end
 

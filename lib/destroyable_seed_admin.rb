@@ -13,7 +13,7 @@ class DestroyableSeedAdmin
         end
 
         def related_person
-          resource.issue.person.id
+          resource.issue.person_id
         end
       end
     end
