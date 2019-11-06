@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :set_current_user
-  before_action :verify_request
+  before_action :verify_request, except: :index
 
   private
 
@@ -17,7 +17,6 @@ class ApplicationController < ActionController::Base
 
   def verify_request
     return if AdminUser.current_admin_user.nil?
-    return if action_name == 'index'
 
     limit = AdminUser.current_admin_user.max_people_allowed
     return if limit.nil?
