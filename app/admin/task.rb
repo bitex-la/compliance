@@ -5,7 +5,11 @@ ActiveAdmin.register Task do
 
   controller do
     def related_person
-      resource.issue.person_id
+      resource.workflow.issue.person_id
+    end
+
+    def scoped_collection
+      super.eager_load(:workflow, workflow: :issue)
     end
   end
 end

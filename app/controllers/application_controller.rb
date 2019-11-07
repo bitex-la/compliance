@@ -26,7 +26,8 @@ class ApplicationController < ActionController::Base
 
     now = Time.now
     now_string = now.strftime('%Y%m%d')
-    expire_at = time_to_seconds_midnight(now)
+    expire_at = now.end_of_day
+
     set = Redis::Set.new("request_limit:people:#{AdminUser.current_admin_user.id}:#{now_string}", :expireat => expire_at)
     counter = Redis::Counter.new("request_limit:counter:#{AdminUser.current_admin_user.id}:#{now_string}", :expireat => expire_at)
 
@@ -40,10 +41,6 @@ class ApplicationController < ActionController::Base
       counter.decrement
       render nothing: true, status: 400 unless set.member? person_id
     end
-  end
-
-  def time_to_seconds_midnight(value)
-    ((24 - value.hour - 1) * 60 * 60) + ((60 - value.min - 1) * 60) + (60 - value.sec)
   end
 
   def related_person

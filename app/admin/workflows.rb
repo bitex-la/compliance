@@ -17,6 +17,10 @@ ActiveAdmin.register Workflow do
     def related_person
       resource.issue.person_id
     end
+
+    def scoped_collection
+      super.eager_load(:issue)
+    end
   end
 
   member_action :finish, method: :post do  

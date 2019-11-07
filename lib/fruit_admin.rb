@@ -3,6 +3,7 @@ class FruitAdmin
     ActiveAdmin.register klass do
       menu false
       actions :all, :except => [:edit, :destroy]
+      includes :issue
 
       controller do
         def related_person

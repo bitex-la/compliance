@@ -18,6 +18,10 @@ ActiveAdmin.register Observation do
     def related_person
       resource.issue.person_id
     end
+
+    def scoped_collection
+      super.eager_load(:issue)
+    end
   end
 
   index do
