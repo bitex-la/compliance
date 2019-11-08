@@ -4,6 +4,10 @@ class Api::AllowanceSeedsController < Api::EntityController
   end
 
   protected 
+
+  def related_person
+    resource.issue.person_id
+  end
   
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,

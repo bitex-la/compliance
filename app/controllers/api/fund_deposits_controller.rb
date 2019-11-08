@@ -5,6 +5,10 @@ class Api::FundDepositsController < Api::EntityController
 
   protected
 
+  def related_person
+    resource.person_id
+  end
+
   def get_mapper
     JsonapiMapper.doc_unsafe!(params.permit!.to_h,
       %w(fund_deposits people),

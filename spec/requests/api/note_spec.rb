@@ -18,6 +18,14 @@ describe Note do
     'title,public,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :notes,
+    :full_note_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :note_seeds,
+    :full_note_seed_with_person
+
   it_behaves_like 'seed',
     :notes,
     :full_note,

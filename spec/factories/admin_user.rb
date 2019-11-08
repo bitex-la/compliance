@@ -26,4 +26,12 @@ FactoryBot.define do
     api_token { 'my_super_admin_secure_token_for_testing' }
     role_type { "super_admin" }
   end
+
+  factory :limited_people_allowed_admin_user, class: 'AdminUser' do
+    email     { Faker::Internet.email }
+    password  { 'mysecurepassword' }
+    api_token { 'my_super_admin_secure_token_for_testing' }
+    role_type { "super_admin" }
+    max_people_allowed { 3 }
+  end
 end

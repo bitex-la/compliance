@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
       end
     else
       counter.decrement
-      render nothing: true, status: 400 unless set.member? person_id
+      render body: nil, status: 400 unless set.member? person_id
     end
   end
 

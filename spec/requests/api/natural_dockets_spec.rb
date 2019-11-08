@@ -18,6 +18,14 @@ describe NaturalDocket do
     'first_name,last_name,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :natural_dockets,
+    :full_natural_docket_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :natural_docket_seeds,
+    :full_natural_docket_seed_with_person
+
   it_behaves_like('seed', :natural_dockets,
     :full_natural_docket, :alt_full_natural_docket)
 

@@ -18,6 +18,14 @@ describe ArgentinaInvoicingDetail do
     'country,vat_status_code,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :argentina_invoicing_details,
+    :full_argentina_invoicing_detail_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :argentina_invoicing_detail_seeds,
+    :full_argentina_invoicing_detail_seed_with_person
+
   it_behaves_like('seed', :argentina_invoicing_details,
     :full_argentina_invoicing_detail,
     :alt_full_argentina_invoicing_detail)
@@ -25,4 +33,3 @@ describe ArgentinaInvoicingDetail do
   it_behaves_like('has_many fruit', :argentina_invoicing_details,
     :full_argentina_invoicing_detail)
 end
-

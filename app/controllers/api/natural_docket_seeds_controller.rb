@@ -5,6 +5,10 @@ class Api::NaturalDocketSeedsController < Api::EntityController
 
   protected
 
+  def related_person
+    resource.issue.person_id
+  end
+
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [:issues, :natural_dockets, :natural_docket_seeds],

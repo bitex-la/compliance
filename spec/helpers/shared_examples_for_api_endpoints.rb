@@ -8,6 +8,10 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   initial_expires_seed = "#{initial_factory}_expires_seed"
 
+  before(:each) {
+    Redis.new.flushall
+  }
+
   it "Gets seed with observation" do
     issue = create(:basic_issue)
     person = issue.person
@@ -137,6 +141,10 @@ shared_examples "docket" do |type, initial_factory|
   initial_seed = "#{initial_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
   fruit_class = Garden::Naming.new(type).fruit.constantize
+
+  before(:each) {
+    Redis.new.flushall
+  }
 
   it "Replaces a #{type}, showing all resources involved" do
     person = create(:empty_person).reload
@@ -278,6 +286,10 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
   fruit_class =  Garden::Naming.new(type).fruit.constantize
   seed_type = Garden::Naming.new(type).seed_plural
 
+  before(:each) {
+    Redis.new.flushall
+  }
+
   it "Adds multiple #{type}, explicitly replaces one of them" do
     person = create(:empty_person).reload
     # We need to create an issue for this person, so that the factory
@@ -413,7 +425,7 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
   expected_pages = 3,
   expected_items = 3|
 
-  before(:each){
+  before(:each) {
     @one = create(factory_one)
     Timecop.travel 10.minutes.from_now
     @two = create(factory_one)
@@ -475,5 +487,45 @@ shared_examples "jsonapi show and index" do |type, factory_one, factory_two,
 
     json_response.fetch(:included, [])
       .map{|i| i.slice(:id, :type) }.to_set.should == expected
+  end
+end
+
+shared_examples "max people allowed request limit" do |type, factory_one|
+  before(:each) {
+    Redis.new.flushall
+
+    create(:limited_people_allowed_admin_user)
+
+    @one = create(factory_one)
+    Timecop.travel 10.minutes.from_now
+    @two = create(factory_one)
+    Timecop.travel 10.minutes.from_now
+    @three = create(factory_one)
+
+    @four = create(factory_one)
+    @five = create(factory_one)
+  }
+
+  it "Can validate max people request limit on #{type} show" do
+    api_get "/#{type}/#{@one.id}"
+    expect(json_response[:data][:id]).to eq(@one.id.to_s)
+
+    api_get "/#{type}/#{@two.id}"
+    expect(json_response[:data][:id]).to eq(@two.id.to_s)
+
+    api_get "/#{type}/#{@three.id}"
+    expect(json_response[:data][:id]).to eq(@three.id.to_s)
+
+    api_get "/#{type}/#{@four.id}", {}, 400
+    api_get "/#{type}/#{@five.id}", {}, 400
+
+    api_get "/#{type}/#{@one.id}"
+    expect(json_response[:data][:id]).to eq(@one.id.to_s)
+
+    api_get "/#{type}/#{@two.id}"
+    expect(json_response[:data][:id]).to eq(@two.id.to_s)
+
+    api_get "/#{type}/#{@three.id}"
+    expect(json_response[:data][:id]).to eq(@three.id.to_s)
   end
 end
