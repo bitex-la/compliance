@@ -51,7 +51,6 @@ class Attachment < ApplicationRecord
     /rar|RAR\z/,
   ]
 
-
   def attached_to_something
     return unless attached_to.nil?
     errors.add(:base, 'must_be_attached_to_something')

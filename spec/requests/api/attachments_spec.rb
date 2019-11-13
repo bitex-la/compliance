@@ -47,6 +47,29 @@ describe Attachment do
     end
   end
 
+  it 'handles heic images' do
+    issue = create(:basic_issue)
+    seed = create(:full_natural_docket_seed,
+      issue: issue, add_all_attachments: false)
+
+    api_create "/attachments",
+      {
+        type: "attachments",
+        relationships: {attached_to_seed: {data: {id: seed.id, type: 'natural_docket_seeds'}}},
+        attributes: {
+          document: "data:#{mime_for(:heic)};base64,#{bytes_for(:heic)}",
+          document_file_name: 'simple.heic',
+          document_content_type: mime_for(:heic)
+        }
+      }
+    file_attachment = api_response.data
+
+    api_get "/attachments/#{file_attachment.id}"
+    expect(api_response.data.relationships.attached_to_seed.data.to_h).to(
+      eq(type: 'natural_docket_seeds', id: seed.id.to_s)
+    )
+  end
+
   describe "when re-arranging attachments" do
     it "can be re-attached to a fruit" do
       pending
