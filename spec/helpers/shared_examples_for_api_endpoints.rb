@@ -543,15 +543,15 @@ shared_examples "max people allowed request limit" do |type, factory_one|
 
     Timecop.travel 1.day.from_now
 
-    api_get "/#{type}/#{@one.id}"
-    expect(json_response[:data][:id]).to eq(@one.id.to_s)
+    api_get "/#{type}/#{@four.id}"
+    expect(json_response[:data][:id]).to eq(@four.id.to_s)
 
     api_get "/#{type}/#{@two.id}"
     expect(json_response[:data][:id]).to eq(@two.id.to_s)
 
-    api_get "/#{type}/#{@three.id}"
-    expect(json_response[:data][:id]).to eq(@three.id.to_s)
+    api_get "/#{type}/#{@one.id}"
+    expect(json_response[:data][:id]).to eq(@one.id.to_s)
 
-    api_get "/#{type}/#{@four.id}", {}, 400
+    api_get "/#{type}/#{@three.id}", {}, 400
   end
 end
