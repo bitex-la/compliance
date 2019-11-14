@@ -14,8 +14,9 @@ class Api::AttachmentsController < Api::EntityController
 
     if params[:data][:attributes][:document_content_type] == 'image/heic'
       file_name = params[:data][:attributes][:document_file_name]
+      heic_document = params[:data][:attributes][:document]
       document, content_type, new_file_name =
-        ImageConverter.heic_to_jpg(file_name)
+        Attachment.heic_to_jpg(heic_document, file_name)
 
       params[:data][:attributes][:document] = document
       params[:data][:attributes][:document_content_type] = content_type
