@@ -38,7 +38,8 @@ class Attachment < ApplicationRecord
         'application/pdf',
         'application/zip',
         'application/x-rar-compressed'
-    ]}
+    ]},
+    unless: :skip_content_validation 
 
   validates_attachment_file_name :document, matches: [
     /bmp|BMP\z/,
@@ -110,5 +111,9 @@ class Attachment < ApplicationRecord
 
   def strip_accents
     self.document_file_name = ActiveSupport::Inflector.transliterate(self.document_file_name) unless self.document_file_name.nil?
+  end
+
+  def skip_content_validation
+    self.document_content_type.in?(['image/heic', 'image/heif'])
   end
 end
