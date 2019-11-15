@@ -74,7 +74,7 @@ class Api::PeopleController < Api::ApiController
     EventLog.log_entity!(resource, AdminUser.current_admin_user, kind)
 
     zip_name = "person_#{resource.id}_kyc_files.zip"
-    headers['Content-Disposition'] = "attachment; filename=\"#{zip_name.gsub '"', '\"'}\""
+    headers['Content-Disposition'] = "attachment; filename=\"#{zip_name.gsub('"', '\"')}\""
 
     zip_tricks_stream do |zip|
       files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
