@@ -33,24 +33,27 @@ class Attachment < ApplicationRecord
         'image/bmp',
         'image/jpeg',
         'image/jpg',
+        'image/heic',
+        'image/heif',
         'image/gif',
         'image/png',
         'application/pdf',
         'application/zip',
         'application/x-rar-compressed'
-    ]},
-    unless: :skip_content_validation 
+    ]}
 
   validates_attachment_file_name :document, matches: [
     /bmp|BMP\z/,
     /png|PNG\z/,
     /jpg|JPG\z/,
     /jpeg|JPEG\z/,
+    /heif|HEIF\z/,
+    /heic|HEIC\z/,
     /pdf|PDF\z/,
     /gif|GIF\z/,
     /zip|ZIP\z/,
     /rar|RAR\z/,
-  ], unless: :skip_content_validation 
+  ]
 
   def attached_to_something
     return unless attached_to.nil?
@@ -110,9 +113,5 @@ class Attachment < ApplicationRecord
 
   def strip_accents
     self.document_file_name = ActiveSupport::Inflector.transliterate(self.document_file_name) unless self.document_file_name.nil?
-  end
-
-  def skip_content_validation
-    self.document_content_type.in?(['image/heic', 'image/heif'])
   end
 end
