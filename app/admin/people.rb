@@ -1,52 +1,16 @@
 ActiveAdmin.register Person do
   includes :emails, :legal_entity_dockets, :natural_dockets
-
+  
   controller do
     include ActionController::Live
     include ZipTricks::RailsStreaming
+    include DownloadProfile
 
     def find_resource
       scoped_collection
         .includes(*Person.eager_person_entities, {issues: Issue.eager_issue_entities.flatten })
         .where(id: params[:id])
         .first!
-    end
-
-    def process_download_profile(kind)
-      EventLog.log_entity!(resource, AdminUser.current_admin_user, kind)
-      
-      zip_name = "person_#{resource.id}_kyc_files.zip"
-      headers['Content-Disposition'] = "attachment; filename=\"#{zip_name.gsub('"', '\"')}\""
-  
-      zip_tricks_stream do |zip|
-        files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
-        files.each do |f, name|
-          zip.write_deflated_file(name) do |sink|
-            if f.options[:storage] == :filesystem
-              stream = File.open(f.path)
-              IO.copy_stream(stream, sink)
-              stream.close
-            else
-              the_remote_uri = URI(file.expiring_url)
-              Net::HTTP.get_response(the_remote_uri) do |response|
-                response.read_body do |chunk|
-                  sink << chunk
-                end
-              end
-            end
-          end  
-        end
-  
-        pdf = if kind == EventLogKind.download_profile_basic 
-                resource.generate_pdf_profile(false, false)
-              else
-                resource.generate_pdf_profile(true, true)
-              end 
-
-        zip.write_deflated_file('profile.pdf') do |sink|
-          sink << pdf.render
-        end
-      end
     end
   end
 
@@ -119,12 +83,12 @@ ActiveAdmin.register Person do
 
   member_action :download_profile_basic, method: :post do
     authorize!(:download_profile, resource)
-    process_download_profile EventLogKind.download_profile_basic
+    process_download_profile resource, EventLogKind.download_profile_basic
   end
 
   member_action :download_profile_full, method: :post do
     authorize!(:download_profile, resource)
-    process_download_profile EventLogKind.download_profile_full
+    process_download_profile resource, EventLogKind.download_profile_full
   end
 
   form do |f|
