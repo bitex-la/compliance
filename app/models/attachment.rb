@@ -50,8 +50,7 @@ class Attachment < ApplicationRecord
     /gif|GIF\z/,
     /zip|ZIP\z/,
     /rar|RAR\z/,
-  ]
-
+  ], unless: :skip_content_validation 
 
   def attached_to_something
     return unless attached_to.nil?
