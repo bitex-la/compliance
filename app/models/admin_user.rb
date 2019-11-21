@@ -24,6 +24,20 @@ class AdminUser < ApplicationRecord
     role_type == "super_admin"
   end
 
+  def request_limit_set
+    now = Time.now
+    now_string = now.strftime('%Y%m%d')
+    expire_at = now.end_of_day
+    Redis::Set.new("request_limit:people:#{AdminUser.current_admin_user.id}:#{now_string}", :expireat => expire_at)
+  end
+
+  def request_limit_counter
+    now = Time.now
+    now_string = now.strftime('%Y%m%d')
+    expire_at = now.end_of_day
+    Redis::Counter.new("request_limit:counter:#{AdminUser.current_admin_user.id}:#{now_string}", :expireat => expire_at)
+  end
+
   private
   
   def set_api_token

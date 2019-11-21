@@ -16,31 +16,22 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_request
-    return if AdminUser.current_admin_user.nil?
+    current_user = AdminUser.current_admin_user
+    return if current_user.nil?
 
-    limit = AdminUser.current_admin_user.max_people_allowed
+    limit = current_user.max_people_allowed
     return if limit.nil?
 
     person_id = related_person.to_s
     return if person_id.empty?
 
-    now = Time.now
-    now_string = now.strftime('%Y%m%d')
-    expire_at = now.end_of_day
+    set = current_user.request_limit_set
+    return if set.member? person_id
 
-    set = Redis::Set.new("request_limit:people:#{AdminUser.current_admin_user.id}:#{now_string}", :expireat => expire_at)
-    counter = Redis::Counter.new("request_limit:counter:#{AdminUser.current_admin_user.id}:#{now_string}", :expireat => expire_at)
+    counter = current_user.request_limit_counter
 
-    if counter.increment <= limit
-      if set.member? person_id
-        counter.decrement
-      else
-        set << person_id
-      end
-    else
-      counter.decrement
-      render body: nil, status: 400 unless set.member? person_id
-    end
+    render body: nil, status: 400 if counter.increment > limit
+    set << person_id
   end
 
   def related_person
