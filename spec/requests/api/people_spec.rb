@@ -414,6 +414,7 @@ describe Person do
         { type: "notes",
           id: person.notes.first.id.to_s,
           attributes: {
+            public: false,
             title:  'my nickname',
             body:   'Please call me by my nickname: Mr. Bond',
             created_at: '2018-01-01T00:00:00.000Z',
@@ -498,6 +499,15 @@ describe Person do
       expect(person.enabled).to eq true
       expect(person.state).to eq 'enabled'
       expect(person.risk).to eq "low"
+    end
+
+    it 'downloads profile' do
+      person = create :full_natural_person
+      api_get "/people/#{person.id}/download_profile", {}, 200
+
+      expect(response.header["Content-Disposition"]).to eq 'attachment; filename="person_1_kyc_files.zip"'
+      expect(response.header["Content-type"]).to eq 'application/zip'
+      expect(response.header["Content-length"]).to eq '95130163'
     end
   end
 

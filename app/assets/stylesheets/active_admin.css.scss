@@ -296,12 +296,12 @@ body.active_admin{
       }
     .note_seeds > fieldset > ol > li.text.input {
       label {
-        display: none;
+        display: block;
       }
 
       textarea {
         box-sizing: border-box;
-        width: 100%;
+        width: 80%;
       }
     }
   }
