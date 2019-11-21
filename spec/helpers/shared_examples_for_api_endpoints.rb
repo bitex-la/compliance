@@ -494,7 +494,7 @@ shared_examples "max people allowed request limit" do |type, factory_one|
   before(:each) {
     Redis.new.flushall
 
-    create(:limited_people_allowed_admin_user)
+    @admin = create(:limited_people_allowed_admin_user)
 
     @one = create(factory_one)
     Timecop.travel 10.minutes.from_now
@@ -527,6 +527,15 @@ shared_examples "max people allowed request limit" do |type, factory_one|
 
     api_get "/#{type}/#{@three.id}"
     expect(json_response[:data][:id]).to eq(@three.id.to_s)
+
+    @admin.max_people_allowed = nil
+    @admin.save!
+
+    api_get "/#{type}/#{@four.id}"
+    expect(json_response[:data][:id]).to eq(@four.id.to_s)
+
+    api_get "/#{type}/#{@five.id}"
+    expect(json_response[:data][:id]).to eq(@five.id.to_s)
   end
 
   it "Can reset counters when day changes" do
