@@ -4,13 +4,13 @@ ActiveAdmin.register AdminUser do
 
   AdminUser.role_types.map(&:first).each do |role|
     action_item role, only: [:show, :edit, :update] do
-      if authorized?(role, resource) && current_admin_user != resource && !resource.is_in_role?(role)
-        link_to "#{role.camelize.capitalize} access", [role, :admin_user], method: :post
+      if authorized?("grant_#{role}_access", resource) && current_admin_user != resource && !resource.is_in_role?(role)
+        link_to "Grant #{role.camelize.capitalize} access", ["grant_#{role}_access", :admin_user], method: :post
       end
     end
 
-    member_action role, method: :post do
-      authorize!(role, resource)
+    member_action "grant_#{role}_access", method: :post do
+      authorize!("grant_#{role}_access", resource)
       resource.update!(role_type: role)
       redirect_to action: :show
     end

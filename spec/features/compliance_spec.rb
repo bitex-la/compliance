@@ -15,10 +15,10 @@ describe 'an admin user' do
       click_link 'Edit'
     end
 
-    click_link 'Restricted access'
+    click_link 'Grant Restricted access'
     expect(restricted_user.reload.is_restricted?).to be_truthy
 
-    click_link 'Admin access'
+    click_link 'Grant Admin access'
     expect(restricted_user.reload.is_restricted?).to be_falsey
   end
 
