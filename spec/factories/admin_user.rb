@@ -4,6 +4,7 @@ FactoryBot.define do
     password  { 'mysecurepassword' }
     api_token { 'my_super_secure_token_for_testing' }
     role_type { "admin" }
+    max_people_allowed { 1000 }
   end
 
   factory :other_admin_user, class: 'AdminUser' do
@@ -11,6 +12,7 @@ FactoryBot.define do
     password  { 'mysecurepassword' }
     api_token { 'my_other_super_secure_token_for_testing' }
     role_type { "admin" }
+    max_people_allowed { 1000 }
   end
 
   factory :restricted_admin_user, class: 'AdminUser' do
@@ -18,6 +20,7 @@ FactoryBot.define do
     password  { 'myrestrictedpassword' }
     api_token { 'my_restricted_token_for_testing' }
     role_type { "restricted" }
+    max_people_allowed { 1000 }
   end
 
   factory :super_admin_user, class: 'AdminUser' do
@@ -25,6 +28,7 @@ FactoryBot.define do
     password  { 'mysecurepassword' }
     api_token { 'my_super_admin_secure_token_for_testing' }
     role_type { "super_admin" }
+    max_people_allowed { 1000 }
   end
 
   factory :limited_people_allowed_admin_user, class: 'AdminUser' do
