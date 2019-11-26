@@ -3,6 +3,10 @@ class Api::TasksController < Api::EntityController
     Task
   end
 
+  def related_person
+    resource.workflow.issue.person_id
+  end
+
   (Task.aasm.events.map(&:name) - [:retry]).each do |action|
     define_method(action) do
       task = Task.find(params[:id])

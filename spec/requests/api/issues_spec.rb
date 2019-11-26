@@ -12,6 +12,10 @@ describe Issue do
     'identification_seeds,domicile_seeds',
     -> { {} }, [3, 4, 2], 4, 4
 
+  it_behaves_like 'max people allowed request limit',
+    :issues,
+    :full_approved_natural_person_issue
+
   describe 'When fetching issues' do
     it 'includes relationships for all issues' do
       one = create(:full_natural_person).reload.issues.first

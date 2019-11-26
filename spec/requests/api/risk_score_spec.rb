@@ -18,6 +18,14 @@ describe RiskScore do
     'score,provider,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :risk_scores,
+    :full_risk_score_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :risk_score_seeds,
+    :full_risk_score_seed_with_person
+
   it_behaves_like 'seed',
     :risk_scores,
     :full_risk_score,

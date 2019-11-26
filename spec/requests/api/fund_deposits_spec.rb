@@ -12,6 +12,10 @@ describe FundDeposit do
     'amount,currency_code,person',
     'attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :fund_deposits,
+    :fund_deposit_with_person
+
   describe 'Creating a new person FundDeposit' do
     it 'responds with (422) when body is empty' do
       api_create "/fund_deposits", {}, 422

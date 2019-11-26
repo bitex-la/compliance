@@ -5,6 +5,10 @@ class Api::ObservationsController < Api::EntityController
 
   protected
 
+  def related_person
+    resource.issue.person_id
+  end
+
   def get_mapper
     
     observables = Observation.observables.map(&:to_sym)  

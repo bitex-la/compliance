@@ -9,9 +9,13 @@ class Api::AttachmentsController < Api::EntityController
 
   protected
 
+  def related_person
+    resource.person_id
+  end
+
   def get_mapper
     can_attach_to = Attachment.attachable_to.map(&:to_sym)
-    
+
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       ([:people, :attachments] + can_attach_to),
       can_attach_to.map{|a| [a, []]}.to_h.merge(
