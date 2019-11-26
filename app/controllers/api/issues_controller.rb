@@ -57,7 +57,7 @@ class Api::IssuesController < Api::ApiController
 
   Issue.aasm.events.map(&:name).each do |action|
     define_method(action) do
-      issue = Issue.find(params[:id])
+      issue = resource
       begin
         issue.aasm.fire!(action)
         jsonapi_response(issue, {}, 200)
@@ -72,25 +72,33 @@ class Api::IssuesController < Api::ApiController
     unlock  
   }.each do |action|
     define_method(action) do
-      issue = Issue.find(params[:id])
+      issue = resource
       return jsonapi_error(422, "invalid transition") unless issue.send(action.to_s + '_issue!')
       jsonapi_response(issue, {}, 200)
     end
   end
 
   def renew_lock
-    issue = Issue.find(params[:id])
+    issue = resource
     return jsonapi_error(422, "invalid transition") unless issue.renew_lock!
     jsonapi_response(issue, {}, 200)
   end
 
   def lock_for_ever
-    issue = Issue.find(params[:id])
+    issue = resource
     return jsonapi_error(422, "invalid transition") unless issue.lock_issue!(false)
     jsonapi_response(issue, {}, 200)
   end
 
   private
+
+  def resource
+    Issue.find(params[:id])
+  end
+
+  def related_person
+    resource.person_id
+  end
 
   def build_eager_load_list
     [

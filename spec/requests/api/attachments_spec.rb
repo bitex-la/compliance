@@ -70,6 +70,30 @@ describe Attachment do
     )
   end
 
+  it "Can validate max people request limit on show" do
+    Redis.new.flushall
+
+    one, two, three, four, five = 5.times.map do
+      seed = create(:full_natural_docket_seed_with_person)
+      api_create "/attachments",
+        jsonapi_attachment('natural_docket_seeds', seed.id.to_s, :jpg)
+      api_response.data
+    end
+
+    create(:limited_people_allowed_admin_user)
+
+    api_get "/attachments/#{one.id}"
+    api_get "/attachments/#{two.id}"
+    api_get "/attachments/#{three.id}"
+
+    api_get "/attachments/#{four.id}", {}, 400
+    api_get "/attachments/#{five.id}", {}, 400
+
+    api_get "/attachments/#{one.id}"
+    api_get "/attachments/#{two.id}"
+    api_get "/attachments/#{three.id}"
+  end
+
   describe "when re-arranging attachments" do
     it "can be re-attached to a fruit" do
       pending
@@ -90,5 +114,5 @@ describe Attachment do
       pending
       fail
     end
-  end
+  end    
 end

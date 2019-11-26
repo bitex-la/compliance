@@ -18,6 +18,14 @@ describe ChileInvoicingDetail do
     'comuna,vat_status_code,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :chile_invoicing_details,
+    :full_chile_invoicing_detail_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :chile_invoicing_detail_seeds,
+    :full_chile_invoicing_detail_seed_with_person
+
   it_behaves_like('seed', :chile_invoicing_details,
     :full_chile_invoicing_detail,
     :alt_full_chile_invoicing_detail)

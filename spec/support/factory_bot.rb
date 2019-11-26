@@ -13,7 +13,7 @@ module FactoryBot
         factory "#{resource_name}_seed", class: seed_class do
           association :issue, factory: :basic_issue
         end
-        
+
         factories.each do |factory_name, block|
           factory "#{factory_name}_base" do
             instance_eval(&block)
@@ -28,6 +28,10 @@ module FactoryBot
             factory("#{factory_name}_seed", class: seed_class) do
               factory "#{factory_name}_seed_with_issue" do
                 association :issue, factory: :basic_issue
+              end
+
+              factory "#{factory_name}_seed_with_person" do
+                association :person, factory: [:empty_person, :with_issue]
               end
             end
 

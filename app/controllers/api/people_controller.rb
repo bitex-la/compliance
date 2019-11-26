@@ -1,5 +1,7 @@
 class Api::PeopleController < Api::ApiController
-  include Zipline
+  include ZipTricks::RailsStreaming
+  include DownloadProfile
+  
   caches_action :show, expires_in: 2.minutes, cache_path: :path_for_show
 
   def index
@@ -64,12 +66,14 @@ class Api::PeopleController < Api::ApiController
 
   def download_profile
     person = Person.find(params[:id])
-    files = person.all_attachments.map { |a| [a.document, a.document_file_name] }
-    EventLog.log_entity!(person, AdminUser.current_admin_user, EventLogKind.download_profile)
-    zipline(files, "person_#{person.id}_kyc_files.zip")
+    process_download_profile person, EventLogKind.download_profile_basic
   end
 
   protected
+
+  def related_person
+    params[:id]
+  end
 
   def can_run_transition(person, action)
     !((action == :enable || action == :disable) && person.state == "rejected")

@@ -2,40 +2,18 @@ ActiveAdmin.register AdminUser do
   menu priority: 3, if: -> { authorized?(:view_menu, AdminUser) }
   permit_params :email, :password, :password_confirmation
 
-  action_item :restrict, only: [:show, :edit, :update] do 
-    if authorized?(:restrict, resource) && current_admin_user != resource && !resource.is_restricted?
-      link_to "Restrict access", [:restrict, :admin_user], method: :post
+  AdminUser.role_types.map(&:first).each do |role|
+    action_item role, only: [:show, :edit, :update] do
+      if authorized?("grant_#{role}_access", resource) && current_admin_user != resource && !resource.is_in_role?(role)
+        link_to "Grant #{role.camelize.capitalize} access", ["grant_#{role}_access", :admin_user], method: :post
+      end
     end
-  end
 
-  action_item :give_admin_access, only: [:show, :edit, :update] do 
-    if authorized?(:give_admin_access, resource) && current_admin_user != resource && !resource.is_admin?
-      link_to "Admin access", [:give_admin_access, :admin_user], method: :post
+    member_action "grant_#{role}_access", method: :post do
+      authorize!("grant_#{role}_access", resource)
+      resource.update!(role_type: role)
+      redirect_to action: :show
     end
-  end
-
-  action_item :give_super_admin_access, only: [:show, :edit, :update] do 
-    if authorized?(:give_super_admin_access, resource) && !resource.is_super_admin?
-      link_to "Super admin access", [:give_super_admin_access, :admin_user], method: :post
-    end
-  end
-
-  member_action :restrict, method: :post do
-    authorize!(:restrict, resource)
-    resource.update!(role_type: "restricted")
-    redirect_to action: :show
-  end
-
-  member_action :give_admin_access, method: :post do
-    authorize!(:give_admin_access, resource)
-    resource.update!(role_type: "admin")
-    redirect_to action: :show
-  end
-
-  member_action :give_super_admin_access, method: :post do
-    authorize!(:give_super_admin_access, resource)
-    resource.update!(role_type: "super_admin")
-    redirect_to action: :show
   end
 
   controller do
@@ -51,7 +29,7 @@ ActiveAdmin.register AdminUser do
       end
       super
     end
-    
+
     def destroy
       authorize!(:destroy, resource)
 
@@ -73,6 +51,10 @@ ActiveAdmin.register AdminUser do
     column :otp_enabled
     column :current_sign_in_at
     column :sign_in_count
+    column :max_people_allowed
+    column(:person_view_count) do |o|
+      o.request_limit_counter.value
+    end
     column :created_at
     actions
   end
@@ -102,6 +84,7 @@ ActiveAdmin.register AdminUser do
       f.input :email
       f.input :password
       f.input :password_confirmation
+      f.input :max_people_allowed
     end
     f.actions
   end

@@ -13,6 +13,14 @@ ActiveAdmin.register Workflow do
       resource.destroy
       redirect_to edit_person_issue_url(issue.person, issue)
     end
+
+    def related_person
+      resource.issue.person_id
+    end
+
+    def scoped_collection
+      super.eager_load(:issue)
+    end
   end
 
   member_action :finish, method: :post do  

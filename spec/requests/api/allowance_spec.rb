@@ -18,6 +18,14 @@ describe Allowance do
     'amount,kind_code,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :allowances,
+    :salary_allowance_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :allowance_seeds,
+    :salary_allowance_seed_with_person
+
   it_behaves_like 'seed',
     :allowances,
     :salary_allowance,

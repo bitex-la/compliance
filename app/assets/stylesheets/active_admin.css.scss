@@ -913,3 +913,12 @@ span.icon-text-fa {
   position: absolute;
   text-shadow: none;
 }
+
+
+.dropdown_other_actions {
+  float: right;
+  margin-bottom: 20px;
+  li a {
+    text-align: left !important;
+  }
+}

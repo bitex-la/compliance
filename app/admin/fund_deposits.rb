@@ -9,4 +9,13 @@ ActiveAdmin.register FundDeposit do
   filter :deposit_method_id, as: :select, collection: DepositMethod.all
   filter :external_id 
 
+  controller do
+    def related_person
+      resource.person_id
+    end
+
+    def scoped_collection
+      super.eager_load :person
+    end
+  end
 end

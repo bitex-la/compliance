@@ -13,7 +13,7 @@ describe 'a restricted admin user' do
       tags
     ).each do |path|
       visit "/#{path}"
-      page.current_path.should == '/'
+      page.current_path.should == '/dashboards'
       expect(page).to have_content 'You are not authorized to perform this action.'
     end
   end
@@ -40,7 +40,7 @@ describe 'a restricted admin user' do
       admin_users
     ).each do |path|
       visit "/#{path}"
-      page.current_path.should == '/'
+      page.current_path.should == '/dashboards'
       expect(page).to have_content 'You are not authorized to perform this action.'
     end
   end

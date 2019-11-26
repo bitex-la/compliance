@@ -18,6 +18,14 @@ describe Domicile do
     'country,apartment,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :domiciles,
+    :full_domicile_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :domicile_seeds,
+    :full_domicile_seed_with_person
+
   it_behaves_like('seed', :domiciles, :full_domicile, :alt_full_domicile)
 
   it_behaves_like('has_many fruit', :domiciles, :full_domicile)
