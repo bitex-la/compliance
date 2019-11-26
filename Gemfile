@@ -61,8 +61,10 @@ gem 'yajl-ruby', require: 'yajl'
 
 gem 'hashie'
 
-gem 'connection_pool'
+gem 'prawn'
+gem 'prawn-table'
 
+gem 'connection_pool'
 gem 'redis-objects'
 gem 'redis-store'
 
@@ -95,5 +97,3 @@ group :development do
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
 end
-
-

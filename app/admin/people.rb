@@ -1,8 +1,10 @@
 ActiveAdmin.register Person do
   includes :emails, :legal_entity_dockets, :natural_dockets
-
+  
   controller do
-    include Zipline
+    include ActionController::Live
+    include ZipTricks::RailsStreaming
+    include DownloadProfile
 
     def find_resource
       scoped_collection
@@ -83,16 +85,14 @@ ActiveAdmin.register Person do
     link_to 'View Person Issues', person_issues_path(resource)
   end
 
-  action_item :download_profile, only: :show do
-    if resource.all_attachments.any?
-      link_to :download_profile.to_s.titleize, [:download_profile, :person], method: :post
-    end
+  member_action :download_profile_basic, method: :post do
+    authorize!(:download_profile, resource)
+    process_download_profile resource, EventLogKind.download_profile_basic
   end
 
-  member_action :download_profile, method: :post do
-    files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
-    EventLog.log_entity!(resource, AdminUser.current_admin_user, EventLogKind.download_profile)
-    zipline(files, "person_#{resource.id}_kyc_files.zip")
+  member_action :download_profile_full, method: :post do
+    authorize!(:download_profile, resource)
+    process_download_profile resource, EventLogKind.download_profile_full
   end
 
   form do |f|
@@ -138,7 +138,7 @@ ActiveAdmin.register Person do
     actions
   end
 
-  show do
+  show as: :grid, columns: 2 do      
     if resource.issues.empty?
       div class: 'flash flash_danger' do
         "This person has no created issues. Please create a new issue to add information."
@@ -149,6 +149,14 @@ ActiveAdmin.register Person do
         "This person has pending issues."
       end
       br
+    end
+  
+    if authorized?(:download_profile, resource)
+      dropdown_menu 'Download Profile', class: 'dropdown_menu dropdown_other_actions' do
+        item 'Basic', download_profile_basic_person_path, method: :post
+        item 'Full', download_profile_full_person_path, method: :post
+      end
+      br  
     end
     
     tabs do
