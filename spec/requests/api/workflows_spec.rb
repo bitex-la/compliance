@@ -10,6 +10,10 @@ describe Workflow do
     'scope',
     'issue'
 
+  it_behaves_like 'max people allowed request limit',
+    :workflows,
+    :basic_workflow
+
   describe 'creating a new workflow' do
     it 'responds with an Unprocessable Entity when body is empty' do
       api_request :post, "/workflows", {}, 422

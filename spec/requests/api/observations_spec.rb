@@ -12,6 +12,10 @@ describe Observation do
     'scope,observation_reason',
     'observation_reason'
 
+  it_behaves_like 'max people allowed request limit',
+    :observations,
+    :robot_observation_with_issue
+
   describe 'Creating a new observation' do
     it 'responds with (422) when body is empty' do
       api_create "/observations", {}, 422

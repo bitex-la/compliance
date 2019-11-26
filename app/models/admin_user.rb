@@ -24,6 +24,20 @@ class AdminUser < ApplicationRecord
     role_type == role
   end
 
+  def request_limit_set
+    now = Time.now
+    now_string = now.strftime('%Y%m%d')
+    expire_at = now.end_of_day
+    Redis::Set.new("request_limit:people:#{id}:#{now_string}", :expireat => expire_at)
+  end
+
+  def request_limit_counter
+    now = Time.now
+    now_string = now.strftime('%Y%m%d')
+    expire_at = now.end_of_day
+    Redis::Counter.new("request_limit:counter:#{id}:#{now_string}", :expireat => expire_at)
+  end
+
   private
 
   def set_api_token
@@ -43,6 +57,7 @@ end
 
 Warden::Manager.after_authentication scope: :admin_user do |user, warden, options|
   next unless user.otp_enabled?
+
   proxy = Devise::Hooks::Proxy.new(warden)
   unless user.authenticate_otp(warden.request.params[:admin_user][:otp])
     proxy.sign_out(:admin_user)

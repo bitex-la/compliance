@@ -3,6 +3,10 @@ class Api::WorkflowsController < Api::EntityController
     Workflow
   end
 
+  def related_person
+    resource.issue.person_id
+  end
+
   Workflow.aasm.events.map(&:name).each do |action|
     define_method(action) do
       workflow = Workflow.find(params[:id])

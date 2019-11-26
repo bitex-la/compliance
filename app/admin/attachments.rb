@@ -17,6 +17,13 @@ ActiveAdmin.register Attachment do
   permit_params :id, :document, :person_id,
     :attached_to_seed_gid, :attached_to_fruit_gid
 
+
+  controller do
+    def related_person
+      resource.person_id
+    end
+  end
+
   form do |f|
     if f.object.new_record?
       f.inputs "Upload" do

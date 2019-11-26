@@ -10,6 +10,10 @@ describe Task do
     'max_retries',
     'workflow'  
 
+  it_behaves_like 'max people allowed request limit',
+    :tasks,
+    :basic_task
+
   describe 'creating a new task' do
     it 'responds with an Unprocessable Entity when body is empty' do
       api_request :post, "/tasks", {}, 422

@@ -2,15 +2,16 @@ require 'rails_helper'
 
 describe Person do
   let(:admin_user) { create(:admin_user) }
-  before :each do 
-    Timecop.freeze Date.new(2018,01,01)
-  end
 
-  before :each do
-    Timecop.freeze Date.new(2018,01,01)
-  end
+  it_behaves_like 'max people allowed request limit',
+    :people,
+    :empty_person
 
   describe 'getting a person' do
+    before :each do
+      Timecop.freeze Date.new(2018, 1, 1)
+    end
+
     it 'creates a new empty user and their initial issue' do
       expect{ api_create('/people', nil) }.to change{ Person.count }.by(1)
 
@@ -512,6 +513,10 @@ describe Person do
   end
 
   describe 'when using filters' do
+    before :each do
+      Timecop.freeze Date.new(2018, 1, 1)
+    end
+
     it 'filters by name' do
       joe_doe = create :full_natural_person
       pending_joe_doe = create :new_natural_person
@@ -538,6 +543,10 @@ describe Person do
   end
 
   describe 'when caching' do
+    before :each do
+      Timecop.freeze Date.new(2018, 1, 1)
+    end
+
     it 'caches the person but does not clash if fields or includes differ' do
       # Caching in tests is cumbersome, so there's all this boilerplate and
       # we need to redefine the caching action.
@@ -573,6 +582,10 @@ describe Person do
   end
 
   describe "when changing state" do
+    before :each do
+      Timecop.freeze Date.new(2018, 1, 1)
+    end
+
     %i{enable disable reject}.each do |action|
       it "It can #{action} person" do
         person = create(:empty_person)

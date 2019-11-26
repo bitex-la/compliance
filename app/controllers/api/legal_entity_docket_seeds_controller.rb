@@ -5,6 +5,10 @@ class Api::LegalEntityDocketSeedsController < Api::EntityController
 
   protected
 
+  def related_person
+    resource.issue.person_id
+  end
+
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [:issues, :legal_entity_dockets, :legal_entity_docket_seeds],

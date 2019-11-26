@@ -6,15 +6,9 @@ class Api::ApiController < ApplicationController
   before_action :validate_restricted_user
 
   private
-  
-  def require_token
-    authenticate_token || jsonapi_403
-  end
 
-  def authenticate_token
-    authenticate_with_http_token do |token, options|
-      AdminUser.current_admin_user = AdminUser.find_by(api_token: token)
-    end
+  def require_token
+    AdminUser.current_admin_user || jsonapi_403
   end
 
   def allow_restricted_user
@@ -22,6 +16,6 @@ class Api::ApiController < ApplicationController
   end
 
   def validate_restricted_user
-    return jsonapi_403 if !allow_restricted_user && AdminUser.current_admin_user.is_restricted?  
+    return jsonapi_403 if !allow_restricted_user && AdminUser.current_admin_user.is_restricted?
   end
 end

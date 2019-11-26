@@ -5,6 +5,10 @@ class Api::RiskScoreSeedsController < Api::EntityController
 
   protected
 
+  def related_person
+    resource.issue.person_id
+  end
+
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [:issues, :risk_scores, :risk_score_seeds],
