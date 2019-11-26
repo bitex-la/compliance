@@ -71,6 +71,10 @@ class Api::PeopleController < Api::ApiController
 
   protected
 
+  def related_person
+    params[:id]
+  end
+
   def can_run_transition(person, action)
     !((action == :enable || action == :disable) && person.state == "rejected")
   end

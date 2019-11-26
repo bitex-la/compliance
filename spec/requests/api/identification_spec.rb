@@ -18,6 +18,14 @@ describe Identification do
     'number,identification_kind_code,issue',
     'issue,attachments'
 
+  it_behaves_like 'max people allowed request limit',
+    :identifications,
+    :full_natural_person_identification_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :identification_seeds,
+    :full_natural_person_identification_seed_with_person
+
   it_behaves_like 'seed',
     :identifications,
     :full_natural_person_identification,

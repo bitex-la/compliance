@@ -18,6 +18,14 @@ describe Affinity do
     'related_person,issue',
     'issue,related_person'
 
+  it_behaves_like 'max people allowed request limit',
+    :affinities,
+    :full_affinity_with_person
+
+  it_behaves_like 'max people allowed request limit',
+    :affinity_seeds,
+    :full_affinity_seed_with_person
+
   it_behaves_like 'seed', :affinities, :full_affinity, :alt_full_affinity, -> {
       {related_person: {
         data: {id: create(:empty_person).id.to_s, type: 'people'}

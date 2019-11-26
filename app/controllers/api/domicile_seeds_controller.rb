@@ -3,6 +3,10 @@ class Api::DomicileSeedsController < Api::EntityController
     DomicileSeed
   end
 
+  def related_person
+    resource.issue.person_id
+  end
+
   def get_mapper
     JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [:issues, :domiciles, :domicile_seeds],

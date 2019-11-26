@@ -12,6 +12,10 @@ ActiveAdmin.register Person do
         .where(id: params[:id])
         .first!
     end
+
+    def related_person
+      params[:id]
+    end
   end
 
   actions :all, except: [:destroy]
@@ -74,11 +78,11 @@ ActiveAdmin.register Person do
   scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
 
   action_item :add_person_information, only: %i(show edit) do
-    link_to 'Add Person Information', new_with_fruits_person_issues_path(person)
+    link_to 'Add Person Information', new_with_fruits_person_issues_path(resource)
   end
 
   action_item :view_person_issues, only: %i(show edit) do
-    link_to 'View Person Issues', person_issues_path(person)
+    link_to 'View Person Issues', person_issues_path(resource)
   end
 
   member_action :download_profile_basic, method: :post do
@@ -92,6 +96,18 @@ ActiveAdmin.register Person do
   end
 
   form do |f|
+    if resource.issues.empty?
+      div class: 'flash flash_danger' do
+        "This person has no created issues. Please create a new issue to add information."
+      end
+      br
+    elsif resource.issues.find { |issue| issue.editable? }
+      div class: 'flash flash_danger' do
+        "This person has pending issues."
+      end
+      br
+    end
+    
     f.inputs 'Basics' do
       f.input :risk, as:  :select, collection: %w(low medium high)
     end
@@ -122,7 +138,19 @@ ActiveAdmin.register Person do
     actions
   end
 
-  show as: :grid, columns: 2 do    
+  show as: :grid, columns: 2 do      
+    if resource.issues.empty?
+      div class: 'flash flash_danger' do
+        "This person has no created issues. Please create a new issue to add information."
+      end
+      br
+    elsif resource.issues.find { |issue| issue.editable? }
+      div class: 'flash flash_danger' do
+        "This person has pending issues."
+      end
+      br
+    end
+  
     if authorized?(:download_profile, resource)
       dropdown_menu 'Download Profile', class: 'dropdown_menu dropdown_other_actions' do
         item 'Basic', download_profile_basic_person_path, method: :post
@@ -201,9 +229,9 @@ ActiveAdmin.register Person do
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, :emails, 'envelope')
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, :risk_scores, 'exclamation-triangle')
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', person.fund_deposits.count, 'university') do
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', resource.fund_deposits.count, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do
-          table_for person.fund_deposits do           
+          table_for resource.fund_deposits do           
             column :amount
             column :currency
             column :exchange_rate_adjusted_amount
