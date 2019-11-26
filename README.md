@@ -34,7 +34,7 @@ or
 
 ## Start the application
 ```
-bin/foreman start
+bundle exec rails -s
 ```
 
 ## Testing
