@@ -35,7 +35,7 @@ defaults: &defaults
     expiration_interval_minutes: 15
 
   redis:
-    cache_url: 'redis://localhost:6379/0/compliance'
+    cache_url: 'unix:/tmp/redis.sock'
     pool_size: 8
 
 production:

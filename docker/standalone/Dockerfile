@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxslt-dev groff zip \
     pkg-config ca-certificates \
     libcurl4-openssl-dev mysql-server libmysqlclient-dev nodejs \
-    libmagickwand-dev imagemagick tzdata file \ 
+    libmagickwand-dev imagemagick tzdata file \
+    redis-server \ 
     && apt-get clean
 
 # Install rbenv
@@ -47,11 +48,13 @@ RUN git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
     && cd /usr/local/compliance && bundle install 
 
 RUN service mysql start \
+    && redis-server --daemonize yes --port 0 --unixsocket /tmp/redis.sock --unixsocketperm 775 \
     && cd /usr/local/compliance && bundle exec rails db:setup
 
 EXPOSE 5000
 
 CMD service mysql start \
+  && redis-server --daemonize yes --port 0 --unixsocket /tmp/redis.sock --unixsocketperm 775 \
   && cd /usr/local/compliance \
   && git pull origin master \
   && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
