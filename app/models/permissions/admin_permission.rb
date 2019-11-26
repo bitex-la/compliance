@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 module Permissions
   class AdminPermission < RestrictedPermission
     def allowed_classes 
-      super + 
+      super +
       [
         Affinity,
         ObservationReason,
-        NaturalDocket, 
+        NaturalDocket,
         LegalEntityDocket,
         Domicile,
         Identification,
