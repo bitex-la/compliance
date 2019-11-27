@@ -67,6 +67,7 @@ gem 'prawn-table'
 gem 'connection_pool'
 gem 'redis-objects'
 gem 'redis-store'
+gem 'redis-rails', '~> 5'
 
 group :development, :test do 
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
