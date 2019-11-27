@@ -27,7 +27,13 @@ jobs:
       - run:
           name: Install heif
           command: |
-            git clone git@github.com:strukturag/libheif.git
+            sudo apt-get install software-properties-common -y
+            sudo add-apt-repository ppa:strukturag/libde265 -y
+            sudo apt-get update
+            sudo apt-get install libde265 -y
+            sudo apt-get install libtool -y
+            git clone https://github.com/strukturag/libheif 
+            apt-get install automake -y
             cd libheif
             ./autogen.sh
             ./configure
