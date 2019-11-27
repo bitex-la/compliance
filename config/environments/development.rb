@@ -17,7 +17,9 @@ Rails.application.configure do
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
     config.action_controller.perform_caching = true
 
-    config.cache_store = :file_store, Settings.cache_store || '/tmp/cache'
+    config.cache_store = :redis_store, Settings.redis.cache_url,
+      { expires_in: 90.minutes, pool_size: Settings.redis.pool_size }
+
     config.public_file_server.headers = {
       'Cache-Control' => "public, max-age=#{2.days.to_i}"
     }

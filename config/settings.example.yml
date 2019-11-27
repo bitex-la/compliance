@@ -22,8 +22,6 @@ defaults: &defaults
     key: some_appsignal_api_key
     app: "Your company"
 
-  cache_store: '/tmp/cache/compliance'
-
   regularities:
     low:
       funding_amount: 2500

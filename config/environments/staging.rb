@@ -57,7 +57,8 @@ Rails.application.configure do
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
   config.action_controller.perform_caching = true
-  config.cache_store = :file_store, Settings.cache_store || '/tmp/cache'
+  config.cache_store = :redis_store, Settings.redis.cache_url,
+    { expires_in: 10.minutes, pool_size: Settings.redis.pool_size }
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque

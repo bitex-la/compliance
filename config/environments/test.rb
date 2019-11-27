@@ -39,4 +39,7 @@ Rails.application.configure do
   
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  config.cache_store = :redis_store, Settings.redis.cache_url,
+    { expires_in: 90.minutes, pool_size: Settings.redis.pool_size }
 end
