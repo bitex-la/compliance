@@ -27,7 +27,7 @@ jobs:
       - run:
           name: Install deps
           command: |
-            sudo add-apt-repository ppa:strukturag/libheif -y && sudo apt-get -qq update && sudo apt install libheif-examples
+            sudo apt-get install software-properties-common -y && sudo add-apt-repository ppa:strukturag/libheif -y && sudo apt-get -qq update && sudo apt install libheif-examples
       - restore_cache:
           keys:
             - rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
