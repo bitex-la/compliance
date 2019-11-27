@@ -24,21 +24,6 @@ jobs:
       - run:
           name: Which bundler?
           command: bundle -v
-      - run:
-          name: Install heif
-          command: |
-            sudo apt-get install software-properties-common -y
-            sudo add-apt-repository ppa:strukturag/libde265 -y
-            sudo apt-get update
-            sudo apt-get install libde265 -y
-            sudo apt-get install libtool -y
-            git clone https://github.com/strukturag/libheif 
-            apt-get install automake -y
-            cd libheif
-            ./autogen.sh
-            ./configure
-            make
-            sudo make install
       - restore_cache:
           keys:
             - rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}

@@ -48,6 +48,9 @@ describe Attachment do
   end
 
   it 'handles heic images' do
+    allow_any_instance_of(Paperclip::MediaTypeSpoofDetector).to(
+      receive(:type_from_file_command).and_return('image/heic')
+    )
     issue = create(:basic_issue)
     seed = create(:full_natural_docket_seed,
       issue: issue, add_all_attachments: false)
