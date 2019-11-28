@@ -34,6 +34,7 @@ defaults: &defaults
 
   redis:
     cache_url: 'unix:/tmp/redis.sock'
+    namespace: 'compliance'
     pool_size: 8
 
 production:

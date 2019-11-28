@@ -305,7 +305,7 @@ class Person < ApplicationRecord
   private
 
   def expire_action_cache
-    ActionController::Base.new.expire_fragment(%r{person/show/#{self.id}})
+    Rails.cache.delete_matched "*/person/show/#{self.id}/*"
   end
 
   def log_if_enabled

@@ -35,6 +35,7 @@ defaults: &defaults
   
   redis:
     cache_url: 'redis://localhost:6379/0/compliance'
+    namespace: 'compliance'
     pool_size: 8
 
 production:
