@@ -1,6 +1,6 @@
 ActiveAdmin.register AdminUser do
   menu priority: 3, if: -> { authorized?(:view_menu, AdminUser) }
-  permit_params :email, :password, :password_confirmation
+  permit_params :email, :password, :password_confirmation, :max_people_allowed
 
   AdminUser.role_types.map(&:first).each do |role|
     action_item role, only: [:show, :edit, :update] do
@@ -39,6 +39,14 @@ ActiveAdmin.register AdminUser do
         return
       end
 
+      super
+    end
+
+    def update
+      if params[:admin_user][:password].blank? && params[:admin_user][:password_confirmation].blank?
+        params[:admin_user].delete(:password)
+        params[:admin_user].delete(:password_confirmation)
+      end
       super
     end
   end

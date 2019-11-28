@@ -19,9 +19,6 @@ class ApplicationController < ActionController::Base
     current_user = AdminUser.current_admin_user
     return if current_user.nil?
 
-    limit = current_user.max_people_allowed
-    return if limit.nil?
-
     person_id = related_person.to_s
     return if person_id.empty?
 
@@ -29,8 +26,14 @@ class ApplicationController < ActionController::Base
     return if set.member? person_id
 
     counter = current_user.request_limit_counter
+    new_value = counter.increment
 
-    render body: nil, status: 400 if counter.increment > limit
+    limit = current_user.max_people_allowed
+
+    unless limit.nil?
+      return render body: nil, status: 400 if new_value > limit
+    end
+
     set << person_id
   end
 
