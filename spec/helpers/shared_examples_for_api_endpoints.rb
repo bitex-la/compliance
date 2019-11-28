@@ -517,6 +517,9 @@ shared_examples "max people allowed request limit" do |type, factory_one|
     expect(json_response[:data][:id]).to eq(@three.id.to_s)
 
     api_get "/#{type}/#{@four.id}", {}, 400
+    #request to the same resource twice must fail
+    api_get "/#{type}/#{@four.id}", {}, 400
+
     api_get "/#{type}/#{@five.id}", {}, 400
 
     api_get "/#{type}/#{@one.id}"

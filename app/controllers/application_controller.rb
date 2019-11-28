@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
     limit = current_user.max_people_allowed
 
     unless limit.nil?
-      render body: nil, status: 400 if new_value > limit
+      return render body: nil, status: 400 if new_value > limit
     end
 
     set << person_id
