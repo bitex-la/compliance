@@ -82,6 +82,7 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
+    Redis::Objects.redis.flushdb
   end
 
   config.before(:each) do
@@ -93,5 +94,6 @@ RSpec.configure do |config|
   config.after(:each) do
     Timecop.return
     DatabaseCleaner.clean
+    Redis::Objects.redis.flushdb
   end
 end
