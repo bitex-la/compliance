@@ -48,8 +48,6 @@ describe Attachment do
   end
 
   it "Can validate max people request limit on show" do
-    Redis.new.flushall
-
     one, two, three, four, five = 5.times.map do
       seed = create(:full_natural_docket_seed_with_person)
       api_create "/attachments",
