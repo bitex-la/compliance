@@ -34,7 +34,7 @@ defaults: &defaults
     expiration_interval_minutes: 15
   
   redis:
-    cache_url: 'redis://localhost:6379/0/compliance'
+    cache_url: 'redis://localhost:6379/0'
     namespace: 'compliance'
     pool_size: 8
 
