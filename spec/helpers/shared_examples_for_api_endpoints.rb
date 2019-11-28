@@ -8,10 +8,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   initial_expires_seed = "#{initial_factory}_expires_seed"
 
-  before(:each) {
-    Redis.new.flushall
-  }
-
   it "Gets seed with observation" do
     issue = create(:basic_issue)
     person = issue.person
@@ -141,10 +137,6 @@ shared_examples "docket" do |type, initial_factory|
   initial_seed = "#{initial_factory}_seed"
   seed_type = Garden::Naming.new(type).seed_plural
   fruit_class = Garden::Naming.new(type).fruit.constantize
-
-  before(:each) {
-    Redis.new.flushall
-  }
 
   it "Replaces a #{type}, showing all resources involved" do
     person = create(:empty_person).reload
@@ -285,10 +277,6 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
   seed_factory = "#{factory}_seed"
   fruit_class =  Garden::Naming.new(type).fruit.constantize
   seed_type = Garden::Naming.new(type).seed_plural
-
-  before(:each) {
-    Redis.new.flushall
-  }
 
   it "Adds multiple #{type}, explicitly replaces one of them" do
     person = create(:empty_person).reload
@@ -492,8 +480,6 @@ end
 
 shared_examples "max people allowed request limit" do |type, factory_one|
   before(:each) {
-    Redis.new.flushall
-
     @admin = create(:limited_people_allowed_admin_user)
 
     @one = create(factory_one)
