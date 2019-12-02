@@ -98,7 +98,10 @@ class Attachment < ApplicationRecord
   private
   def relate_to_person
     unless destroyed?
-      self.update_column(:person_id, issue.person_id) if issue
+      if issue
+        self.update_column(:person_id, issue.person_id)
+        person.expire_action_cache
+      end
     end
   end
 

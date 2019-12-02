@@ -24,12 +24,9 @@ class Issue < ApplicationRecord
 
   after_save :sync_observed_status
   after_save :log_if_needed
-  after_save :expire_person_action_cache
-  validate :defer_until_cannot_be_in_the_past
+  after_save{ person.expire_action_cache }
 
-  def expire_person_action_cache
-    person.expire_action_cache
-  end
+  validate :defer_until_cannot_be_in_the_past
 
   def defer_until_cannot_be_in_the_past
     validation_date = created_at.try(:to_date) || Date.today
