@@ -570,6 +570,21 @@ describe Person do
       api_get "/people/#{person.id}"
       api_response.data.attributes.enabled.should be_falsey
     end
+
+    it 'clears cache when issues are created but not approved' do
+      person = create(:full_natural_person).reload
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.issues.data.size).to eq 1
+
+      api_create('/issues', {
+        type: 'issues',
+        relationships: { person: {data: {id: person.id, type: 'people'}}}
+      })
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.issues.data.size).to eq 2
+    end
   end
 
   describe "when changing state" do
