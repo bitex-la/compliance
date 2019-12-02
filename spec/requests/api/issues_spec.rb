@@ -467,4 +467,25 @@ describe Issue do
       expect(DateTime.parse(api_response.data.attributes.lock_expiration)).to eq interval.from_now
     end
   end
+
+  describe 'when caching person' do
+    before :each do
+      Timecop.freeze Date.new(2018, 1, 1)
+    end
+
+    it 'invalidate person cache on issue changes' do
+      person = create(:empty_person)
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.issues.data.empty?).to be_truthy
+
+      api_create('/issues', {
+        type: 'issues',
+        relationships: { person: {data: {id: person.id, type: 'people'}}}
+      })
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.issues.data.empty?).to be_falsey
+    end
+  end
 end

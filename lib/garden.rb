@@ -78,6 +78,12 @@ module Garden
         observations.destroy_all
       end
 
+      after_save :expire_action_cache
+
+      def expire_action_cache
+        person.expire_action_cache
+      end
+
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
       end
@@ -155,6 +161,12 @@ module Garden
       has_one :replaces, required: false, class_name: name,
         foreign_key: :replaced_by_id
       has_many :attachments, as: :attached_to_fruit
+
+      after_save :expire_action_cache
+
+      def expire_action_cache
+        person.expire_action_cache
+      end
 
       scope :current, -> { 
         where(replaced_by_id: nil)

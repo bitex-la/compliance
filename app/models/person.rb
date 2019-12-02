@@ -302,11 +302,11 @@ class Person < ApplicationRecord
     PersonProfile.generate_pdf(self, include_affinities, include_risk_scores)
   end
 
-  private
-
   def expire_action_cache
     Rails.cache.delete_matched "*/person/show/#{self.id}/*"
   end
+
+  private
 
   def log_if_enabled
     was, is = saved_changes[:enabled]
