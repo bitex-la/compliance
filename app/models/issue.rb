@@ -24,7 +24,7 @@ class Issue < ApplicationRecord
 
   after_save :sync_observed_status
   after_save :log_if_needed
-  after_save :expire_action_cache
+  after_save{ person.expire_action_cache }
 
   validate :defer_until_cannot_be_in_the_past
 
@@ -395,10 +395,6 @@ class Issue < ApplicationRecord
   end
 
   private
-
-  def expire_action_cache
-    person.expire_action_cache
-  end
 
   def lock_expired?
     return false if lock_expiration.nil?

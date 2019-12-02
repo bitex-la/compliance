@@ -570,6 +570,34 @@ describe Person do
       api_get "/people/#{person.id}"
       api_response.data.attributes.enabled.should be_falsey
     end
+
+    it 'clears cache when attachments are created' do
+      person = create(:empty_person)
+      issue = Issue.create(person: person)
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.attachments.data).to be_empty
+
+      domicile_seed = issue.domicile_seeds.create(country: "AR")
+      domicile_seed.attachments.create(attributes_for(:attachment))
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.attachments.data.size).to eq 1
+    end
+
+    it 'clears cache when issues are created but not approved' do
+      person = create(:full_natural_person).reload
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.issues.data.size).to eq 1
+
+      api_create('/issues', {
+        type: 'issues',
+        relationships: { person: {data: {id: person.id, type: 'people'}}}
+      })
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.relationships.issues.data.size).to eq 2
+    end
   end
 
   describe "when changing state" do
