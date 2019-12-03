@@ -16,7 +16,7 @@ module DownloadProfile
             IO.copy_stream(stream, sink)
             stream.close
           else
-            the_remote_uri = URI(file.expiring_url)
+            the_remote_uri = URI(f.expiring_url)
             Net::HTTP.get_response(the_remote_uri) do |response|
               response.read_body do |chunk|
                 sink << chunk
