@@ -96,12 +96,12 @@ ActiveAdmin.register Person do
   end
 
   form do |f|
-    if resource.issues.empty?
+    if resource.issues.empty? && resource.persisted?
       div class: 'flash flash_danger' do
         "This person has no created issues. Please create a new issue to add information."
       end
       br
-    elsif resource.issues.find { |issue| issue.editable? }
+    elsif resource.issues.find { |issue| issue.editable? } && resource.persisted?
       div class: 'flash flash_danger' do
         "This person has pending issues."
       end
