@@ -86,12 +86,10 @@ ActiveAdmin.register Person do
   end
 
   member_action :download_profile_basic, method: :post do
-    authorize!(:download_profile, resource)
     process_download_profile resource, EventLogKind.download_profile_basic
   end
 
   member_action :download_profile_full, method: :post do
-    authorize!(:download_profile, resource)
     process_download_profile resource, EventLogKind.download_profile_full
   end
 
@@ -151,14 +149,19 @@ ActiveAdmin.register Person do
       br
     end
   
-    if authorized?(:download_profile, resource)
+    if authorized?(:download_profile_basic, resource) || 
+      authorized?(:download_profile_full, resource)
       dropdown_menu 'Download Profile', class: 'dropdown_menu dropdown_other_actions' do
-        item 'Basic', download_profile_basic_person_path, method: :post
-        item 'Full', download_profile_full_person_path, method: :post
+        if authorized?(:download_profile_basic, resource)
+          item 'Basic', download_profile_basic_person_path, method: :post
+        end
+        if authorized?(:download_profile_full, resource)
+          item 'Full', download_profile_full_person_path, method: :post
+        end
       end
       br  
     end
-    
+
     tabs do
       ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
