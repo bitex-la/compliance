@@ -69,6 +69,8 @@ shared_examples "seed" do |type, initial_factory, later_factory,
     issue = create(:basic_issue)
     person = issue.person
 
+    api_get "/people/#{person.id}"
+
     initial_attrs = attributes_for(initial_seed)
 
     initial_relations = instance_exec(&relations_proc)
@@ -140,6 +142,7 @@ shared_examples "docket" do |type, initial_factory|
 
   it "Replaces a #{type}, showing all resources involved" do
     person = create(:empty_person).reload
+    api_get "/people/#{person.id}"
     # We need to create an issue for this person, so that the factory
     # for the fruit that follows it can create it's original seed and add
     # it to the existing issue.
@@ -280,6 +283,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
 
   it "Adds multiple #{type}, explicitly replaces one of them" do
     person = create(:empty_person).reload
+    api_get "/people/#{person.id}"
     # We need to create an issue for this person, so that the factory
     # for the fruit that follows it can create it's original seed and add
     # it to the existing issue.

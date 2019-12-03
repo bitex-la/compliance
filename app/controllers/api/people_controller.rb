@@ -2,7 +2,7 @@ class Api::PeopleController < Api::ApiController
   include ZipTricks::RailsStreaming
   include DownloadProfile
   
-  caches_action :show, expires_in: 2.minutes, cache_path: :path_for_show
+  caches_action :show, cache_path: :path_for_show
 
   def index
     scope = Person.ransack(params[:filter]).result

@@ -394,7 +394,7 @@ class Issue < ApplicationRecord
     end
   end
 
-  private  
+  private
 
   def lock_expired?
     return false if lock_expiration.nil?
