@@ -69,6 +69,13 @@ RSpec.configure do |config|
   Capybara.register_driver :firefox do |app|
     browser_options = ::Selenium::WebDriver::Firefox::Options.new()
     browser_options.args << '--headless' if ENV['SELENIUM_HEADLESS']
+    profile = Selenium::WebDriver::Firefox::Profile.new
+    profile['intl.accept_languages'] = "es"
+    browser_options.profile = profile
+    browser_options.profile['browser.download.dir'] = DownloadHelpers::PATH.to_s
+    browser_options.profile['browser.download.folderList'] = 2
+    browser_options.profile['browser.helperApps.neverAsk.saveToDisk'] = 'application/zip'
+
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: browser_options)
   end
 
@@ -89,6 +96,7 @@ RSpec.configure do |config|
     AdminUser.current_admin_user = nil
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
+    DownloadHelpers::clear_downloads
   end
   
   config.after(:each) do
