@@ -16,6 +16,6 @@ describe 'an admin user' do
       click_link('View')
     end
     page.current_path.should == "/people/#{person.id}"
-    #open_download_profile_actions_menu('Basic')
+    open_download_profile_actions_menu('Basic')
   end
 end

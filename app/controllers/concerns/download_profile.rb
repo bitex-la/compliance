@@ -1,40 +1,42 @@
+# frozen_string_literal: true
+
+require 'zip'
+
 module DownloadProfile
   extend ActiveSupport::Concern
 
   def process_download_profile(resource, kind)
     EventLog.log_entity!(resource, AdminUser.current_admin_user, kind)
 
-    zip_name = "person_#{resource.id}_kyc_files.zip"
-    headers['Content-Disposition'] = "attachment; filename=\"#{zip_name.gsub('"', '\"')}\""
+    zip = Tempfile.new('', "#{Rails.root}/tmp/")
 
-    zip_tricks_stream do |zip|
-      files = resource.all_attachments.map { |a| [a.document, a.document_file_name] }
-      files.each do |f, name|
-        zip.write_deflated_file(name) do |sink|
+    files = resource.all_attachments.map { |a| [a.id, a.document, a.document_file_name] }
+
+    begin
+      Zip::OutputStream.open(zip) { |zos| }
+
+      Zip::File.open(zip.path, Zip::File::CREATE) do |zipfile|
+        files.each do |id, f, name|
           if f.options[:storage] == :filesystem
-            stream = File.open(f.path)
-            IO.copy_stream(stream, sink)
-            stream.close
+            zipfile.add("#{id}_#{name}", f.path)
           else
-            the_remote_uri = URI(f.expiring_url)
-            Net::HTTP.get_response(the_remote_uri) do |response|
-              response.read_body do |chunk|
-                sink << chunk
-              end
-            end
+            zipfile.add("#{id}_#{name}", open(f.expiring_url).path)
           end
         end
-      end
 
-      pdf = if kind == EventLogKind.download_profile_basic
-              resource.generate_pdf_profile(false, false)
-            else
-              resource.generate_pdf_profile(true, true)
-            end
+        pdf = if kind == EventLogKind.download_profile_basic
+                resource.generate_pdf_profile(false, false)
+              else
+                resource.generate_pdf_profile(true, true)
+              end
 
-      zip.write_deflated_file('profile.pdf') do |sink|
-        sink << pdf.render
+        zipfile.get_output_stream('profile.pdf') { |f| f.write pdf.render }
       end
+      send_data File.read(zip.path), type: 'application/zip',
+        filename: "person_#{resource.id}_kyc_files.zip"
+    ensure
+      zip.close
+      zip.unlink
     end
   end
 end
