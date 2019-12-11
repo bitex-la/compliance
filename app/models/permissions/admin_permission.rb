@@ -26,7 +26,7 @@ module Permissions
     def allowed_actions
       actions = {
         Issue => [:complete, :approve, :reject, :dismiss, :abandon],
-        Person => [:enable, :disable, :reject, :download_profile],
+        Person => [:enable, :disable, :reject, :download_profile_basic, :download_profile_full],
         AdminUser => [:read],
         Tag => [:destroy],
         Workflow => [:finish],

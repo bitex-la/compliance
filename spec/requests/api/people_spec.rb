@@ -505,9 +505,8 @@ describe Person do
     it 'downloads profile' do
       person = create :full_natural_person
       api_get "/people/#{person.id}/download_profile", {}, 200
-
-      expect(response.header["Content-Disposition"]).to eq 'attachment; filename="person_1_kyc_files.zip"'
-      expect(response.header["Content-type"]).to eq 'application/zip'
+      expect(response.header['Content-Disposition']).to eq 'attachment; filename="person_1_kyc_files.zip"'
+      expect(response.header['Content-type']).to eq 'application/zip'
     end
   end
 

@@ -1,5 +1,4 @@
 class Api::PeopleController < Api::ApiController
-  include ZipTricks::RailsStreaming
   include DownloadProfile
   
   caches_action :show, cache_path: :path_for_show

@@ -34,7 +34,7 @@ gem 'draper'
 gem 'aws-sdk-s3', '~> 1.30.0'
 gem "paperclip", "~>6.1.0"
 gem 'aasm'
-gem 'zipline'
+gem 'rubyzip'
 
 gem 'fast_jsonapi', github: 'netflix/fast_jsonapi'
 gem 'active_model_serializers', '~> 0.10.0'
