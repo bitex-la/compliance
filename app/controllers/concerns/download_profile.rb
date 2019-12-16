@@ -20,7 +20,7 @@ module DownloadProfile
           if f.options[:storage] == :filesystem
             zipfile.add("#{id}_#{name}", f.path)
           else
-            zipfile.get_output_stream("#{id}_#{name}") { |z| z.print open(f.expiring_url) }
+            zipfile.get_output_stream("#{id}_#{name}") { |z| z.print open(f.expiring_url, 'rb') }
             #zipfile.get_output_stream("#{id}_#{name}") { |z| z.print(URI.parse(f.expiring_url).read) }
           end
         end
