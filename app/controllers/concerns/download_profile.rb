@@ -22,8 +22,6 @@ module DownloadProfile
           else
             zipfile.add("#{id}_#{name}", open(f.expiring_url).path)
             zipfile.commit
-            #zipfile.get_output_stream("#{id}_#{name}") { |z| z.print open(f.expiring_url, 'rb') }
-            #zipfile.get_output_stream("#{id}_#{name}") { |z| z.print(URI.parse(f.expiring_url).read) }
           end
         end
 
