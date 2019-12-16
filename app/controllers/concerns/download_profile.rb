@@ -21,6 +21,7 @@ module DownloadProfile
             zipfile.add("#{id}_#{name}", f.path)
           else
             zipfile.add("#{id}_#{name}", open(f.expiring_url).path)
+            zipfile.commit
           end
         end
 
