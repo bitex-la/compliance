@@ -15,9 +15,12 @@ ActiveAdmin.register Issue do
     column(:person_state)do |o|
       o.person.state
     end
-    column(:reason) do |o| 
-      tags =  o.tags.any? ?  "(#{o.tags.pluck(:name).join(' - ')})" : "" 
+    column(:reason) do |o|
+      tags = o.tags.any? ? "(#{o.tags.pluck(:name).join(' - ')})" : ''
       "#{o.reason} #{tags}"
+    end
+    column(:person_tags) do |o| 
+      o.person.tags.pluck(:name).join(' - ')
     end
     column(:state)
     column(:created_at)
@@ -166,6 +169,9 @@ ActiveAdmin.register Issue do
             attributes_table_for resource do
               row :created_at
               row :updated_at
+              row :person_tags do  
+                resource.person.tags.pluck(:name).join(' - ')
+              end
             end
           end
         end
@@ -460,6 +466,9 @@ ActiveAdmin.register Issue do
               row :defer_until
               row :tags do  
                 resource.tags.pluck(:name).join(' - ')
+              end
+              row :person_tags do  
+                resource.person.tags.pluck(:name).join(' - ')
               end
             end
           end
