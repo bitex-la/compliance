@@ -406,6 +406,16 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
     api_response.data.relationships.attachments.data.map(&:id).should ==
       [attachment.id]
   end
+
+  it "Can show #{type} without issue" do
+    person = create(:empty_person).reload
+    create(:basic_issue, person: person, aasm_state: "approved")
+    existing_fruit = create(factory, person: person).reload
+    existing_fruit.seed.update_column(:issue_id, nil)
+    expect(existing_fruit.reload.issue).to be nil
+    api_get "/#{type}/#{existing_fruit.id}"
+    expect(api_response.data.id).to eq existing_fruit.id.to_s
+  end
 end
 
 shared_examples "jsonapi show and index" do |type, factory_one, factory_two,

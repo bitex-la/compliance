@@ -4,6 +4,6 @@ class Api::NaturalDocketsController < Api::ReadOnlyEntityController
   end
 
   def related_person
-    resource.issue.person_id
+    resource.person_id
   end
 end
