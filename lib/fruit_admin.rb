@@ -2,8 +2,12 @@ class FruitAdmin
   def self.register(klass)
     ActiveAdmin.register klass do
       menu false
-      actions :all, :except => [:edit, :destroy]
+      actions :show
       includes :issue
+
+      breadcrumb do
+        []
+      end
 
       controller do
         def related_person
