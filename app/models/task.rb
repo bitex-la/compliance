@@ -1,12 +1,14 @@
 class Task < ApplicationRecord
   include AASM
   include Loggable
-  
+
   belongs_to :workflow
 
   ransack_alias :state, :aasm_state
 
-  aasm do 
+  validates :task_type, presence: true
+
+  aasm do
     state :new, initial: true
     state :started
     state :performed
@@ -17,7 +19,7 @@ class Task < ApplicationRecord
       transitions from: [:new, :started], to: :started, guard: :start_workflow!
     end
 
-    event :finish do 
+    event :finish do
       transitions from: [:started, :retried, :performed], to: :performed, guard: :has_an_output?
     end
 

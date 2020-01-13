@@ -6,9 +6,11 @@ RSpec.describe Task, type: :model do
 
   it 'is not valid without a workflow' do
     expect(invalid_task).to_not be_valid
+    expect(invalid_task.errors[:workflow]).to eq ["must exist"]
+    expect(invalid_task.errors[:task_type]).to eq ["can't be blank"]
   end
 
-  it 'is valid with a workflow' do
+  it 'is valid with a workflow and type' do
     expect(basic_task).to be_valid
   end
 
