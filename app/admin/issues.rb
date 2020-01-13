@@ -213,31 +213,31 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
-        ArbreHelpers::Form.has_many_form self, f, :workflows do |wf, context|
-          wf.template.concat(
-            Arbre::Context.new({}, wf.template){
-              li do
-                ArbreHelpers::Workflow.render_workflow_progress(self, "workflow", wf.object)
-              end
-            }.to_s
-          )
-          wf.input :scope
-          wf.input :workflow_type
-          if !wf.object.new_record?
-            wf.input :state, input_html: { disabled: wf.object.persisted? } 
-            if wf.object.may_finish? || wf.object.may_start?
-              wf.template.concat(
-                Arbre::Context.new({}, wf.template){
-                  li do
-                    link_to 'Mark as finished', [:finish, wf.object], class: 'button', method: :post
-                  end
-              }.to_s)
-            end
-          end  
-          ArbreHelpers::Task.has_many_tasks(context, wf)
-        end
-      end
+      # ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
+      #   ArbreHelpers::Form.has_many_form self, f, :workflows do |wf, context|
+      #     wf.template.concat(
+      #       Arbre::Context.new({}, wf.template){
+      #         li do
+      #           ArbreHelpers::Workflow.render_workflow_progress(self, "workflow", wf.object)
+      #         end
+      #       }.to_s
+      #     )
+      #     wf.input :scope
+      #     wf.input :workflow_type
+      #     if !wf.object.new_record?
+      #       wf.input :state, input_html: { disabled: wf.object.persisted? } 
+      #       if wf.object.may_finish? || wf.object.may_start?
+      #         wf.template.concat(
+      #           Arbre::Context.new({}, wf.template){
+      #             li do
+      #               link_to 'Mark as finished', [:finish, wf.object], class: 'button', method: :post
+      #             end
+      #         }.to_s)
+      #       end
+      #     end  
+      #     ArbreHelpers::Task.has_many_tasks(context, wf)
+      #   end
+      # end
       
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'industry', LegalEntityDocketSeed) do
