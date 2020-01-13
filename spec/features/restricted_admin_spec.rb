@@ -91,6 +91,7 @@ describe 'a restricted admin user' do
     expect(page).to_not have_content 'Reject'
   end
 
+  # TODO: Uncomment when workflow implementation are ready for production
   # it 'can create a natural person and it issue, but cannot approve, reject, dismiss or abandon it with workflows' do
   #   observation_reason = create(:human_world_check_reason)
   #   login_as restricted_user

@@ -164,6 +164,7 @@ describe 'an admin user' do
     end
   end
 
+  # TODO: Uncomment when workflow implementation are ready for production
   # it 'creates a new natural person and its issue via admin with workflows' do
   #   AdminUser.current_admin_user = admin_user
   #   observation_reason = create(:human_world_check_reason)

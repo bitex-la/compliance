@@ -213,6 +213,7 @@ ActiveAdmin.register Issue do
         end
       end
 
+      # TODO: Uncomment when workflow implementation are ready for production
       # ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
       #   ArbreHelpers::Form.has_many_form self, f, :workflows do |wf, context|
       #     wf.template.concat(
