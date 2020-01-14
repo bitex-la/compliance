@@ -35,7 +35,8 @@ describe Workflow do
         api_create('/workflows', {
           type: 'workflows',
           attributes: {
-            workflow_kind_code: 'onboarding'
+            workflow_type: 'onboarding',
+            scope: 'robot'
           },
           relationships: {
             issue: {data:{id: issue.id, type: 'issues'}}
@@ -48,8 +49,10 @@ describe Workflow do
 
       api_get("/workflows/#{workflow.id}")
 
-      api_response.data.relationships.issue
-        .data.id.to_i.should == issue.id 
+      data = api_response.data
+      expect(data.relationships.issue.data.id.to_i).to eq issue.id
+      expect(data.attributes.scope).to eq "robot"
+      expect(data.attributes.workflow_type).to eq "onboarding"
 
       api_response.included.select{|o| o.type == 'issues'}
         .map(&:id).should == [issue.id.to_s]

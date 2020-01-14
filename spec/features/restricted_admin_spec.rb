@@ -91,51 +91,52 @@ describe 'a restricted admin user' do
     expect(page).to_not have_content 'Reject'
   end
 
-  it 'can create a natural person and it issue, but cannot approve, reject, dismiss or abandon it with workflows' do
-    observation_reason = create(:human_world_check_reason)
-    login_as restricted_user
+  # TODO: Uncomment when workflow implementation are ready for production
+  # it 'can create a natural person and it issue, but cannot approve, reject, dismiss or abandon it with workflows' do
+  #   observation_reason = create(:human_world_check_reason)
+  #   login_as restricted_user
 
-    click_link 'People'
-    click_link 'New Person'
-    click_button 'Create Person'
+  #   click_link 'People'
+  #   click_link 'New Person'
+  #   click_button 'Create Person'
 
-    visit '/'
-    click_link 'People'
-    within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
-      click_link 'View'
-    end
+  #   visit '/'
+  #   click_link 'People'
+  #   within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
+  #     click_link 'View'
+  #   end
 
-    click_link 'Edit Person'
+  #   click_link 'Edit Person'
 
-    expect(page).to_not have_content 'Enable'
-    expect(page).to_not have_content 'Disable'
+  #   expect(page).to_not have_content 'Enable'
+  #   expect(page).to_not have_content 'Disable'
     
-    click_link 'View Person Issues'
-    click_link 'New'
+  #   click_link 'View Person Issues'
+  #   click_link 'New'
     
-    fulfil_new_issue_form true
+  #   fulfil_new_issue_form true
 
-    click_button "Create Issue"
-    click_link "Edit"
+  #   click_button "Create Issue"
+  #   click_link "Edit"
 
-    add_observation(observation_reason, 'Please check this guy on world check')
+  #   add_observation(observation_reason, 'Please check this guy on world check')
 
-    click_button "Update Issue"
-    click_link "Edit"
+  #   click_button "Update Issue"
+  #   click_link "Edit"
 
-    find('li[title="Workflows"] a').click
+  #   find('li[title="Workflows"] a').click
 
-    within '.has_many_container.workflows' do
-      click_link 'Mark as finished'
-    end
+  #   within '.has_many_container.workflows' do
+  #     click_link 'Mark as finished'
+  #   end
     
-    expect(page).to have_content 'You are not authorized to perform this action'
+  #   expect(page).to have_content 'You are not authorized to perform this action'
 
-    expect(page).to_not have_content 'Approve'
-    expect(page).to_not have_content 'Dismiss'
-    expect(page).to_not have_content 'Abandon'
-    expect(page).to_not have_content 'Reject'
-  end
+  #   expect(page).to_not have_content 'Approve'
+  #   expect(page).to_not have_content 'Dismiss'
+  #   expect(page).to_not have_content 'Abandon'
+  #   expect(page).to_not have_content 'Reject'
+  # end
 
   it 'can edit an issue' do
     person = create(:full_natural_person).reload
