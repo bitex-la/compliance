@@ -61,7 +61,10 @@ ActiveAdmin.register AdminUser do
     column :sign_in_count
     column :max_people_allowed
     column(:person_view_count) do |o|
-      o.request_limit_counter.value
+      o.request_limit_set.length
+    end
+    column(:rejected_person_view_count) do |o|
+      o.request_limit_rejected_set.length
     end
     column :created_at
     actions
