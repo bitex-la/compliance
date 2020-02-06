@@ -11,6 +11,7 @@ describe 'a restricted admin user' do
       admin_users
       observation_reasons
       tags
+      event_logs
     ).each do |path|
       visit "/#{path}"
       page.current_path.should == '/dashboards'

@@ -5,10 +5,11 @@ module Permission
     include StaticModels::Model
 
     static_models_dense [
-      [:id, :code,          :provider],
-      [1,   :admin,         'Permissions::AdminPermission'],
-      [2,   :restricted,    'Permissions::RestrictedPermission'],
-      [3,   :marketing,     'Permissions::MarketingPermission']
+      [:id, :code,              :provider],
+      [1,   :admin,             'Permissions::AdminPermission'],
+      [2,   :restricted,        'Permissions::RestrictedPermission'],
+      [3,   :marketing,         'Permissions::MarketingPermission'],
+      [4,   :admin_restricted,  'Permissions::AdminRestrictedPermission']
     ]
 
     def to_s
@@ -27,7 +28,8 @@ module Permission
       permission = self.find_by_code(user.role_type)
         .provider.constantize.new
 
-      return true if [:read, :create, :update].include?(action) && permission.allowed_classes.include?(klass)
+      return true if [:read, :create, :update].include?(action) && 
+        permission.allowed_classes.include?(klass)
 
       permission.allowed_actions[klass].include?(action)
     end
