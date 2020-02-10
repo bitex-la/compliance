@@ -24,6 +24,8 @@ describe 'an admin user' do
       click_link 'View'
     end
 
+    super_admin_user.reload
+    
     within '#otp_sidebar_section' do
       expect(page).to have_content 'Otp'
       expect(page).to have_content super_admin_user.otp_secret_key
