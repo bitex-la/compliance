@@ -101,6 +101,7 @@ ActiveAdmin.register AdminUser do
     if resource.otp_enabled?
       span 'OTP is enabled'
     else
+      resource.renew_otp_secret_key!
       div(class: 'qrcode', 'data-provisioning-uri' => resource.provisioning_uri("Compliance Admin | #{resource.email}"))
       attributes_table_for resource do
         row :otp_secret_key
