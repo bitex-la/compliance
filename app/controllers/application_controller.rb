@@ -6,8 +6,8 @@ class ApplicationController < ActionController::Base
   private
 
   def set_current_user
-    if current_admin_user.nil? 
-      authenticate_with_http_token do |token, options|
+    if current_admin_user.nil?
+      authenticate_with_http_token do |token, _options|
         AdminUser.current_admin_user = AdminUser.find_by(api_token: token)
       end
     else
@@ -26,35 +26,37 @@ class ApplicationController < ActionController::Base
     limit = current_admin_user.max_people_allowed
 
     if limit.nil?
-      # si no hay limite configurado o existia y se modifico, no borro 
-      # los usuarios rechazados para que puedan consultarse en el admin 
-      # hasta que expiren. solo incremento el score de los usuarios permitidos.
+      # If the limit is not configured or was changed, don't delete
+      # rejected people to allow queries from admin page until expiration.
+      # Only increment the allowed people score.
       set.increment person_id
     else
       counter = current_admin_user.request_limit_counter
       rejected_set = current_admin_user.request_limit_rejected_set
 
-      # si existe limite y el usuario ya esta incluido en el set de permitidos
-      # incremento el score.
+      # If there are configured limit and the person is already
+      # in the allowed set, increments the score.
       if set.member? person_id
         set.increment person_id
       else
-        # si no esta en el set valido si puedo agregarlo aumentando el contador atomicamente
+        # If the person is not in the set, increment size atomically
+        # and validate limit.
         if counter.increment <= limit
-          # si el valor incrementado es menor o igual al limite
-          # incremento el score en el set de permitidos
-          # si el usuario ya existia en el set decremento el contador para
-          # dejar lugar a un futuro usuario.
-          # el increment evita una condicion de carrera entre 2 request del mismo user_id
+          # If the new counter value is less or equal to limit
+          # increments the allowed people score.
+          # If the person is already in the allowed set,
+          # decrements the counter to make place to future people.
+          # Using increment method avoid a race condition between two or more
+          # concurrent requests.
           unless set.increment(person_id) == 1
             counter.decrement
           end
-          # elimino el usuario del set de rechazados si existe
+          # Deletes person if is already on rejected set
           rejected_set.delete person_id
         else
-          # si se supera el limite, decremento el contador para permitir
-          # modificaciones dinamicas del limite e incremento el score en el set
-          # de usuarios rechazados y retorno error 400.
+          # If the limit reach the maximum, decrements the counter to
+          # allow dynamic changes to the limit, increments the rejected
+          # people set score and returns 404 error.
           counter.decrement
           rejected_set.increment person_id
           render body: nil, status: 400
@@ -62,7 +64,7 @@ class ApplicationController < ActionController::Base
       end
     end
   end
-  
+
   def related_person
   end
 end
