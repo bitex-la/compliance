@@ -79,6 +79,20 @@ RSpec.describe Issue, type: :model do
     expect(empty_issue.errors.messages.keys.first).to eq(:"note_seeds.expires_at")
   end
 
+  it 'create deferred issue with valid defer_until if seed expire_at is in the past' do
+    empty_issue.note_seeds.create(title:'title', body: 'body', expires_at: 1.month.from_now)
+    empty_issue.save
+    empty_issue.reload
+
+    Timecop.travel 3.months.from_now
+
+    expect do
+      empty_issue.approve!
+    end.to change { Issue.count }.by(1)
+
+    expect(Issue.last.defer_until).to eq Date.today
+  end
+
   describe 'when transitioning' do
     it 'defaults to draft' do
       expect(empty_issue).to have_state(:draft)
