@@ -28,7 +28,14 @@ class AdminUser < ApplicationRecord
     now = Time.now
     now_string = now.strftime('%Y%m%d')
     expire_at = (now + 1.week).end_of_day
-    Redis::Set.new("request_limit:people:#{id}:#{now_string}", :expireat => expire_at)
+    Redis::SortedSet.new("request_limit:people:#{id}:#{now_string}", :expireat => expire_at)
+  end
+
+  def request_limit_rejected_set
+    now = Time.now
+    now_string = now.strftime('%Y%m%d')
+    expire_at = (now + 1.week).end_of_day
+    Redis::SortedSet.new("request_limit:rejected_people:#{id}:#{now_string}", :expireat => expire_at)
   end
 
   def request_limit_counter
