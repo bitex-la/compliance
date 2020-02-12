@@ -23,6 +23,14 @@ FactoryBot.define do
     max_people_allowed { 1000 }
   end
 
+  factory :admin_restricted_user, class: 'AdminUser' do
+    email     { Faker::Internet.email }
+    password  { 'myadminrestrictedpassword' }
+    api_token { 'my_admin_restricted_token_for_testing' }
+    role_type { "admin_restricted" }
+    max_people_allowed { 1000 }
+  end
+
   factory :super_admin_user, class: 'AdminUser' do
     email     { Faker::Internet.email }
     password  { 'mysecurepassword' }

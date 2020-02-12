@@ -19,8 +19,7 @@ module Permissions
         PhoneSeed,
         EmailSeed,
         FundDeposit,
-        Attachment,
-        EventLog
+        Attachment
       ]
     end
 

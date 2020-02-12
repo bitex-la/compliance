@@ -1,5 +1,5 @@
 class AdminUser < ApplicationRecord
-  enum role_type: [:restricted, :admin, :super_admin, :marketing]
+  enum role_type: [:restricted, :admin, :super_admin, :marketing, :admin_restricted]
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
