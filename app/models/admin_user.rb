@@ -38,6 +38,13 @@ class AdminUser < ApplicationRecord
     Redis::Counter.new("request_limit:counter:#{id}:#{now_string}", :expireat => expire_at)
   end
 
+  def renew_otp_secret_key!
+    return if otp_enabled?
+
+    self.otp_secret_key = ROTP::Base32.random_base32
+    save!
+  end
+
   private
 
   def set_api_token
