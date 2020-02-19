@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_05_182658) do
+ActiveRecord::Schema.define(version: 2020_02_19_200136) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -343,6 +343,8 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.bigint "replaced_by_id"
     t.string "external_id"
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
+    t.date "deposit_date"
+    t.string "country"
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"
   end
