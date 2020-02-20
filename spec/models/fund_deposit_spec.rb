@@ -15,6 +15,12 @@ RSpec.describe FundDeposit, type: :model do
     expect(create(:fund_deposit, person: person)).to be_valid
   end
 
+  it 'is not valid if deposit_date is in the future' do
+    object = build(:full_fund_deposit, person: person, deposit_date: 1.hour.from_now)
+    expect(object).to_not be_valid
+    expect(object.errors.messages.keys.first).to eq(:"deposit_date")
+  end
+
   it 'logs creation of fund deposits' do
     object = create(:full_fund_deposit, person: person)
     assert_logging(object, :create_entity, 1)

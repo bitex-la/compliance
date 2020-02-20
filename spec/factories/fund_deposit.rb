@@ -6,8 +6,7 @@ FactoryBot.define do
     deposit_method_code { 'bank' }
     external_id { "1" }
     country { 'AR' }
-    deposit_date { '2020-02-01' }
-
+    deposit_date { DateTime.now.utc }
   end
 
   factory :fund_deposit, class: FundDeposit do
@@ -17,7 +16,7 @@ FactoryBot.define do
     deposit_method_code { 'bank' }
     external_id { "1" }
     country { 'AR' }
-    deposit_date { '2020-02-01' }
+    deposit_date { DateTime.now.utc }
 
     factory :fund_deposit_with_person do
       association :person, factory: :empty_person
@@ -31,7 +30,7 @@ FactoryBot.define do
     deposit_method_code { 'debin' }
     external_id { "2" }
     country { 'AR' }
-    deposit_date { '2020-02-01' }
+    deposit_date { DateTime.now.utc }
 
     factory :alt_fund_deposit_with_person do
       association :person, factory: :empty_person

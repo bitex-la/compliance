@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'json'
 
-describe FundDeposit do 
+describe FundDeposit do
   let(:person) { create(:empty_person) }
 
   it_behaves_like 'jsonapi show and index',
@@ -37,15 +37,17 @@ describe FundDeposit do
         exchange_rate_adjusted_amount: '1000.0',
         currency_code: "usd",
         deposit_method_code: "bank",
-        external_id: "1"
+        external_id: "1",
+        deposit_date: Time.at(attributes[:deposit_date].to_i).to_datetime.utc.as_json ,
+        country: "AR"
       }
 
       api_response.data.relationships.person.data.id.should == person.id.to_s
     end
   end
 
-  describe 'Updating a person fund deposit' do 
-    it 'updates the fund info when deposit exists' do 
+  describe 'Updating a person fund deposit' do
+    it 'updates the fund info when deposit exists' do
       fund_deposit = create(:full_fund_deposit, person: person)
 
       api_update "/fund_deposits/#{fund_deposit.id}", {
