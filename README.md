@@ -7,8 +7,6 @@
 - [ ] Install dependencies and setup development tools
   ```
     bundle install
-    bundle binstubs bundler --force
-    bundle binstubs foreman
   ```
 
 ## Environment variables
