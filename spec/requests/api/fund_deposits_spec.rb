@@ -38,7 +38,7 @@ describe FundDeposit do
         currency_code: "usd",
         deposit_method_code: "bank",
         external_id: "1",
-        deposit_date: attributes[:deposit_date].change(usec: 0).as_json
+        deposit_date: attributes[:deposit_date].change(usec: 0).as_json,
         country: "AR"
       }
 
