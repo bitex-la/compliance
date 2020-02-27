@@ -1,6 +1,7 @@
 ActiveAdmin.register AdminUser do
   menu priority: 3, if: -> { authorized?(:view_menu, AdminUser) }
-  permit_params :email, :password, :password_confirmation, :max_people_allowed
+  permit_params :email, :password, :password_confirmation,
+    :max_people_allowed, admin_user_taggings_attributes: [:tag_id, :id]
 
   AdminUser.role_types.map(&:first).each do |role|
     action_item role, only: [:show, :edit, :update] do
@@ -76,6 +77,7 @@ ActiveAdmin.register AdminUser do
   filter :current_sign_in_at
   filter :sign_in_count
   filter :created_at
+  filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
 
   action_item :toggle_otp, only: :show do
     if authorized?(:toggle_otp, resource)
@@ -97,7 +99,38 @@ ActiveAdmin.register AdminUser do
       f.input :password_confirmation
       f.input :max_people_allowed
     end
+
+    ArbreHelpers::Form.has_many_form self, f, :admin_user_taggings,  
+      new_button_text: "Add New Tag" do |cf, context|
+        cf.input :tag, as:  :select, collection: Tag.people
+    end
+
     f.actions
+  end
+
+  show do
+    attributes_table do
+      row :email
+      row :encrypted_password
+      row :reset_password_token
+      row :reset_password_sent_at
+      row :remember_created_at
+      row :sign_in_count
+      row :current_sign_in_at
+      row :last_sign_in_at
+      row :current_sign_in_ip
+      row :last_sign_in_ip
+      row :created_at
+      row :updated_at
+      row :api_token
+      row :otp_secret_key
+      row :otp_enabled
+      row :role_type
+      row :max_people_allowed
+      row :tags do
+        resource.tags.pluck(:name).join(' - ')
+      end
+    end
   end
 
   sidebar 'OTP', only: :show do
