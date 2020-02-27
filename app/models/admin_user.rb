@@ -12,6 +12,10 @@ class AdminUser < ApplicationRecord
   has_secure_token :api_token
   after_initialize :set_api_token
 
+  has_many :admin_user_taggings
+  has_many :tags, through: :admin_user_taggings
+  accepts_nested_attributes_for :admin_user_taggings, allow_destroy: true
+
   def is_restricted?
     role_type == "restricted"
   end

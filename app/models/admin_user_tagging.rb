@@ -1,6 +1,6 @@
-class PersonTagging < ApplicationRecord
+class AdminUserTagging < ApplicationRecord
   def self.taggable_type
-    :person
+    :admin_user
   end
 
   def self.tag_type
