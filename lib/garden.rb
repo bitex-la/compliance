@@ -78,6 +78,8 @@ module Garden
         observations.destroy_all
       end
 
+      default_scope { joins(:issue).distinct }
+
       after_save{ person.expire_action_cache }
 
       def name
@@ -116,7 +118,7 @@ module Garden
         end
       else
         old_fruits =  fruit.person.send(self.class.naming.plural)
-          .current.where('id != ?', fruit.id)
+          .current.where.not(id: fruit.id).distinct(false)
 
         if respond_to?(:copy_attachments)
           if copy_attachments
@@ -159,6 +161,8 @@ module Garden
 
       after_save{ person.expire_action_cache }
 
+      default_scope { left_outer_joins(:person).distinct }
+
       scope :current, -> { 
         where(replaced_by_id: nil)
           .includes(:attachments)
@@ -170,7 +174,7 @@ module Garden
       end
 
       def others_for_person
-        self.class.where(person: person, replaced_by: nil).where("id != ?", self)
+        self.class.where(person: person, replaced_by: nil).where.not(id: self)
       end
 
       def issue

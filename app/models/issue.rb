@@ -44,6 +44,8 @@ class Issue < ApplicationRecord
   belongs_to :lock_admin_user, class_name: "AdminUser", foreign_key: "lock_admin_user_id", optional: true
   validate :locked_issue_cannot_changed
 
+  default_scope { joins(:person).distinct }
+
   def locked_issue_cannot_changed
     return unless locked
     return if lock_expired?

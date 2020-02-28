@@ -129,6 +129,9 @@ ActiveAdmin.register Person do
     column :risk
     column :regularity
     column :person_type
+    column(:tags) do |o|
+      o.tags.pluck(:name).join(' - ')
+    end
     column :created_at
     column :updated_at
     actions

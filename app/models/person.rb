@@ -63,6 +63,16 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
+  def self.default_scope
+    unless (tags = AdminUser.current_admin_user&.admin_user_taggings&.pluck(:tag_id))
+      return nil
+    end
+
+    return nil if tags.empty?
+
+    joins(:person_taggings).where(person_taggings: { tag_id: tags }).distinct
+  end
+
   def natural_docket
     natural_dockets.last
   end
@@ -198,11 +208,11 @@ class Person < ApplicationRecord
   end
 
   def all_affinities
-    Affinity.where("person_id = ? OR related_person_id = ?", id, id)
+    Affinity.where(person: self).or(Affinity.where(related_person: self))
   end
 
   def public_notes
-    Note.where("person_id = ? AND public = true", id)
+    Note.where(person: self, public: true)
   end
 
   def self.suggest(keyword, page = 1, per_page = 20)
