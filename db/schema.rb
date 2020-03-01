@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_05_182658) do
+ActiveRecord::Schema.define(version: 2020_03_01_083628) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -345,6 +345,18 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"
+  end
+
+  create_table "fund_withdrawals", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.decimal "amount", precision: 20, scale: 8, null: false
+    t.integer "currency_id", null: false
+    t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
+    t.datetime "withdrawal_date"
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id"], name: "index_fund_withdrawals_on_person_id"
   end
 
   create_table "fundings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -750,6 +762,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
   add_foreign_key "emails", "people"
   add_foreign_key "event_logs", "admin_users"
   add_foreign_key "fund_deposits", "people"
+  add_foreign_key "fund_withdrawals", "people"
   add_foreign_key "fundings", "fundings", column: "replaced_by_id"
   add_foreign_key "fundings", "issues"
   add_foreign_key "fundings", "people"
