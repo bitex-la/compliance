@@ -77,7 +77,9 @@ ActiveAdmin.register AdminUser do
   filter :current_sign_in_at
   filter :sign_in_count
   filter :created_at
-  filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
+  filter :tags_id, as: :select,
+    collection: proc { Tag.people(false) },
+    multiple: true
 
   action_item :toggle_otp, only: :show do
     if authorized?(:toggle_otp, resource)
@@ -102,7 +104,7 @@ ActiveAdmin.register AdminUser do
 
     ArbreHelpers::Form.has_many_form self, f, :admin_user_taggings,  
       new_button_text: "Add New Tag" do |cf, context|
-        cf.input :tag, as:  :select, collection: Tag.people
+        cf.input :tag, as:  :select, collection: Tag.people(false)
     end
 
     f.actions

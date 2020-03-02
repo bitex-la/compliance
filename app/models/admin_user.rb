@@ -56,6 +56,16 @@ class AdminUser < ApplicationRecord
     save!
   end
 
+  def active_tags
+    admin_user_taggings.pluck(:tag_id)
+  end
+
+  def can_manage_tag?(tag)
+    return true if active_tags.empty?
+
+    active_tags.include? tag.id
+  end
+
   private
 
   def set_api_token

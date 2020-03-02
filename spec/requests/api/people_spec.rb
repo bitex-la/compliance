@@ -481,7 +481,6 @@ describe Person do
       api_get "/people/1", {}, 404
     end
 
-
     it 'create new person with tags' do
       person_tag = create(:person_tag)
 
@@ -617,6 +616,193 @@ describe Person do
         person.reject!
         api_request :post, "/people/#{person.id}/#{action}", {}, 422
       end
+    end
+  end
+
+  describe "When filter by admin tags" do
+    it "allow person creation only with admin tags" do
+      person_tag1 = create(:person_tag)
+      person_tag2 = create(:alt_person_tag)
+
+      admin_user.tags << person_tag1
+      admin_user.save!
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
+        })
+
+      person = Person.last
+      expect(api_response.data.id).to eq(person.id.to_s)
+
+      api_create('/people', {
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
+        } }, 422)
+
+      expect(person).to eq(Person.last)
+
+      api_get "/people/#{person.id}"
+      expect(api_response.data.id).to eq(person.id.to_s)
+    end
+
+    it "allow person creation with tags if admin has no tags" do
+      person_tag1 = create(:person_tag)
+      person_tag2 = create(:alt_person_tag)
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
+        })
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
+        })
+    end
+
+    it "allow person creation without tags if admin has no tags" do
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' })
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' })
+    end
+
+    it "allow person creation without tags if admin has tags" do
+      person_tag1 = create(:person_tag)
+
+      admin_user.tags << person_tag1
+      admin_user.save!
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' })
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' })
+    end
+
+    it "show person with active tags" do
+      person_tag1 = create(:person_tag)
+      person_tag2 = create(:alt_person_tag)
+
+      admin_user.tags << person_tag1
+      admin_user.tags << person_tag2
+      admin_user.save!
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
+        })
+
+      person1_id = api_response.data.id
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' })
+
+      person2_id = api_response.data.id
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
+        })
+
+      person3_id = api_response.data.id
+
+      api_get "/people/#{person1_id}"
+      api_get "/people/#{person2_id}"
+      api_get "/people/#{person3_id}"
+
+      Person.all.map(&:expire_action_cache)
+
+      admin_user.tags.clear
+      admin_user.save!
+
+      api_get "/people/#{person1_id}"
+      api_get "/people/#{person2_id}"
+      api_get "/people/#{person3_id}"
+
+      Person.all.map(&:expire_action_cache)
+
+      admin_user.tags << person_tag2
+      admin_user.save!
+
+      api_get "/people/#{person1_id}", {}, 404
+      api_get "/people/#{person2_id}"
+      api_get "/people/#{person3_id}"
+    end
+
+    it "index person with active tags" do
+      person_tag1 = create(:person_tag)
+      person_tag2 = create(:alt_person_tag)
+
+      admin_user.tags << person_tag1
+      admin_user.tags << person_tag2
+      admin_user.save!
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
+        })
+
+      person1_id = api_response.data.id
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' })
+
+      person2_id = api_response.data.id
+
+      api_create('/people',
+        type: 'people',
+        attributes: { enabled: true, risk: 'low' },
+        relationships: {
+          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
+        })
+
+      person3_id = api_response.data.id
+
+      api_get "/people"
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(person1_id)
+      expect(api_response.data[1].id).to eq(person2_id)
+      expect(api_response.data[2].id).to eq(person3_id)
+
+      admin_user.tags.clear
+      admin_user.save!
+
+      api_get "/people"
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(person1_id)
+      expect(api_response.data[1].id).to eq(person2_id)
+      expect(api_response.data[2].id).to eq(person3_id)
+
+      admin_user.tags << person_tag2
+      admin_user.save!
+
+      api_get "/people"
+      expect(api_response.meta.total_items).to eq(2)
+      expect(api_response.data[0].id).to eq(person2_id)
+      expect(api_response.data[1].id).to eq(person3_id)
     end
   end
 end
