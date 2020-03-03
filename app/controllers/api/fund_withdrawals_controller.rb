@@ -19,6 +19,7 @@ class Api::FundWithdrawalsController < Api::EntityController
         :currency_code,
         :country,
         :withdrawal_date,
+        :external_id,
         :attachments,
         :person
       ]

@@ -5,6 +5,7 @@ FactoryBot.define do
     currency_code { 'usd' }
     country { 'AR' }
     withdrawal_date { DateTime.now.utc }
+    external_id { "1" }
   end
 
   factory :fund_withdrawal, class: FundWithdrawal do
@@ -13,6 +14,7 @@ FactoryBot.define do
     currency_code { 'usd' }
     country { 'AR' }
     withdrawal_date { DateTime.now.utc }
+    external_id { "1" }
 
     factory :fund_withdrawal_with_person do
       association :person, factory: :empty_person
@@ -25,6 +27,7 @@ FactoryBot.define do
     currency_code { 'ars' }
     country { 'AR' }
     withdrawal_date { DateTime.now.utc }
+    external_id { "1" }
 
     factory :alt_fund_withdrawal_with_person do
       association :person, factory: :empty_person

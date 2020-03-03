@@ -1,6 +1,7 @@
 class FundWithdrawal < ApplicationRecord
   include Loggable
 
+  validates :external_id, presence: true
   validates :currency, inclusion: { in: Currency.all }
   validates :amount, :exchange_rate_adjusted_amount,
             numericality: { greater_than: 0 }
