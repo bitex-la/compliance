@@ -2,11 +2,6 @@ require 'rails_helper'
 
 RSpec.describe FundDeposit, type: :model do
   let(:person) { create(:empty_person) }
-  let!(:old_fund_deposit) {
-    fund_deposit = build(:fund_deposit, deposit_date: nil, person: person)
-    fund_deposit.save(validate: false)
-    fund_deposit
-  }
 
   it 'validates non null fields' do
     invalid = FundDeposit.new
@@ -33,9 +28,15 @@ RSpec.describe FundDeposit, type: :model do
   end
 
   it 'is valid update a deposit without deposit_date' do
-    old_fund_deposit.update(amount: 303.00)
-    old_fund_deposit.save
+    old_fund_deposit = build(:fund_deposit, deposit_date: nil, person: create(:empty_person))
+    old_fund_deposit.save(validate: false)
+    old_fund_deposit.update!(amount: 303.00)
+
     expect(old_fund_deposit).to be_valid
+
+    old_fund_deposit.reload
+
+    expect(old_fund_deposit.amount).to eq(303.00)
   end
 
   it 'logs creation of fund deposits' do
