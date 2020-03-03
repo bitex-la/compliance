@@ -6,11 +6,6 @@ class FundWithdrawalSerializer
   has_many :attachments, record_type: 'attachments'
 
   attributes *%i(amount currency_code
-             exchange_rate_adjusted_amount country)
-
-  %i(created_at updated_at withdrawal_date).each do |attr|
-    attribute attr do |obj|
-      obj.send(attr)
-    end
-  end
+             exchange_rate_adjusted_amount country
+             withdrawal_date created_at updated_at)
 end

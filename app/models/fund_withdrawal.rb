@@ -11,14 +11,10 @@ class FundWithdrawal < ApplicationRecord
 
   has_many :attachments, as: :attached_to_fruit
 
-  # after_save :refresh_person_withdrawal_regularity!
   after_save{ person.expire_action_cache }
 
-  private
-
-  def refresh_person_withdrawal_regularity!
-    person.fund_withdrawals.reload
-    person.refresh_person_withdrawal_regularity! #TODO
+  def name
+    "##{id}: #{amount} #{currency_code} #{country}"
   end
 
 end

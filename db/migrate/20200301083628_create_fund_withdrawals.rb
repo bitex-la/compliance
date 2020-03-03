@@ -10,6 +10,7 @@ class CreateFundWithdrawals < ActiveRecord::Migration[5.2]
                 null: false
       t.datetime :withdrawal_date
       t.string :country
+      t.string :external_id
 
       t.timestamps
     end

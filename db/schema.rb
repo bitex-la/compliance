@@ -354,6 +354,7 @@ ActiveRecord::Schema.define(version: 2020_03_01_083628) do
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
     t.datetime "withdrawal_date"
     t.string "country"
+    t.string "external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["person_id"], name: "index_fund_withdrawals_on_person_id"
