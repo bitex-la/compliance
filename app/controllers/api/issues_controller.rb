@@ -2,7 +2,7 @@ class Api::IssuesController < Api::ApiController
   def index
     scope = Issue.current
       .includes(*build_eager_load_list)
-      .order(updated_at: :desc)
+      .order(updated_at: :desc, id: :desc)
       .ransack(params[:filter])
       .result
       
@@ -20,6 +20,7 @@ class Api::IssuesController < Api::ApiController
 
   def show
     issue = Issue.includes(*build_eager_load_list).find(params[:id])
+
     jsonapi_response issue, {include: params[:include] || Issue.included_for}
   end
 
