@@ -20,7 +20,6 @@ class Api::IssuesController < Api::ApiController
 
   def show
     issue = Issue.includes(*build_eager_load_list).find(params[:id])
-
     jsonapi_response issue, {include: params[:include] || Issue.included_for}
   end
 

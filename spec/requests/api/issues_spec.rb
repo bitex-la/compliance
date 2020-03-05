@@ -469,37 +469,13 @@ describe Issue do
   end
 
   describe "When filter by admin tags" do
-    let(:admin_user) { create(:admin_user) }
+    let(:admin_user) { create(:other_admin_user) }
 
     it "allow issue creation only with person valid admin tags" do
-      person_tag1 = create(:person_tag)
-      person_tag2 = create(:alt_person_tag)
+      person1 = create(:full_person_tagging).person
+      person2 = create(:alt_full_person_tagging).person
 
-      admin_user.tags << person_tag1
-      admin_user.tags << person_tag2
-      admin_user.save!
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
-        })
-
-      person1 = Person.last
-      expect(api_response.data.id).to eq(person1.id.to_s)
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
-        })
-
-      person2 = Person.last
-      expect(api_response.data.id).to eq(person2.id.to_s)
-
-      admin_user.tags.delete(person_tag2)
+      admin_user.tags << person1.tags.first
       admin_user.save!
 
       expect do
@@ -521,99 +497,53 @@ describe Issue do
     end
 
     it "allow issue creation with person tags if admin has no tags" do
-      person_tag1 = create(:person_tag)
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
-        })
-
-      person_id = api_response.data.id
+      person1 = create(:full_person_tagging).person
 
       expect do
         api_create('/issues',
           type: 'issues',
           relationships: { person: {
-            data: { id: person_id, type: 'people' }
+            data: { id: person1.id, type: 'people' }
           } })
       end.to change { Issue.count }.by(1)
     end
 
     it "allow issue creation without person tags if admin has no tags" do
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
-
-      person_id = api_response.data.id
+      person = create(:empty_person)
 
       expect do
         api_create('/issues',
           type: 'issues',
           relationships: { person: {
-            data: { id: person_id, type: 'people' }
+            data: { id: person.id, type: 'people' }
           } })
       end.to change { Issue.count }.by(1)
     end
 
     it "allow issue creation without person tags if admin has tags" do
-      person_tag1 = create(:person_tag)
+      person1 = create(:full_person_tagging).person
 
-      admin_user.tags << person_tag1
+      admin_user.tags << person1.tags.first
       admin_user.save!
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
-
-      person_id = api_response.data.id
 
       expect do
         api_create('/issues',
           type: 'issues',
           relationships: { person: {
-            data: { id: person_id, type: 'people' }
+            data: { id: person1.id, type: 'people' }
           } })
       end.to change { Issue.count }.by(1)
     end
 
     it "show issue with admin user active tags" do
-      person_tag1 = create(:person_tag)
-      person_tag2 = create(:alt_person_tag)
-
-      admin_user.tags << person_tag1
-      admin_user.tags << person_tag2
-      admin_user.save!
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
-        })
-
-      person1_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
-
-      person2_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
-        })
-
-      person3_id = api_response.data.id
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
 
       api_create('/issues',
         type: 'issues',
         relationships: { person: {
-          data: { id: person1_id, type: 'people' }
+          data: { id: person1.id, type: 'people' }
         } })
 
       issue1_id = api_response.data.id
@@ -621,7 +551,7 @@ describe Issue do
       api_create('/issues',
         type: 'issues',
         relationships: { person: {
-          data: { id: person2_id, type: 'people' }
+          data: { id: person2.id, type: 'people' }
         } })
 
       issue2_id = api_response.data.id
@@ -629,7 +559,7 @@ describe Issue do
       api_create('/issues',
         type: 'issues',
         relationships: { person: {
-          data: { id: person3_id, type: 'people' }
+          data: { id: person3.id, type: 'people' }
         } })
 
       issue3_id = api_response.data.id
@@ -645,7 +575,7 @@ describe Issue do
       api_get("/issues/#{issue2_id}")
       api_get("/issues/#{issue3_id}")
 
-      admin_user.tags << person_tag2
+      admin_user.tags << person3.tags.first
       admin_user.save!
 
       api_get("/issues/#{issue1_id}", {}, 404)
@@ -654,41 +584,14 @@ describe Issue do
     end
 
     it "index issue with admin user active tags" do
-      person_tag1 = create(:person_tag)
-      person_tag2 = create(:alt_person_tag)
-
-      admin_user.tags << person_tag1
-      admin_user.tags << person_tag2
-      admin_user.save!
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
-        })
-
-      person1_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
-
-      person2_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
-        })
-
-      person3_id = api_response.data.id
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
 
       api_create('/issues',
         type: 'issues',
         relationships: { person: {
-          data: { id: person1_id, type: 'people' }
+          data: { id: person1.id, type: 'people' }
         } })
 
       issue1_id = api_response.data.id
@@ -696,7 +599,7 @@ describe Issue do
       api_create('/issues',
         type: 'issues',
         relationships: { person: {
-          data: { id: person2_id, type: 'people' }
+          data: { id: person2.id, type: 'people' }
         } })
 
       issue2_id = api_response.data.id
@@ -704,7 +607,7 @@ describe Issue do
       api_create('/issues',
         type: 'issues',
         relationships: { person: {
-          data: { id: person3_id, type: 'people' }
+          data: { id: person3.id, type: 'people' }
         } })
 
       issue3_id = api_response.data.id
@@ -724,7 +627,7 @@ describe Issue do
       expect(api_response.data[1].id).to eq(issue2_id)
       expect(api_response.data[2].id).to eq(issue1_id)
 
-      admin_user.tags << person_tag2
+      admin_user.tags << person3.tags.first
       admin_user.save!
 
       api_get("/issues/")
