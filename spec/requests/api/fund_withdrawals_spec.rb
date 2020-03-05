@@ -9,7 +9,7 @@ describe FundWithdrawal do
     :fund_withdrawal_with_person,
     :alt_fund_withdrawal_with_person,
     {amount_eq: 45000},
-    'amount,currency_code,person',
+    'amount,currency_code,country,withdrawal_date,external_id,person',
     'attachments'
 
   it_behaves_like 'max people allowed request limit',
@@ -47,14 +47,16 @@ describe FundWithdrawal do
   describe 'Updating a person fund withdrawal' do
     it 'updates the fund info when withdrawal exists' do
       fund_withdrawal = create(:full_fund_withdrawal, person: person)
-
       api_update "/fund_withdrawals/#{fund_withdrawal.id}", {
         type: 'fund_withdrawals',
         id: fund_withdrawal.id,
-        attributes: {amount: 20000.00}
+        attributes: {amount: 20000.00, country: 'ES', external_id: '2'}
       }
 
       api_response.data.attributes.amount.should == '20000.0'
+      api_response.data.attributes.country.should == 'ES'
+      api_response.data.attributes.external_id.should == '2'
+      api_response.data.attributes.withdrawal_date.should == fund_withdrawal.withdrawal_date.as_json
     end
   end
 end
