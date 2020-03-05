@@ -469,7 +469,12 @@ describe Issue do
   end
 
   describe "When filter by admin tags" do
-    let(:admin_user) { create(:other_admin_user) }
+    let(:admin_user) { create(:admin_user) }
+
+    before :each do
+      admin_user.tags.clear
+      admin_user.save!
+    end
 
     it "allow issue creation only with person valid admin tags" do
       person1 = create(:full_person_tagging).person

@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe Person do
-  let(:admin_user) { create(:admin_user) }
 
   it_behaves_like 'max people allowed request limit',
     :people,
@@ -620,6 +619,13 @@ describe Person do
   end
 
   describe "When filter by admin tags" do
+    let(:admin_user) { create(:admin_user) }
+
+    before :each do
+      admin_user.tags.clear
+      admin_user.save!
+    end
+
     it "allow person creation only with admin tags" do
       person_tag1 = create(:person_tag)
       person_tag2 = create(:alt_person_tag)
