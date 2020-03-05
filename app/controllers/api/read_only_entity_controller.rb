@@ -1,7 +1,7 @@
 class Api::ReadOnlyEntityController < Api::ApiController
   def index
     collection = resource_class
-      .order(updated_at: :desc)
+      .order(updated_at: :desc, id: :desc)
       .ransack(params[:filter])
       .result
 
