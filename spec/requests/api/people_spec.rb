@@ -701,114 +701,61 @@ describe Person do
     end
 
     it "show person with active tags" do
-      person_tag1 = create(:person_tag)
-      person_tag2 = create(:alt_person_tag)
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
 
-      admin_user.tags << person_tag1
-      admin_user.tags << person_tag2
-      admin_user.save!
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
-        })
-
-      person1_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
-
-      person2_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
-        })
-
-      person3_id = api_response.data.id
-
-      api_get "/people/#{person1_id}"
-      api_get "/people/#{person2_id}"
-      api_get "/people/#{person3_id}"
+      api_get "/people/#{person1.id}"
+      api_get "/people/#{person2.id}"
+      api_get "/people/#{person3.id}"
 
       Person.all.map(&:expire_action_cache)
 
-      admin_user.tags.clear
+      admin_user.tags << person1.tags.first
       admin_user.save!
 
-      api_get "/people/#{person1_id}"
-      api_get "/people/#{person2_id}"
-      api_get "/people/#{person3_id}"
+      api_get "/people/#{person1.id}"
+      api_get "/people/#{person2.id}"
+      api_get "/people/#{person3.id}", {}, 404
 
       Person.all.map(&:expire_action_cache)
 
-      admin_user.tags << person_tag2
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
       admin_user.save!
 
-      api_get "/people/#{person1_id}", {}, 404
-      api_get "/people/#{person2_id}"
-      api_get "/people/#{person3_id}"
+      api_get "/people/#{person1.id}", {}, 404
+      api_get "/people/#{person2.id}"
+      api_get "/people/#{person3.id}"
     end
 
     it "index person with active tags" do
-      person_tag1 = create(:person_tag)
-      person_tag2 = create(:alt_person_tag)
-
-      admin_user.tags << person_tag1
-      admin_user.tags << person_tag2
-      admin_user.save!
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag1.id, type: 'tags' }] }
-        })
-
-      person1_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
-
-      person2_id = api_response.data.id
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' },
-        relationships: {
-          tags: { data: [{ id: person_tag2.id, type: 'tags' }] }
-        })
-
-      person3_id = api_response.data.id
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
 
       api_get "/people"
       expect(api_response.meta.total_items).to eq(3)
-      expect(api_response.data[0].id).to eq(person1_id)
-      expect(api_response.data[1].id).to eq(person2_id)
-      expect(api_response.data[2].id).to eq(person3_id)
+      expect(api_response.data[0].id).to eq(person1.id.to_s)
+      expect(api_response.data[1].id).to eq(person2.id.to_s)
+      expect(api_response.data[2].id).to eq(person3.id.to_s)
 
-      admin_user.tags.clear
-      admin_user.save!
-
-      api_get "/people"
-      expect(api_response.meta.total_items).to eq(3)
-      expect(api_response.data[0].id).to eq(person1_id)
-      expect(api_response.data[1].id).to eq(person2_id)
-      expect(api_response.data[2].id).to eq(person3_id)
-
-      admin_user.tags << person_tag2
+      admin_user.tags << person1.tags.first
       admin_user.save!
 
       api_get "/people"
       expect(api_response.meta.total_items).to eq(2)
-      expect(api_response.data[0].id).to eq(person2_id)
-      expect(api_response.data[1].id).to eq(person3_id)
+      expect(api_response.data[0].id).to eq(person1.id.to_s)
+      expect(api_response.data[1].id).to eq(person2.id.to_s)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_get "/people"
+      expect(api_response.meta.total_items).to eq(2)
+      expect(api_response.data[0].id).to eq(person2.id.to_s)
+      expect(api_response.data[1].id).to eq(person3.id.to_s)
     end
   end
 end

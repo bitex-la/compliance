@@ -545,47 +545,28 @@ describe Issue do
       person2 = create(:empty_person)
       person3 = create(:alt_full_person_tagging).person
 
-      api_create('/issues',
-        type: 'issues',
-        relationships: { person: {
-          data: { id: person1.id, type: 'people' }
-        } })
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
 
-      issue1_id = api_response.data.id
+      api_get("/issues/#{issue1.id}")
+      api_get("/issues/#{issue2.id}")
+      api_get("/issues/#{issue3.id}")
 
-      api_create('/issues',
-        type: 'issues',
-        relationships: { person: {
-          data: { id: person2.id, type: 'people' }
-        } })
-
-      issue2_id = api_response.data.id
-
-      api_create('/issues',
-        type: 'issues',
-        relationships: { person: {
-          data: { id: person3.id, type: 'people' }
-        } })
-
-      issue3_id = api_response.data.id
-
-      api_get("/issues/#{issue1_id}")
-      api_get("/issues/#{issue2_id}")
-      api_get("/issues/#{issue3_id}")
-
-      admin_user.tags.clear
+      admin_user.tags << person1.tags.first
       admin_user.save!
 
-      api_get("/issues/#{issue1_id}")
-      api_get("/issues/#{issue2_id}")
-      api_get("/issues/#{issue3_id}")
+      api_get("/issues/#{issue1.id}")
+      api_get("/issues/#{issue2.id}")
+      api_get("/issues/#{issue3.id}", {}, 404)
 
+      admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
-      api_get("/issues/#{issue1_id}", {}, 404)
-      api_get("/issues/#{issue2_id}")
-      api_get("/issues/#{issue3_id}")
+      api_get("/issues/#{issue1.id}", {}, 404)
+      api_get("/issues/#{issue2.id}")
+      api_get("/issues/#{issue3.id}")
     end
 
     it "index issue with admin user active tags" do
@@ -593,52 +574,32 @@ describe Issue do
       person2 = create(:empty_person)
       person3 = create(:alt_full_person_tagging).person
 
-      api_create('/issues',
-        type: 'issues',
-        relationships: { person: {
-          data: { id: person1.id, type: 'people' }
-        } })
-
-      issue1_id = api_response.data.id
-
-      api_create('/issues',
-        type: 'issues',
-        relationships: { person: {
-          data: { id: person2.id, type: 'people' }
-        } })
-
-      issue2_id = api_response.data.id
-
-      api_create('/issues',
-        type: 'issues',
-        relationships: { person: {
-          data: { id: person3.id, type: 'people' }
-        } })
-
-      issue3_id = api_response.data.id
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
 
       api_get("/issues/")
       expect(api_response.meta.total_items).to eq(3)
-      expect(api_response.data[0].id).to eq(issue3_id)
-      expect(api_response.data[1].id).to eq(issue2_id)
-      expect(api_response.data[2].id).to eq(issue1_id)
+      expect(api_response.data[0].id).to eq(issue3.id.to_s)
+      expect(api_response.data[1].id).to eq(issue2.id.to_s)
+      expect(api_response.data[2].id).to eq(issue1.id.to_s)
 
-      admin_user.tags.clear
+      admin_user.tags << person1.tags.first
       admin_user.save!
 
       api_get("/issues/")
-      expect(api_response.meta.total_items).to eq(3)
-      expect(api_response.data[0].id).to eq(issue3_id)
-      expect(api_response.data[1].id).to eq(issue2_id)
-      expect(api_response.data[2].id).to eq(issue1_id)
+      expect(api_response.meta.total_items).to eq(2)
+      expect(api_response.data[0].id).to eq(issue2.id.to_s)
+      expect(api_response.data[1].id).to eq(issue1.id.to_s)
 
+      admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       api_get("/issues/")
       expect(api_response.meta.total_items).to eq(2)
-      expect(api_response.data[0].id).to eq(issue3_id)
-      expect(api_response.data[1].id).to eq(issue2_id)
+      expect(api_response.data[0].id).to eq(issue3.id.to_s)
+      expect(api_response.data[1].id).to eq(issue2.id.to_s)
     end
   end
 end
