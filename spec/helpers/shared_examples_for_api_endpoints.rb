@@ -10,8 +10,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   it "Gets seed with observation" do
     issue = create(:basic_issue)
-    person = issue.person
-
     initial_attrs = attributes_for(initial_expires_seed)
 
     initial_relations = instance_exec(&relations_proc)
@@ -39,8 +37,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   it "Creates an expiring seed" do
     issue = create(:basic_issue)
-    person = issue.person
-
     initial_attrs = attributes_for(initial_expires_seed)
 
     initial_relations = instance_exec(&relations_proc)
@@ -59,12 +55,12 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   it "Destroy a #{seed_type}" do
     seed = create(initial_seed, issue: create(:basic_issue))
     api_destroy "/#{seed_type}/#{seed.id}"
-    
+
     response.body.should be_blank
 
     api_get "/#{seed_type}/#{seed.id}", {}, 404
   end
-   
+
   it "Creates, updates and approves #{seed_type}" do
     issue = create(:basic_issue)
     person = issue.person
@@ -142,242 +138,331 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       admin_user.save!
     end
 
-    it "allow #{seed_type} creation only with person valid admin tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:alt_full_person_tagging).person
+    describe "seeds" do
+      it "allow #{seed_type} creation only with person valid admin tags" do
+        person1 = create(:full_person_tagging).person
+        person2 = create(:alt_full_person_tagging).person
 
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
+        issue1 = create(:basic_issue, person: person1)
+        issue2 = create(:basic_issue, person: person2)
 
-      admin_user.tags << person1.tags.first
-      admin_user.save!
+        admin_user.tags << person1.tags.first
+        admin_user.save!
 
-      initial_attrs = attributes_for(initial_expires_seed)
+        initial_attrs = attributes_for(initial_expires_seed)
 
-      initial_relations = instance_exec(&relations_proc)
-      issue_relation = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
+        initial_relations = instance_exec(&relations_proc)
+        issue_relation = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
 
-      type = seed_type.to_s.camelize.singularize.constantize
+        type_const = seed_type.to_s.camelize.singularize.constantize
 
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
 
-      id1 = api_response.data.id
-      expect(type.last.id).to eq(id1.to_i)
+        id1 = api_response.data.id
+        expect(type_const.last.id).to eq(id1.to_i)
 
-      issue_relation = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
+        issue_relation = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
 
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }, 404
-      end.to change { type.count }.by(0)
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }, 404
+        end.to change { type_const.count }.by(0)
+      end
+
+      it "allow #{seed_type} creation with person tags if admin has no tags" do
+        person = create(:full_person_tagging).person
+
+        issue = create(:basic_issue, person: person)
+
+        initial_attrs = attributes_for(initial_expires_seed)
+
+        initial_relations = instance_exec(&relations_proc)
+        issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } }}
+
+        type_const = seed_type.to_s.camelize.singularize.constantize
+
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+      end
+
+      it "allow #{seed_type} creation without person tags if admin has no tags" do
+        person = create(:empty_person)
+        issue = create(:basic_issue, person: person)
+
+        initial_attrs = attributes_for(initial_expires_seed)
+
+        initial_relations = instance_exec(&relations_proc)
+        issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } }}
+
+        type_const = seed_type.to_s.camelize.singularize.constantize
+
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+      end
+
+      it "allow #{seed_type} creation without person tags if admin has tags" do
+        person = create(:full_person_tagging).person
+        issue = create(:basic_issue, person: person)
+
+        admin_user.tags << person.tags.first
+        admin_user.save!
+
+        initial_attrs = attributes_for(initial_expires_seed)
+
+        initial_relations = instance_exec(&relations_proc)
+        issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } }}
+
+        type_const = seed_type.to_s.camelize.singularize.constantize
+
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+      end
+
+      it "show #{seed_type} with admin user active tags" do
+        person1 = create(:full_person_tagging).person
+        person2 = create(:empty_person)
+        person3 = create(:alt_full_person_tagging).person
+
+        issue1 = create(:basic_issue, person: person1)
+        issue2 = create(:basic_issue, person: person2)
+        issue3 = create(:basic_issue, person: person3)
+
+        type_const = seed_type.to_s.camelize.singularize.constantize
+        initial_attrs = attributes_for(initial_expires_seed)
+        initial_relations = instance_exec(&relations_proc)
+
+        issue_relation = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id1 = api_response.data.id
+
+        issue_relation = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id2 = api_response.data.id
+
+        issue_relation = { issue: { data: { id: issue3.id.to_s, type: 'issues' } }}
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id3 = api_response.data.id
+
+        api_get("/#{seed_type}/#{id1}")
+        api_get("/#{seed_type}/#{id2}")
+        api_get("/#{seed_type}/#{id3}")
+
+        admin_user.tags.clear
+        admin_user.save!
+
+        api_get("/#{seed_type}/#{id1}")
+        api_get("/#{seed_type}/#{id2}")
+        api_get("/#{seed_type}/#{id3}")
+
+        admin_user.tags << person3.tags.first
+        admin_user.save!
+
+        api_get("/#{seed_type}/#{id1}", {}, 404)
+        api_get("/#{seed_type}/#{id2}")
+        api_get("/#{seed_type}/#{id3}")
+      end
+
+      it "index #{seed_type} with admin user active tags" do
+        person1 = create(:full_person_tagging).person
+        person2 = create(:empty_person)
+        person3 = create(:alt_full_person_tagging).person
+
+        issue1 = create(:basic_issue, person: person1)
+        issue2 = create(:basic_issue, person: person2)
+        issue3 = create(:basic_issue, person: person3)
+
+        type_const = seed_type.to_s.camelize.singularize.constantize
+        initial_attrs = attributes_for(initial_expires_seed)
+        initial_relations = instance_exec(&relations_proc)
+
+        issue_relation = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id1 = api_response.data.id
+
+        issue_relation = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id2 = api_response.data.id
+
+        issue_relation = { issue: { data: { id: issue3.id.to_s, type: 'issues' } }}
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs,
+            relationships: issue_relation.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id3 = api_response.data.id
+
+        api_get("/#{seed_type}/")
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(id3)
+        expect(api_response.data[1].id).to eq(id2)
+        expect(api_response.data[2].id).to eq(id1)
+
+        admin_user.tags.clear
+        admin_user.save!
+
+        api_get("/#{seed_type}/")
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(id3)
+        expect(api_response.data[1].id).to eq(id2)
+        expect(api_response.data[2].id).to eq(id1)
+
+        admin_user.tags << person3.tags.first
+        admin_user.save!
+
+        api_get("/#{seed_type}/")
+        expect(api_response.meta.total_items).to eq(2)
+        expect(api_response.data[0].id).to eq(id3)
+        expect(api_response.data[1].id).to eq(id2)
+      end
     end
 
-    it "allow #{seed_type} creation with person tags if admin has no tags" do
-      person = create(:full_person_tagging).person
+    describe "fruits" do
+      it "show #{type} with admin user active tags" do
+        person1 = create(:full_person_tagging).person
+        person2 = create(:empty_person)
+        person3 = create(:alt_full_person_tagging).person
 
-      issue = create(:basic_issue, person: person)
+        issue1 = create(:basic_issue, person: person1)
+        issue2 = create(:basic_issue, person: person2)
+        issue3 = create(:basic_issue, person: person3)
 
-      initial_attrs = attributes_for(initial_expires_seed)
+        seed1 = create(initial_seed, issue: issue1)
+        seed2 = create(initial_seed, issue: issue2)
+        seed3 = create(initial_seed, issue: issue3)
 
-      initial_relations = instance_exec(&relations_proc)
-      issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } }}
+        issue1.reload.approve!
+        issue2.reload.approve!
+        issue3.reload.approve!
 
-      type = seed_type.to_s.camelize.singularize.constantize
+        seed1.reload
+        seed2.reload
+        seed3.reload
 
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-    end
+        api_get("/#{type}/#{seed1.fruit.id}")
+        api_get("/#{type}/#{seed2.fruit.id}")
+        api_get("/#{type}/#{seed3.fruit.id}")
 
-    it "allow #{seed_type} creation without person tags if admin has no tags" do
-      person = create(:empty_person)
-      issue = create(:basic_issue, person: person)
+        admin_user.tags.clear
+        admin_user.save!
 
-      initial_attrs = attributes_for(initial_expires_seed)
+        api_get("/#{type}/#{seed1.fruit.id}")
+        api_get("/#{type}/#{seed2.fruit.id}")
+        api_get("/#{type}/#{seed3.fruit.id}")
 
-      initial_relations = instance_exec(&relations_proc)
-      issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } }}
+        admin_user.tags << person3.tags.first
+        admin_user.save!
 
-      type = seed_type.to_s.camelize.singularize.constantize
+        api_get("/#{type}/#{seed1.fruit.id}", {}, 404)
+        api_get("/#{type}/#{seed2.fruit.id}")
+        api_get("/#{type}/#{seed3.fruit.id}")
+      end
 
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-    end
+      it "index #{type} with admin user active tags" do
+        person1 = create(:full_person_tagging).person
+        person2 = create(:empty_person)
+        person3 = create(:alt_full_person_tagging).person
 
-    it "allow #{seed_type} creation without person tags if admin has tags" do
-      person = create(:full_person_tagging).person
-      issue = create(:basic_issue, person: person)
+        issue1 = create(:basic_issue, person: person1)
+        issue2 = create(:basic_issue, person: person2)
+        issue3 = create(:basic_issue, person: person3)
 
-      admin_user.tags << person.tags.first
-      admin_user.save!
+        seed1 = create(initial_seed, issue: issue1)
+        seed2 = create(initial_seed, issue: issue2)
+        seed3 = create(initial_seed, issue: issue3)
 
-      initial_attrs = attributes_for(initial_expires_seed)
+        issue1.reload.approve!
+        issue2.reload.approve!
+        issue3.reload.approve!
 
-      initial_relations = instance_exec(&relations_proc)
-      issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } }}
+        seed1.reload
+        seed2.reload
+        seed3.reload
 
-      type = seed_type.to_s.camelize.singularize.constantize
+        api_get("/#{type}")
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(seed3.fruit.id.to_s)
+        expect(api_response.data[1].id).to eq(seed2.fruit.id.to_s)
+        expect(api_response.data[2].id).to eq(seed1.fruit.id.to_s)
 
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-    end
+        admin_user.tags.clear
+        admin_user.save!
 
-    it "show #{seed_type} with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
+        api_get("/#{type}")
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(seed3.fruit.id.to_s)
+        expect(api_response.data[1].id).to eq(seed2.fruit.id.to_s)
+        expect(api_response.data[2].id).to eq(seed1.fruit.id.to_s)
 
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
+        admin_user.tags << person3.tags.first
+        admin_user.save!
 
-      type = seed_type.to_s.camelize.singularize.constantize
-      initial_attrs = attributes_for(initial_expires_seed)
-      initial_relations = instance_exec(&relations_proc)
-
-      issue_relation = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-
-      id1 = api_response.data.id
-
-      issue_relation = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-
-      id2 = api_response.data.id
-
-      issue_relation = { issue: { data: { id: issue3.id.to_s, type: 'issues' } }}
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-
-      id3 = api_response.data.id
-
-      api_get("/#{seed_type}/#{id1}")
-      api_get("/#{seed_type}/#{id2}")
-      api_get("/#{seed_type}/#{id3}")
-
-      admin_user.tags.clear
-      admin_user.save!
-
-      api_get("/#{seed_type}/#{id1}")
-      api_get("/#{seed_type}/#{id2}")
-      api_get("/#{seed_type}/#{id3}")
-
-      admin_user.tags << person3.tags.first
-      admin_user.save!
-
-      api_get("/#{seed_type}/#{id1}", {}, 404)
-      api_get("/#{seed_type}/#{id2}")
-      api_get("/#{seed_type}/#{id3}")
-    end
-
-    it "index #{seed_type} with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-
-      type = seed_type.to_s.camelize.singularize.constantize
-      initial_attrs = attributes_for(initial_expires_seed)
-      initial_relations = instance_exec(&relations_proc)
-
-      issue_relation = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-
-      id1 = api_response.data.id
-
-      issue_relation = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-
-      id2 = api_response.data.id
-
-      issue_relation = { issue: { data: { id: issue3.id.to_s, type: 'issues' } }}
-      expect do
-        api_create "/#{seed_type}", {
-          type: seed_type,
-          attributes: initial_attrs,
-          relationships: issue_relation.merge(initial_relations)
-        }
-      end.to change { type.count }.by(1)
-
-      id3 = api_response.data.id
-
-      api_get("/#{seed_type}/")
-      expect(api_response.meta.total_items).to eq(3)
-      expect(api_response.data[0].id).to eq(id3)
-      expect(api_response.data[1].id).to eq(id2)
-      expect(api_response.data[2].id).to eq(id1)
-
-      admin_user.tags.clear
-      admin_user.save!
-
-      api_get("/#{seed_type}/")
-      expect(api_response.meta.total_items).to eq(3)
-      expect(api_response.data[0].id).to eq(id3)
-      expect(api_response.data[1].id).to eq(id2)
-      expect(api_response.data[2].id).to eq(id1)
-
-      admin_user.tags << person3.tags.first
-      admin_user.save!
-
-      api_get("/#{seed_type}/")
-      expect(api_response.meta.total_items).to eq(2)
-      expect(api_response.data[0].id).to eq(id3)
-      expect(api_response.data[1].id).to eq(id2)
+        api_get("/#{type}")
+        expect(api_response.meta.total_items).to eq(2)
+        expect(api_response.data[0].id).to eq(seed3.fruit.id.to_s)
+        expect(api_response.data[1].id).to eq(seed2.fruit.id.to_s)
+      end
     end
   end
 end

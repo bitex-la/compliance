@@ -161,7 +161,15 @@ module Garden
 
       after_save{ person.expire_action_cache }
 
-      default_scope { left_outer_joins(:person).distinct }
+      def self.default_scope
+        unless (tags = AdminUser.current_admin_user&.active_tags)
+          return nil
+        end
+    
+        return nil if tags.empty?
+
+        where(person_id: Person.all)
+      end
 
       scope :current, -> { 
         where(replaced_by_id: nil)
