@@ -84,6 +84,9 @@ describe FundDeposit do
           }
       end.to change { FundDeposit.count }.by(1)
 
+      fund = FundDeposit.last
+      expect(api_response.data.id).to eq(fund.id.to_s)
+
       expect do
         api_create '/fund_deposits', {
           type: 'fund_deposits',
@@ -93,6 +96,8 @@ describe FundDeposit do
           }
         }, 404
       end.to change { FundDeposit.count }.by(0)
+
+      expect(fund).to eq(FundDeposit.last)
 
       admin_user.tags << person2.tags.first
       admin_user.save!
@@ -106,6 +111,9 @@ describe FundDeposit do
           }
       end.to change { FundDeposit.count }.by(1)
 
+      fund = FundDeposit.last
+      expect(api_response.data.id).to eq(fund.id.to_s)
+
       expect do
         api_create '/fund_deposits', {
           type: 'fund_deposits',
@@ -115,6 +123,9 @@ describe FundDeposit do
           }
         }
       end.to change { FundDeposit.count }.by(1)
+
+      fund = FundDeposit.last
+      expect(api_response.data.id).to eq(fund.id.to_s)
     end
 
     it "allow fund deposit creation with person tags if admin has no tags" do

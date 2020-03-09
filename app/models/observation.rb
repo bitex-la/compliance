@@ -26,7 +26,7 @@ class Observation < ApplicationRecord
   validate :validate_scope_integrity
   validate :validate_issue_correspondence
 
-  default_scope { joins(:issue, issue: :person) }
+  default_scope { joins(:issue, issue: :person).distinct }
 
   def self.ransackable_scopes(auth_object = nil)
     %i(by_issue_reason)

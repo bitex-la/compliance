@@ -491,6 +491,9 @@ describe Issue do
           } })
       end.to change { Issue.count }.by(1)
 
+      issue = Issue.last
+      expect(api_response.data.id).to eq(issue.id.to_s)
+
       expect do
         api_create('/issues', {
           type: 'issues',
@@ -499,6 +502,33 @@ describe Issue do
           } }
         }, 404)
       end.to change { Issue.count }.by(0)
+
+      expect(issue).to eq(Issue.last)
+
+      admin_user.tags << person2.tags.first
+      admin_user.save!
+
+      expect do
+        api_create('/issues',
+          type: 'issues',
+          relationships: { person: {
+            data: { id: person1.id, type: 'people' }
+          } })
+      end.to change { Issue.count }.by(1)
+
+      issue = Issue.last
+      expect(api_response.data.id).to eq(issue.id.to_s)
+
+      expect do
+        api_create('/issues',
+          type: 'issues',
+          relationships: { person: {
+            data: { id: person2.id, type: 'people' }
+          } })
+      end.to change { Issue.count }.by(1)
+
+      issue = Issue.last
+      expect(api_response.data.id).to eq(issue.id.to_s)
     end
 
     it "allow issue creation with person tags if admin has no tags" do
@@ -544,14 +574,19 @@ describe Issue do
       person1 = create(:full_person_tagging).person
       person2 = create(:empty_person)
       person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
       issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
 
       api_get("/issues/#{issue1.id}")
       api_get("/issues/#{issue2.id}")
       api_get("/issues/#{issue3.id}")
+      api_get("/issues/#{issue4.id}")
 
       admin_user.tags << person1.tags.first
       admin_user.save!
@@ -559,6 +594,7 @@ describe Issue do
       api_get("/issues/#{issue1.id}")
       api_get("/issues/#{issue2.id}")
       api_get("/issues/#{issue3.id}", {}, 404)
+      api_get("/issues/#{issue4.id}")
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
@@ -567,39 +603,66 @@ describe Issue do
       api_get("/issues/#{issue1.id}", {}, 404)
       api_get("/issues/#{issue2.id}")
       api_get("/issues/#{issue3.id}")
+      api_get("/issues/#{issue4.id}")
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/issues/#{issue1.id}")
+      api_get("/issues/#{issue2.id}")
+      api_get("/issues/#{issue3.id}")
+      api_get("/issues/#{issue4.id}")
     end
 
     it "index issue with admin user active tags" do
       person1 = create(:full_person_tagging).person
       person2 = create(:empty_person)
       person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
       issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
 
-      api_get("/issues/")
-      expect(api_response.meta.total_items).to eq(3)
-      expect(api_response.data[0].id).to eq(issue3.id.to_s)
-      expect(api_response.data[1].id).to eq(issue2.id.to_s)
-      expect(api_response.data[2].id).to eq(issue1.id.to_s)
+      api_get("/issues/", page: { page: 0, per_page: 4 })
+
+      expect(api_response.meta.total_items).to eq(4)
+      expect(api_response.data[0].id).to eq(issue4.id.to_s)
+      expect(api_response.data[1].id).to eq(issue3.id.to_s)
+      expect(api_response.data[2].id).to eq(issue2.id.to_s)
+      expect(api_response.data[3].id).to eq(issue1.id.to_s)
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      api_get("/issues/")
-      expect(api_response.meta.total_items).to eq(2)
-      expect(api_response.data[0].id).to eq(issue2.id.to_s)
-      expect(api_response.data[1].id).to eq(issue1.id.to_s)
+      api_get("/issues/", page: { page: 0, per_page: 4 })
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(issue4.id.to_s)
+      expect(api_response.data[1].id).to eq(issue2.id.to_s)
+      expect(api_response.data[2].id).to eq(issue1.id.to_s)
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
-      api_get("/issues/")
-      expect(api_response.meta.total_items).to eq(2)
-      expect(api_response.data[0].id).to eq(issue3.id.to_s)
-      expect(api_response.data[1].id).to eq(issue2.id.to_s)
+      api_get("/issues/", page: { page: 0, per_page: 4 })
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(issue4.id.to_s)
+      expect(api_response.data[1].id).to eq(issue3.id.to_s)
+      expect(api_response.data[2].id).to eq(issue2.id.to_s)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/issues/", page: { page: 0, per_page: 4 })
+      expect(api_response.meta.total_items).to eq(4)
+      expect(api_response.data[0].id).to eq(issue4.id.to_s)
+      expect(api_response.data[1].id).to eq(issue3.id.to_s)
+      expect(api_response.data[2].id).to eq(issue2.id.to_s)
+      expect(api_response.data[3].id).to eq(issue1.id.to_s)
     end
   end
 end

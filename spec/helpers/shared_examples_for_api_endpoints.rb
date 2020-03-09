@@ -149,33 +149,63 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         admin_user.tags << person1.tags.first
         admin_user.save!
 
-        initial_attrs = attributes_for(initial_expires_seed)
+        type_const = seed_type.to_s.camelize.singularize.constantize
 
         initial_relations = instance_exec(&relations_proc)
-        issue_relation = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
 
-        type_const = seed_type.to_s.camelize.singularize.constantize
+        issue_relation1 = { issue: { data: { id: issue1.id.to_s, type: 'issues' } }}
+        initial_attrs1 = attributes_for(initial_expires_seed)
 
         expect do
           api_create "/#{seed_type}", {
             type: seed_type,
-            attributes: initial_attrs,
-            relationships: issue_relation.merge(initial_relations)
+            attributes: initial_attrs1,
+            relationships: issue_relation1.merge(initial_relations)
           }
         end.to change { type_const.count }.by(1)
 
         id1 = api_response.data.id
         expect(type_const.last.id).to eq(id1.to_i)
 
-        issue_relation = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
+        issue_relation2 = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
+        initial_attrs2 = attributes_for(later_seed)
 
         expect do
           api_create "/#{seed_type}", {
             type: seed_type,
-            attributes: initial_attrs,
-            relationships: issue_relation.merge(initial_relations)
+            attributes: initial_attrs2,
+            relationships: issue_relation2.merge(initial_relations)
           }, 404
         end.to change { type_const.count }.by(0)
+
+        expect(type_const.last.id).to eq(id1.to_i)
+
+        admin_user.tags << person2.tags.first
+        admin_user.save!
+
+        initial_attrs1 = attributes_for(later_seed)
+
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs1,
+            relationships: issue_relation1.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id1 = api_response.data.id
+        expect(type_const.last.id).to eq(id1.to_i)
+
+        expect do
+          api_create "/#{seed_type}", {
+            type: seed_type,
+            attributes: initial_attrs2,
+            relationships: issue_relation2.merge(initial_relations)
+          }
+        end.to change { type_const.count }.by(1)
+
+        id1 = api_response.data.id
+        expect(type_const.last.id).to eq(id1.to_i)
       end
 
       it "allow #{seed_type} creation with person tags if admin has no tags" do
@@ -246,18 +276,24 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         person1 = create(:full_person_tagging).person
         person2 = create(:empty_person)
         person3 = create(:alt_full_person_tagging).person
+        person4 = create(:empty_person)
+        person4.tags << person1.tags.first
+        person4.tags << person3.tags.first
 
         seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
         seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
         seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
+        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
 
         seed1.issue.reload.approve!
         seed2.issue.reload.approve!
         seed3.issue.reload.approve!
+        seed4.issue.reload.approve!
 
         api_get("/#{seed_type}/#{seed1.id}")
         api_get("/#{seed_type}/#{seed2.id}")
         api_get("/#{seed_type}/#{seed3.id}")
+        api_get("/#{seed_type}/#{seed4.id}")
 
         admin_user.tags << person1.tags.first
         admin_user.save!
@@ -265,6 +301,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{seed_type}/#{seed1.id}")
         api_get("/#{seed_type}/#{seed2.id}")
         api_get("/#{seed_type}/#{seed3.id}", {}, 404)
+        api_get("/#{seed_type}/#{seed4.id}")
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
@@ -273,43 +310,70 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{seed_type}/#{seed1.id}", {}, 404)
         api_get("/#{seed_type}/#{seed2.id}")
         api_get("/#{seed_type}/#{seed3.id}")
+        api_get("/#{seed_type}/#{seed4.id}")
+
+        admin_user.tags << person1.tags.first
+        admin_user.save!
+
+        api_get("/#{seed_type}/#{seed1.id}")
+        api_get("/#{seed_type}/#{seed2.id}")
+        api_get("/#{seed_type}/#{seed3.id}")
+        api_get("/#{seed_type}/#{seed4.id}")
       end
 
       it "index #{seed_type} with admin user active tags" do
         person1 = create(:full_person_tagging).person
         person2 = create(:empty_person)
         person3 = create(:alt_full_person_tagging).person
+        person4 = create(:empty_person)
+        person4.tags << person1.tags.first
+        person4.tags << person3.tags.first
 
         seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
         seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
         seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
+        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
 
         seed1.issue.reload.approve!
         seed2.issue.reload.approve!
         seed3.issue.reload.approve!
+        seed4.issue.reload.approve!
 
         api_get("/#{seed_type}/")
-        expect(api_response.meta.total_items).to eq(3)
-        expect(api_response.data[0].id).to eq(seed3.id.to_s)
-        expect(api_response.data[1].id).to eq(seed2.id.to_s)
-        expect(api_response.data[2].id).to eq(seed1.id.to_s)
+        expect(api_response.meta.total_items).to eq(4)
+        expect(api_response.data[0].id).to eq(seed4.id.to_s)
+        expect(api_response.data[1].id).to eq(seed3.id.to_s)
+        expect(api_response.data[2].id).to eq(seed2.id.to_s)
+        expect(api_response.data[3].id).to eq(seed1.id.to_s)
 
         admin_user.tags << person1.tags.first
         admin_user.save!
 
         api_get("/#{seed_type}/")
-        expect(api_response.meta.total_items).to eq(2)
-        expect(api_response.data[0].id).to eq(seed2.id.to_s)
-        expect(api_response.data[1].id).to eq(seed1.id.to_s)
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(seed4.id.to_s)
+        expect(api_response.data[1].id).to eq(seed2.id.to_s)
+        expect(api_response.data[2].id).to eq(seed1.id.to_s)
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
         admin_user.save!
 
         api_get("/#{seed_type}/")
-        expect(api_response.meta.total_items).to eq(2)
-        expect(api_response.data[0].id).to eq(seed3.id.to_s)
-        expect(api_response.data[1].id).to eq(seed2.id.to_s)
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(seed4.id.to_s)
+        expect(api_response.data[1].id).to eq(seed3.id.to_s)
+        expect(api_response.data[2].id).to eq(seed2.id.to_s)
+
+        admin_user.tags << person1.tags.first
+        admin_user.save!
+
+        api_get("/#{seed_type}/")
+        expect(api_response.meta.total_items).to eq(4)
+        expect(api_response.data[0].id).to eq(seed4.id.to_s)
+        expect(api_response.data[1].id).to eq(seed3.id.to_s)
+        expect(api_response.data[2].id).to eq(seed2.id.to_s)
+        expect(api_response.data[3].id).to eq(seed1.id.to_s)
       end
     end
 
@@ -318,22 +382,29 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         person1 = create(:full_person_tagging).person
         person2 = create(:empty_person)
         person3 = create(:alt_full_person_tagging).person
+        person4 = create(:empty_person)
+        person4.tags << person1.tags.first
+        person4.tags << person3.tags.first
 
         seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
         seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
         seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
+        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
 
         seed1.issue.reload.approve!
         seed2.issue.reload.approve!
         seed3.issue.reload.approve!
+        seed4.issue.reload.approve!
 
         seed1.reload
         seed2.reload
         seed3.reload
+        seed4.reload
 
         api_get("/#{type}/#{seed1.fruit.id}")
         api_get("/#{type}/#{seed2.fruit.id}")
         api_get("/#{type}/#{seed3.fruit.id}")
+        api_get("/#{type}/#{seed4.fruit.id}")
 
         admin_user.tags << person1.tags.first
         admin_user.save!
@@ -341,6 +412,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{type}/#{seed1.fruit.id}")
         api_get("/#{type}/#{seed2.fruit.id}")
         api_get("/#{type}/#{seed3.fruit.id}", {}, 404)
+        api_get("/#{type}/#{seed4.fruit.id}")
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
@@ -349,47 +421,75 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{type}/#{seed1.fruit.id}", {}, 404)
         api_get("/#{type}/#{seed2.fruit.id}")
         api_get("/#{type}/#{seed3.fruit.id}")
+        api_get("/#{type}/#{seed4.fruit.id}")
+
+        admin_user.tags << person1.tags.first
+        admin_user.save!
+
+        api_get("/#{type}/#{seed1.fruit.id}")
+        api_get("/#{type}/#{seed2.fruit.id}")
+        api_get("/#{type}/#{seed3.fruit.id}")
+        api_get("/#{type}/#{seed4.fruit.id}")
       end
 
       it "index #{type} with admin user active tags" do
         person1 = create(:full_person_tagging).person
         person2 = create(:empty_person)
         person3 = create(:alt_full_person_tagging).person
+        person4 = create(:empty_person)
+        person4.tags << person1.tags.first
+        person4.tags << person3.tags.first
 
         seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
         seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
         seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
+        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
 
         seed1.issue.reload.approve!
         seed2.issue.reload.approve!
         seed3.issue.reload.approve!
+        seed4.issue.reload.approve!
 
         seed1.reload
         seed2.reload
         seed3.reload
+        seed4.reload
 
         api_get("/#{type}")
-        expect(api_response.meta.total_items).to eq(3)
-        expect(api_response.data[0].id).to eq(seed3.fruit.id.to_s)
-        expect(api_response.data[1].id).to eq(seed2.fruit.id.to_s)
-        expect(api_response.data[2].id).to eq(seed1.fruit.id.to_s)
+        expect(api_response.meta.total_items).to eq(4)
+        expect(api_response.data[0].id).to eq(seed4.fruit.id.to_s)
+        expect(api_response.data[1].id).to eq(seed3.fruit.id.to_s)
+        expect(api_response.data[2].id).to eq(seed2.fruit.id.to_s)
+        expect(api_response.data[3].id).to eq(seed1.fruit.id.to_s)
 
         admin_user.tags << person1.tags.first
         admin_user.save!
 
         api_get("/#{type}")
-        expect(api_response.meta.total_items).to eq(2)
-        expect(api_response.data[0].id).to eq(seed2.fruit.id.to_s)
-        expect(api_response.data[1].id).to eq(seed1.fruit.id.to_s)
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(seed4.fruit.id.to_s)
+        expect(api_response.data[1].id).to eq(seed2.fruit.id.to_s)
+        expect(api_response.data[2].id).to eq(seed1.fruit.id.to_s)
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
         admin_user.save!
 
         api_get("/#{type}")
-        expect(api_response.meta.total_items).to eq(2)
-        expect(api_response.data[0].id).to eq(seed3.fruit.id.to_s)
-        expect(api_response.data[1].id).to eq(seed2.fruit.id.to_s)
+        expect(api_response.meta.total_items).to eq(3)
+        expect(api_response.data[0].id).to eq(seed4.fruit.id.to_s)
+        expect(api_response.data[1].id).to eq(seed3.fruit.id.to_s)
+        expect(api_response.data[2].id).to eq(seed2.fruit.id.to_s)
+
+        admin_user.tags << person1.tags.first
+        admin_user.save!
+
+        api_get("/#{type}")
+        expect(api_response.meta.total_items).to eq(4)
+        expect(api_response.data[0].id).to eq(seed4.fruit.id.to_s)
+        expect(api_response.data[1].id).to eq(seed3.fruit.id.to_s)
+        expect(api_response.data[2].id).to eq(seed2.fruit.id.to_s)
+        expect(api_response.data[3].id).to eq(seed1.fruit.id.to_s)
       end
     end
   end
