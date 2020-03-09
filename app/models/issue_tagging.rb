@@ -1,5 +1,4 @@
 class IssueTagging < ApplicationRecord
-
   default_scope { joins(:issue).distinct }
 
   def self.taggable_type

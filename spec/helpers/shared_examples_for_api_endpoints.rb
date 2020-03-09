@@ -157,15 +157,19 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         initial_attrs1 = attributes_for(initial_expires_seed)
 
         expect do
-          api_create "/#{seed_type}", {
+          api_create "/#{seed_type}",
             type: seed_type,
             attributes: initial_attrs1,
             relationships: issue_relation1.merge(initial_relations)
-          }
         end.to change { type_const.count }.by(1)
 
         id1 = api_response.data.id
         expect(type_const.last.id).to eq(id1.to_i)
+
+        expect do
+          api_destroy "/#{seed_type}/#{id1}"
+        end.to change { type_const.count }.by(-1)
+        response.body.should be_blank
 
         issue_relation2 = { issue: { data: { id: issue2.id.to_s, type: 'issues' } }}
         initial_attrs2 = attributes_for(later_seed)
@@ -178,30 +182,26 @@ shared_examples "seed" do |type, initial_factory, later_factory,
           }, 404
         end.to change { type_const.count }.by(0)
 
-        expect(type_const.last.id).to eq(id1.to_i)
-
         admin_user.tags << person2.tags.first
         admin_user.save!
 
         initial_attrs1 = attributes_for(later_seed)
 
         expect do
-          api_create "/#{seed_type}", {
+          api_create "/#{seed_type}",
             type: seed_type,
             attributes: initial_attrs1,
             relationships: issue_relation1.merge(initial_relations)
-          }
         end.to change { type_const.count }.by(1)
 
         id1 = api_response.data.id
         expect(type_const.last.id).to eq(id1.to_i)
 
         expect do
-          api_create "/#{seed_type}", {
+          api_create "/#{seed_type}",
             type: seed_type,
             attributes: initial_attrs2,
             relationships: issue_relation2.merge(initial_relations)
-          }
         end.to change { type_const.count }.by(1)
 
         id1 = api_response.data.id

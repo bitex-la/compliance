@@ -532,13 +532,13 @@ describe Issue do
     end
 
     it "allow issue creation with person tags if admin has no tags" do
-      person1 = create(:full_person_tagging).person
+      person = create(:full_person_tagging).person
 
       expect do
         api_create('/issues',
           type: 'issues',
           relationships: { person: {
-            data: { id: person1.id, type: 'people' }
+            data: { id: person.id, type: 'people' }
           } })
       end.to change { Issue.count }.by(1)
     end
@@ -556,16 +556,16 @@ describe Issue do
     end
 
     it "allow issue creation without person tags if admin has tags" do
-      person1 = create(:full_person_tagging).person
+      person = create(:full_person_tagging).person
 
-      admin_user.tags << person1.tags.first
+      admin_user.tags << person.tags.first
       admin_user.save!
 
       expect do
         api_create('/issues',
           type: 'issues',
           relationships: { person: {
-            data: { id: person1.id, type: 'people' }
+            data: { id: person.id, type: 'people' }
           } })
       end.to change { Issue.count }.by(1)
     end
