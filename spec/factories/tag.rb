@@ -24,6 +24,10 @@ FactoryBot.define do
       tag_type { :issue }
 
       factory :issue_tag do
+        name { 'this-is-a-issue-tag-1' }
+      end
+
+      factory :alt_issue_tag do
         name { 'this-is-a-issue-tag-2' }
       end
     end
