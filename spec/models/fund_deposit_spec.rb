@@ -8,11 +8,35 @@ RSpec.describe FundDeposit, type: :model do
     expect(invalid).not_to be_valid
     expect(invalid.errors.keys).to match_array(%i[
       external_id deposit_method currency person amount
-      exchange_rate_adjusted_amount])
+      exchange_rate_adjusted_amount country deposit_date])
   end
 
   it 'is valid with a person, currency and deposit method' do
     expect(create(:fund_deposit, person: person)).to be_valid
+  end
+
+  it 'is not valid if deposit_date is in the future' do
+    object = build(:full_fund_deposit, person: person, deposit_date: 1.hour.from_now)
+    expect(object).to_not be_valid
+    expect(object.errors.messages.keys.first).to eq(:"deposit_date")
+  end
+
+  it 'is not valid if deposit_date is nil' do
+    object = build(:full_fund_deposit, person: person, deposit_date: nil)
+    expect(object).to_not be_valid
+    expect(object.errors.messages.keys.first).to eq(:"deposit_date")
+  end
+
+  it 'is valid update a deposit without deposit_date' do
+    old_fund_deposit = build(:fund_deposit, deposit_date: nil, person: create(:empty_person))
+    old_fund_deposit.save(validate: false)
+    old_fund_deposit.update!(amount: 303.00)
+
+    expect(old_fund_deposit).to be_valid
+
+    old_fund_deposit.reload
+
+    expect(old_fund_deposit.amount).to eq(303.00)
   end
 
   it 'logs creation of fund deposits' do
@@ -23,15 +47,15 @@ RSpec.describe FundDeposit, type: :model do
   describe 'when customer changes regularity' do
     it 'person changes regularity by amount funded' do
       expect(person.regularity).to eq PersonRegularity.none
-      
+
       create(:alt_fund_deposit, person: person)
       expect(person.regularity).to eq PersonRegularity.none
-     
+
       expect do
         create(:full_fund_deposit, person: person, amount: 2500)
       end.to change{person.issues.count}.by(1)
-      
-      issue = person.issues.last 
+
+      issue = person.issues.last
 
       expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'low',
@@ -41,26 +65,26 @@ RSpec.describe FundDeposit, type: :model do
           'regularity_funding_count' => 3,
           'funding_total_amount' => '3500.0',
           'funding_count' => 2
-        } 
+        }
       )
 
       expect(issue.reason).to eq(IssueReason.new_risk_information)
 
       expect(person.regularity).to eq PersonRegularity.low
 
-      assert_logging(person, :update_person_regularity, 1) do |l|  
+      assert_logging(person, :update_person_regularity, 1) do |l|
         fund_deposits = l.data.data.relationships.fund_deposits.data
         expect(fund_deposits.size).to eq 2
-        
-        expect(l.data.included.find {|x| 
-          x.type == "regularities" && 
+
+        expect(l.data.included.find {|x|
+          x.type == "regularities" &&
           x.id == PersonRegularity.low.id.to_s
         }).not_to be_nil
       end
 
       create(:alt_fund_deposit, person: person)
       expect(person.regularity).to eq PersonRegularity.low
-      
+
       expect do
         create(:full_fund_deposit, person: person, amount: 20000)
       end.to change{person.issues.count}.by(1)
@@ -70,79 +94,79 @@ RSpec.describe FundDeposit, type: :model do
       assert_logging(person, :update_person_regularity, 2) do |l|
         fund_deposits = l.data.data.relationships.fund_deposits.data
         expect(fund_deposits.size).to eq 4
-        
-        expect(l.data.included.find {|x| 
-          x.type == "regularities" && 
+
+        expect(l.data.included.find {|x|
+          x.type == "regularities" &&
           x.id == PersonRegularity.high.id.to_s
         }).not_to be_nil
       end
 
       expect(person.issues.size).to eq 2
-      
-      issue = person.issues.last 
+
+      issue = person.issues.last
       expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'high'
       )
 
       expect(issue.reason).to eq(IssueReason.new_risk_information)
     end
-    
+
     it 'person changes regularity by funding repeatedly' do
       expect(person.regularity).to eq PersonRegularity.none
-     
+
       create(:alt_fund_deposit, person: person, amount:1)
       expect(person.regularity).to eq PersonRegularity.none
-      
+
       create(:full_fund_deposit, person: person, amount:1)
       expect(person.regularity).to eq PersonRegularity.none
 
       expect do
         create(:alt_fund_deposit, person: person, amount:1)
       end.to change{person.issues.count}.by(1)
-      
+
       expect(person.regularity).to eq PersonRegularity.low
 
       assert_logging(person, :update_person_regularity, 1) do |l|
         fund_deposits = l.data.data.relationships.fund_deposits.data
         expect(fund_deposits.size).to eq 3
-        
-        expect(l.data.included.find {|x| 
-          x.type == "regularities" && 
+
+        expect(l.data.included.find {|x|
+          x.type == "regularities" &&
           x.id == PersonRegularity.low.id.to_s
         }).not_to be_nil
       end
 
-      issue = person.issues.last 
+      issue = person.issues.last
       expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'low'
       )
 
       expect(issue.reason).to eq(IssueReason.new_risk_information)
 
-      6.times do 
+      6.times do
         create(:alt_fund_deposit, person: person, amount:1)
         expect(person.regularity).to eq PersonRegularity.low
       end
-      
+
       expect do
         create(:full_fund_deposit, person: person, amount: 1)
       end.to change{person.issues.count}.by(1)
-      
+
       expect(person.regularity).to eq PersonRegularity.high
-      
+
       assert_logging(person, :update_person_regularity, 2) do |l|
         fund_deposits = l.data.data.relationships.fund_deposits.data
         expect(fund_deposits.size).to eq 10
-        
-        expect(l.data.included.find {|x| 
-          x.type == "regularities" && 
+
+        expect(l.data.included.find {|x|
+          x.type == "regularities" &&
           x.id == PersonRegularity.high.id.to_s
         }).not_to be_nil
       end
 
       expect(person.issues.size).to eq 2
-      
-      issue = person.issues.last 
+
+      issue = person.issues.last
       expect(issue.risk_score_seeds.last).to have_attributes(
         score: 'high'
       )
@@ -151,13 +175,13 @@ RSpec.describe FundDeposit, type: :model do
 
     it 'none person can become high_regular by amount funded' do
       expect(person.regularity).to eq PersonRegularity.none
-      
+
       expect do
         create(:full_fund_deposit, person: person, amount:50000)
       end.to change{person.issues.count}.by(1)
-      
+
       expect(person.regularity).to eq PersonRegularity.high
-    
+
       assert_logging(person, :update_person_regularity, 1)
 
       create(:full_fund_deposit, person: person, amount:50000)
@@ -165,7 +189,7 @@ RSpec.describe FundDeposit, type: :model do
 
       assert_logging(person, :update_person_regularity, 1)
 
-      expect(person.issues.size).to eq 1    
+      expect(person.issues.size).to eq 1
     end
   end
 end
