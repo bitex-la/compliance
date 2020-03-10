@@ -33,6 +33,7 @@ class Person < ApplicationRecord
   HAS_MANY_PLAIN = %i{
     issues
     fund_deposits
+    fund_withdrawals
     attachments
   }.each do |relationship|
     has_many relationship
@@ -83,7 +84,7 @@ class Person < ApplicationRecord
     %i(natural legal)
   end
 
-  scope :by_person_type, -> (type){ 
+  scope :by_person_type, -> (type){
     {
       natural: left_outer_joins(:natural_dockets)
         .left_outer_joins(:issues =>  :natural_docket_seed)
@@ -236,14 +237,14 @@ class Person < ApplicationRecord
     sum, count = fund_deposits.pluck(Arel.sql('sum(exchange_rate_adjusted_amount), count(*)')).first
 
     self.regularity = PersonRegularity.all.reverse
-      .find {|x| x.applies? sum,count} 
+      .find {|x| x.applies? sum,count}
 
     should_log = regularity_id_changed?
 
     if should_log
       issue = issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.risk_score_seeds.build(
-        score: regularity.code, 
+        score: regularity.code,
         provider: 'open_compliance',
         extra_info: {
           regularity_funding_amount: regularity.funding_amount.to_d,
@@ -256,7 +257,7 @@ class Person < ApplicationRecord
 
     save!
 
-    EventLog.log_entity!(self, AdminUser.current_admin_user, 
+    EventLog.log_entity!(self, AdminUser.current_admin_user,
       EventLogKind.update_person_regularity) if should_log
   end
 
@@ -329,7 +330,7 @@ class Person < ApplicationRecord
   def self.eager_person_entities
     entities = []
     HAS_MANY
-      .reject{|x| [:attachments, :issues, :fund_deposits].include? x}
+      .reject{|x| [:attachments, :issues, :fund_deposits, :fund_withdrawals].include? x}
       .map(&:to_s).each do |fruit|
       entities.push("#{fruit}": eager_fruit_entities)
     end
@@ -351,6 +352,7 @@ class Person < ApplicationRecord
       :observations
     ])
     entities.push(fund_deposits: :attachments)
+    entities.push(fund_withdrawals: :attachments)
     entities
   end
 
@@ -365,13 +367,13 @@ class Person < ApplicationRecord
       :identifications,
       :natural_dockets,
       :legal_entity_dockets,
-      :allowances, 
-      :phones, 
-      :emails, 
+      :allowances,
+      :phones,
+      :emails,
       :affinities,
-      :argentina_invoicing_details, 
-      :chile_invoicing_details, 
-      :notes, 
+      :argentina_invoicing_details,
+      :chile_invoicing_details,
+      :notes,
       :attachments,
       :regularity
     ]
