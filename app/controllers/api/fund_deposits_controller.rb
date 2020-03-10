@@ -20,7 +20,9 @@ class Api::FundDepositsController < Api::EntityController
         :deposit_method_code,
         :external_id,
         :attachments,
-        :person
+        :person,
+        :country,
+        :deposit_date
       ]
     )
   end
