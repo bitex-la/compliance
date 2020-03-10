@@ -13,9 +13,9 @@ module RiskAssesment
     end
 
     def self.create_issue(person)
-      issue = person.issues.create
+      issue = person.issues.build
 
-      issue.risk_score_seeds.create(
+      issue.risk_score_seeds.build(
         replaces: existing_risk_score(person),
         provider: 'open-compliance',
         score: 'same_person_international_transfers',
@@ -27,16 +27,17 @@ module RiskAssesment
         }
       )
 
+      issue.save!
       issue.approve!
     end
 
     def self.existing_risk_score(person)
       person
         .risk_scores
-        .select do |r|
-          r.provider == 'open_compliance' &&
-          r.score == 'same_person_international_transfers'
-        end[0]
+        .find_by(
+          provider: 'open_compliance',
+          score: 'same_person_international_transfers'
+        )
     end
   end
 end
