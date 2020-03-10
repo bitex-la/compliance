@@ -65,6 +65,7 @@ Rails.application.routes.draw do
 
     %i(
       fund_deposits
+      fund_withdrawals
       attachments
       observation_reasons
       observations
@@ -104,7 +105,7 @@ Rails.application.routes.draw do
         post :failure
       end
     end
-    
+
     %i(
       person_taggings
       issue_taggings
@@ -119,7 +120,7 @@ Rails.application.routes.draw do
   end
 
   devise_for :admin_users, ActiveAdmin::Devise.config
-  begin 
+  begin
     ActiveAdmin.routes(self)
   rescue ActiveAdmin::DatabaseHitDuringLoad
     puts "Ignoring database hit during load"
