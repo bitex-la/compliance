@@ -4,7 +4,7 @@ class Api::TasksController < Api::EntityController
   end
 
   def related_person
-    resource&.workflow&.issue&.person_id
+    resource.workflow.issue.person_id
   end
 
   (Task.aasm.events.map(&:name) - [:retry]).each do |action|
@@ -42,5 +42,5 @@ class Api::TasksController < Api::EntityController
         :task_type,
         :workflow
       ]
-  end 
+  end
 end

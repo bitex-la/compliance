@@ -4,7 +4,7 @@ class Api::WorkflowsController < Api::EntityController
   end
 
   def related_person
-    resource&.issue&.person_id
+    resource.issue.person_id
   end
 
   Workflow.aasm.events.map(&:name).each do |action|

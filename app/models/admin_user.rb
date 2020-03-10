@@ -61,6 +61,8 @@ class AdminUser < ApplicationRecord
   end
 
   def can_manage_tag?(tag)
+    active_tags = admin_user_taggings.pluck(:tag_id)
+
     return true if active_tags.empty?
 
     active_tags.include? tag.id

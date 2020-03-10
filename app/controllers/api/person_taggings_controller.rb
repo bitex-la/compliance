@@ -10,7 +10,7 @@ class Api::PersonTaggingsController < Api::EntityController
   protected
 
   def get_mapper
-    mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
+    JsonapiMapper.doc_unsafe! params.permit!.to_h,
       [:people, :tags, :person_taggings],
       people: [],
       tags: [],
@@ -18,17 +18,6 @@ class Api::PersonTaggingsController < Api::EntityController
         :tag,
         :person
       ]
-
-    return mapper unless mapper.data
-
-    return mapper if mapper.data.person.tags.empty?
-
-    mapper.data = nil unless validate_tags(mapper.data.person.tags)
-    mapper
-  end
-
-  def validate_tags(tags)
-    tags.any? { |t| AdminUser.current_admin_user.can_manage_tag?(t) }
   end
 
   def resource
