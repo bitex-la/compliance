@@ -1,21 +1,20 @@
 class Api::ReadOnlyEntityController < Api::ApiController
   def index
-    collection = resource_class
-      .order(updated_at: :desc, id: :desc)
-      .ransack(params[:filter])
-      .result
+    scope = collection.ransack(params[:filter]).result
 
     page, per_page = Util::PageCalculator.call(params, 0, 10)
-    paginated = collection.page(page).per(per_page)
+    paginated = scope.page(page).per(per_page)
 
     jsonapi_response paginated, options_for_response.merge!(
       meta: {
-        total_pages: (collection.count.to_f / per_page).ceil,
-        total_items: collection.count
+        total_pages: (scope.count.to_f / per_page).ceil,
+        total_items: scope.count
       })
   end
 
   def show
+    return jsonapi_404 unless resource
+
     jsonapi_response resource
   end
 
@@ -26,6 +25,10 @@ class Api::ReadOnlyEntityController < Api::ApiController
   protected
 
   def resource
-    resource_class.find(params[:id])
+    collection.find(params[:id])
+  end
+
+  def collection
+    resource_class.order(updated_at: :desc, id: :desc)
   end
 end
