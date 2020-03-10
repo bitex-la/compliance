@@ -172,4 +172,244 @@ describe Workflow do
       end
     end
   end
+
+  describe "When filter by admin tags" do
+    let(:admin_user) { create(:admin_user) }
+
+    before :each do
+      admin_user.tags.clear
+      admin_user.save!
+    end
+
+    it "allow workflow creation only with person valid admin tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:alt_full_person_tagging).person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+
+      expect do
+        api_create('/workflows',
+          type: 'workflows',
+          attributes: {
+            workflow_type: 'onboarding',
+            scope: 'robot'
+          },
+          relationships: {
+            issue: { data: { id: issue1.id, type: 'issues' } }
+          })
+      end.to change { Workflow.count }.by 1
+
+      workflow = Workflow.last
+      expect(api_response.data.id).to eq(workflow.id.to_s)
+
+      expect do
+        api_create('/workflows', {
+          type: 'workflows',
+          attributes: {
+            workflow_type: 'onboarding',
+            scope: 'robot'
+          },
+          relationships: {
+            issue: { data: { id: issue2.id, type: 'issues' } }
+          }}, 404)
+      end.to change { Workflow.count }.by(0)
+
+      expect(workflow).to eq(Workflow.last)
+
+      admin_user.tags << person2.tags.first
+      admin_user.save!
+
+      expect do
+        api_create('/workflows',
+          type: 'workflows',
+          attributes: {
+            workflow_type: 'onboarding',
+            scope: 'robot'
+          },
+          relationships: {
+            issue: { data: { id: issue1.id, type: 'issues' } }
+          })
+      end.to change { Workflow.count }.by 1
+
+      workflow = Workflow.last
+      expect(api_response.data.id).to eq(workflow.id.to_s)
+
+      expect do
+        api_create('/workflows',
+          type: 'workflows',
+          attributes: {
+            workflow_type: 'onboarding',
+            scope: 'robot'
+          },
+          relationships: {
+            issue: { data: { id: issue2.id, type: 'issues' } }
+          })
+      end.to change { Workflow.count }.by 1
+
+      workflow = Workflow.last
+      expect(api_response.data.id).to eq(workflow.id.to_s)
+    end
+
+    it "allow workflow creation with person tags if admin has no tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+
+      expect do
+        api_create('/workflows',
+          type: 'workflows',
+          attributes: {
+            workflow_type: 'onboarding',
+            scope: 'robot'
+          },
+          relationships: {
+            issue: { data: { id: issue.id, type: 'issues' } }
+          })
+      end.to change { Workflow.count }.by 1
+    end
+
+    it "allow workflow creation without person tags if admin has no tags" do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person)
+      
+      expect do
+        api_create('/workflows',
+          type: 'workflows',
+          attributes: {
+            workflow_type: 'onboarding',
+            scope: 'robot'
+          },
+          relationships: {
+            issue: { data: { id: issue.id, type: 'issues' } }
+          })
+      end.to change { Workflow.count }.by 1
+    end
+
+    it "allow workflow creation without person tags if admin has tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+
+      admin_user.tags << person.tags.first
+      admin_user.save!
+
+      expect do
+        api_create('/workflows',
+          type: 'workflows',
+          attributes: {
+            workflow_type: 'onboarding',
+            scope: 'robot'
+          },
+          relationships: {
+            issue: { data: { id: issue.id, type: 'issues' } }
+          })
+      end.to change { Workflow.count }.by 1
+    end
+
+    it "show workflow with admin user active tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+      workflow3 = create(:basic_workflow, issue: issue3)
+      workflow4 = create(:basic_workflow, issue: issue4)
+
+      api_get("/workflows/#{workflow1.id}")
+      api_get("/workflows/#{workflow2.id}")
+      api_get("/workflows/#{workflow3.id}")
+      api_get("/workflows/#{workflow4.id}")
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/workflows/#{workflow1.id}")
+      api_get("/workflows/#{workflow2.id}")
+      api_get("/workflows/#{workflow3.id}", {}, 404)
+      api_get("/workflows/#{workflow4.id}")
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_get("/workflows/#{workflow1.id}", {}, 404)
+      api_get("/workflows/#{workflow2.id}")
+      api_get("/workflows/#{workflow3.id}")
+      api_get("/workflows/#{workflow4.id}")
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/workflows/#{workflow1.id}")
+      api_get("/workflows/#{workflow2.id}")
+      api_get("/workflows/#{workflow3.id}")
+      api_get("/workflows/#{workflow4.id}")
+    end
+
+    it "index workflow with admin user active tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+      workflow3 = create(:basic_workflow, issue: issue3)
+      workflow4 = create(:basic_workflow, issue: issue4)
+
+      api_get("/workflows/")
+      expect(api_response.meta.total_items).to eq(4)
+      expect(api_response.data[0].id).to eq(workflow4.id.to_s)
+      expect(api_response.data[1].id).to eq(workflow3.id.to_s)
+      expect(api_response.data[2].id).to eq(workflow2.id.to_s)
+      expect(api_response.data[3].id).to eq(workflow1.id.to_s)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/workflows/")
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(workflow4.id.to_s)
+      expect(api_response.data[1].id).to eq(workflow2.id.to_s)
+      expect(api_response.data[2].id).to eq(workflow1.id.to_s)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_get("/workflows/")
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(workflow4.id.to_s)
+      expect(api_response.data[1].id).to eq(workflow3.id.to_s)
+      expect(api_response.data[2].id).to eq(workflow2.id.to_s)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/workflows/")
+      expect(api_response.meta.total_items).to eq(4)
+      expect(api_response.data[0].id).to eq(workflow4.id.to_s)
+      expect(api_response.data[1].id).to eq(workflow3.id.to_s)
+      expect(api_response.data[2].id).to eq(workflow2.id.to_s)
+      expect(api_response.data[3].id).to eq(workflow1.id.to_s)
+    end
+  end
 end

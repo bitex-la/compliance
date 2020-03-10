@@ -8,6 +8,8 @@ class Task < ApplicationRecord
 
   validates :task_type, presence: true
 
+  default_scope { joins(:workflow, workflow: :issue) }
+
   aasm do
     state :new, initial: true
     state :started

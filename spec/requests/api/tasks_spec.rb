@@ -154,4 +154,255 @@ describe Task do
       api_request :post, "/tasks/#{task.id}/fail", {}, 200
     end
   end
+
+  describe "When filter by admin tags" do
+    let(:admin_user) { create(:admin_user) }
+
+    before :each do
+      admin_user.tags.clear
+      admin_user.save!
+    end
+
+    it "allow task creation only with person valid admin tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:alt_full_person_tagging).person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+
+      expect do
+        api_create('/tasks',
+          type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
+          relationships: {
+            workflow: { data: { id: workflow1.id, type: 'workflows' } }
+          })
+      end.to change{ Task.count }.by 1
+
+      task = Task.last
+      expect(api_response.data.id).to eq(task.id.to_s)
+
+      expect do
+        api_create('/tasks', {
+          type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
+          relationships: {
+            workflow: { data: { id: workflow2.id, type: 'workflows' } }
+          }
+        }, 404)
+      end.to change { Task.count }.by(0)
+
+      expect(task).to eq(Task.last)
+
+      admin_user.tags << person2.tags.first
+      admin_user.save!
+
+      expect do
+        api_create('/tasks',
+          type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
+          relationships: {
+            workflow: { data: { id: workflow1.id, type: 'workflows' } }
+          })
+      end.to change{ Task.count }.by 1
+
+      task = Task.last
+      expect(api_response.data.id).to eq(task.id.to_s)
+
+      expect do
+        api_create('/tasks',
+          type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
+          relationships: {
+            workflow: { data: { id: workflow2.id, type: 'workflows' } }
+          })
+      end.to change{ Task.count }.by 1
+
+      task = Task.last
+      expect(api_response.data.id).to eq(task.id.to_s)
+    end
+
+    it "allow task creation with person tags if admin has no tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+      workflow = create(:basic_workflow, issue: issue)
+
+      expect do
+        api_create('/tasks',
+          type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
+          relationships: {
+            workflow: { data: { id: workflow.id, type: 'workflows' } }
+          })
+      end.to change{ Task.count }.by 1
+    end
+
+    it "allow task creation without person tags if admin has no tags" do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person)
+      workflow = create(:basic_workflow, issue: issue)
+
+      expect do
+        api_create('/tasks',
+          type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
+          relationships: {
+            workflow: { data: { id: workflow.id, type: 'workflows' } }
+          })
+      end.to change{ Task.count }.by 1
+    end
+
+    it "allow task creation without person tags if admin has tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+
+      admin_user.tags << person.tags.first
+      admin_user.save!
+
+      workflow = create(:basic_workflow, issue: issue)
+
+      expect do
+        api_create('/tasks',
+          type: 'tasks',
+          attributes: {
+            task_type: 'onboarding'
+          },
+          relationships: {
+            workflow: { data: { id: workflow.id, type: 'workflows' } }
+          })
+      end.to change{ Task.count }.by 1
+    end
+
+    it "show task with admin user active tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+      workflow3 = create(:basic_workflow, issue: issue3)
+      workflow4 = create(:basic_workflow, issue: issue4)
+
+      task1 = create(:basic_task, workflow: workflow1)
+      task2 = create(:basic_task, workflow: workflow2)
+      task3 = create(:basic_task, workflow: workflow3)
+      task4 = create(:basic_task, workflow: workflow4)
+
+      api_get("/tasks/#{task1.id}")
+      api_get("/tasks/#{task2.id}")
+      api_get("/tasks/#{task3.id}")
+      api_get("/tasks/#{task4.id}")
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/tasks/#{task1.id}")
+      api_get("/tasks/#{task2.id}")
+      api_get("/tasks/#{task3.id}", {}, 404)
+      api_get("/tasks/#{task4.id}")
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_get("/tasks/#{task1.id}", {}, 404)
+      api_get("/tasks/#{task2.id}")
+      api_get("/tasks/#{task3.id}")
+      api_get("/tasks/#{task4.id}")
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/tasks/#{task1.id}")
+      api_get("/tasks/#{task2.id}")
+      api_get("/tasks/#{task3.id}")
+      api_get("/tasks/#{task4.id}")
+    end
+
+    it "index task with admin user active tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+      workflow3 = create(:basic_workflow, issue: issue3)
+      workflow4 = create(:basic_workflow, issue: issue4)
+
+      task1 = create(:basic_task, workflow: workflow1)
+      task2 = create(:basic_task, workflow: workflow2)
+      task3 = create(:basic_task, workflow: workflow3)
+      task4 = create(:basic_task, workflow: workflow4)
+
+      api_get("/tasks/")
+      expect(api_response.meta.total_items).to eq(4)
+      expect(api_response.data[0].id).to eq(task4.id.to_s)
+      expect(api_response.data[1].id).to eq(task3.id.to_s)
+      expect(api_response.data[2].id).to eq(task2.id.to_s)
+      expect(api_response.data[3].id).to eq(task1.id.to_s)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/tasks/")
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(task4.id.to_s)
+      expect(api_response.data[1].id).to eq(task2.id.to_s)
+      expect(api_response.data[2].id).to eq(task1.id.to_s)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_get("/tasks/")
+      expect(api_response.meta.total_items).to eq(3)
+      expect(api_response.data[0].id).to eq(task4.id.to_s)
+      expect(api_response.data[1].id).to eq(task3.id.to_s)
+      expect(api_response.data[2].id).to eq(task2.id.to_s)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get("/tasks/")
+      expect(api_response.meta.total_items).to eq(4)
+      expect(api_response.data[0].id).to eq(task4.id.to_s)
+      expect(api_response.data[1].id).to eq(task3.id.to_s)
+      expect(api_response.data[2].id).to eq(task2.id.to_s)
+      expect(api_response.data[3].id).to eq(task1.id.to_s)
+    end
+  end
 end

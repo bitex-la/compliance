@@ -23,6 +23,8 @@ class Workflow < ApplicationRecord
   validates :workflow_type, presence: true
   validates :scope, inclusion: { in: scopes }
 
+  default_scope { joins(:issue) }
+
   scope :running, -> {
     joins(:issue)
     .where(aasm_state: 'started')
