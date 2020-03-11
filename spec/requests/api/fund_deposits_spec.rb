@@ -187,18 +187,63 @@ describe FundDeposit do
       end.to change { FundDeposit.count }.by(1)
     end
 
-    it "show fund deposit with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
+    it "Update a fund deposit with person tags if admin has tags" do
+      fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
+      person1 = fund_deposit1.person
+      person3 = fund_deposit3.person
 
-      fund_deposit1 = create(:full_fund_deposit, person: person1)
-      fund_deposit2 = create(:full_fund_deposit, person: person2)
-      fund_deposit3 = create(:full_fund_deposit, person: person3)
-      fund_deposit4 = create(:full_fund_deposit, person: person4)
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_update "/fund_deposits/#{fund_deposit1.id}",
+        type: 'fund_deposits',
+        id: fund_deposit1.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+
+      api_update "/fund_deposits/#{fund_deposit2.id}",
+        type: 'fund_deposits',
+        id: fund_deposit2.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+
+      api_update "/fund_deposits/#{fund_deposit3.id}", {
+        type: 'fund_deposits',
+        id: fund_deposit3.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+      }, 404
+
+      api_update "/fund_deposits/#{fund_deposit4.id}",
+        type: 'fund_deposits',
+        id: fund_deposit4.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_update "/fund_deposits/#{fund_deposit3.id}",
+        type: 'fund_deposits',
+        id: fund_deposit3.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+    end
+
+    it "show fund deposit with admin user active tags" do
+      fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
+      person1 = fund_deposit1.person
+      person3 = fund_deposit3.person
 
       api_get("/fund_deposits/#{fund_deposit1.id}")
       api_get("/fund_deposits/#{fund_deposit2.id}")
@@ -232,17 +277,9 @@ describe FundDeposit do
     end
 
     it "index fund deposit with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      fund_deposit1 = create(:full_fund_deposit, person: person1)
-      fund_deposit2 = create(:full_fund_deposit, person: person2)
-      fund_deposit3 = create(:full_fund_deposit, person: person3)
-      fund_deposit4 = create(:full_fund_deposit, person: person4)
+      fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
+      person1 = fund_deposit1.person
+      person3 = fund_deposit3.person
 
       api_get("/fund_deposits/")
       expect(api_response.meta.total_items).to eq(4)
@@ -279,6 +316,22 @@ describe FundDeposit do
       expect(api_response.data[1].id).to eq(fund_deposit3.id.to_s)
       expect(api_response.data[2].id).to eq(fund_deposit2.id.to_s)
       expect(api_response.data[3].id).to eq(fund_deposit1.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      fund_deposit1 = create(:full_fund_deposit, person: person1)
+      fund_deposit2 = create(:full_fund_deposit, person: person2)
+      fund_deposit3 = create(:full_fund_deposit, person: person3)
+      fund_deposit4 = create(:full_fund_deposit, person: person4)
+
+      [fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4]
     end
   end
 end

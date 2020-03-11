@@ -178,18 +178,63 @@ describe FundWithdrawal do
       end.to change { FundWithdrawal.count }.by(1)
     end
 
-    it "show fund withdrawal with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
+    it "Update a fund deposit with person tags if admin has tags" do
+      fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
+      person1 = fund1.person
+      person3 = fund3.person
 
-      fund1 = create(:full_fund_withdrawal, person: person1)
-      fund2 = create(:full_fund_withdrawal, person: person2)
-      fund3 = create(:full_fund_withdrawal, person: person3)
-      fund4 = create(:full_fund_withdrawal, person: person4)
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_update "/fund_withdrawals/#{fund1.id}",
+        type: 'fund_withdrawals',
+        id: fund1.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+
+      api_update "/fund_withdrawals/#{fund2.id}",
+        type: 'fund_withdrawals',
+        id: fund2.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+
+      api_update "/fund_withdrawals/#{fund3.id}", {
+        type: 'fund_withdrawals',
+        id: fund3.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+      }, 404
+
+      api_update "/fund_withdrawals/#{fund4.id}",
+        type: 'fund_withdrawals',
+        id: fund4.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_update "/fund_withdrawals/#{fund3.id}",
+        type: 'fund_withdrawals',
+        id: fund3.id,
+        attributes: {
+          amount: 20_000.00,
+          country: 'BR'
+        }
+    end
+
+    it "show fund withdrawal with admin user active tags" do
+      fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
+      person1 = fund1.person
+      person3 = fund3.person
 
       api_get("/fund_withdrawals/#{fund1.id}")
       api_get("/fund_withdrawals/#{fund2.id}")
@@ -223,17 +268,9 @@ describe FundWithdrawal do
     end
 
     it "index fund withdrawal with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      fund1 = create(:full_fund_withdrawal, person: person1)
-      fund2 = create(:full_fund_withdrawal, person: person2)
-      fund3 = create(:full_fund_withdrawal, person: person3)
-      fund4 = create(:full_fund_withdrawal, person: person4)
+      fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
+      person1 = fund1.person
+      person3 = fund3.person
 
       api_get("/fund_withdrawals/")
       expect(api_response.meta.total_items).to eq(4)
@@ -270,6 +307,22 @@ describe FundWithdrawal do
       expect(api_response.data[1].id).to eq(fund3.id.to_s)
       expect(api_response.data[2].id).to eq(fund2.id.to_s)
       expect(api_response.data[3].id).to eq(fund1.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      fund1 = create(:full_fund_withdrawal, person: person1)
+      fund2 = create(:full_fund_withdrawal, person: person2)
+      fund3 = create(:full_fund_withdrawal, person: person3)
+      fund4 = create(:full_fund_withdrawal, person: person4)
+
+      [fund1, fund2, fund3, fund4]
     end
   end
 end

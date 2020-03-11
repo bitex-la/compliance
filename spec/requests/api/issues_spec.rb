@@ -570,18 +570,49 @@ describe Issue do
       end.to change { Issue.count }.by(1)
     end
 
-    it "show issue with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
+    it "Update a person with person tags if admin has tags" do
+      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
+      person1 = issue1.person
+      person3 = issue3.person
 
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_update "/issues/#{issue1.id}",
+        type: 'issues',
+        id: issue1.id,
+        attributes: { reason: IssueReason.update_expired_data }
+
+      api_update "/issues/#{issue2.id}",
+        type: 'issues',
+        id: issue2.id,
+        attributes: { reason: IssueReason.update_expired_data }
+
+      api_update "/issues/#{issue3.id}", {
+        type: 'issues',
+        id: issue3.id,
+        attributes: { reason: IssueReason.update_expired_data }
+      }, 404
+
+      api_update "/issues/#{issue4.id}",
+        type: 'issues',
+        id: issue4.id,
+        attributes: { reason: IssueReason.update_expired_data }
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_update "/issues/#{issue3.id}", {
+        type: 'issues',
+        id: issue3.id,
+        attributes: { reason: IssueReason.update_expired_data }
+      }
+    end
+
+    it "show issue with admin user active tags" do
+      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
+      person1 = issue1.person
+      person3 = issue3.person
 
       api_get("/issues/#{issue1.id}")
       api_get("/issues/#{issue2.id}")
@@ -615,17 +646,9 @@ describe Issue do
     end
 
     it "index issue with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
+      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
+      person1 = issue1.person
+      person3 = issue3.person
 
       api_get("/issues/", page: { page: 0, per_page: 4 })
 
@@ -663,6 +686,22 @@ describe Issue do
       expect(api_response.data[1].id).to eq(issue3.id.to_s)
       expect(api_response.data[2].id).to eq(issue2.id.to_s)
       expect(api_response.data[3].id).to eq(issue1.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      [issue1, issue2, issue3, issue4]
     end
   end
 end

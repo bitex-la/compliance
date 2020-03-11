@@ -720,13 +720,44 @@ describe Person do
         attributes: { enabled: true, risk: 'low' })
     end
 
+    it "Update a person with person tags if admin has tags" do
+      person1, person2, person3, person4 = setup_for_admin_tags_spec
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_update "/people/#{person1.id}",
+        type: "people",
+        id: person1.id,
+        attributes: { enabled: true }
+
+      api_update "/people/#{person2.id}",
+        type: "people",
+        id: person2.id,
+        attributes: { enabled: true }
+
+      api_update "/people/#{person3.id}", {
+        type: "people",
+        id: person3.id,
+        attributes: { enabled: true }
+      }, 404
+
+      api_update "/people/#{person4.id}",
+        type: "people",
+        id: person4.id,
+        attributes: { enabled: true }
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_update "/people/#{person3.id}",
+        type: "people",
+        id: person3.id,
+        attributes: { enabled: true }
+    end
+
     it "show person with active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
+      person1, person2, person3, person4 = setup_for_admin_tags_spec
 
       api_get "/people/#{person1.id}"
       api_get "/people/#{person2.id}"
@@ -764,13 +795,8 @@ describe Person do
     end
 
     it "index person with active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
+      person1, person2, person3, person4 = setup_for_admin_tags_spec
+      
       api_get "/people"
       expect(api_response.meta.total_items).to eq(4)
       expect(api_response.data[0].id).to eq(person1.id.to_s)
@@ -806,6 +832,17 @@ describe Person do
       expect(api_response.data[1].id).to eq(person2.id.to_s)
       expect(api_response.data[2].id).to eq(person3.id.to_s)
       expect(api_response.data[3].id).to eq(person4.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      [person1, person2, person3, person4]
     end
   end
 end

@@ -291,6 +291,39 @@ describe Task do
       end.to change{ Task.count }.by 1
     end
 
+    it "Update a task with person tags if admin has tags" do
+      task1, task2, task3, task4 = setup_for_admin_tags_spec
+      person1 = task1.workflow.issue.person
+      person3 = task3.workflow.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_update "/tasks/#{task1.id}",
+        type: 'tasks',
+        attributes: { current_retries: 2 }
+
+      api_update "/tasks/#{task2.id}",
+        type: 'tasks',
+        attributes: { current_retries: 2 }
+
+      api_update "/tasks/#{task3.id}", {
+        type: 'tasks',
+        attributes: { current_retries: 2 }
+      }, 404
+
+      api_update "/tasks/#{task4.id}",
+        type: 'tasks',
+        attributes: { current_retries: 2 }
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_update "/tasks/#{task3.id}",
+        type: 'tasks',
+        attributes: { current_retries: 2 }
+    end
+
     it "Destroy a task with person tags if admin has tags" do
       task1, task2, task3, task4 = setup_for_admin_tags_spec
       person1 = task1.workflow.issue.person

@@ -237,23 +237,48 @@ describe Observation do
       end.to change { Observation.count }.by(1)
     end
 
+    it "Update an obsevation with person tags if admin has tags" do
+      obs1, obs2, obs3, obs4 = setup_for_admin_tags_spec
+      person1 = obs1.issue.person
+      person3 = obs3.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_update "/observations/#{obs1.id}",
+        type: 'observations',
+        id: obs1.id,
+        attributes: { reply: "Some reply here" }
+
+      api_update "/observations/#{obs2.id}",
+        type: 'observations',
+        id: obs1.id,
+        attributes: { reply: "Some reply here" }
+
+      api_update "/observations/#{obs3.id}", {
+        type: 'observations',
+        id: obs1.id,
+        attributes: { reply: "Some reply here" }
+      }, 404
+
+      api_update "/observations/#{obs4.id}",
+        type: 'observations',
+        id: obs1.id,
+        attributes: { reply: "Some reply here" }
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_update "/observations/#{obs3.id}",
+        type: 'observations',
+        id: obs1.id,
+        attributes: { reply: "Some reply here" }
+    end
+
     it "show observations with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
-
-      obs1 = create(:robot_observation, issue: issue1)
-      obs2 = create(:robot_observation, issue: issue2)
-      obs3 = create(:robot_observation, issue: issue3)
-      obs4 = create(:robot_observation, issue: issue4)
+      obs1, obs2, obs3, obs4 = setup_for_admin_tags_spec
+      person1 = obs1.issue.person
+      person3 = obs3.issue.person
 
       api_get("/observations/#{obs1.id}")
       api_get("/observations/#{obs2.id}")
@@ -287,22 +312,9 @@ describe Observation do
     end
 
     it "index observations with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
-
-      obs1 = create(:robot_observation, issue: issue1)
-      obs2 = create(:robot_observation, issue: issue2)
-      obs3 = create(:robot_observation, issue: issue3)
-      obs4 = create(:robot_observation, issue: issue4)
+      obs1, obs2, obs3, obs4 = setup_for_admin_tags_spec
+      person1 = obs1.issue.person
+      person3 = obs3.issue.person
 
       api_get("/observations/")
       expect(api_response.meta.total_items).to eq(4)
@@ -339,6 +351,27 @@ describe Observation do
       expect(api_response.data[1].id).to eq(obs3.id.to_s)
       expect(api_response.data[2].id).to eq(obs2.id.to_s)
       expect(api_response.data[3].id).to eq(obs1.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      obs1 = create(:robot_observation, issue: issue1)
+      obs2 = create(:robot_observation, issue: issue2)
+      obs3 = create(:robot_observation, issue: issue3)
+      obs4 = create(:robot_observation, issue: issue4)
+
+      [obs1, obs2, obs3, obs4]
     end
   end
 end

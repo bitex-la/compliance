@@ -272,6 +272,59 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         end.to change { type_const.count }.by(1)
       end
 
+      it "Update a #{seed_type} with person tags if admin has tags" do
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        person1 = seed1.issue.person
+        person3 = seed3.issue.person
+
+        admin_user.tags << person1.tags.first
+        admin_user.save!
+
+        later_attrs = attributes_for(later_seed)
+        later_relations = instance_exec(&relations_proc)
+
+        api_update "/#{seed_type}/#{seed1.id}", {
+          type: seed_type,
+          attributes: later_attrs,
+          relationships: later_relations
+        }
+
+        api_response.data.attributes.should >= later_attrs
+
+        api_update "/#{seed_type}/#{seed2.id}", {
+          type: seed_type,
+          attributes: later_attrs,
+          relationships: later_relations
+        }
+
+        api_response.data.attributes.should >= later_attrs
+
+        api_update "/#{seed_type}/#{seed3.id}", {
+          type: seed_type,
+          attributes: later_attrs,
+          relationships: later_relations
+        }, 404
+
+        api_update "/#{seed_type}/#{seed4.id}", {
+          type: seed_type,
+          attributes: later_attrs,
+          relationships: later_relations
+        }
+
+        api_response.data.attributes.should >= later_attrs
+
+        admin_user.tags << person3.tags.first
+        admin_user.save!
+
+        api_update "/#{seed_type}/#{seed3.id}", {
+          type: seed_type,
+          attributes: later_attrs,
+          relationships: later_relations
+        }
+
+        api_response.data.attributes.should >= later_attrs
+      end
+
       it "Destroy a #{seed_type} with person tags if admin has tags" do
         seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
         person1 = seed1.issue.person
@@ -383,7 +436,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
     describe "fruits" do
       it "show #{type} with admin user active tags" do
-        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed, true)
         person1 = seed1.issue.person
         person3 = seed3.issue.person
 
@@ -419,7 +472,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       end
 
       it "index #{type} with admin user active tags" do
-        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed, true)
         person1 = seed1.issue.person
         person3 = seed3.issue.person
 
@@ -461,7 +514,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       end
     end
 
-    def setup_for_admin_tags_spec(initial_seed)
+    def setup_for_admin_tags_spec(initial_seed, approve_issue = false)
       person1 = create(:full_person_tagging).person
       person2 = create(:empty_person)
       person3 = create(:alt_full_person_tagging).person
@@ -474,10 +527,12 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
       seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
 
-      seed1.issue.reload.approve!
-      seed2.issue.reload.approve!
-      seed3.issue.reload.approve!
-      seed4.issue.reload.approve!
+      if approve_issue
+        seed1.issue.reload.approve!
+        seed2.issue.reload.approve!
+        seed3.issue.reload.approve!
+        seed4.issue.reload.approve!
+      end
 
       seed1.reload
       seed2.reload

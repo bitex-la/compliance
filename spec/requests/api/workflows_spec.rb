@@ -308,6 +308,39 @@ describe Workflow do
       end.to change { Workflow.count }.by 1
     end
 
+    it "Update a workflow with person tags if admin has tags" do
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_update "/workflows/#{workflow1.id}",
+        type: 'workflows',
+        attributes: { scope: 'admin', workflow_type: 'risk_check' }
+
+      api_update "/workflows/#{workflow2.id}",
+        type: 'workflows',
+        attributes: { scope: 'admin', workflow_type: 'risk_check' }
+
+      api_update "/workflows/#{workflow3.id}", {
+      type: 'workflows',
+      attributes: { scope: 'admin', workflow_type: 'risk_check' }
+      }, 404
+
+      api_update "/workflows/#{workflow4.id}",
+      type: 'workflows',
+      attributes: { scope: 'admin', workflow_type: 'risk_check' }
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_update "/workflows/#{workflow3.id}",
+        type: 'workflows',
+        attributes: { scope: 'admin', workflow_type: 'risk_check' }
+    end
+
     it "Destroy a task with person tags if admin has tags" do
       workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
       person1 = workflow1.issue.person
