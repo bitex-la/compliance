@@ -16,12 +16,9 @@ class PersonTagging < ApplicationRecord
 
     return if person.tags.empty?
 
-    admin_user = AdminUser.current_admin_user
-    unless (tags = admin_user&.active_tags)
+    unless (admin_user = AdminUser.current_admin_user)
       return
     end
-
-    return if tags.empty?
 
     return if person.tags.any? { |t| admin_user.can_manage_tag?(t) }
 

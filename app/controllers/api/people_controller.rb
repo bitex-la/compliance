@@ -29,8 +29,6 @@ class Api::PeopleController < Api::ApiController
 
     return jsonapi_422 unless mapper.data
 
-    return jsonapi_422 unless validate_tags(mapper.data.tags)
-
     if mapper.save_all
       jsonapi_response mapper.data,{}, 201
     else
@@ -82,9 +80,5 @@ class Api::PeopleController < Api::ApiController
 
   def path_for_show
     "person/show/#{params[:id]}/?#{params.permit!.to_query}"
-  end
-
-  def validate_tags(tags)
-    tags.all? { |t| AdminUser.current_admin_user.can_manage_tag?(t) }
   end
 end

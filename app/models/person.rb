@@ -48,6 +48,20 @@ class Person < ApplicationRecord
   has_many :tags, through: :person_taggings
   accepts_nested_attributes_for :person_taggings, allow_destroy: true
 
+  validate :person_tag_must_be_managed_by_admin
+
+  def person_tag_must_be_managed_by_admin
+    return if tags.empty?
+
+    unless (admin_user = AdminUser.current_admin_user)
+      return
+    end
+
+    return if tags.any? { |t| admin_user.can_manage_tag?(t) }
+
+    errors.add(:person, 'Person tags not allowed')
+  end
+
   def replaceable_fruits
     %i[
       natural_dockets
