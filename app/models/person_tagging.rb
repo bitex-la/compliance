@@ -16,13 +16,14 @@ class PersonTagging < ApplicationRecord
 
     return if person.tags.empty?
 
-    unless (tags = AdminUser.current_admin_user&.active_tags)
+    admin_user = AdminUser.current_admin_user
+    unless (tags = admin_user&.active_tags)
       return
     end
 
     return if tags.empty?
 
-    return if person.tags.any? { |t| AdminUser.current_admin_user.can_manage_tag?(t) }
+    return if person.tags.any? { |t| admin_user.can_manage_tag?(t) }
 
     errors.add(:person, 'Person tags not allowed')
   end

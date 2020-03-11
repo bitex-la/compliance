@@ -26,15 +26,7 @@ class FundDeposit < ApplicationRecord
   after_save :refresh_person_regularity!
   after_save { person.expire_action_cache }
 
-  def self.default_scope
-    unless (tags = AdminUser.current_admin_user&.active_tags)
-      return nil
-    end
-
-    return nil if tags.empty?
-
-    where(person_id: Person.all)
-  end
+  include PersonScopeable
 
   def name
     "##{id}: #{amount} #{currency_code} #{deposit_method_code}"

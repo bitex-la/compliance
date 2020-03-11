@@ -149,6 +149,7 @@ module Garden
 
   module Fruit
     extend ActiveSupport::Concern
+    include PersonScopeable
 
     included do
       belongs_to :person
@@ -160,16 +161,6 @@ module Garden
       has_many :attachments, as: :attached_to_fruit
 
       after_save{ person.expire_action_cache }
-
-      def self.default_scope
-        unless (tags = AdminUser.current_admin_user&.active_tags)
-          return nil
-        end
-    
-        return nil if tags.empty?
-
-        where(person_id: Person.all)
-      end
 
       scope :current, -> { 
         where(replaced_by_id: nil)

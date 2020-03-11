@@ -44,15 +44,7 @@ class Issue < ApplicationRecord
   belongs_to :lock_admin_user, class_name: "AdminUser", foreign_key: "lock_admin_user_id", optional: true
   validate :locked_issue_cannot_changed
 
-  def self.default_scope
-    unless (tags = AdminUser.current_admin_user&.active_tags)
-      return nil
-    end
-
-    return nil if tags.empty?
-
-    where(person_id: Person.all)
-  end
+  include PersonScopeable
 
   def locked_issue_cannot_changed
     return unless locked
