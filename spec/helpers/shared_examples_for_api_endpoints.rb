@@ -273,22 +273,9 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       end
 
       it "show #{seed_type} with admin user active tags" do
-        person1 = create(:full_person_tagging).person
-        person2 = create(:empty_person)
-        person3 = create(:alt_full_person_tagging).person
-        person4 = create(:empty_person)
-        person4.tags << person1.tags.first
-        person4.tags << person3.tags.first
-
-        seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
-        seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
-        seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
-        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
-
-        seed1.issue.reload.approve!
-        seed2.issue.reload.approve!
-        seed3.issue.reload.approve!
-        seed4.issue.reload.approve!
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        person1 = seed1.issue.person
+        person3 = seed3.issue.person
 
         api_get("/#{seed_type}/#{seed1.id}")
         api_get("/#{seed_type}/#{seed2.id}")
@@ -322,22 +309,9 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       end
 
       it "index #{seed_type} with admin user active tags" do
-        person1 = create(:full_person_tagging).person
-        person2 = create(:empty_person)
-        person3 = create(:alt_full_person_tagging).person
-        person4 = create(:empty_person)
-        person4.tags << person1.tags.first
-        person4.tags << person3.tags.first
-
-        seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
-        seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
-        seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
-        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
-
-        seed1.issue.reload.approve!
-        seed2.issue.reload.approve!
-        seed3.issue.reload.approve!
-        seed4.issue.reload.approve!
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        person1 = seed1.issue.person
+        person3 = seed3.issue.person
 
         api_get("/#{seed_type}/")
         expect(api_response.meta.total_items).to eq(4)
@@ -379,27 +353,9 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
     describe "fruits" do
       it "show #{type} with admin user active tags" do
-        person1 = create(:full_person_tagging).person
-        person2 = create(:empty_person)
-        person3 = create(:alt_full_person_tagging).person
-        person4 = create(:empty_person)
-        person4.tags << person1.tags.first
-        person4.tags << person3.tags.first
-
-        seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
-        seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
-        seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
-        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
-
-        seed1.issue.reload.approve!
-        seed2.issue.reload.approve!
-        seed3.issue.reload.approve!
-        seed4.issue.reload.approve!
-
-        seed1.reload
-        seed2.reload
-        seed3.reload
-        seed4.reload
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        person1 = seed1.issue.person
+        person3 = seed3.issue.person
 
         api_get("/#{type}/#{seed1.fruit.id}")
         api_get("/#{type}/#{seed2.fruit.id}")
@@ -433,27 +389,9 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       end
 
       it "index #{type} with admin user active tags" do
-        person1 = create(:full_person_tagging).person
-        person2 = create(:empty_person)
-        person3 = create(:alt_full_person_tagging).person
-        person4 = create(:empty_person)
-        person4.tags << person1.tags.first
-        person4.tags << person3.tags.first
-
-        seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
-        seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
-        seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
-        seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
-
-        seed1.issue.reload.approve!
-        seed2.issue.reload.approve!
-        seed3.issue.reload.approve!
-        seed4.issue.reload.approve!
-
-        seed1.reload
-        seed2.reload
-        seed3.reload
-        seed4.reload
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        person1 = seed1.issue.person
+        person3 = seed3.issue.person
 
         api_get("/#{type}")
         expect(api_response.meta.total_items).to eq(4)
@@ -491,6 +429,32 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         expect(api_response.data[2].id).to eq(seed2.fruit.id.to_s)
         expect(api_response.data[3].id).to eq(seed1.fruit.id.to_s)
       end
+    end
+
+    def setup_for_admin_tags_spec(initial_seed)
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
+      seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
+      seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
+      seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
+
+      seed1.issue.reload.approve!
+      seed2.issue.reload.approve!
+      seed3.issue.reload.approve!
+      seed4.issue.reload.approve!
+      
+      seed1.reload
+      seed2.reload
+      seed3.reload
+      seed4.reload
+      
+      [seed1, seed2, seed3, seed4]
     end
   end
 end

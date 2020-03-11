@@ -12,10 +12,11 @@ class FundWithdrawal < ApplicationRecord
 
   has_many :attachments, as: :attached_to_fruit
 
-  after_save{ person.expire_action_cache }
+  after_save { person.expire_action_cache }
+
+  include PersonScopeable
 
   def name
     "##{id}: #{amount} #{currency_code} #{country}"
   end
-
 end
