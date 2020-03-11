@@ -308,23 +308,40 @@ describe Workflow do
       end.to change { Workflow.count }.by 1
     end
 
+    it "Destroy a task with person tags if admin has tags" do
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_destroy "/workflows/#{workflow1.id}"
+      response.body.should be_blank
+      api_get "/workflows/#{workflow1.id}", {}, 404
+
+      api_destroy "/workflows/#{workflow2.id}"
+      response.body.should be_blank
+      api_get "/workflows/#{workflow2.id}", {}, 404
+
+      api_destroy "/workflows/#{workflow3.id}", 404
+
+      api_destroy "/workflows/#{workflow4.id}"
+      response.body.should be_blank
+      api_get "/workflows/#{workflow4.id}", {}, 404
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_destroy "/workflows/#{workflow3.id}"
+      response.body.should be_blank
+      api_get "/workflows/#{workflow3.id}", {}, 404
+    end
+
     it "show workflow with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
-
-      workflow1 = create(:basic_workflow, issue: issue1)
-      workflow2 = create(:basic_workflow, issue: issue2)
-      workflow3 = create(:basic_workflow, issue: issue3)
-      workflow4 = create(:basic_workflow, issue: issue4)
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
 
       api_get("/workflows/#{workflow1.id}")
       api_get("/workflows/#{workflow2.id}")
@@ -358,22 +375,9 @@ describe Workflow do
     end
 
     it "index workflow with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
-
-      workflow1 = create(:basic_workflow, issue: issue1)
-      workflow2 = create(:basic_workflow, issue: issue2)
-      workflow3 = create(:basic_workflow, issue: issue3)
-      workflow4 = create(:basic_workflow, issue: issue4)
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
 
       api_get("/workflows/")
       expect(api_response.meta.total_items).to eq(4)
@@ -410,6 +414,27 @@ describe Workflow do
       expect(api_response.data[1].id).to eq(workflow3.id.to_s)
       expect(api_response.data[2].id).to eq(workflow2.id.to_s)
       expect(api_response.data[3].id).to eq(workflow1.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+      workflow3 = create(:basic_workflow, issue: issue3)
+      workflow4 = create(:basic_workflow, issue: issue4)
+
+      [workflow1, workflow2, workflow3, workflow4]
     end
   end
 end

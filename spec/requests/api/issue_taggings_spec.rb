@@ -213,25 +213,40 @@ describe IssueTagging do
       end.to change { IssueTagging.count }.by(1)
     end
 
+    it "Destroy a issue tagging with person tags if admin has tags" do
+      issue_tag1, issue_tag2, issue_tag3, issue_tag4 = setup_for_admin_tags_spec
+      person1 = issue_tag1.issue.person
+      person3 = issue_tag3.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_destroy "/issue_taggings/#{issue_tag1.id}"
+      response.body.should be_blank
+      api_get "/issue_taggings/#{issue_tag1.id}", {}, 404
+
+      api_destroy "/issue_taggings/#{issue_tag2.id}"
+      response.body.should be_blank
+      api_get "/issue_taggings/#{issue_tag2.id}", {}, 404
+
+      api_destroy "/issue_taggings/#{issue_tag3.id}", 404
+
+      api_destroy "/issue_taggings/#{issue_tag4.id}"
+      response.body.should be_blank
+      api_get "/issue_taggings/#{issue_tag4.id}", {}, 404
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_destroy "/issue_taggings/#{issue_tag3.id}"
+      response.body.should be_blank
+      api_get "/issue_taggings/#{issue_tag3.id}", {}, 404
+    end
+
     it "show issue tagging with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
-
-      tag = create(:issue_tag)
-
-      issue_tag1 = create(:full_issue_tagging, issue: issue1, tag: tag)
-      issue_tag2 = create(:full_issue_tagging, issue: issue2, tag: tag)
-      issue_tag3 = create(:full_issue_tagging, issue: issue3, tag: tag)
-      issue_tag4 = create(:full_issue_tagging, issue: issue4, tag: tag)
+      issue_tag1, issue_tag2, issue_tag3, issue_tag4 = setup_for_admin_tags_spec
+      person1 = issue_tag1.issue.person
+      person3 = issue_tag3.issue.person
 
       api_get("/issue_taggings/#{issue_tag1.id}")
       api_get("/issue_taggings/#{issue_tag2.id}")
@@ -265,24 +280,9 @@ describe IssueTagging do
     end
 
     it "index issue tagging with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
-
-      tag = create(:issue_tag)
-
-      issue_tag1 = create(:full_issue_tagging, issue: issue1, tag: tag)
-      issue_tag2 = create(:full_issue_tagging, issue: issue2, tag: tag)
-      issue_tag3 = create(:full_issue_tagging, issue: issue3, tag: tag)
-      issue_tag4 = create(:full_issue_tagging, issue: issue4, tag: tag)
+      issue_tag1, issue_tag2, issue_tag3, issue_tag4 = setup_for_admin_tags_spec
+      person1 = issue_tag1.issue.person
+      person3 = issue_tag3.issue.person
 
       api_get("/issue_taggings/")
       expect(api_response.meta.total_items).to eq(4)
@@ -319,6 +319,29 @@ describe IssueTagging do
       expect(api_response.data[1].id).to eq(issue_tag3.id.to_s)
       expect(api_response.data[2].id).to eq(issue_tag2.id.to_s)
       expect(api_response.data[3].id).to eq(issue_tag1.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      tag = create(:issue_tag)
+
+      issue_tag1 = create(:full_issue_tagging, issue: issue1, tag: tag)
+      issue_tag2 = create(:full_issue_tagging, issue: issue2, tag: tag)
+      issue_tag3 = create(:full_issue_tagging, issue: issue3, tag: tag)
+      issue_tag4 = create(:full_issue_tagging, issue: issue4, tag: tag)
+
+      [issue_tag1, issue_tag2, issue_tag3, issue_tag4]
     end
   end
 end

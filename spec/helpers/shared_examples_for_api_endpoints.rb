@@ -272,6 +272,36 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         end.to change { type_const.count }.by(1)
       end
 
+      it "Destroy a #{seed_type} with person tags if admin has tags" do
+        seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+        person1 = seed1.issue.person
+        person3 = seed3.issue.person
+
+        admin_user.tags << person1.tags.first
+        admin_user.save!
+
+        api_destroy "/#{seed_type}/#{seed1.id}"
+        response.body.should be_blank
+        api_get "/#{seed_type}/#{seed1.id}", {}, 404
+
+        api_destroy "/#{seed_type}/#{seed2.id}"
+        response.body.should be_blank
+        api_get "/#{seed_type}/#{seed2.id}", {}, 404
+
+        api_destroy "/#{seed_type}/#{seed3.id}", 404
+
+        api_destroy "/#{seed_type}/#{seed4.id}"
+        response.body.should be_blank
+        api_get "/#{seed_type}/#{seed4.id}", {}, 404
+
+        admin_user.tags << person3.tags.first
+        admin_user.save!
+
+        api_destroy "/#{seed_type}/#{seed3.id}"
+        response.body.should be_blank
+        api_get "/#{seed_type}/#{seed3.id}", {}, 404
+      end
+
       it "show #{seed_type} with admin user active tags" do
         seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
         person1 = seed1.issue.person
@@ -448,12 +478,12 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       seed2.issue.reload.approve!
       seed3.issue.reload.approve!
       seed4.issue.reload.approve!
-      
+
       seed1.reload
       seed2.reload
       seed3.reload
       seed4.reload
-      
+
       [seed1, seed2, seed3, seed4]
     end
   end

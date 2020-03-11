@@ -206,20 +206,38 @@ describe PersonTagging do
       end.to change { PersonTagging.count }.by(1)
     end
 
+    it "Destroy a person tagging with person tags if admin has tags" do
+      person_tag1, person_tag2, person_tag3, person_tag4 = setup_for_admin_tags_spec
+      person1 = person_tag1.person
+      person3 = person_tag3.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_destroy "/person_taggings/#{person_tag1.id}"
+      response.body.should be_blank
+      api_get "/person_taggings/#{person_tag1.id}", {}, 404
+
+      api_destroy "/person_taggings/#{person_tag2.id}", 404
+
+      api_destroy "/person_taggings/#{person_tag3.id}", 404
+
+      api_destroy "/person_taggings/#{person_tag4.id}"
+      response.body.should be_blank
+      api_get "/person_taggings/#{person_tag4.id}", {}, 404
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_destroy "/person_taggings/#{person_tag3.id}"
+      response.body.should be_blank
+      api_get "/person_taggings/#{person_tag3.id}", {}, 404
+    end
+
     it "show person tagging with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      tag = create(:person_tag, name: 'new-tag1')
-
-      person_tag1 = create(:full_person_tagging, person: person1, tag: tag)
-      person_tag2 = create(:full_person_tagging, person: person2, tag: tag)
-      person_tag3 = create(:full_person_tagging, person: person3, tag: tag)
-      person_tag4 = create(:full_person_tagging, person: person4, tag: tag)
+      person_tag1, person_tag2, person_tag3, person_tag4 = setup_for_admin_tags_spec
+      person1 = person_tag1.person
+      person3 = person_tag3.person
 
       api_get("/person_taggings/#{person_tag1.id}")
       api_get("/person_taggings/#{person_tag2.id}")
@@ -253,19 +271,10 @@ describe PersonTagging do
     end
 
     it "index person tagging with admin user active tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      tag = create(:person_tag, name: 'new-tag1')
-
-      person_tag1 = create(:full_person_tagging, person: person1, tag: tag)
-      person_tag2 = create(:full_person_tagging, person: person2, tag: tag)
-      person_tag3 = create(:full_person_tagging, person: person3, tag: tag)
-      person_tag4 = create(:full_person_tagging, person: person4, tag: tag)
+      person_tag1, person_tag2, person_tag3, person_tag4 = setup_for_admin_tags_spec
+      person1 = person_tag1.person
+      person3 = person_tag3.person
+      person4 = person_tag4.person
 
       api_get("/person_taggings/")
       expect(api_response.meta.total_items).to eq(8)
@@ -313,6 +322,24 @@ describe PersonTagging do
       expect(api_response.data[4].id).to eq(person4.person_taggings.first.id.to_s)
       expect(api_response.data[5].id).to eq(person3.person_taggings.first.id.to_s)
       expect(api_response.data[6].id).to eq(person1.person_taggings.first.id.to_s)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      tag = create(:person_tag, name: 'new-tag1')
+
+      person_tag1 = create(:full_person_tagging, person: person1, tag: tag)
+      person_tag2 = create(:full_person_tagging, person: person2, tag: tag)
+      person_tag3 = create(:full_person_tagging, person: person3, tag: tag)
+      person_tag4 = create(:full_person_tagging, person: person4, tag: tag)
+
+      [person_tag1, person_tag2, person_tag3, person_tag4]
     end
   end
 end
