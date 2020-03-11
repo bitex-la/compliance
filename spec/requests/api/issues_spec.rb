@@ -570,6 +570,48 @@ describe Issue do
       end.to change { Issue.count }.by(1)
     end
 
+    it "allow locking with person tags if admin has tags" do
+      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
+      person1 = issue1.person
+      person3 = issue3.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      %i{lock renew_lock unlock lock_for_ever}.each do |action|
+        api_request :post, "/issues/#{issue1.id}/#{action}", {}, 200
+        api_request :post, "/issues/#{issue2.id}/#{action}", {}, 200
+        api_request :post, "/issues/#{issue3.id}/#{action}", {}, 404
+        api_request :post, "/issues/#{issue4.id}/#{action}", {}, 200
+      end
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      %i{lock renew_lock unlock lock_for_ever}.each do |action|
+        api_request :post, "/issues/#{issue3.id}/#{action}", {}, 200
+      end
+    end
+
+    it "allow change state with person tags if admin has tags" do
+      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
+      person1 = issue1.person
+      person3 = issue3.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_request :post, "/issues/#{issue1.id}/complete", {}, 200
+      api_request :post, "/issues/#{issue2.id}/complete", {}, 200
+      api_request :post, "/issues/#{issue3.id}/complete", {}, 404
+      api_request :post, "/issues/#{issue4.id}/complete", {}, 200
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_request :post, "/issues/#{issue3.id}/complete", {}, 200
+    end
+
     it "Update a person with person tags if admin has tags" do
       issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
       person1 = issue1.person

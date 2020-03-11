@@ -720,6 +720,44 @@ describe Person do
         attributes: { enabled: true, risk: 'low' })
     end
 
+    it "allow download profile allow change state with person tags if admin has tags" do
+      person1, person2, person3, person4 = setup_for_admin_tags_spec
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      api_get "/people/#{person1.id}/download_profile", {}, 200
+      api_get "/people/#{person2.id}/download_profile", {}, 200
+      api_get "/people/#{person3.id}/download_profile", {}, 404
+      api_get "/people/#{person4.id}/download_profile", {}, 200
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      api_get "/people/#{person3.id}/download_profile", {}, 200
+    end
+
+    it "allow change state with person tags if admin has tags" do
+      person1, person2, person3, person4 = setup_for_admin_tags_spec
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      %i{enable disable reject}.each do |action|
+        api_request :post, "/people/#{person1.id}/#{action}", {}, 200
+        api_request :post, "/people/#{person2.id}/#{action}", {}, 200
+        api_request :post, "/people/#{person3.id}/#{action}", {}, 404
+        api_request :post, "/people/#{person4.id}/#{action}", {}, 200
+      end
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      %i{enable disable reject}.each do |action|
+        api_request :post, "/people/#{person3.id}/#{action}", {}, 200
+      end
+    end
+
     it "Update a person with person tags if admin has tags" do
       person1, person2, person3, person4 = setup_for_admin_tags_spec
 
