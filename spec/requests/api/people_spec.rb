@@ -699,10 +699,6 @@ describe Person do
       api_create('/people',
         type: 'people',
         attributes: { enabled: true, risk: 'low' })
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
     end
 
     it "allow person creation without tags if admin has tags" do
@@ -714,13 +710,9 @@ describe Person do
       api_create('/people',
         type: 'people',
         attributes: { enabled: true, risk: 'low' })
-
-      api_create('/people',
-        type: 'people',
-        attributes: { enabled: true, risk: 'low' })
     end
 
-    it "allow download profile allow change state with person tags if admin has tags" do
+    it "allow download profile with person tags if admin has tags" do
       person1, person2, person3, person4 = setup_for_admin_tags_spec
 
       admin_user.tags << person1.tags.first
@@ -760,6 +752,26 @@ describe Person do
 
     it "Update a person with person tags if admin has tags" do
       person1, person2, person3, person4 = setup_for_admin_tags_spec
+
+      api_update "/people/#{person1.id}",
+        type: "people",
+        id: person1.id,
+        attributes: { enabled: true }
+
+      api_update "/people/#{person2.id}",
+        type: "people",
+        id: person2.id,
+        attributes: { enabled: true }
+
+      api_update "/people/#{person3.id}",
+        type: "people",
+        id: person3.id,
+        attributes: { enabled: true }
+
+      api_update "/people/#{person4.id}",
+        type: "people",
+        id: person4.id,
+        attributes: { enabled: true }
 
       admin_user.tags << person1.tags.first
       admin_user.save!
