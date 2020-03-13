@@ -79,9 +79,11 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def self.default_scope
-    unless (tags = AdminUser.current_admin_user&.active_tags)
+    unless (admin_user = AdminUser.current_admin_user)
       return nil
     end
+
+    tags = admin_user.active_tags
 
     return nil if tags.empty?
 
