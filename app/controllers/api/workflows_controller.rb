@@ -20,15 +20,14 @@ class Api::WorkflowsController < Api::EntityController
   end
 
   protected
-
-  def get_mapper
-    JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [:issues, :workflows],
-      issues: [],
-      workflows: [
-        :issue,
-        :scope,
-        :workflow_type
-      ]
-  end
+    def get_mapper 
+      JsonapiMapper.doc_unsafe! params.permit!.to_h,
+        [:issues, :workflows],
+        issues: [],
+        workflows: [
+          :issue,
+          :scope,
+          :workflow_type
+        ]
+    end
 end

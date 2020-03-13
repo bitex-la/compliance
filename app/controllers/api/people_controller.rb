@@ -1,6 +1,6 @@
 class Api::PeopleController < Api::ApiController
   include DownloadProfile
-
+  
   caches_action :show, cache_path: :path_for_show
 
   def index
@@ -16,7 +16,7 @@ class Api::PeopleController < Api::ApiController
   end
 
   def show
-    jsonapi_response resource, {}
+    jsonapi_response Person.find(params[:id]), {}
   end
 
   def create
@@ -30,7 +30,7 @@ class Api::PeopleController < Api::ApiController
     return jsonapi_422 unless mapper.data
 
     if mapper.save_all
-      jsonapi_response mapper.data, {}, 201
+      jsonapi_response mapper.data,{}, 201
     else
       json_response mapper.all_errors, 422
     end
@@ -51,26 +51,24 @@ class Api::PeopleController < Api::ApiController
 
   Person.aasm.events.map(&:name).each do |action|
     define_method(action) do
-      begin
-        return jsonapi_error(422, "invalid transition") unless can_run_transition(resource, action)
+      person = Person.find(params[:id])
+      begin        
+        return jsonapi_error(422, "invalid transition") unless can_run_transition(person, action)
 
-        resource.aasm.fire!(action)
-        jsonapi_response(resource, {}, 200)
-      rescue AASM::InvalidTransition
+        person.aasm.fire!(action)
+        jsonapi_response(person, {}, 200)
+      rescue AASM::InvalidTransition => e
         jsonapi_error(422, "invalid transition")
       end
     end
   end
 
   def download_profile
-    process_download_profile resource, EventLogKind.download_profile_basic
+    person = Person.find(params[:id])
+    process_download_profile person, EventLogKind.download_profile_basic
   end
 
   protected
-
-  def resource
-    Person.find(params[:id])
-  end
 
   def related_person
     params[:id]
