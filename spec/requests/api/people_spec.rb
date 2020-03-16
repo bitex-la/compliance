@@ -750,7 +750,7 @@ describe Person do
       end
     end
 
-    it "Update a person with person tags if admin has tags" do
+    it "Update a person with tags if admin has tags" do
       person1, person2, person3, person4 = setup_for_admin_tags_spec
 
       api_update "/people/#{person1.id}",
@@ -846,7 +846,7 @@ describe Person do
 
     it "index person with active tags" do
       person1, person2, person3, person4 = setup_for_admin_tags_spec
-      
+
       api_get "/people"
       expect(api_response.meta.total_items).to eq(4)
       expect(api_response.data[0].id).to eq(person1.id.to_s)
