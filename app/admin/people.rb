@@ -92,6 +92,10 @@ ActiveAdmin.register Person do
   end
 
   form do |f|
+    unless resource.persisted?
+      resource.load_admin_tags
+    end
+    
     if resource.issues.empty? && resource.persisted?
       div class: 'flash flash_danger' do
         "This person has no created issues. Please create a new issue to add information."

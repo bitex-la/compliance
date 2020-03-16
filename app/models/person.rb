@@ -336,6 +336,12 @@ class Person < ApplicationRecord
     Rails.cache.delete_matched "*/person/show/#{self.id}/*"
   end
 
+  def load_admin_tags
+    AdminUser.current_admin_user&.tags&.each do |t|
+      person_taggings.build(tag: t)
+    end
+  end
+
   private
 
   def log_if_enabled
