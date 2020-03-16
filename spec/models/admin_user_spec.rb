@@ -20,4 +20,14 @@ describe AdminUser do
     admin.renew_otp_secret_key!
     expect(admin.otp_secret_key).not_to eq otp_key
   end
+
+  it 'can manage tags' do
+    person_tag = create(:person_tag, name: 'new-tag')
+    admin_user = create(:full_admin_user_tagging).admin_user
+    expect(admin_user.can_manage_tag?(admin_user.tags.first)).to be_truthy
+    expect(admin_user.can_manage_tag?(person_tag)).to be_falsey
+    admin_user.tags << person_tag
+    expect(admin_user.can_manage_tag?(admin_user.tags.first)).to be_truthy
+    expect(admin_user.can_manage_tag?(person_tag)).to be_truthy
+  end
 end
