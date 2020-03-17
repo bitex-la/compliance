@@ -192,4 +192,237 @@ RSpec.describe FundDeposit, type: :model do
       expect(person.issues.size).to eq 1
     end
   end
+
+  describe "When filter by admin tags" do
+    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+    before :each do
+      admin_user.tags.clear
+      admin_user.save!
+    end
+
+    it "allow fund deposit creation only with person valid admin tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:alt_full_person_tagging).person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      expect do
+        fund_deposit1 = FundDeposit.new(person: Person.find(person1.id))
+        fund_deposit1.amount = 1000
+        fund_deposit1.exchange_rate_adjusted_amount = 1000
+        fund_deposit1.currency_code = 'usd'
+        fund_deposit1.deposit_method_code = 'bank'
+        fund_deposit1.external_id = '1'
+        fund_deposit1.country = 'AR'
+        fund_deposit1.deposit_date = DateTime.now.utc
+        fund_deposit1.save!
+      end.to change { FundDeposit.count }.by(1)
+
+      expect { Person.find(person2.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+      admin_user.tags << person2.tags.first
+      admin_user.save!
+
+      expect do
+        fund_deposit1 = FundDeposit.new(person: Person.find(person1.id))
+        fund_deposit1.amount = 1000
+        fund_deposit1.exchange_rate_adjusted_amount = 1000
+        fund_deposit1.currency_code = 'usd'
+        fund_deposit1.deposit_method_code = 'bank'
+        fund_deposit1.external_id = '1'
+        fund_deposit1.country = 'AR'
+        fund_deposit1.deposit_date = DateTime.now.utc
+        fund_deposit1.save!
+      end.to change { FundDeposit.count }.by(1)
+
+      expect do
+        fund_deposit1 = FundDeposit.new(person: Person.find(person2.id))
+        fund_deposit1.amount = 1000
+        fund_deposit1.exchange_rate_adjusted_amount = 1000
+        fund_deposit1.currency_code = 'usd'
+        fund_deposit1.deposit_method_code = 'bank'
+        fund_deposit1.external_id = '1'
+        fund_deposit1.country = 'AR'
+        fund_deposit1.deposit_date = DateTime.now.utc
+        fund_deposit1.save!
+      end.to change { FundDeposit.count }.by(1)
+    end
+
+    it "allow fund deposit creation with person tags if admin has no tags" do
+      person = create(:full_person_tagging).person
+
+      expect do
+        fund_deposit1 = FundDeposit.new(person: Person.find(person.id))
+        fund_deposit1.amount = 1000
+        fund_deposit1.exchange_rate_adjusted_amount = 1000
+        fund_deposit1.currency_code = 'usd'
+        fund_deposit1.deposit_method_code = 'bank'
+        fund_deposit1.external_id = '1'
+        fund_deposit1.country = 'AR'
+        fund_deposit1.deposit_date = DateTime.now.utc
+        fund_deposit1.save!
+      end.to change { FundDeposit.count }.by(1)
+    end
+
+    it "allow fund deposit creation without person tags if admin has no tags" do
+      person = create(:empty_person)
+
+      expect do
+        fund_deposit1 = FundDeposit.new(person: Person.find(person.id))
+        fund_deposit1.amount = 1000
+        fund_deposit1.exchange_rate_adjusted_amount = 1000
+        fund_deposit1.currency_code = 'usd'
+        fund_deposit1.deposit_method_code = 'bank'
+        fund_deposit1.external_id = '1'
+        fund_deposit1.country = 'AR'
+        fund_deposit1.deposit_date = DateTime.now.utc
+        fund_deposit1.save!
+      end.to change { FundDeposit.count }.by(1)
+    end
+
+    it "allow fund deposit creation without person tags if admin has tags" do
+      person1 = create(:full_person_tagging).person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      expect do
+        fund_deposit1 = FundDeposit.new(person: Person.find(person.id))
+        fund_deposit1.amount = 1000
+        fund_deposit1.exchange_rate_adjusted_amount = 1000
+        fund_deposit1.currency_code = 'usd'
+        fund_deposit1.deposit_method_code = 'bank'
+        fund_deposit1.external_id = '1'
+        fund_deposit1.country = 'AR'
+        fund_deposit1.deposit_date = DateTime.now.utc
+        fund_deposit1.save!
+      end.to change { FundDeposit.count }.by(1)
+    end
+
+    it "Update a fund deposit with person tags if admin has tags" do
+      fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
+      person1 = fund_deposit1.person
+      person3 = fund_deposit3.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      fund_deposit = FundDeposit.find(fund_deposit1.id)
+      fund_deposit.country = 'BR'
+      fund_deposit.save!
+
+      fund_deposit = FundDeposit.find(fund_deposit2.id)
+      fund_deposit.country = 'BR'
+      fund_deposit.save!
+
+      expect { FundDeposit.find(fund_deposit3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+      fund_deposit = FundDeposit.find(fund_deposit4.id)
+      fund_deposit.country = 'BR'
+      fund_deposit.save!
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      fund_deposit = FundDeposit.find(fund_deposit3.id)
+      fund_deposit.country = 'BR'
+      fund_deposit.save!
+    end
+
+    it "show fund deposit with admin user active tags" do
+      fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
+      person1 = fund_deposit1.person
+      person3 = fund_deposit3.person
+
+      FundDeposit.find(fund_deposit1.id)
+      FundDeposit.find(fund_deposit2.id)
+      FundDeposit.find(fund_deposit3.id)
+      FundDeposit.find(fund_deposit4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      FundDeposit.find(fund_deposit1.id)
+      FundDeposit.find(fund_deposit2.id)
+      expect { FundDeposit.find(fund_deposit3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      FundDeposit.find(fund_deposit4.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      expect { FundDeposit.find(fund_deposit1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      FundDeposit.find(fund_deposit2.id)
+      FundDeposit.find(fund_deposit3.id)
+      FundDeposit.find(fund_deposit4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      FundDeposit.find(fund_deposit1.id)
+      FundDeposit.find(fund_deposit2.id)
+      FundDeposit.find(fund_deposit3.id)
+      FundDeposit.find(fund_deposit4.id)
+    end
+
+    it "index fund deposit with admin user active tags" do
+      fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
+      person1 = fund_deposit1.person
+      person3 = fund_deposit3.person
+
+      fund_deposits = FundDeposit.all
+      expect(fund_deposits.count).to eq(4)
+      expect(fund_deposits[0].id).to eq(fund_deposit1.id)
+      expect(fund_deposits[1].id).to eq(fund_deposit2.id)
+      expect(fund_deposits[2].id).to eq(fund_deposit3.id)
+      expect(fund_deposits[3].id).to eq(fund_deposit4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      fund_deposits = FundDeposit.all
+      expect(fund_deposits.count).to eq(3)
+      expect(fund_deposits[0].id).to eq(fund_deposit1.id)
+      expect(fund_deposits[1].id).to eq(fund_deposit2.id)
+      expect(fund_deposits[2].id).to eq(fund_deposit4.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      fund_deposits = FundDeposit.all
+      expect(fund_deposits.count).to eq(3)
+      expect(fund_deposits[0].id).to eq(fund_deposit2.id)
+      expect(fund_deposits[1].id).to eq(fund_deposit3.id)
+      expect(fund_deposits[2].id).to eq(fund_deposit4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      fund_deposits = FundDeposit.all
+      expect(fund_deposits.count).to eq(4)
+      expect(fund_deposits[0].id).to eq(fund_deposit1.id)
+      expect(fund_deposits[1].id).to eq(fund_deposit2.id)
+      expect(fund_deposits[2].id).to eq(fund_deposit3.id)
+      expect(fund_deposits[3].id).to eq(fund_deposit4.id)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      fund_deposit1 = create(:full_fund_deposit, person: person1)
+      fund_deposit2 = create(:full_fund_deposit, person: person2)
+      fund_deposit3 = create(:full_fund_deposit, person: person3)
+      fund_deposit4 = create(:full_fund_deposit, person: person4)
+
+      [fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4]
+    end
+  end
 end
