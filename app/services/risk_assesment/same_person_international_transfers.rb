@@ -6,15 +6,18 @@ module RiskAssesment
 
       return if deposits_countries.empty? || withdrawal_countries.empty?
 
-      unmatched_countries = withdrawal_countries - deposits_countries |
-                            deposits_countries - withdrawal_countries
+      unmatched_deposits_countries = deposits_countries - withdrawal_countries
+      unmatched_withdrawals_countries = withdrawal_countries - deposits_countries
+
+      unmatched_countries = unmatched_withdrawals_countries |
+                            unmatched_deposits_countries
 
       return if unmatched_countries.empty?
 
-      create_issue(person, unmatched_countries)
+      create_issue(person, unmatched_countries, unmatched_withdrawals_countries, unmatched_deposits_countries)
     end
 
-    def self.create_issue(person, unmatched_countries)
+    def self.create_issue(person, unmatched_countries, unmatched_withdrawals_countries, unmatched_deposits_countries)
       issue = person.issues.build
 
       fund_withdrawals = person
@@ -25,28 +28,20 @@ module RiskAssesment
                         .where(country: unmatched_countries)
 
       issue.risk_score_seeds.build(
-        replaces: existing_risk_score(person),
         provider: 'open-compliance',
         score: 'same_person_international_transfers',
         extra_info: {
           fund_withdrawals_count: fund_withdrawals.count,
           fund_withdrawals_sum: fund_withdrawals.sum(:exchange_rate_adjusted_amount),
           fund_deposits_count: fund_deposits.count,
-          fund_deposits_sum: fund_deposits.sum(:exchange_rate_adjusted_amount)
+          fund_deposits_sum: fund_deposits.sum(:exchange_rate_adjusted_amount),
+          fund_withdrawals_countries: unmatched_withdrawals_countries.uniq,
+          fund_deposits_countries: unmatched_deposits_countries.uniq
         }.to_json
       )
 
       issue.save!
-      issue.approve!
-    end
-
-    def self.existing_risk_score(person)
-      person
-        .risk_scores
-        .find_by(
-          provider: 'open_compliance',
-          score: 'same_person_international_transfers'
-        )
+      issue.complete!
     end
   end
 end

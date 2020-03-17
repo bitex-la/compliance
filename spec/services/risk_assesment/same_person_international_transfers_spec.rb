@@ -3,7 +3,7 @@ require 'rails_helper'
 describe RiskAssesment::SamePersonInternationalTransfers do
   let(:person) { create(:empty_person) }
 
-  it 'creates and approve issue with same_person_international_transfers score' do
+  it 'creates and complete issue with same_person_international_transfers score' do
     create(:fund_withdrawal, person: person, country: 'AR')
     create(:fund_deposit, person: person, country: 'UY')
 
@@ -13,21 +13,23 @@ describe RiskAssesment::SamePersonInternationalTransfers do
 
     issue = person.reload.issues.last
 
-    expect(issue.approved?).to be true
+    expect(issue.complete).to be true
     expect(issue.risk_score_seeds.count).to be 1
     expect(issue.risk_score_seeds[0].provider).to eq 'open-compliance'
     expect(issue.risk_score_seeds[0].score).to eq 'same_person_international_transfers'
 
-    expect(person.risk_scores.count).to eq 1
-    expect(person.risk_scores.first).to eq issue.risk_score_seeds.first.fruit
+    extra_info = JSON.parse(issue.risk_score_seeds.first.extra_info)
 
-    extra_info = JSON.parse(person.risk_scores.first.extra_info)
+    expect(extra_info.length).to be(6)
 
     expect(extra_info['fund_withdrawals_count']).to eq person.fund_withdrawals.count
     expect(extra_info['fund_withdrawals_sum']).to eq person.fund_withdrawals.sum(:exchange_rate_adjusted_amount).to_s
 
     expect(extra_info['fund_deposits_count']).to eq person.fund_deposits.count
     expect(extra_info['fund_deposits_sum']).to eq person.fund_deposits.sum(:exchange_rate_adjusted_amount).to_s
+
+    expect(extra_info['fund_deposits_countries']).to eq(['UY'])
+    expect(extra_info['fund_withdrawals_countries']).to eq(['AR'])
   end
 
   it 'does nothing if transfers are from same country' do
@@ -74,22 +76,24 @@ describe RiskAssesment::SamePersonInternationalTransfers do
 
     issue = person.reload.issues.last
 
-    expect(issue.approved?).to be true
+    expect(issue.complete).to be true
     expect(issue.risk_score_seeds.count).to be 1
     expect(issue.risk_score_seeds[0].provider).to eq 'open-compliance'
     expect(issue.risk_score_seeds[0].score).to eq 'same_person_international_transfers'
 
-    expect(person.risk_scores.count).to eq 1
-    expect(person.risk_scores.first).to eq issue.risk_score_seeds.first.fruit
-
-    extra_info = JSON.parse(person.risk_scores.first.extra_info)
+    extra_info = JSON.parse(issue.risk_score_seeds.first.extra_info)
     fund_withdrawals = person.fund_withdrawals.where(country: 'AR')
     fund_deposits = person.fund_deposits.where(country: 'UY')
+
+    expect(extra_info.length).to be(6)
 
     expect(extra_info['fund_withdrawals_count']).to eq fund_withdrawals.count
     expect(extra_info['fund_withdrawals_sum']).to eq fund_withdrawals.sum(:exchange_rate_adjusted_amount).to_s
 
     expect(extra_info['fund_deposits_count']).to eq fund_deposits.count
     expect(extra_info['fund_deposits_sum']).to eq fund_deposits.sum(:exchange_rate_adjusted_amount).to_s
+
+    expect(extra_info['fund_deposits_countries']).to eq(['UY'])
+    expect(extra_info['fund_withdrawals_countries']).to eq(['AR'])
   end
 end
