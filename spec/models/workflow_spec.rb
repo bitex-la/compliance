@@ -180,4 +180,241 @@ RSpec.describe Workflow, type: :model do
       expect(basic_workflow).to have_state(:started)
     end
   end
+
+  describe "When filter by admin tags" do
+    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+    before :each do
+      admin_user.tags.clear
+      admin_user.save!
+    end
+
+    it "allow workflow creation only with person valid admin tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:alt_full_person_tagging).person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+
+      expect do
+        workflow = Workflow.new(issue: Issue.find(issue1.id))
+        workflow.workflow_type = 'onboarding'
+        workflow.scope = 'robot'
+        workflow.save!
+      end.to change { Workflow.count }.by(1)
+
+      expect { Issue.find(issue2.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+      admin_user.tags << person2.tags.first
+      admin_user.save!
+
+      expect do
+        workflow = Workflow.new(issue: Issue.find(issue1.id))
+        workflow.workflow_type = 'onboarding'
+        workflow.scope = 'robot'
+        workflow.save!
+      end.to change { Workflow.count }.by(1)
+
+      expect do
+        workflow = Workflow.new(issue: Issue.find(issue2.id))
+        workflow.workflow_type = 'onboarding'
+        workflow.scope = 'robot'
+        workflow.save!
+      end.to change { Workflow.count }.by(1)
+    end
+
+    it "allow workflow creation with person tags if admin has no tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+
+      expect do
+        workflow = Workflow.new(issue: Issue.find(issue.id))
+        workflow.workflow_type = 'onboarding'
+        workflow.scope = 'robot'
+        workflow.save!
+      end.to change { Workflow.count }.by(1)
+    end
+
+    it "allow workflow creation without person tags if admin has no tags" do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person)
+
+      expect do
+        workflow = Workflow.new(issue: Issue.find(issue.id))
+        workflow.workflow_type = 'onboarding'
+        workflow.scope = 'robot'
+        workflow.save!
+      end.to change { Workflow.count }.by(1)
+    end
+
+    it "allow workflow creation without person tags if admin has tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+
+      admin_user.tags << person.tags.first
+      admin_user.save!
+
+      expect do
+        workflow = Workflow.new(issue: Issue.find(issue.id))
+        workflow.workflow_type = 'onboarding'
+        workflow.scope = 'robot'
+        workflow.save!
+      end.to change { Workflow.count }.by(1)
+    end
+
+    it "Update a workflow with person tags if admin has tags" do
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      workflow = Workflow.find(workflow1.id)
+      workflow.workflow_type = 'risk_check'
+      workflow.scope = 'admin'
+      workflow.save!
+
+      workflow = Workflow.find(workflow2.id)
+      workflow.workflow_type = 'risk_check'
+      workflow.scope = 'admin'
+      workflow.save!
+
+      expect { Workflow.find(workflow3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+      workflow = Workflow.find(workflow4.id)
+      workflow.workflow_type = 'risk_check'
+      workflow.scope = 'admin'
+      workflow.save!
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      workflow = Workflow.find(workflow3.id)
+      workflow.workflow_type = 'risk_check'
+      workflow.scope = 'admin'
+      workflow.save!
+    end
+
+    it "Destroy a task with person tags if admin has tags" do
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      Workflow.find(workflow1.id).destroy
+      Workflow.find(workflow2.id).destroy
+      expect { Workflow.find(workflow3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      Workflow.find(workflow4.id).destroy
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      Workflow.find(workflow3.id).destroy
+    end
+
+    it "show workflow with admin user active tags" do
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
+
+      Workflow.find(workflow1.id)
+      Workflow.find(workflow2.id)
+      Workflow.find(workflow3.id)
+      Workflow.find(workflow4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      Workflow.find(workflow1.id)
+      Workflow.find(workflow2.id)
+      expect { Workflow.find(workflow3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      Workflow.find(workflow4.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      expect { Workflow.find(workflow1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      Workflow.find(workflow2.id)
+      Workflow.find(workflow3.id)
+      Workflow.find(workflow4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      Workflow.find(workflow1.id)
+      Workflow.find(workflow2.id)
+      Workflow.find(workflow3.id)
+      Workflow.find(workflow4.id)
+    end
+
+    it "index workflow with admin user active tags" do
+      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
+      person1 = workflow1.issue.person
+      person3 = workflow3.issue.person
+
+      workflows = Workflow.all
+      expect(workflows.count).to eq(4)
+      expect(workflows[0].id).to eq(workflow1.id)
+      expect(workflows[1].id).to eq(workflow2.id)
+      expect(workflows[2].id).to eq(workflow3.id)
+      expect(workflows[3].id).to eq(workflow4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      workflows = Workflow.all
+      expect(workflows.count).to eq(3)
+      expect(workflows[0].id).to eq(workflow1.id)
+      expect(workflows[1].id).to eq(workflow2.id)
+      expect(workflows[2].id).to eq(workflow4.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      workflows = Workflow.all
+      expect(workflows.count).to eq(3)
+      expect(workflows[0].id).to eq(workflow2.id)
+      expect(workflows[1].id).to eq(workflow3.id)
+      expect(workflows[2].id).to eq(workflow4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      workflows = Workflow.all
+      expect(workflows.count).to eq(4)
+      expect(workflows[0].id).to eq(workflow1.id)
+      expect(workflows[1].id).to eq(workflow2.id)
+      expect(workflows[2].id).to eq(workflow3.id)
+      expect(workflows[3].id).to eq(workflow4.id)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+      workflow3 = create(:basic_workflow, issue: issue3)
+      workflow4 = create(:basic_workflow, issue: issue4)
+
+      [workflow1, workflow2, workflow3, workflow4]
+    end
+  end
 end
