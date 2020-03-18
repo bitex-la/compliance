@@ -24,4 +24,12 @@ class PersonTagging < ApplicationRecord
 
     errors.add(:person, 'Person tags not allowed')
   end
+
+  before_destroy :destroyable?
+
+  def destroyable?
+    return if person
+
+    raise 'Destroy not allowed'
+  end
 end
