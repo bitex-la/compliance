@@ -24,6 +24,11 @@ describe IdentificationSeed do
     public_registry_extra_data: ' 344343'
   }
 
+  it_behaves_like 'seed_model',
+    :identifications,
+    :full_natural_person_identification,
+    :alt_full_natural_person_identification
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

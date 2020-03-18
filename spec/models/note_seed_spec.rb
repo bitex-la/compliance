@@ -23,5 +23,9 @@ RSpec.describe NoteSeed, type: :model do
     title: '  A long spaced title   ',
     body: '  The body  ',
   }
-end
 
+  it_behaves_like 'seed_model',
+    :notes,
+    :full_note,
+    :alt_full_note
+end

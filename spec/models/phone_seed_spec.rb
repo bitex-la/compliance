@@ -13,4 +13,6 @@ describe PhoneSeed do
     country: 'AR ',
     note:  'please do not call on Sundays ',
   }
+
+  it_behaves_like('seed_model', :phones, :full_phone, :alt_full_phone)
 end

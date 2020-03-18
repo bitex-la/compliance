@@ -28,6 +28,8 @@ RSpec.describe DomicileSeed, type: :model do
     apartment: 'A '
   }
 
+  it_behaves_like('seed_model', :domiciles, :full_domicile, :alt_full_domicile)
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

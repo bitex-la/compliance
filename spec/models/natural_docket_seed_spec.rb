@@ -12,6 +12,9 @@ describe NaturalDocketSeed do
 
   it_behaves_like 'observable', :full_natural_docket_seed_with_issue
 
+  it_behaves_like('seed_model', :natural_dockets,
+    :full_natural_docket, :alt_full_natural_docket)
+
   %i(first_name last_name nationality
     job_title job_description
   ).each do |attr|
