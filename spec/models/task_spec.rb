@@ -77,4 +77,243 @@ RSpec.describe Task, type: :model do
       expect(basic_task.state).to eq("failed")
     end
   end
+
+  describe "When filter by admin tags" do
+    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+    before :each do
+      admin_user.tags.clear
+      admin_user.save!
+    end
+
+    it "allow task creation only with person valid admin tags" do
+      person1 = create(:full_person_tagging).person
+      person2 = create(:alt_full_person_tagging).person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+
+      expect do
+        task = Task.new(workflow: Workflow.find(workflow1.id))
+        task.task_type = 'onboarding'
+        task.save!
+      end.to change { Task.count }.by(1)
+
+      expect { Workflow.find(workflow2.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+      admin_user.tags << person2.tags.first
+      admin_user.save!
+
+      expect do
+        task = Task.new(workflow: Workflow.find(workflow1.id))
+        task.task_type = 'onboarding'
+        task.save!
+      end.to change { Task.count }.by(1)
+
+      expect do
+        task = Task.new(workflow: Workflow.find(workflow2.id))
+        task.task_type = 'onboarding'
+        task.save!
+      end.to change { Task.count }.by(1)
+    end
+
+    it "allow task creation with person tags if admin has no tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+      workflow = create(:basic_workflow, issue: issue)
+
+      expect do
+        task = Task.new(workflow: Workflow.find(workflow.id))
+        task.task_type = 'onboarding'
+        task.save!
+      end.to change { Task.count }.by(1)
+    end
+
+    it "allow task creation without person tags if admin has no tags" do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person)
+      workflow = create(:basic_workflow, issue: issue)
+
+      expect do
+        task = Task.new(workflow: Workflow.find(workflow.id))
+        task.task_type = 'onboarding'
+        task.save!
+      end.to change { Task.count }.by(1)
+    end
+
+    it "allow task creation without person tags if admin has tags" do
+      person = create(:full_person_tagging).person
+      issue = create(:basic_issue, person: person)
+
+      admin_user.tags << person.tags.first
+      admin_user.save!
+
+      workflow = create(:basic_workflow, issue: issue)
+
+      expect do
+        task = Task.new(workflow: Workflow.find(workflow.id))
+        task.task_type = 'onboarding'
+        task.save!
+      end.to change { Task.count }.by(1)
+    end
+
+    it "Update a task with person tags if admin has tags" do
+      task1, task2, task3, task4 = setup_for_admin_tags_spec
+      person1 = task1.workflow.issue.person
+      person3 = task3.workflow.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      task = Task.find(task1.id)
+      task.current_retries = 2
+      task.save!
+
+      task = Task.find(task2.id)
+      task.current_retries = 2
+      task.save!
+
+      expect { Task.find(task3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+      task = Task.find(task4.id)
+      task.current_retries = 2
+      task.save!
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      task = Task.find(task3.id)
+      task.current_retries = 2
+      task.save!
+    end
+
+    it "Destroy a task with person tags if admin has tags" do
+      task1, task2, task3, task4 = setup_for_admin_tags_spec
+      person1 = task1.workflow.issue.person
+      person3 = task3.workflow.issue.person
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      Task.find(task1.id).destroy
+      Task.find(task2.id).destroy
+      expect { Task.find(task3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      Task.find(task4.id).destroy
+
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      Task.find(task3.id).destroy
+    end
+
+    it "show task with admin user active tags" do
+      task1, task2, task3, task4 = setup_for_admin_tags_spec
+      person1 = task1.workflow.issue.person
+      person3 = task3.workflow.issue.person
+
+      Task.find(task1.id)
+      Task.find(task2.id)
+      Task.find(task3.id)
+      Task.find(task4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      Task.find(task1.id)
+      Task.find(task2.id)
+      expect { Task.find(task3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      Task.find(task4.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      expect { Task.find(task1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      Task.find(task2.id)
+      Task.find(task3.id)
+      Task.find(task4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      Task.find(task1.id)
+      Task.find(task2.id)
+      Task.find(task3.id)
+      Task.find(task4.id)
+    end
+
+    it "index task with admin user active tags" do
+      task1, task2, task3, task4 = setup_for_admin_tags_spec
+      person1 = task1.workflow.issue.person
+      person3 = task3.workflow.issue.person
+
+      tasks = Task.all
+      expect(tasks.count).to eq(4)
+      expect(tasks[0].id).to eq(task1.id)
+      expect(tasks[1].id).to eq(task2.id)
+      expect(tasks[2].id).to eq(task3.id)
+      expect(tasks[3].id).to eq(task4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      tasks = Task.all
+      expect(tasks.count).to eq(3)
+      expect(tasks[0].id).to eq(task1.id)
+      expect(tasks[1].id).to eq(task2.id)
+      expect(tasks[2].id).to eq(task4.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      tasks = Task.all
+      expect(tasks.count).to eq(3)
+      expect(tasks[0].id).to eq(task2.id)
+      expect(tasks[1].id).to eq(task3.id)
+      expect(tasks[2].id).to eq(task4.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      tasks = Task.all
+      expect(tasks.count).to eq(4)
+      expect(tasks[0].id).to eq(task1.id)
+      expect(tasks[1].id).to eq(task2.id)
+      expect(tasks[2].id).to eq(task3.id)
+      expect(tasks[3].id).to eq(task4.id)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      issue1 = create(:basic_issue, person: person1)
+      issue2 = create(:basic_issue, person: person2)
+      issue3 = create(:basic_issue, person: person3)
+      issue4 = create(:basic_issue, person: person4)
+
+      workflow1 = create(:basic_workflow, issue: issue1)
+      workflow2 = create(:basic_workflow, issue: issue2)
+      workflow3 = create(:basic_workflow, issue: issue3)
+      workflow4 = create(:basic_workflow, issue: issue4)
+
+      task1 = create(:basic_task, workflow: workflow1)
+      task2 = create(:basic_task, workflow: workflow2)
+      task3 = create(:basic_task, workflow: workflow3)
+      task4 = create(:basic_task, workflow: workflow4)
+
+      [task1, task2, task3, task4]
+    end
+  end
 end
