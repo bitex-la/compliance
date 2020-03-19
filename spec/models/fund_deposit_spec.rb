@@ -336,35 +336,35 @@ RSpec.describe FundDeposit, type: :model do
       person1 = fund_deposit1.person
       person3 = fund_deposit3.person
 
-      FundDeposit.find(fund_deposit1.id)
-      FundDeposit.find(fund_deposit2.id)
-      FundDeposit.find(fund_deposit3.id)
-      FundDeposit.find(fund_deposit4.id)
+      expect(FundDeposit.find(fund_deposit1.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit2.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit3.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      FundDeposit.find(fund_deposit1.id)
-      FundDeposit.find(fund_deposit2.id)
+      expect(FundDeposit.find(fund_deposit1.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit2.id)).to_not be_nil
       expect { FundDeposit.find(fund_deposit3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      FundDeposit.find(fund_deposit4.id)
+      expect(FundDeposit.find(fund_deposit4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { FundDeposit.find(fund_deposit1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      FundDeposit.find(fund_deposit2.id)
-      FundDeposit.find(fund_deposit3.id)
-      FundDeposit.find(fund_deposit4.id)
+      expect(FundDeposit.find(fund_deposit2.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit3.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      FundDeposit.find(fund_deposit1.id)
-      FundDeposit.find(fund_deposit2.id)
-      FundDeposit.find(fund_deposit3.id)
-      FundDeposit.find(fund_deposit4.id)
+      expect(FundDeposit.find(fund_deposit1.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit2.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit3.id)).to_not be_nil
+      expect(FundDeposit.find(fund_deposit4.id)).to_not be_nil
     end
 
     it "index fund deposit with admin user active tags" do

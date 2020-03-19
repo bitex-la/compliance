@@ -201,15 +201,15 @@ RSpec.describe Task, type: :model do
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Task.find(task1.id).destroy
-      Task.find(task2.id).destroy
+      expect(Task.find(task1.id).destroy).to be_truthy
+      expect(Task.find(task2.id).destroy).to be_truthy
       expect { Task.find(task3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Task.find(task4.id).destroy
+      expect(Task.find(task4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
       admin_user.save!
 
-      Task.find(task3.id).destroy
+      expect(Task.find(task3.id).destroy).to be_truthy
     end
 
     it "show task with admin user active tags" do
@@ -217,35 +217,35 @@ RSpec.describe Task, type: :model do
       person1 = task1.workflow.issue.person
       person3 = task3.workflow.issue.person
 
-      Task.find(task1.id)
-      Task.find(task2.id)
-      Task.find(task3.id)
-      Task.find(task4.id)
+      expect(Task.find(task1.id)).to_not be_nil
+      expect(Task.find(task2.id)).to_not be_nil
+      expect(Task.find(task3.id)).to_not be_nil
+      expect(Task.find(task4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Task.find(task1.id)
-      Task.find(task2.id)
+      expect(Task.find(task1.id)).to_not be_nil
+      expect(Task.find(task2.id)).to_not be_nil
       expect { Task.find(task3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Task.find(task4.id)
+      expect(Task.find(task4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { Task.find(task1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Task.find(task2.id)
-      Task.find(task3.id)
-      Task.find(task4.id)
+      expect(Task.find(task2.id)).to_not be_nil
+      expect(Task.find(task3.id)).to_not be_nil
+      expect(Task.find(task4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Task.find(task1.id)
-      Task.find(task2.id)
-      Task.find(task3.id)
-      Task.find(task4.id)
+      expect(Task.find(task1.id)).to_not be_nil
+      expect(Task.find(task2.id)).to_not be_nil
+      expect(Task.find(task3.id)).to_not be_nil
+      expect(Task.find(task4.id)).to_not be_nil
     end
 
     it "index task with admin user active tags" do

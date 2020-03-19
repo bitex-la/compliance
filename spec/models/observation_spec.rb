@@ -231,35 +231,35 @@ RSpec.describe Observation, type: :model do
       person1 = obs1.issue.person
       person3 = obs3.issue.person
 
-      Observation.find(obs1.id)
-      Observation.find(obs2.id)
-      Observation.find(obs3.id)
-      Observation.find(obs4.id)
+      expect(Observation.find(obs1.id)).to_not be_nil
+      expect(Observation.find(obs2.id)).to_not be_nil
+      expect(Observation.find(obs3.id)).to_not be_nil
+      expect(Observation.find(obs4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Observation.find(obs1.id)
-      Observation.find(obs2.id)
+      expect(Observation.find(obs1.id)).to_not be_nil
+      expect(Observation.find(obs2.id)).to_not be_nil
       expect { Observation.find(obs3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Observation.find(obs4.id)
+      expect(Observation.find(obs4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { Observation.find(obs1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Observation.find(obs2.id)
-      Observation.find(obs3.id)
-      Observation.find(obs4.id)
+      expect(Observation.find(obs2.id)).to_not be_nil
+      expect(Observation.find(obs3.id)).to_not be_nil
+      expect(Observation.find(obs4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Observation.find(obs1.id)
-      Observation.find(obs2.id)
-      Observation.find(obs3.id)
-      Observation.find(obs4.id)
+      expect(Observation.find(obs1.id)).to_not be_nil
+      expect(Observation.find(obs2.id)).to_not be_nil
+      expect(Observation.find(obs3.id)).to_not be_nil
+      expect(Observation.find(obs4.id)).to_not be_nil
     end
 
     it "index observations with admin user active tags" do

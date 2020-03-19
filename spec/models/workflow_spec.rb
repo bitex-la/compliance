@@ -307,15 +307,15 @@ RSpec.describe Workflow, type: :model do
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Workflow.find(workflow1.id).destroy
-      Workflow.find(workflow2.id).destroy
+      expect(Workflow.find(workflow1.id).destroy).to be_truthy
+      expect(Workflow.find(workflow2.id).destroy).to be_truthy
       expect { Workflow.find(workflow3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Workflow.find(workflow4.id).destroy
+      expect(Workflow.find(workflow4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
       admin_user.save!
 
-      Workflow.find(workflow3.id).destroy
+      expect(Workflow.find(workflow3.id).destroy).to be_truthy
     end
 
     it "show workflow with admin user active tags" do
@@ -323,35 +323,35 @@ RSpec.describe Workflow, type: :model do
       person1 = workflow1.issue.person
       person3 = workflow3.issue.person
 
-      Workflow.find(workflow1.id)
-      Workflow.find(workflow2.id)
-      Workflow.find(workflow3.id)
-      Workflow.find(workflow4.id)
+      expect(Workflow.find(workflow1.id)).to_not be_nil
+      expect(Workflow.find(workflow2.id)).to_not be_nil
+      expect(Workflow.find(workflow3.id)).to_not be_nil
+      expect(Workflow.find(workflow4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Workflow.find(workflow1.id)
-      Workflow.find(workflow2.id)
+      expect(Workflow.find(workflow1.id)).to_not be_nil
+      expect(Workflow.find(workflow2.id)).to_not be_nil
       expect { Workflow.find(workflow3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Workflow.find(workflow4.id)
+      expect(Workflow.find(workflow4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { Workflow.find(workflow1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Workflow.find(workflow2.id)
-      Workflow.find(workflow3.id)
-      Workflow.find(workflow4.id)
+      expect(Workflow.find(workflow2.id)).to_not be_nil
+      expect(Workflow.find(workflow3.id)).to_not be_nil
+      expect(Workflow.find(workflow4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Workflow.find(workflow1.id)
-      Workflow.find(workflow2.id)
-      Workflow.find(workflow3.id)
-      Workflow.find(workflow4.id)
+      expect(Workflow.find(workflow1.id)).to_not be_nil
+      expect(Workflow.find(workflow2.id)).to_not be_nil
+      expect(Workflow.find(workflow3.id)).to_not be_nil
+      expect(Workflow.find(workflow4.id)).to_not be_nil
     end
 
     it "index workflow with admin user active tags" do

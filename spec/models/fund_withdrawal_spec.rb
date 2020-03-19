@@ -157,35 +157,35 @@ RSpec.describe FundWithdrawal, type: :model do
       person1 = fund1.person
       person3 = fund3.person
 
-      FundWithdrawal.find(fund1.id)
-      FundWithdrawal.find(fund2.id)
-      FundWithdrawal.find(fund3.id)
-      FundWithdrawal.find(fund4.id)
+      expect(FundWithdrawal.find(fund1.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund2.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund3.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      FundWithdrawal.find(fund1.id)
-      FundWithdrawal.find(fund2.id)
+      expect(FundWithdrawal.find(fund1.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund2.id)).to_not be_nil
       expect { FundWithdrawal.find(fund3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      FundWithdrawal.find(fund4.id)
+      expect(FundWithdrawal.find(fund4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { FundWithdrawal.find(fund1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      FundWithdrawal.find(fund2.id)
-      FundWithdrawal.find(fund3.id)
-      FundWithdrawal.find(fund4.id)
+      expect(FundWithdrawal.find(fund2.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund3.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      FundWithdrawal.find(fund1.id)
-      FundWithdrawal.find(fund2.id)
-      FundWithdrawal.find(fund3.id)
-      FundWithdrawal.find(fund4.id)
+      expect(FundWithdrawal.find(fund1.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund2.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund3.id)).to_not be_nil
+      expect(FundWithdrawal.find(fund4.id)).to_not be_nil
     end
 
     it "index fund withdrawal with admin user active tags" do

@@ -787,35 +787,35 @@ RSpec.describe Issue, type: :model do
       person1 = issue1.person
       person3 = issue3.person
 
-      Issue.find(issue1.id)
-      Issue.find(issue2.id)
-      Issue.find(issue3.id)
-      Issue.find(issue4.id)
+      expect(Issue.find(issue1.id)).to_not be_nil
+      expect(Issue.find(issue2.id)).to_not be_nil
+      expect(Issue.find(issue3.id)).to_not be_nil
+      expect(Issue.find(issue4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Issue.find(issue1.id)
-      Issue.find(issue2.id)
+      expect(Issue.find(issue1.id)).to_not be_nil
+      expect(Issue.find(issue2.id)).to_not be_nil
       expect { Issue.find(issue3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Issue.find(issue4.id)
+      expect(Issue.find(issue4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { Issue.find(issue1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Issue.find(issue2.id)
-      Issue.find(issue3.id)
-      Issue.find(issue4.id)
+      expect(Issue.find(issue2.id)).to_not be_nil
+      expect(Issue.find(issue3.id)).to_not be_nil
+      expect(Issue.find(issue4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Issue.find(issue1.id)
-      Issue.find(issue2.id)
-      Issue.find(issue3.id)
-      Issue.find(issue4.id)
+      expect(Issue.find(issue1.id)).to_not be_nil
+      expect(Issue.find(issue2.id)).to_not be_nil
+      expect(Issue.find(issue3.id)).to_not be_nil
+      expect(Issue.find(issue4.id)).to_not be_nil
     end
 
     it "index issue with admin user active tags" do

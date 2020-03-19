@@ -113,15 +113,15 @@ RSpec.describe PersonTagging, type: :model do
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      PersonTagging.find(person_tag1.id).destroy
+      expect(PersonTagging.find(person_tag1.id).destroy).to be_truthy
       expect { PersonTagging.find(person_tag2.id).destroy }.to raise_error(RuntimeError)
       expect { PersonTagging.find(person_tag3.id).destroy }.to raise_error(RuntimeError)
-      PersonTagging.find(person_tag4.id).destroy
+      expect(PersonTagging.find(person_tag4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
       admin_user.save!
 
-      PersonTagging.find(person_tag3.id).destroy
+      expect(PersonTagging.find(person_tag3.id).destroy).to be_truthy
     end
 
     it "show person tagging with admin user active tags" do
