@@ -23,12 +23,11 @@ class Api::PersonTaggingsController < Api::EntityController
   def resource
     resource = super
 
-    unless (tags = AdminUser.current_admin_user&.active_tags)
-      return resource
-    end
+    # if the admin users doesn't have tags return the resource
+    return resource if AdminUser.current_admin_user&.active_tags&.empty?
 
-    return resource if tags.empty?
-
+    # return nil if the current admin user do not have permission
+    # to view the resource's person
     return nil unless Person.all.include?(resource.person)
 
     resource
@@ -37,12 +36,12 @@ class Api::PersonTaggingsController < Api::EntityController
   def collection
     collection = super
 
-    unless (tags = AdminUser.current_admin_user&.active_tags)
-      return collection
-    end
+    # if the admin users doesn't have tags return the collection
+    # without filtering
+    return collection if AdminUser.current_admin_user&.active_tags&.empty?
 
-    return collection if tags.empty?
-
+    # filter the collection with the valid people..Person.all already filter the
+    # proper tags
     collection.where(person: Person.all)
   end
 end
