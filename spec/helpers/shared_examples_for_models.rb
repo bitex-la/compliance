@@ -130,15 +130,15 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
         admin_user.tags << person1.tags.first
         admin_user.save!
 
-        seed_type_const.find(seed1.id).destroy
-        seed_type_const.find(seed2.id).destroy
+        expect(seed_type_const.find(seed1.id).destroy).to be_truthy
+        expect(seed_type_const.find(seed2.id).destroy).to be_truthy
         expect { seed_type_const.find(seed3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-        seed_type_const.find(seed4.id).destroy
+        expect(seed_type_const.find(seed4.id).destroy).to be_truthy
 
         admin_user.tags << person3.tags.first
         admin_user.save!
 
-        seed_type_const.find(seed3.id).destroy
+        expect(seed_type_const.find(seed3.id).destroy).to be_truthy
       end
 
       it "show #{seed_type} with admin user active tags" do
@@ -146,35 +146,35 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
         person1 = seed1.issue.person
         person3 = seed3.issue.person
 
-        seed_type_const.find(seed1.id)
-        seed_type_const.find(seed2.id)
-        seed_type_const.find(seed3.id)
-        seed_type_const.find(seed4.id)
+        expect(seed_type_const.find(seed1.id)).to_not be_nil
+        expect(seed_type_const.find(seed2.id)).to_not be_nil
+        expect(seed_type_const.find(seed3.id)).to_not be_nil
+        expect(seed_type_const.find(seed4.id)).to_not be_nil
 
         admin_user.tags << person1.tags.first
         admin_user.save!
 
-        seed_type_const.find(seed1.id)
-        seed_type_const.find(seed2.id)
+        expect(seed_type_const.find(seed1.id)).to_not be_nil
+        expect(seed_type_const.find(seed2.id)).to_not be_nil
         expect { seed_type_const.find(seed3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-        seed_type_const.find(seed4.id)
+        expect(seed_type_const.find(seed4.id)).to_not be_nil
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
         admin_user.save!
 
         expect { seed_type_const.find(seed1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-        seed_type_const.find(seed2.id)
-        seed_type_const.find(seed3.id)
-        seed_type_const.find(seed4.id)
+        expect(seed_type_const.find(seed2.id)).to_not be_nil
+        expect(seed_type_const.find(seed3.id)).to_not be_nil
+        expect(seed_type_const.find(seed4.id)).to_not be_nil
 
         admin_user.tags << person1.tags.first
         admin_user.save!
 
-        seed_type_const.find(seed1.id)
-        seed_type_const.find(seed2.id)
-        seed_type_const.find(seed3.id)
-        seed_type_const.find(seed4.id)
+        expect(seed_type_const.find(seed1.id)).to_not be_nil
+        expect(seed_type_const.find(seed2.id)).to_not be_nil
+        expect(seed_type_const.find(seed3.id)).to_not be_nil
+        expect(seed_type_const.find(seed4.id)).to_not be_nil
       end
 
       it "index #{seed_type} with admin user active tags" do
@@ -226,35 +226,35 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
         person1 = seed1.issue.person
         person3 = seed3.issue.person
 
-        type_const.find(seed1.fruit.id)
-        type_const.find(seed2.fruit.id)
-        type_const.find(seed3.fruit.id)
-        type_const.find(seed4.fruit.id)
+        expect(type_const.find(seed1.fruit.id)).to_not be_nil
+        expect(type_const.find(seed2.fruit.id)).to_not be_nil
+        expect(type_const.find(seed3.fruit.id)).to_not be_nil
+        expect(type_const.find(seed4.fruit.id)).to_not be_nil
 
         admin_user.tags << person1.tags.first
         admin_user.save!
 
-        type_const.find(seed1.fruit.id)
-        type_const.find(seed2.fruit.id)
+        expect(type_const.find(seed1.fruit.id)).to_not be_nil
+        expect(type_const.find(seed2.fruit.id)).to_not be_nil
         expect { type_const.find(seed3.fruit.id) }.to raise_error(ActiveRecord::RecordNotFound)
-        type_const.find(seed4.fruit.id)
+        expect(type_const.find(seed4.fruit.id)).to_not be_nil
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
         admin_user.save!
 
         expect { type_const.find(seed1.fruit.id) }.to raise_error(ActiveRecord::RecordNotFound)
-        type_const.find(seed2.fruit.id)
-        type_const.find(seed3.fruit.id)
-        type_const.find(seed4.fruit.id)
+        expect(type_const.find(seed2.fruit.id)).to_not be_nil
+        expect(type_const.find(seed3.fruit.id)).to_not be_nil
+        expect(type_const.find(seed4.fruit.id)).to_not be_nil
 
         admin_user.tags << person1.tags.first
         admin_user.save!
 
-        type_const.find(seed1.fruit.id)
-        type_const.find(seed2.fruit.id)
-        type_const.find(seed3.fruit.id)
-        type_const.find(seed4.fruit.id)
+        expect(type_const.find(seed1.fruit.id)).to_not be_nil
+        expect(type_const.find(seed2.fruit.id)).to_not be_nil
+        expect(type_const.find(seed3.fruit.id)).to_not be_nil
+        expect(type_const.find(seed4.fruit.id)).to_not be_nil
       end
 
       it "index #{type} with admin user active tags" do

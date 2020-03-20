@@ -137,35 +137,35 @@ RSpec.describe Attachment, type: :model do
       att3 = create(:jpg_attachment, thing: seed3)
       att4 = create(:jpg_attachment, thing: seed4)
 
-      Attachment.find(att1.id)
-      Attachment.find(att2.id)
-      Attachment.find(att3.id)
-      Attachment.find(att4.id)
+      expect(Attachment.find(att1.id)).to_not be_nil
+      expect(Attachment.find(att2.id)).to_not be_nil
+      expect(Attachment.find(att3.id)).to_not be_nil
+      expect(Attachment.find(att4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Attachment.find(att1.id)
-      Attachment.find(att2.id)
+      expect(Attachment.find(att1.id)).to_not be_nil
+      expect(Attachment.find(att2.id)).to_not be_nil
       expect { Attachment.find(att3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Attachment.find(att4.id)
+      expect(Attachment.find(att4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { Attachment.find(att1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      Attachment.find(att2.id)
-      Attachment.find(att3.id)
-      Attachment.find(att4.id)
+      expect(Attachment.find(att2.id)).to_not be_nil
+      expect(Attachment.find(att3.id)).to_not be_nil
+      expect(Attachment.find(att4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      Attachment.find(att1.id)
-      Attachment.find(att2.id)
-      Attachment.find(att3.id)
-      Attachment.find(att4.id)
+      expect(Attachment.find(att1.id)).to_not be_nil
+      expect(Attachment.find(att2.id)).to_not be_nil
+      expect(Attachment.find(att3.id)).to_not be_nil
+      expect(Attachment.find(att4.id)).to_not be_nil
     end
 
     it "index attachment with admin user active tags" do

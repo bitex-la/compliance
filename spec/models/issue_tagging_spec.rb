@@ -135,15 +135,15 @@ RSpec.describe IssueTagging, type: :model do
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      IssueTagging.find(issue_tag1.id).destroy
-      IssueTagging.find(issue_tag2.id).destroy
+      expect(IssueTagging.find(issue_tag1.id).destroy).to be_truthy
+      expect(IssueTagging.find(issue_tag2.id).destroy).to be_truthy
       expect { IssueTagging.find(issue_tag3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      IssueTagging.find(issue_tag4.id).destroy
+      expect(IssueTagging.find(issue_tag4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
       admin_user.save!
 
-      IssueTagging.find(issue_tag3.id).destroy
+      expect(IssueTagging.find(issue_tag3.id).destroy).to be_truthy
     end
 
     it "show issue tagging with admin user active tags" do
@@ -151,35 +151,35 @@ RSpec.describe IssueTagging, type: :model do
       person1 = issue_tag1.issue.person
       person3 = issue_tag3.issue.person
 
-      IssueTagging.find(issue_tag1.id)
-      IssueTagging.find(issue_tag2.id)
-      IssueTagging.find(issue_tag3.id)
-      IssueTagging.find(issue_tag4.id)
+      expect(IssueTagging.find(issue_tag1.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag3.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      IssueTagging.find(issue_tag1.id)
-      IssueTagging.find(issue_tag2.id)
+      expect(IssueTagging.find(issue_tag1.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
       expect { IssueTagging.find(issue_tag3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      IssueTagging.find(issue_tag4.id)
+      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
       expect { IssueTagging.find(issue_tag1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      IssueTagging.find(issue_tag2.id)
-      IssueTagging.find(issue_tag3.id)
-      IssueTagging.find(issue_tag4.id)
+      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag3.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
       admin_user.save!
 
-      IssueTagging.find(issue_tag1.id)
-      IssueTagging.find(issue_tag2.id)
-      IssueTagging.find(issue_tag3.id)
-      IssueTagging.find(issue_tag4.id)
+      expect(IssueTagging.find(issue_tag1.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag3.id)).to_not be_nil
+      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
     end
 
     it "index issue tagging with admin user active tags" do
