@@ -66,6 +66,7 @@ Rails.application.routes.draw do
     %i(
       fund_deposits
       fund_withdrawals
+      fund_transfers
       attachments
       observation_reasons
       observations

@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  source_person_id: 
+  target_person_id: 
+  amount: 9.99
+  transfer_date: 2020-03-24 18:54:40
+  exchange_rate_adjusted_amount: 9.99
+  currency_id: 1
+
+two:
+  source_person_id: 
+  target_person_id: 
+  amount: 9.99
+  transfer_date: 2020-03-24 18:54:40
+  exchange_rate_adjusted_amount: 9.99
+  currency_id: 1

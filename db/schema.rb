@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_01_083628) do
+ActiveRecord::Schema.define(version: 2020_03_24_175440) do
+
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
     t.text "body", limit: 4294967295
@@ -344,8 +345,20 @@ ActiveRecord::Schema.define(version: 2020_03_01_083628) do
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
     t.datetime "deposit_date"
     t.string "country"
+    t.index ["person_id", "country"], name: "index_fund_deposits_on_person_id_and_country"
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"
+  end
+
+  create_table "fund_transfers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "source_person_id"
+    t.bigint "target_person_id"
+    t.decimal "amount", precision: 10
+    t.datetime "transfer_date"
+    t.decimal "exchange_rate_adjusted_amount", precision: 10
+    t.integer "currency_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "fund_withdrawals", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -358,6 +371,7 @@ ActiveRecord::Schema.define(version: 2020_03_01_083628) do
     t.string "external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["person_id", "country"], name: "index_fund_withdrawals_on_person_id_and_country"
     t.index ["person_id"], name: "index_fund_withdrawals_on_person_id"
   end
 
