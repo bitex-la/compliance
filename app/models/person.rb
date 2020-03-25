@@ -41,8 +41,8 @@ class Person < ApplicationRecord
 
   HAS_MANY = HAS_MANY_REPLACEABLE + HAS_MANY_PLAIN
 
-  has_many :receive_transfers, :class_name => 'FundTransfer', :foreign_key => 'target_person_id'
-  has_many :send_transfers, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
+  has_many :received_transfers, :class_name => 'FundTransfer', :foreign_key => 'target_person_id'
+  has_many :sen_transfers, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
 
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
@@ -334,7 +334,7 @@ class Person < ApplicationRecord
     entities = []
     HAS_MANY
       .reject{|x| [:attachments, :issues, :fund_deposits, :fund_withdrawals,
-                   :receive_transfers, :send_transfers].include? x}
+                   :received_transfers, :sent_transfers].include? x}
       .map(&:to_s).each do |fruit|
       entities.push("#{fruit}": eager_fruit_entities)
     end
@@ -357,8 +357,8 @@ class Person < ApplicationRecord
     ])
     entities.push(fund_deposits: :attachments)
     entities.push(fund_withdrawals: :attachments)
-    entities.push(receive_transfers: :attachments)
-    entities.push(send_transfers: :attachments)
+    entities.push(received_transfers: :attachments)
+    entities.push(sent_transfers: :attachments)
     entities
   end
 

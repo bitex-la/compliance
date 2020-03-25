@@ -55,10 +55,10 @@ describe FundTransfer do
         attributes: {amount: 20000.00, country: 'ES', external_id: '2'}
       }
 
-      api_response.data.attributes.amount.should == '20000.0'
-      api_response.data.attributes.country.should == 'ES'
-      api_response.data.attributes.external_id.should == '2'
-      api_response.data.attributes.transfer_date.should == fund_transfer.transfer_date.as_json
+      expect(api_response.data.attributes.amount).to eq '20000.0'
+      expect(api_response.data.attributes.country).to eq 'ES'
+      expect(api_response.data.attributes.external_id).to eq '2'
+      expect(api_response.data.attributes.transfer_date).to eq fund_transfer.transfer_date.as_json
     end
   end
 end
