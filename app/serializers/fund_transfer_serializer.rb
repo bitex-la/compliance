@@ -7,5 +7,5 @@ class FundTransferSerializer
 
   attributes *%i(amount currency_code source_person_id
              target_person_id exchange_rate_adjusted_amount
-             country transfer_date created_at updated_at)
+             transfer_date created_at updated_at)
 end
