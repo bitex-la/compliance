@@ -114,8 +114,8 @@ RSpec.describe PersonTagging, type: :model do
       admin_user.save!
 
       expect(PersonTagging.find(person_tag1.id).destroy).to be_truthy
-      expect { PersonTagging.find(person_tag2.id).destroy }.to raise_error(RuntimeError)
-      expect { PersonTagging.find(person_tag3.id).destroy }.to raise_error(RuntimeError)
+      expect { PersonTagging.find(person_tag2.id).destroy }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { PersonTagging.find(person_tag3.id).destroy }.to raise_error(ActiveRecord::RecordNotFound)
       expect(PersonTagging.find(person_tag4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
@@ -125,99 +125,93 @@ RSpec.describe PersonTagging, type: :model do
     end
 
     it "show person tagging with admin user active tags" do
-      pending
-      fail
-      # TODO
-      #person_tag1, person_tag2, person_tag3, person_tag4 = setup_for_admin_tags_spec
-      #person1 = person_tag1.person
-      #person3 = person_tag3.person
+      person_tag1, person_tag2, person_tag3, person_tag4 = setup_for_admin_tags_spec
+      person1 = person_tag1.person
+      person3 = person_tag3.person
 
-      #api_get("/person_taggings/#{person_tag1.id}")
-      #api_get("/person_taggings/#{person_tag2.id}")
-      #api_get("/person_taggings/#{person_tag3.id}")
-      #api_get("/person_taggings/#{person_tag4.id}")
+      expect(PersonTagging.find(person_tag1.id)).to_not be_nil
+      expect(PersonTagging.find(person_tag2.id)).to_not be_nil
+      expect(PersonTagging.find(person_tag3.id)).to_not be_nil
+      expect(PersonTagging.find(person_tag4.id)).to_not be_nil
 
-      #admin_user.tags << person1.tags.first
-      #admin_user.save!
+      admin_user.tags << person1.tags.first
+      admin_user.save!
 
-      #api_get("/person_taggings/#{person_tag1.id}")
-      #api_get("/person_taggings/#{person_tag2.id}", {}, 404)
-      #api_get("/person_taggings/#{person_tag3.id}", {}, 404)
-      #api_get("/person_taggings/#{person_tag4.id}")
+      expect(PersonTagging.find(person_tag1.id)).to_not be_nil
+      expect { PersonTagging.find(person_tag2.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { PersonTagging.find(person_tag3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(PersonTagging.find(person_tag4.id)).to_not be_nil
 
-      #admin_user.tags.delete(person1.tags.first)
-      #admin_user.tags << person3.tags.first
-      #admin_user.save!
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
 
-      #api_get("/person_taggings/#{person_tag1.id}", {}, 404)
-      #api_get("/person_taggings/#{person_tag2.id}", {}, 404)
-      #api_get("/person_taggings/#{person_tag3.id}")
-      #api_get("/person_taggings/#{person_tag4.id}")
+      expect { PersonTagging.find(person_tag1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { PersonTagging.find(person_tag2.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(PersonTagging.find(person_tag3.id)).to_not be_nil
+      expect(PersonTagging.find(person_tag4.id)).to_not be_nil
 
-      #admin_user.tags << person1.tags.first
-      #admin_user.save!
+      admin_user.tags << person1.tags.first
+      admin_user.save!
 
-      #api_get("/person_taggings/#{person_tag1.id}")
-      #api_get("/person_taggings/#{person_tag2.id}", {}, 404)
-      #api_get("/person_taggings/#{person_tag3.id}")
-      #api_get("/person_taggings/#{person_tag4.id}")
+      expect(PersonTagging.find(person_tag1.id)).to_not be_nil
+      expect { PersonTagging.find(person_tag2.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(PersonTagging.find(person_tag3.id)).to_not be_nil
+      expect(PersonTagging.find(person_tag4.id)).to_not be_nil
     end
 
     it "index person tagging with admin user active tags" do
-      pending
-      fail
-      # TODO
-      #person_tag1, person_tag2, person_tag3, person_tag4 = setup_for_admin_tags_spec
-      #person1 = person_tag1.person
-      #person3 = person_tag3.person
-      #person4 = person_tag4.person
+      person_tag1, person_tag2, person_tag3, person_tag4 = setup_for_admin_tags_spec
+      person1 = person_tag1.person
+      person3 = person_tag3.person
+      person4 = person_tag4.person
 
-      #api_get("/person_taggings/")
-      #expect(api_response.meta.total_items).to eq(8)
-      #expect(api_response.data[0].id).to eq(person_tag4.id.to_s)
-      #expect(api_response.data[1].id).to eq(person_tag3.id.to_s)
-      #expect(api_response.data[2].id).to eq(person_tag2.id.to_s)
-      #expect(api_response.data[3].id).to eq(person_tag1.id.to_s)
-      #expect(api_response.data[4].id).to eq(person4.person_taggings.second.id.to_s)
-      #expect(api_response.data[5].id).to eq(person4.person_taggings.first.id.to_s)
-      #expect(api_response.data[6].id).to eq(person3.person_taggings.first.id.to_s)
-      #expect(api_response.data[7].id).to eq(person1.person_taggings.first.id.to_s)
+      person_taggings = PersonTagging.all
+      expect(person_taggings.count).to eq(8)
+      expect(person_taggings[0].id).to eq(person1.person_taggings.first.id)
+      expect(person_taggings[1].id).to eq(person3.person_taggings.first.id)
+      expect(person_taggings[2].id).to eq(person4.person_taggings.first.id)
+      expect(person_taggings[3].id).to eq(person4.person_taggings.second.id)
+      expect(person_taggings[4].id).to eq(person_tag1.id)
+      expect(person_taggings[5].id).to eq(person_tag2.id)
+      expect(person_taggings[6].id).to eq(person_tag3.id)
+      expect(person_taggings[7].id).to eq(person_tag4.id)
 
-      #admin_user.tags << person1.tags.first
-      #admin_user.save!
+      admin_user.tags << person1.tags.first
+      admin_user.save!
 
-      #api_get("/person_taggings/")
-      #expect(api_response.meta.total_items).to eq(5)
-      #expect(api_response.data[0].id).to eq(person_tag4.id.to_s)
-      #expect(api_response.data[1].id).to eq(person_tag1.id.to_s)
-      #expect(api_response.data[2].id).to eq(person4.person_taggings.second.id.to_s)
-      #expect(api_response.data[3].id).to eq(person4.person_taggings.first.id.to_s)
-      #expect(api_response.data[4].id).to eq(person1.person_taggings.first.id.to_s)
+      person_taggings = PersonTagging.all
+      expect(person_taggings.count).to eq(5)
+      expect(person_taggings[0].id).to eq(person1.person_taggings.first.id)
+      expect(person_taggings[1].id).to eq(person4.person_taggings.first.id)
+      expect(person_taggings[2].id).to eq(person4.person_taggings.second.id)
+      expect(person_taggings[3].id).to eq(person_tag1.id)
+      expect(person_taggings[4].id).to eq(person_tag4.id)
 
-      #admin_user.tags.delete(person1.tags.first)
-      #admin_user.tags << person3.tags.first
-      #admin_user.save!
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
 
-      #api_get("/person_taggings/")
-      #expect(api_response.meta.total_items).to eq(5)
-      #expect(api_response.data[0].id).to eq(person_tag4.id.to_s)
-      #expect(api_response.data[1].id).to eq(person_tag3.id.to_s)
-      #expect(api_response.data[2].id).to eq(person4.person_taggings.second.id.to_s)
-      #expect(api_response.data[3].id).to eq(person4.person_taggings.first.id.to_s)
-      #expect(api_response.data[4].id).to eq(person3.person_taggings.first.id.to_s)
+      person_taggings = PersonTagging.all
+      expect(person_taggings.count).to eq(5)
+      expect(person_taggings[0].id).to eq(person3.person_taggings.first.id)
+      expect(person_taggings[1].id).to eq(person4.person_taggings.first.id)
+      expect(person_taggings[2].id).to eq(person4.person_taggings.second.id)
+      expect(person_taggings[3].id).to eq(person_tag3.id)
+      expect(person_taggings[4].id).to eq(person_tag4.id)
 
-      #admin_user.tags << person1.tags.first
-      #admin_user.save!
+      admin_user.tags << person1.tags.first
+      admin_user.save!
 
-      #api_get("/person_taggings/")
-      #expect(api_response.meta.total_items).to eq(7)
-      #expect(api_response.data[0].id).to eq(person_tag4.id.to_s)
-      #expect(api_response.data[1].id).to eq(person_tag3.id.to_s)
-      #expect(api_response.data[2].id).to eq(person_tag1.id.to_s)
-      #expect(api_response.data[3].id).to eq(person4.person_taggings.second.id.to_s)
-      #expect(api_response.data[4].id).to eq(person4.person_taggings.first.id.to_s)
-      #expect(api_response.data[5].id).to eq(person3.person_taggings.first.id.to_s)
-      #expect(api_response.data[6].id).to eq(person1.person_taggings.first.id.to_s)
+      person_taggings = PersonTagging.all
+      expect(person_taggings.count).to eq(7)
+      expect(person_taggings[0].id).to eq(person1.person_taggings.first.id)
+      expect(person_taggings[1].id).to eq(person3.person_taggings.first.id)
+      expect(person_taggings[2].id).to eq(person4.person_taggings.first.id)
+      expect(person_taggings[3].id).to eq(person4.person_taggings.second.id)
+      expect(person_taggings[4].id).to eq(person_tag1.id)
+      expect(person_taggings[5].id).to eq(person_tag3.id)
+      expect(person_taggings[6].id).to eq(person_tag4.id)
     end
 
     def setup_for_admin_tags_spec

@@ -79,18 +79,15 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def self.default_scope
-    unless (admin_user = AdminUser.current_admin_user)
+    unless (tags = AdminUser.current_admin_user&.active_tags)
       return nil
     end
 
-    tags = admin_user.active_tags
-
     return nil if tags.empty?
 
-    left_outer_joins(:person_taggings)
-      .where(person_taggings: { tag_id: tags })
-      .or(Person.left_outer_joins(:person_taggings).where(person_taggings: { tag_id: nil }))
-      .distinct
+    where.not(id: PersonTagging.unscoped.pluck(:person_id).uniq)
+         .or(Person.where(id: PersonTagging.unscoped.select(:person_id).where(tag: tags)))
+         .distinct
   end
 
   def natural_docket

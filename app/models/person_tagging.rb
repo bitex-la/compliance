@@ -8,6 +8,7 @@ class PersonTagging < ApplicationRecord
   end
 
   include Tagging
+  include PersonScopeable
 
   validate :person_tag_must_be_managed_by_admin
 

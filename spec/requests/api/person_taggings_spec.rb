@@ -116,7 +116,7 @@ describe PersonTagging do
             person: { data: { id: person1.id, type: 'people' } },
             tag: { data: { id: tag.id, type: 'tags' } }
           }
-      end.to change { PersonTagging.count }.by(1)
+      end.to change { PersonTagging.unscoped.count }.by(1)
 
       person_tag = PersonTagging.last
       expect(api_response.data.id).to eq(person_tag.id.to_s)
@@ -203,7 +203,7 @@ describe PersonTagging do
             person: { data: { id: person.id, type: 'people' } },
             tag: { data: { id: tag.id, type: 'tags' } }
           }
-      end.to change { PersonTagging.count }.by(1)
+      end.to change { PersonTagging.unscoped.count }.by(1)
     end
 
     it "Destroy a person tagging with person tags if admin has tags" do
