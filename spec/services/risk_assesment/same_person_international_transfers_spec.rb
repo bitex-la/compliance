@@ -28,7 +28,8 @@ describe RiskAssesment::SamePersonInternationalTransfers do
     expect(extra_info['fund_deposits_count']).to eq person.fund_deposits.count
     expect(extra_info['fund_deposits_sum']).to eq person.fund_deposits.sum(:exchange_rate_adjusted_amount).to_s
 
-    expect(extra_info['countries']).to match_array(%w[UY AR])  end
+    expect(extra_info['countries']).to match_array(%w[UY AR])
+  end
 
   it 'does nothing if deposit and withdrawal are from same country' do
     create(:fund_withdrawal, person: person, country: 'AR')
