@@ -62,10 +62,7 @@ class AdminUser < ApplicationRecord
 
   def can_manage_tag?(tag)
     result = active_tags
-
-    return true if result.empty?
-
-    result.include? tag.id
+    result.empty? || result.include?(tag.id)
   end
 
   private
