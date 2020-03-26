@@ -3,6 +3,7 @@ FactoryBot.define do
     amount { 1000 }
     exchange_rate_adjusted_amount{ amount }
     currency_code { 'usd' }
+    external_id { '2' }
     transfer_date { DateTime.now.utc }
   end
 
@@ -10,6 +11,7 @@ FactoryBot.define do
     amount { 1000 }
     exchange_rate_adjusted_amount{ amount }
     currency_code { 'usd' }
+    external_id { '2' }
     transfer_date { DateTime.now.utc }
 
     factory :fund_transfer_with_people do
@@ -22,9 +24,10 @@ FactoryBot.define do
     amount { 45000 }
     exchange_rate_adjusted_amount{ amount / 45.0 }
     currency_code { 'ars' }
+    external_id { '2' }
     transfer_date { DateTime.now.utc }
 
-    factory :alt_fund_transfeer_with_people do
+    factory :alt_fund_transfer_with_people do
       association :source_person, factory: :empty_person
       association :target_person, factory: :empty_person
     end

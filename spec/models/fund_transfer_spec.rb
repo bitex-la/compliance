@@ -8,7 +8,7 @@ RSpec.describe FundTransfer, type: :model do
     invalid = FundTransfer.new
     expect(invalid).not_to be_valid
     expect(invalid.errors.keys).to match_array(%i[
-      currency external_id person amount exchange_rate_adjusted_amount transfer_date
+      currency source_person target_person amount exchange_rate_adjusted_amount transfer_date
     ])
   end
 

@@ -10,7 +10,9 @@ class FundTransfer < ApplicationRecord
     belongs_to :target_person, class_name: 'Person'
     ransackable_static_belongs_to :currency
 
+    has_many :attachments, as: :attached_to_fruit
+
     def name
-        "##{id}: #{source_person.name} -> #{target_person.name} (#{amount} #{currency_code})"
-      end
+      "##{id}: #{source_person.name} -> #{target_person.name} (#{amount} #{currency_code})"
+    end
 end

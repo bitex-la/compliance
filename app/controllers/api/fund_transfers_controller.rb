@@ -19,7 +19,9 @@ class Api::FundTransfersController < Api::EntityController
         :currency_code,
         :transfer_date,
         :attachments,
-        :person
+        :external_id,
+        :source_person,
+        :target_person
       ]
     )
   end
