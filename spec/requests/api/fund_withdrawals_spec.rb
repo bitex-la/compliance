@@ -181,9 +181,11 @@ describe FundWithdrawal do
     it "Update a fund deposit with person tags if admin has tags" do
       fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
       person1 = fund1.person
+      person2 = fund2.person
       person3 = fund3.person
 
       admin_user.tags << person1.tags.first
+      admin_user.tags << person2.tags.first
       admin_user.save!
 
       api_update "/fund_withdrawals/#{fund1.id}",
@@ -202,6 +204,7 @@ describe FundWithdrawal do
           country: 'BR'
         }
 
+      admin_user.tags.delete person3.tags.last
       api_update "/fund_withdrawals/#{fund3.id}", {
         type: 'fund_withdrawals',
         id: fund3.id,
@@ -234,6 +237,7 @@ describe FundWithdrawal do
     it "show fund withdrawal with admin user active tags" do
       fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
       person1 = fund1.person
+      person2 = fund2.person
       person3 = fund3.person
 
       api_get("/fund_withdrawals/#{fund1.id}")
@@ -242,6 +246,7 @@ describe FundWithdrawal do
       api_get("/fund_withdrawals/#{fund4.id}")
 
       admin_user.tags << person1.tags.first
+      admin_user.tags << person2.tags.first
       admin_user.save!
 
       api_get("/fund_withdrawals/#{fund1.id}")
@@ -270,6 +275,7 @@ describe FundWithdrawal do
     it "index fund withdrawal with admin user active tags" do
       fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
       person1 = fund1.person
+      person2 = fund2.person
       person3 = fund3.person
 
       api_get("/fund_withdrawals/")
@@ -280,6 +286,7 @@ describe FundWithdrawal do
       expect(api_response.data[3].id).to eq(fund1.id.to_s)
 
       admin_user.tags << person1.tags.first
+      admin_user.tags << person2.tags.first
       admin_user.save!
 
       api_get("/fund_withdrawals/")
@@ -318,9 +325,9 @@ describe FundWithdrawal do
       person4.tags << person3.tags.first
 
       fund1 = create(:full_fund_withdrawal, person: person1)
-      fund2 = create(:full_fund_withdrawal, person: person2)
-      fund3 = create(:full_fund_withdrawal, person: person3)
-      fund4 = create(:full_fund_withdrawal, person: person4)
+      fund2 = create(:full_fund_withdrawal, person: person2, country: 'CL')
+      fund3 = create(:full_fund_withdrawal, person: person3, country: 'ES')
+      fund4 = create(:full_fund_withdrawal, person: person4, country: 'US')
 
       [fund1, fund2, fund3, fund4]
     end
