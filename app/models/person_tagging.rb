@@ -21,16 +21,19 @@ class PersonTagging < ApplicationRecord
       return
     end
 
+    return if admin_user.can_manage_tag?(tag)
+
     return if person.tags.any? { |t| admin_user.can_manage_tag?(t) }
 
     errors.add(:person, 'Person tags not allowed')
   end
 
-  before_destroy :destroyable?
+  before_destroy :can_destroy?, prepend: true
 
-  def destroyable?
+  def can_destroy?
     return if person
 
-    raise 'Destroy not allowed'
+    errors[:base] << "Destroy not allowed"
+    throw :abort
   end
 end

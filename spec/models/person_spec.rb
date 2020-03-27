@@ -412,6 +412,47 @@ RSpec.describe Person, type: :model do
       expect(persons[3].id).to eq(person4.id)
     end
 
+    it 'add country tag and create a new tag' do
+      person = create(:empty_person)
+
+      expect do
+        person.refresh_person_country_tagging!('AR')
+      end.to change { Tag.count }.by(1)
+
+      person.reload
+      tag = Tag.last
+      expect(tag.name).to eq 'active-in-AR'
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'add country tag to person not creating a new tag' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      expect do
+        person.refresh_person_country_tagging!('AR')
+      end.to change { Tag.count }.by(0)
+
+      person.reload
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag to person if already exists' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+      person.tags << tag
+      person.save!
+
+      expect do
+        person.refresh_person_country_tagging!('AR')
+      end.to change { PersonTagging.count }.by(0)
+
+      person.reload
+      expect(person.tags.count).to eq(1)
+    end
+
     def setup_for_admin_tags_spec
       person1 = create(:full_person_tagging).person
       person2 = create(:empty_person)

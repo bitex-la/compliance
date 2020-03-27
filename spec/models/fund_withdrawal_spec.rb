@@ -7,7 +7,7 @@ RSpec.describe FundWithdrawal, type: :model do
     invalid = FundWithdrawal.new
     expect(invalid).not_to be_valid
     expect(invalid.errors.keys).to match_array(%i[
-      currency external_id person amount exchange_rate_adjusted_amount withdrawal_date
+      country currency external_id person amount exchange_rate_adjusted_amount withdrawal_date
     ])
   end
 
@@ -122,7 +122,7 @@ RSpec.describe FundWithdrawal, type: :model do
       end.to change { FundWithdrawal.count }.by(1)
     end
 
-    it "Update a fund deposit with person tags if admin has tags" do
+    it "Update a fund withdrawal with person tags if admin has tags" do
       fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
       person1 = fund1.person
       person3 = fund3.person
@@ -137,6 +137,8 @@ RSpec.describe FundWithdrawal, type: :model do
       fund_withdrawal = FundWithdrawal.find(fund2.id)
       fund_withdrawal.country = 'BR'
       fund_withdrawal.save!
+
+      admin_user.tags.delete person3.tags.last
 
       expect { FundWithdrawal.find(fund3.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
@@ -167,10 +169,12 @@ RSpec.describe FundWithdrawal, type: :model do
 
       expect(FundWithdrawal.find(fund1.id)).to_not be_nil
       expect(FundWithdrawal.find(fund2.id)).to_not be_nil
+      admin_user.tags.delete(person3.tags.last)
       expect { FundWithdrawal.find(fund3.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(FundWithdrawal.find(fund4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
+      admin_user.tags.delete(person1.tags.last)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
@@ -200,6 +204,7 @@ RSpec.describe FundWithdrawal, type: :model do
       expect(withdrawals[2].id).to eq(fund3.id)
       expect(withdrawals[3].id).to eq(fund4.id)
 
+      admin_user.tags.delete(person3.tags.last)
       admin_user.tags << person1.tags.first
       admin_user.save!
 
@@ -210,6 +215,7 @@ RSpec.describe FundWithdrawal, type: :model do
       expect(withdrawals[2].id).to eq(fund4.id)
 
       admin_user.tags.delete(person1.tags.first)
+      admin_user.tags.delete(person1.tags.last)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
@@ -230,6 +236,47 @@ RSpec.describe FundWithdrawal, type: :model do
       expect(withdrawals[3].id).to eq(fund4.id)
     end
 
+    it 'add country tag and create a new tag' do
+      person = create(:empty_person)
+
+      expect do
+        create(:full_fund_withdrawal, person: person)
+      end.to change { Tag.count }.by(1)
+
+      person.reload
+      tag = Tag.last
+      expect(tag.name).to eq 'active-in-AR'
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'add country tag to person not creating a new tag' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      expect do
+        create(:full_fund_withdrawal, person: person)
+      end.to change { Tag.count }.by(0)
+
+      person.reload
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag to person if already exists' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+      person.tags << tag
+      person.save!
+
+      expect do
+        create(:full_fund_withdrawal, person: person)
+      end.to change { PersonTagging.count }.by(0)
+
+      person.reload
+      expect(person.tags.count).to eq(1)
+    end
+
     def setup_for_admin_tags_spec
       person1 = create(:full_person_tagging).person
       person2 = create(:empty_person)
@@ -239,9 +286,9 @@ RSpec.describe FundWithdrawal, type: :model do
       person4.tags << person3.tags.first
 
       fund1 = create(:full_fund_withdrawal, person: person1)
-      fund2 = create(:full_fund_withdrawal, person: person2)
-      fund3 = create(:full_fund_withdrawal, person: person3)
-      fund4 = create(:full_fund_withdrawal, person: person4)
+      fund2 = create(:full_fund_withdrawal, person: person2, country: 'CL')
+      fund3 = create(:full_fund_withdrawal, person: person3, country: 'ES')
+      fund4 = create(:full_fund_withdrawal, person: person4, country: 'US')
 
       [fund1, fund2, fund3, fund4]
     end

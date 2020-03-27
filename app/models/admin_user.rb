@@ -65,6 +65,13 @@ class AdminUser < ApplicationRecord
     result.empty? || result.include?(tag.id)
   end
 
+  def add_tag(tag)
+    return if tags.include? tag
+
+    tags << tag
+    save!
+  end
+
   private
 
   def set_api_token

@@ -287,6 +287,18 @@ class Person < ApplicationRecord
       EventLogKind.update_person_regularity) if should_log
   end
 
+  def refresh_person_country_tagging!(country)
+    tag_name = "active-in-#{country}"
+    tag = Tag.find_or_create_by(tag_type: :person, name: tag_name)
+
+    AdminUser.current_admin_user&.add_tag(tag)
+
+    return if tags.include?(tag)
+
+    tags << tag
+    save!
+  end
+
   aasm do
     state :new, initial: true
     state :enabled

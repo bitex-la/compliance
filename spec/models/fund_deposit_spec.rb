@@ -317,6 +317,7 @@ RSpec.describe FundDeposit, type: :model do
       fund_deposit.country = 'BR'
       fund_deposit.save!
 
+      admin_user.tags.delete person3.tags.last
       expect { FundDeposit.find(fund_deposit3.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
       fund_deposit = FundDeposit.find(fund_deposit4.id)
@@ -341,15 +342,18 @@ RSpec.describe FundDeposit, type: :model do
       expect(FundDeposit.find(fund_deposit3.id)).to_not be_nil
       expect(FundDeposit.find(fund_deposit4.id)).to_not be_nil
 
+      admin_user.tags.delete(person3.tags.last)
       admin_user.tags << person1.tags.first
       admin_user.save!
 
       expect(FundDeposit.find(fund_deposit1.id)).to_not be_nil
       expect(FundDeposit.find(fund_deposit2.id)).to_not be_nil
+      admin_user.tags.delete(person3.tags.last)
       expect { FundDeposit.find(fund_deposit3.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(FundDeposit.find(fund_deposit4.id)).to_not be_nil
 
       admin_user.tags.delete(person1.tags.first)
+      admin_user.tags.delete(person1.tags.last)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
@@ -379,6 +383,7 @@ RSpec.describe FundDeposit, type: :model do
       expect(fund_deposits[2].id).to eq(fund_deposit3.id)
       expect(fund_deposits[3].id).to eq(fund_deposit4.id)
 
+      admin_user.tags.delete(person3.tags.last)
       admin_user.tags << person1.tags.first
       admin_user.save!
 
@@ -389,6 +394,7 @@ RSpec.describe FundDeposit, type: :model do
       expect(fund_deposits[2].id).to eq(fund_deposit4.id)
 
       admin_user.tags.delete(person1.tags.first)
+      admin_user.tags.delete(person1.tags.last)
       admin_user.tags << person3.tags.first
       admin_user.save!
 
@@ -409,6 +415,47 @@ RSpec.describe FundDeposit, type: :model do
       expect(fund_deposits[3].id).to eq(fund_deposit4.id)
     end
 
+    it 'add country tag and create a new tag' do
+      person = create(:empty_person)
+
+      expect do
+        create(:full_fund_deposit, person: person)
+      end.to change { Tag.count }.by(1)
+
+      person.reload
+      tag = Tag.last
+      expect(tag.name).to eq 'active-in-AR'
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'add country tag to person not creating a new tag' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      expect do
+        create(:full_fund_deposit, person: person)
+      end.to change { Tag.count }.by(0)
+
+      person.reload
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag to person if already exists' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+      person.tags << tag
+      person.save!
+
+      expect do
+        create(:full_fund_deposit, person: person)
+      end.to change { PersonTagging.count }.by(0)
+
+      person.reload
+      expect(person.tags.count).to eq(1)
+    end
+
     def setup_for_admin_tags_spec
       person1 = create(:full_person_tagging).person
       person2 = create(:empty_person)
@@ -418,9 +465,9 @@ RSpec.describe FundDeposit, type: :model do
       person4.tags << person3.tags.first
 
       fund_deposit1 = create(:full_fund_deposit, person: person1)
-      fund_deposit2 = create(:full_fund_deposit, person: person2)
-      fund_deposit3 = create(:full_fund_deposit, person: person3)
-      fund_deposit4 = create(:full_fund_deposit, person: person4)
+      fund_deposit2 = create(:full_fund_deposit, person: person2, country: 'CL')
+      fund_deposit3 = create(:full_fund_deposit, person: person3, country: 'ES')
+      fund_deposit4 = create(:full_fund_deposit, person: person4, country: 'US')
 
       [fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4]
     end
