@@ -190,9 +190,11 @@ describe FundDeposit do
     it "Update a fund deposit with person tags if admin has tags" do
       fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
       person1 = fund_deposit1.person
+      person2 = fund_deposit2.person
       person3 = fund_deposit3.person
 
       admin_user.tags << person1.tags.first
+      admin_user.tags << person2.tags.first
       admin_user.save!
 
       api_update "/fund_deposits/#{fund_deposit1.id}",
@@ -211,6 +213,7 @@ describe FundDeposit do
           country: 'BR'
         }
 
+      admin_user.tags.delete person3.tags.last
       api_update "/fund_deposits/#{fund_deposit3.id}", {
         type: 'fund_deposits',
         id: fund_deposit3.id,
@@ -243,6 +246,7 @@ describe FundDeposit do
     it "show fund deposit with admin user active tags" do
       fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
       person1 = fund_deposit1.person
+      person2 = fund_deposit2.person
       person3 = fund_deposit3.person
 
       api_get("/fund_deposits/#{fund_deposit1.id}")
@@ -251,6 +255,7 @@ describe FundDeposit do
       api_get("/fund_deposits/#{fund_deposit4.id}")
 
       admin_user.tags << person1.tags.first
+      admin_user.tags << person2.tags.first
       admin_user.save!
 
       api_get("/fund_deposits/#{fund_deposit1.id}")
@@ -279,6 +284,7 @@ describe FundDeposit do
     it "index fund deposit with admin user active tags" do
       fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4, = setup_for_admin_tags_spec
       person1 = fund_deposit1.person
+      person2 = fund_deposit2.person
       person3 = fund_deposit3.person
 
       api_get("/fund_deposits/")
@@ -289,6 +295,7 @@ describe FundDeposit do
       expect(api_response.data[3].id).to eq(fund_deposit1.id.to_s)
 
       admin_user.tags << person1.tags.first
+      admin_user.tags << person2.tags.first
       admin_user.save!
 
       api_get("/fund_deposits/")
@@ -327,9 +334,9 @@ describe FundDeposit do
       person4.tags << person3.tags.first
 
       fund_deposit1 = create(:full_fund_deposit, person: person1)
-      fund_deposit2 = create(:full_fund_deposit, person: person2)
-      fund_deposit3 = create(:full_fund_deposit, person: person3)
-      fund_deposit4 = create(:full_fund_deposit, person: person4)
+      fund_deposit2 = create(:full_fund_deposit, person: person2, country: 'CL')
+      fund_deposit3 = create(:full_fund_deposit, person: person3, country: 'ES')
+      fund_deposit4 = create(:full_fund_deposit, person: person4, country: 'US')
 
       [fund_deposit1, fund_deposit2, fund_deposit3, fund_deposit4]
     end
