@@ -42,7 +42,7 @@ class Person < ApplicationRecord
   HAS_MANY = HAS_MANY_REPLACEABLE + HAS_MANY_PLAIN
 
   has_many :received_transfers, :class_name => 'FundTransfer', :foreign_key => 'target_person_id'
-  has_many :sen_transfers, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
+  has_many :sent_transfers, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
 
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
