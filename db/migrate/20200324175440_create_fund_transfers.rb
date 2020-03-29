@@ -7,7 +7,7 @@ class CreateFundTransfers < ActiveRecord::Migration[5.2]
                 precision: 20,
                 scale: 8,
                 null: false
-      t.datetime :transfer_date
+      t.datetime :transfer_date, null: false
       t.decimal :exchange_rate_adjusted_amount,
                 precision: 20,
                 scale: 8,

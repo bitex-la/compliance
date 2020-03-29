@@ -353,7 +353,7 @@ ActiveRecord::Schema.define(version: 2020_03_24_175440) do
     t.bigint "source_person_id", null: false
     t.bigint "target_person_id", null: false
     t.decimal "amount", precision: 20, scale: 8, null: false
-    t.datetime "transfer_date"
+    t.datetime "transfer_date", null: false
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
     t.integer "currency_id", null: false
     t.string "external_id"
