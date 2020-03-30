@@ -5,6 +5,7 @@ class FundTransfer < ApplicationRecord
     validates :amount, :exchange_rate_adjusted_amount,
               numericality: { greater_than: 0 }
     validates :transfer_date, presence: true
+    validates :external_id, presence: true
 
     belongs_to :source_person, class_name: 'Person'
     belongs_to :target_person, class_name: 'Person'

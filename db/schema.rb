@@ -356,7 +356,7 @@ ActiveRecord::Schema.define(version: 2020_03_24_175440) do
     t.datetime "transfer_date", null: false
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
     t.integer "currency_id", null: false
-    t.string "external_id"
+    t.string "external_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["source_person_id"], name: "index_fund_transfers_on_source_person_id"

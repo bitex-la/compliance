@@ -13,7 +13,7 @@ class CreateFundTransfers < ActiveRecord::Migration[5.2]
                 scale: 8,
                 null: false
       t.integer :currency_id, null: false
-      t.string :external_id
+      t.string :external_id, null: false
 
       t.timestamps
     end
