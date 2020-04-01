@@ -1,6 +1,7 @@
 class FundWithdrawal < ApplicationRecord
   include Loggable
 
+  validates :country, country: true
   validates :external_id, presence: true
   validates :currency, inclusion: { in: Currency.all }
   validates :amount, :exchange_rate_adjusted_amount,
@@ -12,10 +13,17 @@ class FundWithdrawal < ApplicationRecord
 
   has_many :attachments, as: :attached_to_fruit
 
-  after_save{ person.expire_action_cache }
+  after_save { person.expire_action_cache }
+
+  validate :withdrawal_date_cannot_be_in_the_future
+
+  def withdrawal_date_cannot_be_in_the_future
+    return unless withdrawal_date.present? && withdrawal_date > DateTime.now.utc
+
+    errors.add(:withdrawal_date, 'cannot be in the future')
+  end
 
   def name
     "##{id}: #{amount} #{currency_code} #{country}"
   end
-
 end
