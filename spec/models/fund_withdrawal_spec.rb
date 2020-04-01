@@ -7,7 +7,7 @@ RSpec.describe FundWithdrawal, type: :model do
     invalid = FundWithdrawal.new
     expect(invalid).not_to be_valid
     expect(invalid.errors.keys).to match_array(%i[
-      currency external_id person amount exchange_rate_adjusted_amount withdrawal_date
+      country currency external_id person amount exchange_rate_adjusted_amount withdrawal_date
     ])
   end
 
