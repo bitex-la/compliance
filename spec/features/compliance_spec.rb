@@ -1077,6 +1077,30 @@ describe 'an admin user' do
     person.risk.should == 'low'
   end
 
+  it "don't show api token for admin users in view page" do
+    login_as super_admin_user
+
+    click_link 'Admin Users'
+    within("#admin_user_#{super_admin_user.id} td.col.col-actions") do
+      click_link 'View'
+    end
+
+    expect(page.current_path).to eq("/admin_users/#{super_admin_user.id}")
+    expect(page).to_not have_text 'API TOKEN'
+    expect(page).to_not have_text super_admin_user.api_token
+  end
+
+  it "don't show api token for admin users in csv export" do
+    login_as super_admin_user
+
+    click_link 'Admin Users'
+    click_link 'CSV'
+    DownloadHelpers::wait_for_download
+    csv = File.read(DownloadHelpers::download)
+    expect(csv).to_not include('API TOKEN')
+    expect(csv).to_not include(super_admin_user.api_token)
+  end
+
   it 'keeps track of usage allowances' do
     pending
     fail

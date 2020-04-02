@@ -11,7 +11,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 2020_04_01_183437) do
-
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
     t.text "body", limit: 4294967295
@@ -347,6 +346,20 @@ ActiveRecord::Schema.define(version: 2020_04_01_183437) do
     t.string "country"
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"
+  end
+
+  create_table "fund_transfers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "source_person_id", null: false
+    t.bigint "target_person_id", null: false
+    t.decimal "amount", precision: 20, scale: 8, null: false
+    t.datetime "transfer_date", null: false
+    t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
+    t.integer "currency_id", null: false
+    t.string "external_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_person_id"], name: "index_fund_transfers_on_source_person_id"
+    t.index ["target_person_id"], name: "index_fund_transfers_on_target_person_id"
   end
 
   create_table "fund_withdrawals", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -765,6 +778,8 @@ ActiveRecord::Schema.define(version: 2020_04_01_183437) do
   add_foreign_key "emails", "people"
   add_foreign_key "event_logs", "admin_users"
   add_foreign_key "fund_deposits", "people"
+  add_foreign_key "fund_transfers", "people", column: "source_person_id"
+  add_foreign_key "fund_transfers", "people", column: "target_person_id"
   add_foreign_key "fund_withdrawals", "people"
   add_foreign_key "fundings", "fundings", column: "replaced_by_id"
   add_foreign_key "fundings", "issues"
