@@ -74,7 +74,7 @@ RSpec.configure do |config|
     browser_options.profile = profile
     browser_options.profile['browser.download.dir'] = DownloadHelpers::PATH.to_s
     browser_options.profile['browser.download.folderList'] = 2
-    browser_options.profile['browser.helperApps.neverAsk.saveToDisk'] = 'application/zip'
+    browser_options.profile['browser.helperApps.neverAsk.saveToDisk'] = 'text/csv; application/zip'
 
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: browser_options)
   end

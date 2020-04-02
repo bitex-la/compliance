@@ -56,14 +56,14 @@ describe FundDeposit do
         type: 'fund_deposits',
         id: fund_deposit.id,
         attributes: {
-          amount: 20_000.00,
+          amount: 20_000.36,
           country: 'BR',
           deposit_date: new_deposit_date
         }
       }
 
       attributes = api_response.data.attributes
-      expect(attributes.amount).to eq('20000.0')
+      expect(attributes.amount).to eq('20000.36')
       expect(attributes.country).to eq('BR')
       expect(attributes.deposit_date).to eq(new_deposit_date.as_json)
     end
