@@ -17,5 +17,4 @@ class FundWithdrawal < ApplicationRecord
   def name
     "##{id}: #{amount} #{currency_code} #{country}"
   end
-
 end

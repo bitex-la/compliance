@@ -51,7 +51,7 @@ ActiveAdmin.register AdminUser do
     end
   end
 
-  index do
+  index download_links: [:csv] do
     selectable_column
     id_column
     column :email
@@ -98,6 +98,46 @@ ActiveAdmin.register AdminUser do
       f.input :max_people_allowed
     end
     f.actions
+  end
+
+  show do
+    attributes_table do
+      row :email
+      row :encrypted_password
+      row :reset_password_token
+      row :reset_password_sent_at
+      row :remember_created_at
+      row :sign_in_count
+      row :current_sign_in_at
+      row :last_sign_in_at
+      row :current_sign_in_ip
+      row :last_sign_in_ip
+      row :created_at
+      row :updated_at
+      row :otp_secret_key
+      row :otp_enabled
+      row :role_type
+      row :max_people_allowed
+    end
+  end
+
+  csv do
+    column :email
+    column :encrypted_password
+    column :reset_password_token
+    column :reset_password_sent_at
+    column :remember_created_at
+    column :sign_in_count
+    column :current_sign_in_at
+    column :last_sign_in_at
+    column :current_sign_in_ip
+    column :last_sign_in_ip
+    column :created_at
+    column :updated_at
+    column :otp_secret_key
+    column :otp_enabled
+    column :role_type
+    column :max_people_allowed
   end
 
   sidebar 'OTP', only: :show do
