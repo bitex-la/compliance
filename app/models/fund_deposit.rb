@@ -12,9 +12,9 @@ class FundDeposit < ApplicationRecord
   validate :deposit_date_cannot_be_in_the_future
 
   def deposit_date_cannot_be_in_the_future
-    if deposit_date.present? && deposit_date > DateTime.now.utc
-      errors.add(:deposit_date, "cannot be in the future")
-    end
+    return unless deposit_date.present? && deposit_date > DateTime.now.utc
+
+    errors.add(:deposit_date, 'cannot be in the future')
   end
 
   belongs_to :person

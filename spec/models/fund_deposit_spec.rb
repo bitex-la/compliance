@@ -18,13 +18,13 @@ RSpec.describe FundDeposit, type: :model do
   it 'is not valid if deposit_date is in the future' do
     object = build(:full_fund_deposit, person: person, deposit_date: 1.hour.from_now)
     expect(object).to_not be_valid
-    expect(object.errors.messages.keys.first).to eq(:"deposit_date")
+    expect(object.errors.messages.keys.first).to eq(:deposit_date)
   end
 
   it 'is not valid if deposit_date is nil' do
     object = build(:full_fund_deposit, person: person, deposit_date: nil)
     expect(object).to_not be_valid
-    expect(object.errors.messages.keys.first).to eq(:"deposit_date")
+    expect(object.errors.messages.keys.first).to eq(:deposit_date)
   end
 
   it 'is valid update a deposit without deposit_date' do

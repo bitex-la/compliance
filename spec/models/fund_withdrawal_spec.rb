@@ -20,6 +20,18 @@ RSpec.describe FundWithdrawal, type: :model do
     assert_logging(object, :create_entity, 1)
   end
 
+  it 'is not valid if withdrawal_date is in the future' do
+    object = build(:fund_withdrawal, person: person, withdrawal_date: 1.hour.from_now)
+    expect(object).to_not be_valid
+    expect(object.errors.messages.keys.first).to eq(:withdrawal_date)
+  end
+
+  it 'is not valid if withdrawal_date is nil' do
+    object = build(:fund_withdrawal, person: person, withdrawal_date: nil)
+    expect(object).to_not be_valid
+    expect(object.errors.messages.keys.first).to eq(:withdrawal_date)
+  end
+
   describe "When filter by admin tags" do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
