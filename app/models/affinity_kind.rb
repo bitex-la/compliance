@@ -1,6 +1,7 @@
 class AffinityKind
   include StaticModels::Model
 
+  # should we define same_person affinity here?
   static_models_dense [
     [:id, :code, :inverse_of],
     [10, :spouse],
