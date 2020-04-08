@@ -529,9 +529,20 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
       if approve_issue
         seed1.issue.reload.approve!
+        admin_user.tags.clear
+        admin_user.save!
         seed2.issue.reload.approve!
+        if seed2.issue.person.tags.count >= 1
+          seed2.issue.person.tags.delete seed2.issue.person.tags.last
+        end
+        admin_user.tags.clear
+        admin_user.save!
         seed3.issue.reload.approve!
+        admin_user.tags.clear
+        admin_user.save!
         seed4.issue.reload.approve!
+        admin_user.tags.clear
+        admin_user.save!
       end
 
       seed1.reload
