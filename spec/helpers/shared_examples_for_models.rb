@@ -315,9 +315,18 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
 
       if approve_issue
         seed1.issue.reload.approve!
+        admin_user.tags.clear
+        admin_user.save!
         seed2.issue.reload.approve!
+        seed2.issue.person.tags.delete seed2.issue.person.tags.last
+        admin_user.tags.clear
+        admin_user.save!
         seed3.issue.reload.approve!
+        admin_user.tags.clear
+        admin_user.save!
         seed4.issue.reload.approve!
+        admin_user.tags.clear
+        admin_user.save!
       end
 
       seed1.reload
