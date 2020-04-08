@@ -318,7 +318,9 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
         admin_user.tags.clear
         admin_user.save!
         seed2.issue.reload.approve!
-        seed2.issue.person.tags.delete seed2.issue.person.tags.last
+        if seed2.issue.person.tags.count >= 1
+          seed2.issue.person.tags.delete seed2.issue.person.tags.last
+        end
         admin_user.tags.clear
         admin_user.save!
         seed3.issue.reload.approve!
