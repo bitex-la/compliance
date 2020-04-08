@@ -252,6 +252,10 @@ class Issue < ApplicationRecord
 
     event :complete do
       transitions from: [:draft, :new], to: :new
+
+      after do 
+        refresh_person_country_tagging!
+      end
     end
 
     event :observe do
@@ -292,6 +296,7 @@ class Issue < ApplicationRecord
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
+          refresh_person_country_tagging!
         end
       end
     end
@@ -394,6 +399,16 @@ class Issue < ApplicationRecord
     elsif legal_entity_docket_seed_id
       :legal_entity
     end
+  end
+
+  def refresh_person_country_tagging!
+    country = nil
+    if argentina_invoicing_detail_seed
+      country = argentina_invoicing_detail_seed.country
+    elsif chile_invoicing_detail_seed
+      country = 'CL'
+    end
+    person.refresh_person_country_tagging!(country) if country
   end
 
   private

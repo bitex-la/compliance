@@ -875,5 +875,96 @@ RSpec.describe Issue, type: :model do
 
       [issue1, issue2, issue3, issue4]
     end
+
+    it 'add country AR tag and create a new tag on complete' do
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+      expect do
+        issue.complete!
+      end.to change { Tag.count }.by(1)
+
+      expect do
+        issue.approve!
+      end.to change { Tag.count }.by(0)
+
+      issue.person.reload
+      tag = Tag.last
+      expect(tag.name).to eq 'active-in-AR'
+      expect(issue.person.tags.count).to eq(1)
+      expect(issue.person.tags.first).to eq(tag)
+    end
+
+    it 'add country CL tag and create a new tag on complete' do
+      seed = create(:full_chile_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+      expect do
+        issue.complete!
+      end.to change { Tag.count }.by(1)
+
+      expect do
+        issue.approve!
+      end.to change { Tag.count }.by(0)
+
+      issue.person.reload
+      tag = Tag.last
+      expect(tag.name).to eq 'active-in-CL'
+      expect(issue.person.tags.count).to eq(1)
+      expect(issue.person.tags.first).to eq(tag)
+    end
+
+    it 'add country tag and create a new tag on approve' do
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+      expect do
+        issue.approve!
+      end.to change { Tag.count }.by(1)
+
+      issue.person.reload
+      tag = Tag.last
+      expect(tag.name).to eq 'active-in-AR'
+      expect(issue.person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag and create a new tag on complete' do
+      issue = create(:basic_issue)
+      expect do
+        issue.complete!
+      end.to change { Tag.count }.by(0)
+
+      issue.person.reload
+      expect(issue.person.tags.count).to eq(0)
+    end
+
+    it 'add country tag to person not creating a new tag on complete' do
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+
+      expect do
+        issue.complete!
+      end.to change { Tag.count }.by(0)
+
+      issue.person.reload
+      expect(issue.person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag to person if already exists on complete' do
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+      issue.person.tags << tag
+      issue.person.save!
+
+      expect do
+        issue.complete!
+      end.to change { PersonTagging.count }.by(0)
+
+      issue.person.reload
+      expect(issue.person.tags.count).to eq(1)
+    end
   end
 end
