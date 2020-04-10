@@ -26,7 +26,7 @@ class Person < ApplicationRecord
     affinities
     risk_scores
   }.each do |relationship|
-    has_many relationship, -> { where("#{relationship}.replaced_by_id is NULL") }
+    has_many relationship, -> { where("#{relationship}.replaced_by_id is NULL and #{relationship}.archived_at is NULL") }
     has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
   end
 

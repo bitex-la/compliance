@@ -7,6 +7,8 @@ describe PhoneSeed do
 
   it_behaves_like 'observable', :full_phone_seed_with_issue
 
+  it_behaves_like 'archived_seed', :full_phone
+
   it_behaves_like 'whitespaced_seed', described_class.new, {
     number: ' +5491125410470 ',
     phone_kind_code: :main,
