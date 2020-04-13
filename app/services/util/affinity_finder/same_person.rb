@@ -60,8 +60,8 @@ module AffinityFinder
       Identification.where(
         "person_id <> :person_id AND
         replaced_by_id is NULL AND
-        (number REGEXP :numbers
-        OR :numbers REGEXP number)",
+        (LOWER(number) REGEXP LOWER(:numbers)
+        OR LOWER(:numbers) REGEXP LOWER(number))",
         person_id: person.id,
         numbers: person.identifications.pluck(:number).join('|')
       ).pluck(:person_id)
