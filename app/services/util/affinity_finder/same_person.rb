@@ -35,7 +35,14 @@ module AffinityFinder
             affinity_person = found_affinity.person
           end
 
+          # TODO: chequear validez de affinities preexistentes si person
+          # tiene affinities same_person activos y marcarlos de alguna manera
+          # para invalidarlos si person es hijo. En caso de que sea Padre
+          # se debe marcar a los related_persons de los affinities a expirar
+          # para correr en cada related_person el affinity creator de same_person
           create_same_person_issue(person, affinity_person)
+
+          # Crear issues por cada
 
           persons_ids_linked_by_affinity << Affinity.where(
             person_id: affinity_person_id,
@@ -68,16 +75,37 @@ module AffinityFinder
 
         end
 
+        # Ejemplo de cambio de datos de padre e hijo en affinities
         # PERSONA A NOMBRE IGUAL DNI DISTINTO
-        # PERSONA B NOMBRE IGUAL DNI DISTINTO
-        # PERSONA C NOMBRE IGUAL PERSONA F  DNI IGUAL A B
-
+        # PERSONA B NOMBRE IGUAL DNI DISTINTO (Persona A es padre)
 
         # PERSONA F NOMBRE DIST DNI DIST
-        # PERSONA G NOMBRE DIST DNI IGUAL A G
+        # PERSONA G NOMBRE DIST DNI IGUAL A (Persona A es padre)
+
+        # PERSONA H NOMBRE IGUAL PERSONA F  DNI IGUAL A B (Persona A y F padre)
+
+        # PERSONA H cambia NOMBRE o # PERSONA F cambia NOMBRE
+
 
         # Creates an issue with AffinitySeed affinity_kind_code: :same_person
         # expiration??
+
+        # Ejemplo de cambio de person que es padre e hijo a la vez
+        # PERSONA A
+        # PERSONA B NOMBRE = A DNI DISTINTO (Persona A es padre)
+        # PERSONA C NOMBRE DIST DNI = B (Persona B es padre)
+        # PERSONA D NOMBRE DIST DNI = B (Persona B es padre)
+        # EDITO PERSONA B
+        # Ecuentro Affinities.
+        #    - Si es hijo, marco para expirar.
+        #    - Si es padre, marco para expirar
+
+
+
+        # EJEMPLO: Persona A es padre de B por mismo DNI
+        # cambio DNI a B. Creo Issue para comunicar a compliance
+        # para expirar affinity same_person de A a B.
+
       end
     end
 end
