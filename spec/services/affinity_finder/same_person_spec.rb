@@ -11,6 +11,20 @@ require 'rails_helper'
         )
     }
 
+    context '.with_matched_id_numbers' do
+      it 'matches exact numbers'
+      it 'matches when person identification are contained in another record'
+      it 'matches when another record number are contained in person identification'
+      it 'returns empty array when no matches are found'
+    end
+
+    context '.with_matched_names' do
+      it 'matches exact name and surname'
+      it 'matches when person name are contained in another record'
+      it 'matches when another record name are contained in person name'
+      it 'returns empty array when no matches are found'
+    end
+
     it 'creates a same_person AffinitySeed issue' do
         person.reload
         expect do
