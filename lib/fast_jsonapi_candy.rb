@@ -49,6 +49,7 @@ module FastJsonapiCandy
       if attrs = naming.serializer.constantize.attributes_to_serialize
         attributes *attrs.try(:keys)
         attributes :expires_at
+        attributes :archived_at
       else
         raise "Cannot derive #{name} as seed has no attributes."
       end

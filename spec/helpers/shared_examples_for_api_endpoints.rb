@@ -7,6 +7,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   seed_type = Garden::Naming.new(type).seed_plural
 
   initial_expires_seed = "#{initial_factory}_expires_seed"
+  initial_archived_seed = "#{initial_factory}_archived_seed"
 
   it "Gets seed with observation" do
     issue = create(:basic_issue)
@@ -54,6 +55,25 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
     seed = api_response.data
     expect(Date.parse(seed.attributes.expires_at)).to eq(initial_attrs[:expires_at])
+  end
+
+  it 'Create an archived seed' do
+    issue = create(:basic_issue)
+
+    initial_attrs = attributes_for(initial_archived_seed)
+
+    initial_relations = instance_exec(&relations_proc)
+    issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
+
+    api_create "/#{seed_type}", {
+      type: seed_type,
+      attributes: initial_attrs,
+      relationships: issue_relation.merge(initial_relations)
+    }
+
+    seed = api_response.data
+
+    expect(Date.parse(seed.attributes.archived_at)).to eq(initial_attrs[:archived_at])
   end
 
   it "Destroy a #{seed_type}" do

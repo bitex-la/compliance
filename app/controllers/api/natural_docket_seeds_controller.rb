@@ -27,7 +27,8 @@ class Api::NaturalDocketSeedsController < Api::EntityController
         :politically_exposed_reason,
         :copy_attachments,
         :issue,
-        :expires_at
+        :expires_at,
+        :archived_at
       ]
   end
 end
