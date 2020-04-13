@@ -912,6 +912,30 @@ RSpec.describe Issue, type: :model do
       expect(issue.person.tags.first).to eq(tag)
     end
 
+    it 'add country AR and CL tag and create new tags on complete' do
+      seed1 = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed1.issue
+      create(:full_chile_invoicing_detail_seed_with_issue, issue: issue)
+
+      expect do
+        issue.reload.complete!
+      end.to change { Tag.count }.by(2)
+
+      expect do
+        issue.approve!
+      end.to change { Tag.count }.by(0)
+
+      issue.person.reload
+
+      tag1 = Tag.first
+      tag2 = Tag.last
+      expect(tag1.name).to eq 'active-in-AR'
+      expect(tag2.name).to eq 'active-in-CL'
+      expect(issue.person.tags.count).to eq(2)
+      expect(issue.person.tags.first).to eq(tag1)
+      expect(issue.person.tags.last).to eq(tag2)
+    end
+
     it 'add country tag and create a new tag on approve' do
       seed = create(:full_argentina_invoicing_detail_seed_with_issue)
       issue = seed.issue

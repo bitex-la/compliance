@@ -402,13 +402,13 @@ class Issue < ApplicationRecord
   end
 
   def refresh_person_country_tagging!
-    country = nil
     if argentina_invoicing_detail_seed
-      country = argentina_invoicing_detail_seed.country
-    elsif chile_invoicing_detail_seed
-      country = 'CL'
+      person.refresh_person_country_tagging!('AR')
     end
-    person.refresh_person_country_tagging!(country) if country
+
+    if chile_invoicing_detail_seed
+      person.refresh_person_country_tagging!('CL')
+    end
   end
 
   private
