@@ -10,6 +10,7 @@ module FastJsonapiCandy
       belongs_to :replaced_by, record_type: @naming.plural, serializer: @naming.serializer
       has_one :seed, record_type: @naming.seed_plural, serializer: @naming.seed_serializer
       build_has_many :attachments
+      attributes :archived_at
     end
 
     class_methods do
