@@ -57,6 +57,8 @@ module AffinityFinder
       # (exact match or one containg the other) on Identification collection.
       # The query use REGEXP operator in MySQL in order to get the result
       # in a single call (https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp)
+      return [] if person.identifications.pluck(:number).empty?
+
       Identification.where(
         "person_id <> :person_id AND
         replaced_by_id is NULL AND
@@ -64,7 +66,7 @@ module AffinityFinder
         OR LOWER(:numbers) REGEXP LOWER(number))",
         person_id: person.id,
         numbers: person.identifications.pluck(:number).join('|')
-      ).pluck(:person_id)
+      ).pluck(:person_id).uniq
     end
 
     def self.with_matched_names(person)
@@ -86,37 +88,5 @@ module AffinityFinder
       # TODO create same_person_affinity_seed in issue
 
     end
-
-      # Ejemplo de cambio de datos de padre e hijo en affinities
-      # PERSONA A NOMBRE IGUAL DNI DISTINTO
-      # PERSONA B NOMBRE IGUAL DNI DISTINTO (Persona A es padre)
-
-      # PERSONA F NOMBRE DIST DNI DIST
-      # PERSONA G NOMBRE DIST DNI IGUAL A (Persona A es padre)
-
-      # PERSONA H NOMBRE IGUAL PERSONA F  DNI IGUAL A B (Persona A y F padre)
-
-      # PERSONA H cambia NOMBRE o # PERSONA F cambia NOMBRE
-
-
-      # Creates an issue with AffinitySeed affinity_kind_code: :same_person
-      # expiration??
-
-      # Ejemplo de cambio de person que es padre e hijo a la vez
-      # PERSONA A
-      # PERSONA B NOMBRE = A DNI DISTINTO (Persona A es padre)
-      # PERSONA C NOMBRE DIST DNI = B (Persona B es padre)
-      # PERSONA D NOMBRE DIST DNI = B (Persona B es padre)
-      # EDITO PERSONA B
-      # Ecuentro Affinities.
-      #    - Si es hijo, marco para expirar.
-      #    - Si es padre, marco para expirar
-
-
-
-      # EJEMPLO: Persona A es padre de B por mismo DNI
-      # cambio DNI a B. Creo Issue para comunicar a compliance
-      # para expirar affinity same_person de A a B.
-
   end
 end
