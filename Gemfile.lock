@@ -334,6 +334,8 @@ GEM
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.7)
+    rack-protection (2.0.8.1)
+      rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.2.3)
@@ -435,6 +437,11 @@ GEM
       childprocess (~> 0.5)
       rubyzip (~> 1.2, >= 1.2.2)
     settingslogic (2.0.9)
+    sidekiq (5.2.8)
+      connection_pool (~> 2.2, >= 2.2.2)
+      rack (< 2.1.0)
+      rack-protection (>= 1.5.0)
+      redis (>= 3.3.5, < 5)
     sixarm_ruby_unaccent (1.2.0)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
@@ -544,6 +551,7 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   selenium-webdriver
   settingslogic
+  sidekiq (~> 5.2)
   static_models!
   strip_attributes
   timecop
