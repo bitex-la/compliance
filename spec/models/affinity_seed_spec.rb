@@ -12,6 +12,8 @@ describe AffinitySeed do
 
   it_behaves_like 'seed_model', :affinities, :full_affinity, :alt_full_affinity
 
+  it_behaves_like 'archived_seed', :full_affinity
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

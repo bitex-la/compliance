@@ -7,6 +7,9 @@ describe RiskScoreSeed do
       issue: create(:basic_issue)
     )
   }
+
+  it_behaves_like 'archived_seed', :full_risk_score
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

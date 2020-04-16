@@ -7,6 +7,7 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   seed_type = Garden::Naming.new(type).seed_plural
 
   initial_expires_seed = "#{initial_factory}_expires_seed"
+  initial_archived_seed = "#{initial_factory}_archived_seed"
 
   it "Gets seed with observation" do
     issue = create(:basic_issue)
@@ -50,6 +51,25 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
     seed = api_response.data
     expect(Date.parse(seed.attributes.expires_at)).to eq(initial_attrs[:expires_at])
+  end
+
+  it 'Create an archived seed' do
+    issue = create(:basic_issue)
+
+    initial_attrs = attributes_for(initial_archived_seed)
+
+    initial_relations = instance_exec(&relations_proc)
+    issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
+
+    api_create "/#{seed_type}", {
+      type: seed_type,
+      attributes: initial_attrs,
+      relationships: issue_relation.merge(initial_relations)
+    }
+
+    seed = api_response.data
+
+    expect(Date.parse(seed.attributes.archived_at)).to eq(initial_attrs[:archived_at])
   end
 
   it "Destroy a #{seed_type}" do
@@ -700,6 +720,7 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
   seed_factory = "#{factory}_seed"
   fruit_class =  Garden::Naming.new(type).fruit.constantize
   seed_type = Garden::Naming.new(type).seed_plural
+  initial_archived_seed = "#{factory}_archived_seed"
 
   it "Adds multiple #{type}, explicitly replaces one of them" do
     person = create(:empty_person).reload
@@ -835,6 +856,76 @@ shared_examples "has_many fruit" do |type, factory, relations_proc = -> { {} }, 
     expect(existing_fruit.reload.issue).to be nil
     api_get "/#{type}/#{existing_fruit.id}"
     expect(api_response.data.id).to eq existing_fruit.id.to_s
+  end
+
+  it "can get archived #{type} fruit" do
+    seed1 = create("#{factory}_archived_seed_with_issue")
+    issue1 = seed1.issue.reload
+    issue1.approve!
+
+    person = issue1.person.reload
+    issue2 = person.issues.build
+
+    seed2 = create("#{factory}_seed", issue: issue2)
+    issue2.reload.approve!
+
+    api_get "/#{type}/#{seed1.reload.fruit.id}"
+    fruit1 = api_response.data
+    expect(Date.parse(fruit1.attributes.archived_at)).to eq(seed1.fruit.archived_at)
+
+    api_get "/#{type}/#{seed2.reload.fruit.id}"
+    fruit2 = api_response.data
+    expect(fruit2.attributes.archived_at).to be_nil
+
+    api_get "/people/#{person.id}"
+    person_data = api_response.data
+
+    fruits = person_data.relationships.send(type).data
+    expect(fruits.count).to eq(1)
+    expect(fruits.first.id).to eq(fruit2.id)
+  end
+
+  it "can create and replace #{type} fruit with archived one" do
+    seed1 = create("#{factory}_archived_seed_with_issue")
+    issue1 = seed1.issue.reload
+    issue1.approve!
+
+    person = issue1.person.reload
+    issue2 = person.issues.build
+
+    seed2 = create("#{factory}_seed", issue: issue2)
+    issue2.reload.approve!
+
+    api_get "/#{type}/#{seed1.reload.fruit.id}"
+    fruit1 = api_response.data
+    expect(Date.parse(fruit1.attributes.archived_at)).to eq(seed1.fruit.archived_at)
+
+    api_get "/#{type}/#{seed2.reload.fruit.id}"
+    fruit2 = api_response.data
+    expect(fruit2.attributes.archived_at).to be_nil
+
+    api_get "/people/#{person.id}"
+    person_data = api_response.data
+    fruits = person_data.relationships.send(type).data
+    expect(fruits.count).to eq(1)
+    expect(fruits.first.id).to eq(fruit2.id)
+
+    issue = person.issues.create
+    seed3 = create("#{factory}_archived_seed_with_issue", issue: issue, replaces: seed2.fruit)
+    issue.reload.approve!
+
+    api_get "/#{type}/#{seed3.reload.fruit.id}"
+    fruit3 = api_response.data
+    expect(Date.parse(fruit3.attributes.archived_at)).to eq(seed3.fruit.archived_at)
+
+    api_get "/#{type}/#{seed2.reload.fruit.id}"
+    fruit2 = api_response.data
+    expect(fruit2.relationships.replaced_by.data.id).to eq(fruit3.id.to_s)
+
+    api_get "/people/#{person.id}"
+    person_data = api_response.data
+    fruits = person_data.relationships.send(type).data
+    expect(fruits.count).to eq(0)
   end
 end
 

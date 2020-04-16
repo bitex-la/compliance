@@ -22,7 +22,8 @@ class Api::LegalEntityDocketSeedsController < Api::EntityController
         :legal_name,
         :copy_attachments,
         :issue,
-        :expires_at
+        :expires_at,
+        :archived_at
       ]
   end
 end

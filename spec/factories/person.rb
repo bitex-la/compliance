@@ -63,6 +63,7 @@ FactoryBot.define do
         full_note
         full_affinity
         full_fund_deposit
+        full_fund_withdrawal
         salary_allowance
         savings_allowance
       ).each do |name|
@@ -84,6 +85,7 @@ FactoryBot.define do
           full_note
           full_affinity
           full_fund_deposit
+          full_fund_withdrawal
           salary_allowance
           savings_allowance
         ).each do |name|
@@ -119,6 +121,7 @@ FactoryBot.define do
         full_note
         full_affinity
         full_fund_deposit
+        full_fund_withdrawal
         heavy_allowance
       ).each do |name|
         create name, person: person

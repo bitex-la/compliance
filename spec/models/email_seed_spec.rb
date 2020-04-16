@@ -11,5 +11,7 @@ RSpec.describe EmailSeed, type: :model do
 
   it_behaves_like 'observable', :full_email_seed_with_issue
 
-  it_behaves_like('seed_model', :emails, :full_email, :alt_full_email)
+  it_behaves_like 'seed_model', :emails, :full_email, :alt_full_email
+
+  it_behaves_like 'archived_seed', :full_email
 end
