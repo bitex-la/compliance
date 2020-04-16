@@ -4,6 +4,8 @@ require "helpers/shared_examples_for_models"
 RSpec.describe NoteSeed, type: :model do
   let(:invalid_note) { create(:full_note, body: nil) }
 
+  it_behaves_like 'archived_seed', :full_note
+
   it { is_expected.to strip_attribute :title }
   it { is_expected.to strip_attribute :body }
 

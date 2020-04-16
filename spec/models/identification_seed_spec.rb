@@ -10,6 +10,8 @@ describe IdentificationSeed do
 
   it_behaves_like 'observable'
 
+  it_behaves_like 'archived_seed', :full_natural_person_identification
+
   %i(number issuer public_registry_authority 
   public_registry_book public_registry_extra_data).each do |attr|
     it { is_expected.to strip_attribute attr }
