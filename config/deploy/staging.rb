@@ -3,7 +3,9 @@ set :rails_env, 'staging'
 
 server ENV['compliance_host'], roles: [:web, :app, :db], primary: true
 
-set :pty,             true
+set :init_system, :systemd
+
+set :pty,             false
 set :use_sudo,        false
 
 # server-based syntax

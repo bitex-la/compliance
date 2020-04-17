@@ -166,6 +166,9 @@ GEM
     capistrano-rbenv-install (1.2.0)
       capistrano (>= 3.0)
       capistrano-rbenv (>= 2.0)
+    capistrano-sidekiq (1.0.3)
+      capistrano (>= 3.9.0)
+      sidekiq (>= 3.4, < 6.0)
     capistrano3-puma (3.1.1)
       capistrano (~> 3.7)
       capistrano-bundler
@@ -512,6 +515,7 @@ DEPENDENCIES
   capistrano-rails-db
   capistrano-rbenv (~> 2.0.2)
   capistrano-rbenv-install
+  capistrano-sidekiq
   capistrano3-puma
   capybara
   coffee-rails (~> 4.2)

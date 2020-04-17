@@ -95,6 +95,7 @@ group :development do
   gem 'capistrano-rbenv-install', require: false
   gem 'capistrano3-puma',   require: false
   gem 'capistrano-rails-db', require: false
+  gem 'capistrano-sidekiq', require: false
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
 end
