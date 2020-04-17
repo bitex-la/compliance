@@ -134,6 +134,17 @@ ActiveAdmin.register Person do
     actions
   end
 
+  csv do
+    column :id
+    column :person_info
+    column :state
+    column :risk
+    column :regularity
+    column :person_type
+    column :created_at
+    column :updated_at
+  end
+
   show as: :grid, columns: 2 do      
     if resource.issues.empty?
       div class: 'flash flash_danger' do
