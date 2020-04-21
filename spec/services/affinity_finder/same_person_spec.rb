@@ -3,25 +3,16 @@ require 'rails_helper'
 describe AffinityFinder::SamePerson do
   describe '.with_matched_id_numbers' do
     it 'matches exact numbers' do
-      create( :full_natural_person_identification,
-              person: person_a, number: 'number_a')
-      create( :full_natural_person_identification,
-              person: person_b, number: 'number_a')
-
-      person_b.reload
+      person_a = create_person_with_identification('number_a')
+      person_b = create_person_with_identification('number_a')
 
       expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
         [person_a.id]
       )
 
-      create( :full_natural_person_identification,
-        person: person_b, number: 'num_d')
-      create( :full_natural_person_identification,
-        person: person_c, number: 'num_d')
-      create( :full_natural_person_identification,
-        person: person_d, number: 'num_d')
-
-      person_c.reload
+      add_id_to_person(person_b, 'num_d')
+      person_c = create_person_with_identification('num_d')
+      person_d = create_person_with_identification('num_d')
 
       expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_c)).to eq(
         [person_b.id, person_d.id]
@@ -36,20 +27,54 @@ describe AffinityFinder::SamePerson do
         [person_a.id]
       )
 
-      add_id_to_person(person_b, 'num_d')
-      person_c = create_person_with_identification('a num_d contained again')
-      person_d = create_person_with_identification('the num_d contained')
+      add_id_to_person(person_b, 'num_b')
+      person_c = create_person_with_identification('a num_b contained again')
+      person_d = create_person_with_identification('the num_b inside')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_c)).to eq(
-        [person_b.id, person_d.id]
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+        [person_a.id, person_c.id, person_d.id]
       )
     end
 
-    it 'matches when another record number are contained in person identification'
-    it 'matches when person identification are at beginning of id in another record'
-    it 'matches when another record number are at beginning of person identification'
-    it 'matches when person identification are at the end of id in another record'
-    it 'matches when another record number are at the end of person identification'
+    it 'matches when person id number are at beginning of id number in another record' do
+      person_a = create_person_with_identification('num a and other stuff')
+      person_b = create_person_with_identification('num a')
+      person_c = create_person_with_identification('num c')
+
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+        [person_a.id]
+      )
+    end
+
+    it 'matches when another record number are at beginning of person id number' do
+      person_a = create_person_with_identification('num a')
+      person_b = create_person_with_identification('num a and other stuff')
+      person_c = create_person_with_identification('num c')
+
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+        [person_a.id]
+      )
+    end
+
+    it 'matches when person id number are at the end of id number in another record' do
+      person_a = create_person_with_identification('ends with num a')
+      person_b = create_person_with_identification('num a')
+      person_c = create_person_with_identification('num c')
+
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+        [person_a.id]
+      )
+    end
+
+    it 'matches when another record number are at the end of person identification' do
+      person_a = create_person_with_identification('num a')
+      person_b = create_person_with_identification('ends with num a')
+      person_c = create_person_with_identification('num c')
+
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+        [person_a.id]
+      )
+    end
     it 'returns empty array when no matches are found'
   end
 
@@ -61,12 +86,7 @@ describe AffinityFinder::SamePerson do
   end
 
   describe '.call' do
-    it 'creates a same_person AffinitySeed issue when found matches' do
-        person.reload
-        expect do
-            AffinityFinder::SamePerson.call(person)
-        end.to change { Issue.count }.by(1)
-    end
+    it 'creates a same_person AffinitySeed issue when found matches'
 
     # Ejemplo de cambio de datos de padre e hijo en affinities
     # PERSONA A NOMBRE IGUAL DNI DISTINTO
