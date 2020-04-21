@@ -175,22 +175,6 @@ class Issue < ApplicationRecord
     scope k, -> { current.with_relations.where('issues.aasm_state=?', v) }  
   end
 
-  scope :changed_after_observation, -> {
-    where = []
-    Issue::HAS_ONE.each do |r|
-      where << "#{r.to_s.pluralize}.updated_at > observations.created_at"
-    end
-    Issue::HAS_MANY.each do |r|
-      where << "#{r}.updated_at > observations.created_at"
-    end
-
-    observed
-      .current
-      .eager_load(*[:observations, *Issue::HAS_ONE, *Issue::HAS_MANY])
-      .where(where.join(" OR "))
-      .where("observations.reply IS NULL OR observations.reply = ''")
-  }
-
   scope :active, ->(yes=true){
     current.active_states(yes)
   }

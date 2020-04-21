@@ -12,7 +12,6 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   scope :dismissed
   scope :rejected
   scope :approved
-  scope :changed_after_observation
   scope :future
   scope :all
 
