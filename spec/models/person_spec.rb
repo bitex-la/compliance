@@ -132,6 +132,31 @@ RSpec.describe Person, type: :model do
     person.all_observations.to_a.should == [robot_observation]
   end
 
+  it 'return correct auth email address' do
+    seed = create(:full_email_seed_with_person)
+    issue = seed.issue
+    create(:alt_full_email_seed_with_issue, issue: issue)
+    issue.reload.approve!
+    person = seed.issue.person.reload
+    expect(person.email_for_export).to eq(seed.address)
+    expect(person.emails.count).to eq(2)
+  end
+
+  it 'return correct alt address' do
+    seed = create(:alt_full_email_seed_with_person)
+    issue = seed.issue
+    issue.reload.approve!
+    person = seed.issue.person.reload
+    expect(person.email_for_export).to eq(seed.address)
+    expect(person.emails.count).to eq(1)
+  end
+
+  it 'return correct nil address' do
+    person = create(:empty_person)
+    expect(person.email_for_export).to be_nil
+    expect(person.emails.count).to eq(0)
+  end
+
   describe 'looking for suggestions' do
     it 'search a person by id, first name, last name, email, phone and identification' do
       

@@ -137,6 +137,9 @@ ActiveAdmin.register Person do
   csv do
     column :id
     column :person_info
+    column 'email' do |o|
+      o.email_for_export
+    end
     column :state
     column :risk
     column :regularity
