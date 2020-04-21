@@ -47,7 +47,6 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :rejected
   scope :approved
-  scope :changed_after_observation
   scope :future
 
   collection_action :new_with_fruits, method: :get do
