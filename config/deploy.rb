@@ -25,6 +25,8 @@ set :puma_init_active_record, true
 set :linked_files, %w{ config/settings.yml }
 set :linked_dirs, %w{log tmp/cache tmp/pids}
 
+set :init_system, :systemd
+
 set(:ssh_options, fetch(:ssh_options, { }).merge!(
   forward_agent: true,
   user: fetch(:user),
