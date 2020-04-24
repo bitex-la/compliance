@@ -209,6 +209,12 @@ class Person < ApplicationRecord
     Note.where("person_id = ? AND public = true", id)
   end
 
+  def email_for_export
+    email = emails.find { |e| e.email_kind == EmailKind.authentication } ||
+            emails.last
+    email&.address
+  end
+
   def self.suggest(keyword, page = 1, per_page = 20)
     result = Array.new
     [
