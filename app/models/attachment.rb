@@ -24,7 +24,7 @@ class Attachment < ApplicationRecord
     self.attachable_to_fruits.each do |a|
       all += [a.pluralize, "#{a}_seeds"]
     end
-    all + %w[fund_deposits fund_withdrawals received_transfers sent_transfers]
+    all + %w[fund_deposits fund_withdrawals fund_transfers]
   end
  
   validates_attachment :document,
