@@ -52,6 +52,7 @@ module AffinityFinder
       end
     end
 
+    # Returns Array[Int] (matched Person Ids)
     def self.with_matched_id_numbers(person)
       # This method matches person identification numbers
       # (exact match or one containg the other) on Identification collection.
@@ -59,10 +60,8 @@ module AffinityFinder
       # in a single call (https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp)
       return [] if person.identifications.pluck(:number).empty?
 
-      Identification.where(
+      Identification.current.where(
         "person_id <> :person_id AND
-        replaced_by_id is NULL AND
-        archived_at is NULL AND
         (LOWER(number) REGEXP LOWER(:numbers)
         OR LOWER(:numbers) REGEXP LOWER(number))",
         person_id: person.id,
@@ -70,29 +69,36 @@ module AffinityFinder
       ).pluck(:person_id).uniq
     end
 
+    # Returns Array[Int] (matched Person Ids)
     def self.with_matched_names(person)
-      # This method matches person first and last name in natural_docket fruits
-      # (exact match or one containg the other) on NaturalDocket collection.
-      # The query use REGEXP operator in MySQL in order to get the result
-      # in a single call (https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp)
-      return [] if person.natural_dockets.count == 0
+      # By using CONCAT we are not taking advantage of any index
+      # (YET -->)In the newest versions of MySQL 8.0 and MariaDB 10,
+      # you can index "virtual" columns.
 
-      # NaturalDocket.where(
-      #   "person_id <> :person_id AND
-      #   replaced_by_id is NULL AND
-      #   archived_at is NULL AND
-      #   (LOWER(concat(last_name,' ',first_name)) REGEXP LOWER(:name)
-      #   OR LOWER(:numbers) REGEXP LOWER(number))",
-      #   person_id: person.id,
-      #   numbers: person.
-      # ).pluck(:person_id).uniq
+      case person.person_type
+        when :natural_person
+          return [] if person.natural_dockets.count == 0
 
-#       if (a.identificacion_number parecido(igualdad o uno contiene al otro) b.identification_number)
-#         creo issue
-#       elsif ((a.last_name + a.name).split.to_set.subset?((b.last_name + b.name).split.to_set))
-#       || ((b.last_name + b.name).split.to_set.subset?((a.last_name + a.name).split.to_set))
-#       creo issue
-#       end
+          NaturalDocket.current.where(
+            "person_id <> :person_id AND
+            (LOWER(concat(first_name,' ',last_name)) LIKE LOWER(:name)
+            OR LOWER(:name) LIKE LOWER(concat('%', first_name, ' ', last_name, '%')))",
+            name: person.natural_dockets.last.name_body
+          ).pluck(:person_id).uniq
+        when :legal_entity
+          return [] if person.legal_entity_dockets.count == 0
+
+          LegalEntityDocket.current.where(
+            "person_id <> :person_id AND
+            (LOWER(comercial_name) LIKE LOWER(:name)
+            OR LOWER(:name) LIKE LOWER(comercial_name)
+            OR LOWER(legal_name) LIKE LOWER(:name)
+            OR LOWER(:name) LIKE LOWER(legal_name))",
+            name: person.legal_entity_dockets.last.name_body
+          ).pluck(:person_id).uniq
+        else
+          return []
+      end
     end
 
     def create_same_person_issue(related_person, person)
