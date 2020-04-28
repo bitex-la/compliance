@@ -92,8 +92,10 @@ ActiveAdmin.register Person do
   end
 
   form do |f|
-    unless resource.persisted?
-      resource.load_admin_tags
+    if resource.new_record?
+      AdminUser.current_admin_user&.tags&.each do |t|
+        resource.person_taggings.build(tag: t)
+      end
     end
     
     if resource.issues.empty? && resource.persisted?
