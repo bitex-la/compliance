@@ -1,6 +1,7 @@
 module RiskAssesment
   class SamePersonInternationalTransfers
     def self.call(person)
+      person.reload
       withdrawal_countries = person.fund_withdrawals.pluck(:country)
       deposits_countries = person.fund_deposits.where.not(country: nil).pluck(:country)
 
