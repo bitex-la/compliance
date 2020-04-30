@@ -76,7 +76,14 @@ describe AffinityFinder::SamePerson do
       )
     end
 
-    it 'returns empty array when no matches are found'
+    it 'returns empty array when no matches are found' do
+      person_a = create_person_with_identification('number_a')
+      person_b = create_person_with_identification('number_b')
+
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+        []
+      )
+    end
   end
 
   describe '.with_matched_names' do
