@@ -8,6 +8,12 @@ shared_examples 'archived_fruit' do |fruit, seed_type|
     expect(person.send(fruit).include?(seed1.reload.fruit)).to be_falsey
     expect(person.send(fruit).include?(seed2.reload.fruit)).to be_truthy
     expect(person.send("#{fruit}_history").include?(seed1.fruit)).to be_truthy
+
+    fruit_class = seed1.fruit.class
+    expect(fruit_class.current.include?(seed1.fruit)).to be_falsey
+    expect(fruit_class.current.include?(seed2.fruit)).to be_truthy
+    expect(fruit_class.archived(person).include?(seed1.fruit)).to be_truthy
+    expect(fruit_class.archived(person).include?(seed2.fruit)).to be_falsey
   end
 
   it 'can create and replace a fruit with an archived one' do
@@ -27,6 +33,14 @@ shared_examples 'archived_fruit' do |fruit, seed_type|
     expect(seed2.reload.fruit.replaced_by).to eq(seed3.reload.fruit)
     expect(person.send(fruit)).to be_empty
     expect(person.send("#{fruit}_history").include?(seed3.fruit)).to be_truthy
+
+    fruit_class = seed1.fruit.class
+    expect(fruit_class.current.include?(seed1.fruit)).to be_falsey
+    expect(fruit_class.current.include?(seed2.fruit)).to be_falsey
+    expect(fruit_class.current.include?(seed3.fruit)).to be_falsey
+    expect(fruit_class.archived(person).include?(seed1.fruit)).to be_truthy
+    expect(fruit_class.archived(person).include?(seed2.fruit)).to be_falsey
+    expect(fruit_class.archived(person).include?(seed3.fruit)).to be_truthy
   end
 
   it 'can archive fruit with future date' do
@@ -45,5 +59,11 @@ shared_examples 'archived_fruit' do |fruit, seed_type|
     expect(person.send(fruit).include?(seed1.reload.fruit)).to be_falsey
     expect(person.send(fruit).include?(seed2.reload.fruit)).to be_truthy
     expect(person.send("#{fruit}_history").include?(seed1.fruit)).to be_truthy
+
+    fruit_class = seed1.fruit.class
+    expect(fruit_class.current.include?(seed1.fruit)).to be_falsey
+    expect(fruit_class.current.include?(seed2.fruit)).to be_truthy
+    expect(fruit_class.archived(person).include?(seed1.fruit)).to be_truthy
+    expect(fruit_class.archived(person).include?(seed2.fruit)).to be_falsey
   end
 end

@@ -188,6 +188,20 @@ class Person < ApplicationRecord
       notes.current
   end
 
+  def archived_fruits
+    Domicile.archived(self) +
+      Identification.archived(self) +
+      NaturalDocket.archived(self) +
+      LegalEntityDocket.archived(self) +
+      Allowance.archived(self) +
+      Phone.archived(self) +
+      Email.archived(self) +
+      Affinity.archived(self) +
+      ArgentinaInvoicingDetail.archived(self) +
+      ChileInvoicingDetail.archived(self) +
+      Note.archived(self)
+  end
+
   def all_attachments
     attachments
       .where("attached_to_seed_id is null AND attached_to_fruit_id is not null")
