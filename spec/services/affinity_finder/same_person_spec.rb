@@ -97,7 +97,22 @@ describe AffinityFinder::SamePerson do
     end
     it 'matches when person name are contained in another record'
     it 'matches when another record name are contained in person name'
-    it 'returns empty array when no matches are found'
+    it 'returns empty array when no matches are found' do
+      person_a = create_natural_person_with_docket('Juan', 'Perez')
+      person_b = create_natural_person_with_docket('Juana', 'Molina')
+
+      legal_person_a = create_legal_person_with_docket('ACME S.A.', '')
+      legal_person_b = create_legal_person_with_docket('LA EMPRESA', 'AC S.A.')
+
+      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to eq(
+        []
+      )
+
+      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_b)).to eq(
+        []
+      )
+
+    end
   end
 
   describe '.call' do
