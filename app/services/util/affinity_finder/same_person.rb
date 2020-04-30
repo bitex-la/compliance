@@ -3,6 +3,7 @@ module AffinityFinder
     def self.call(person)
 
       matched_ids = with_matched_id_numbers(person)
+      matched_ids << with_matched_names(person)
 
       return nil if matched_ids.empty?
 
@@ -61,7 +62,7 @@ module AffinityFinder
       return [] if person.identifications.pluck(:number).empty?
 
       Identification.current.where(
-        "person_id <> :person_id AND
+        "identifications.person_id <> :person_id AND
         (LOWER(number) REGEXP LOWER(:numbers)
         OR LOWER(:numbers) REGEXP LOWER(number))",
         person_id: person.id,
@@ -80,21 +81,28 @@ module AffinityFinder
           return [] if person.natural_dockets.count == 0
 
           NaturalDocket.current.where(
-            "person_id <> :person_id AND
-            (LOWER(concat(first_name,' ',last_name)) LIKE LOWER(:name)
-            OR LOWER(:name) LIKE LOWER(concat('%', first_name, ' ', last_name, '%')))",
-            name: person.natural_dockets.last.name_body
+            "natural_dockets.person_id <> :person_id AND
+            (LOWER(concat(first_name,' ',last_name)) LIKE :like_name
+            OR :name LIKE LOWER(concat('%', first_name, ' ', last_name, '%')))",
+            person_id: person.id,
+            name: person.natural_dockets.last.name_body.downcase,
+            like_name: "%#{person.natural_dockets.last.name_body.downcase}%"
           ).pluck(:person_id).uniq
         when :legal_entity
           return [] if person.legal_entity_dockets.count == 0
 
+          docket = person.legal_entity_dockets.last
+          like_names = []
+
+          like_names << docket.commercial_name.downcase unless docket.commercial_name.empty?
+          like_names << docket.legal_name.downcase unless docket.legal_name.empty?
+
           LegalEntityDocket.current.where(
-            "person_id <> :person_id AND
-            (LOWER(comercial_name) LIKE LOWER(:name)
-            OR LOWER(:name) LIKE LOWER(comercial_name)
-            OR LOWER(legal_name) LIKE LOWER(:name)
-            OR LOWER(:name) LIKE LOWER(legal_name))",
-            name: person.legal_entity_dockets.last.name_body
+            "legal_entity_dockets.person_id <> :person_id AND
+            (LOWER(commercial_name) REGEXP :like_names
+            OR LOWER(legal_name) REGEXP :like_names)",
+            person_id: person.id,
+            like_names: like_names.join('|')
           ).pluck(:person_id).uniq
         else
           return []

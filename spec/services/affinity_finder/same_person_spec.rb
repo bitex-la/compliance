@@ -14,7 +14,7 @@ describe AffinityFinder::SamePerson do
       person_c = create_person_with_identification('num_d')
       person_d = create_person_with_identification('num_d')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_c)).to eq(
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_c)).to match_array(
         [person_b.id, person_d.id]
       )
     end
@@ -31,7 +31,7 @@ describe AffinityFinder::SamePerson do
       person_c = create_person_with_identification('a num_b contained again')
       person_d = create_person_with_identification('the num_b inside')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to match_array(
         [person_a.id, person_c.id, person_d.id]
       )
     end
@@ -75,11 +75,26 @@ describe AffinityFinder::SamePerson do
         [person_a.id]
       )
     end
+
     it 'returns empty array when no matches are found'
   end
 
   describe '.with_matched_names' do
-    it 'matches exact name and surname'
+    it 'matches exact name and surname' do
+      person_a = create_natural_person_with_docket('Juan', 'Perez')
+      person_b = create_natural_person_with_docket('Juan', 'Perez')
+
+      legal_person_a = create_legal_person_with_docket('ACME', 'Perez')
+      legal_person_b = create_legal_person_with_docket('Juan', 'ACME')
+
+      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to eq(
+        [person_a.id]
+      )
+
+      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_b)).to eq(
+        [legal_person_a.id]
+      )
+    end
     it 'matches when person name are contained in another record'
     it 'matches when another record name are contained in person name'
     it 'returns empty array when no matches are found'
@@ -135,10 +150,24 @@ describe AffinityFinder::SamePerson do
 end
 
 def create_person_with_identification(number)
-  seed_a = create(:full_natural_person_identification_seed_with_person,
+  seed = create(:full_natural_person_identification_seed_with_person,
                   number: number)
-  seed_a.issue.approve!
-  seed_a.issue.person.reload
+  seed.issue.approve!
+  seed.issue.person.reload
+end
+
+def create_natural_person_with_docket(first_name, last_name)
+  seed = create(:full_natural_docket_seed_with_person,
+                first_name: first_name, last_name: last_name)
+  seed.issue.approve!
+  seed.issue.person.reload
+end
+
+def create_legal_person_with_docket(commercial_name, legal_name)
+  seed = create(:full_legal_entity_docket_seed_with_person,
+                commercial_name: commercial_name, legal_name: legal_name)
+  seed.issue.approve!
+  seed.issue.person.reload
 end
 
 def add_id_to_person(person, number)
