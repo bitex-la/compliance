@@ -90,26 +90,36 @@ describe AffinityFinder::SamePerson do
     it 'matches exact name and surname' do
       person_a = create_natural_person_with_docket('Juan', 'Perez')
       person_b = create_natural_person_with_docket('Juan', 'Perez')
+      person_c = create_natural_person_with_docket('juan', 'perez')
+      person_d = create_natural_person_with_docket('juana', 'perez')
+      person_e = create_natural_person_with_docket('Juana', 'Molina')
+      person_f = create_natural_person_with_docket('juan', 'pereza')
 
-      legal_person_a = create_legal_person_with_docket('ACME', 'Perez')
-      legal_person_b = create_legal_person_with_docket('Juan', 'ACME')
+      legal_person_a = create_legal_person_with_docket('ACME', nil)
+      legal_person_b = create_legal_person_with_docket('acme', nil)
 
-      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to eq(
-        [person_a.id]
+      legal_person_c = create_legal_person_with_docket(nil, 'Apple Inc.')
+      legal_person_d = create_legal_person_with_docket(nil, 'APPLE INC.')
+
+      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to match_array(
+        [person_a.id, person_c.id]
       )
 
       expect(AffinityFinder::SamePerson.with_matched_names(legal_person_b)).to eq(
         [legal_person_a.id]
       )
     end
-    it 'matches when person name are contained in another record'
-    it 'matches when another record name are contained in person name'
+    it 'matches when person full name are a subset of another records'
+    it 'matches when another records full name are a subset of person sub name'
     it 'returns empty array when no matches are found' do
       person_a = create_natural_person_with_docket('Juan', 'Perez')
       person_b = create_natural_person_with_docket('Juana', 'Molina')
 
-      legal_person_a = create_legal_person_with_docket('ACME S.A.', '')
-      legal_person_b = create_legal_person_with_docket('LA EMPRESA', 'AC S.A.')
+      legal_person_a = create_legal_person_with_docket('Empresa', nil)
+      legal_person_b = create_legal_person_with_docket('La Empresa', nil)
+
+      legal_person_c = create_legal_person_with_docket(nil, 'ACME Inc.')
+      legal_person_d = create_legal_person_with_docket(nil, 'ACME S.A.')
 
       expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to eq(
         []

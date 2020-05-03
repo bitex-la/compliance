@@ -1,21 +1,24 @@
 module AffinityFinder
   class SamePerson
-    def self.call(person)
+    # Crear servicio orquestador que llama a este servicio
 
-      matched_ids = with_matched_id_numbers(person)
-      matched_ids << with_matched_names(person)
+    # Returns Array[Int] (person_ids of orphans if any)
+    def self.call(person_id)
+      person = Person.find(person_id)
+
+      matched_ids = with_matched_id_numbers(person).to_set
+      matched_ids.merge(with_matched_names(person))
 
       return nil if matched_ids.empty?
 
       persons_ids_linked_by_affinity = []
-      matched_ids.uniq.sort.each do |person_id|
-        continue if persons_ids_linked_by_affinity.include?(person_id)
+      matched_ids.each do |match_id|
+        continue if persons_ids_linked_by_affinity.include?(match_id)
 
-        affinity_person = person.find(person_id)
+        affinity_person = person.find(match_id)
 
         # check if there is a same_person affinity
         # already linked to this affinity_person
-        # TODO: refactor this to a helper in affinity (?)
         if found_affinity = Affinity.find_by(
           related_person_id: affinity_person.id,
           kind: 'same_person'
@@ -78,31 +81,46 @@ module AffinityFinder
 
       case person.person_type
         when :natural_person
-          return [] if person.natural_dockets.count == 0
+          return [] if person.natural_dockets.current.count == 0
 
-          NaturalDocket.current.where(
-            "natural_dockets.person_id <> :person_id AND
-            (LOWER(concat(first_name,' ',last_name)) LIKE :like_name
-            OR :name LIKE LOWER(concat('%', first_name, ' ', last_name, '%')))",
-            person_id: person.id,
-            name: person.natural_dockets.last.name_body.downcase,
-            like_name: "%#{person.natural_dockets.last.name_body.downcase}%"
-          ).pluck(:person_id).uniq
+          full_name = person.natural_dockets.current.last.name_body
+
+          conditions = []
+          full_name.split(/\W+/).each do |word|
+            conditions << "
+                (first_name REGEXP '[[:<:]]#{word}[[:>:]]' OR
+                last_name REGEXP '[[:<:]]#{word}[[:>:]]')
+            "
+          end
+
+          match_names = NaturalDocket.current.where(
+                          "natural_dockets.person_id <> :person_id AND
+                          #{conditions.join(' AND ')}",
+                          person_id: person.id
+                        )
+
+          match_names.pluck(:person_id)
         when :legal_entity
-          return [] if person.legal_entity_dockets.count == 0
+          return [] if person.legal_entity_dockets.current.count == 0
 
-          docket = person.legal_entity_dockets.last
-          like_names = []
+          docket = person.legal_entity_dockets.current.last
 
-          like_names << docket.commercial_name.downcase unless docket.commercial_name.empty?
-          like_names << docket.legal_name.downcase unless docket.legal_name.empty?
+          legal_match_conditions = []
+          legal_match_conditions.push(
+            'LOWER(commercial_name) = :commercial_name'
+          ) if docket.commercial_name && !docket.commercial_name.empty?
+          legal_match_conditions.push(
+            'LOWER(legal_name) = :legal_name'
+          ) if docket.legal_name && !docket.legal_name.empty?
+
+          legal_matches = LegalEntityDocket.current.where.not(person: person)
 
           LegalEntityDocket.current.where(
             "legal_entity_dockets.person_id <> :person_id AND
-            (LOWER(commercial_name) REGEXP :like_names
-            OR LOWER(legal_name) REGEXP :like_names)",
+            (#{legal_match_conditions.join(' OR ')})",
             person_id: person.id,
-            like_names: like_names.join('|')
+            commercial_name: docket.commercial_name&.downcase,
+            legal_name: docket.legal_name&.downcase
           ).pluck(:person_id).uniq
         else
           return []
