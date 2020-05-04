@@ -47,7 +47,6 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :rejected
   scope :approved
-  scope :changed_after_observation
   scope :future
 
   collection_action :new_with_fruits, method: :get do
@@ -194,6 +193,7 @@ ActiveAdmin.register Issue do
               nf.input :public 
               nf.input :body, input_html: {rows: 3}
               nf.input :expires_at, as: :datepicker
+              nf.input :archived_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(context, nf)
             end
           end
@@ -254,6 +254,7 @@ ActiveAdmin.register Issue do
                 label: "Move existing Legal Entity Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
+            sf.input :archived_at, as: :datepicker
             ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
             ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
@@ -282,6 +283,7 @@ ActiveAdmin.register Issue do
                 label: "Move existing Natural Person Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
+            sf.input :archived_at, as: :datepicker
             ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
             ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
@@ -300,6 +302,7 @@ ActiveAdmin.register Issue do
           sf.input :apartment
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
           sf.input :expires_at, as: :datepicker
+          sf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -315,6 +318,7 @@ ActiveAdmin.register Issue do
           sf.input :public_registry_extra_data
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
           sf.input :expires_at, as: :datepicker
+          sf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -326,6 +330,7 @@ ActiveAdmin.register Issue do
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
           sf.input :expires_at, as: :datepicker
+          sf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -343,6 +348,7 @@ ActiveAdmin.register Issue do
           ArbreHelpers::Replacement.fields_for_replaces self, af,
             :argentina_invoicing_details
           af.input :expires_at, as: :datepicker
+          af.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, af, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(self, af)
         end
@@ -357,6 +363,7 @@ ActiveAdmin.register Issue do
           cf.input :comuna
           ArbreHelpers::Replacement.fields_for_replaces self, cf, :chile_invoicing_details
           cf.input :expires_at, as: :datepicker
+          cf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, cf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(self, cf)
         end
@@ -378,6 +385,7 @@ ActiveAdmin.register Issue do
           end
           ArbreHelpers::Replacement.fields_for_replaces context, rf, :affinities
           rf.input :expires_at, as: :datepicker
+          rf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, rf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, rf)
         end
@@ -395,6 +403,7 @@ ActiveAdmin.register Issue do
             pf.input :replaces, collection: current
           end
           pf.input :expires_at, as: :datepicker
+          pf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, pf, :observations, true)
         end
       end
@@ -407,6 +416,7 @@ ActiveAdmin.register Issue do
             ef.input :replaces, collection: current
           end
           ef.input :expires_at, as: :datepicker
+          ef.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, ef, :observations, true)
         end
       end
@@ -436,6 +446,7 @@ ActiveAdmin.register Issue do
             rs.input :extra_info 
           end
           rs.input :expires_at, as: :datepicker
+          rs.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, rs, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, rs)
         end

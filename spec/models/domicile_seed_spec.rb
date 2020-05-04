@@ -11,6 +11,8 @@ RSpec.describe DomicileSeed, type: :model do
 
   it_behaves_like 'observable'
 
+  it_behaves_like 'archived_seed', :full_domicile
+
   %i(country state city street_address street_number
     postal_code floor apartment
   ).each do |attr|

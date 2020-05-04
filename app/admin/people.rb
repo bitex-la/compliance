@@ -134,6 +134,20 @@ ActiveAdmin.register Person do
     actions
   end
 
+  csv do
+    column :id
+    column :person_info
+    column 'email' do |o|
+      o.email_for_export
+    end
+    column :state
+    column :risk
+    column :regularity
+    column :person_type
+    column :created_at
+    column :updated_at
+  end
+
   show as: :grid, columns: 2 do      
     if resource.issues.empty?
       div class: 'flash flash_danger' do
@@ -238,6 +252,22 @@ ActiveAdmin.register Person do
             column :exchange_rate_adjusted_amount
             column :deposit_method
             column :external_id
+          end
+        end
+      end
+
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Archived Fruits', resource.archived_fruits.count, 'archive') do
+        panel 'Archived Fruits' , class: 'archived_fruits' do
+          table_for resource.archived_fruits do           
+            column :id
+            column 'Type' do |o|
+              o.class
+            end
+            column :created_at
+            column :archived_at
+            column 'Action' do |o|
+              link_to 'View', o
+            end
           end
         end
       end

@@ -26,7 +26,11 @@ class Person < ApplicationRecord
     affinities
     risk_scores
   }.each do |relationship|
-    has_many relationship, -> { where("#{relationship}.replaced_by_id is NULL") }
+    has_many relationship, -> {
+      where("#{relationship}.replaced_by_id is NULL")
+      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.today)
+    }
+
     has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
   end
 
@@ -184,6 +188,20 @@ class Person < ApplicationRecord
       notes.current
   end
 
+  def archived_fruits
+    Domicile.archived(self) +
+      Identification.archived(self) +
+      NaturalDocket.archived(self) +
+      LegalEntityDocket.archived(self) +
+      Allowance.archived(self) +
+      Phone.archived(self) +
+      Email.archived(self) +
+      Affinity.archived(self) +
+      ArgentinaInvoicingDetail.archived(self) +
+      ChileInvoicingDetail.archived(self) +
+      Note.archived(self)
+  end
+
   def all_attachments
     attachments
       .where("attached_to_seed_id is null AND attached_to_fruit_id is not null")
@@ -207,6 +225,12 @@ class Person < ApplicationRecord
 
   def public_notes
     Note.where("person_id = ? AND public = true", id)
+  end
+
+  def email_for_export
+    email = emails.find { |e| e.email_kind == EmailKind.authentication } ||
+            emails.last
+    email&.address
   end
 
   def self.suggest(keyword, page = 1, per_page = 20)
