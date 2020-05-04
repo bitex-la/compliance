@@ -164,8 +164,15 @@ module Garden
 
       scope :current, -> { 
         where(replaced_by_id: nil)
-          .includes(:attachments)
-          .order(updated_at: :desc) 
+        .where("archived_at is NULL OR archived_at > ?", Date.today)
+        .includes(:attachments)
+        .order(updated_at: :desc) 
+      }
+
+      scope :archived, ->(person) { 
+        where("archived_at <= ?", Date.today)
+        .where(person: person)
+        .order(archived_at: :desc) 
       }
 
       def previous_versions
