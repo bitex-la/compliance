@@ -26,7 +26,11 @@ class Person < ApplicationRecord
     affinities
     risk_scores
   }.each do |relationship|
-    has_many relationship, -> { where("#{relationship}.replaced_by_id is NULL AND #{relationship}.archived_at is NULL") }
+    has_many relationship, -> {
+      where("#{relationship}.replaced_by_id is NULL")
+      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.today)
+    }
+
     has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
   end
 
@@ -182,6 +186,20 @@ class Person < ApplicationRecord
       argentina_invoicing_details.current +
       chile_invoicing_details.current +
       notes.current
+  end
+
+  def archived_fruits
+    Domicile.archived(self) +
+      Identification.archived(self) +
+      NaturalDocket.archived(self) +
+      LegalEntityDocket.archived(self) +
+      Allowance.archived(self) +
+      Phone.archived(self) +
+      Email.archived(self) +
+      Affinity.archived(self) +
+      ArgentinaInvoicingDetail.archived(self) +
+      ChileInvoicingDetail.archived(self) +
+      Note.archived(self)
   end
 
   def all_attachments

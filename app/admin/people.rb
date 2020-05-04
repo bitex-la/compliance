@@ -303,6 +303,22 @@ ActiveAdmin.register Person do
           end
         end
       end
+
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Archived Fruits', resource.archived_fruits.count, 'archive') do
+        panel 'Archived Fruits' , class: 'archived_fruits' do
+          table_for resource.archived_fruits do           
+            column :id
+            column 'Type' do |o|
+              o.class
+            end
+            column :created_at
+            column :archived_at
+            column 'Action' do |o|
+              link_to 'View', o
+            end
+          end
+        end
+      end
     end
   end
 end
