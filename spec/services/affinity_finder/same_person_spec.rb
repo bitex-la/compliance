@@ -88,16 +88,19 @@ describe AffinityFinder::SamePerson do
 
   describe '.with_matched_names' do
     it 'matches exact name and surname' do
+      # matches
       person_a = create_natural_person_with_docket('Juan', 'Perez')
       person_b = create_natural_person_with_docket('Juan', 'Perez')
       person_c = create_natural_person_with_docket('juan', 'perez')
+
+      # no matches
       person_d = create_natural_person_with_docket('juana', 'perez')
       person_e = create_natural_person_with_docket('Juana', 'Molina')
       person_f = create_natural_person_with_docket('juan', 'pereza')
 
+
       legal_person_a = create_legal_person_with_docket('ACME', nil)
       legal_person_b = create_legal_person_with_docket('acme', nil)
-
       legal_person_c = create_legal_person_with_docket(nil, 'Apple Inc.')
       legal_person_d = create_legal_person_with_docket(nil, 'APPLE INC.')
 
@@ -108,9 +111,33 @@ describe AffinityFinder::SamePerson do
       expect(AffinityFinder::SamePerson.with_matched_names(legal_person_b)).to eq(
         [legal_person_a.id]
       )
+
+      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_d)).to eq(
+        [legal_person_c.id]
+      )
     end
-    it 'matches when person full name are a subset of another records'
-    it 'matches when another records full name are a subset of person sub name'
+
+    it 'matches when person full name are a subset of another records' do
+      person_a = create_natural_person_with_docket('Juan', 'Perez')
+      person_b = create_natural_person_with_docket('Juan Antonio', 'Perez')
+      person_c = create_natural_person_with_docket('Juan', 'Perez Gonzalez')
+      person_d = create_natural_person_with_docket('Pedro Juan', 'García Perez')
+      person_e = create_natural_person_with_docket('Not the Droid', 'U are looking for')
+
+      expect(AffinityFinder::SamePerson.with_matched_names(person_a)).to match_array(
+        [person_b.id, person_c.id, person_d.id]
+      )
+    end
+
+    it 'matches when another records full name are a subset of person sub name' do
+      person_a = create_natural_person_with_docket('Juan', 'Perez')
+      person_b = create_natural_person_with_docket('Juan Antonio', 'Perez')
+
+      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to match_array(
+        [person_a.id]
+      )
+    end
+
     it 'returns empty array when no matches are found' do
       person_a = create_natural_person_with_docket('Juan', 'Perez')
       person_b = create_natural_person_with_docket('Juana', 'Molina')
