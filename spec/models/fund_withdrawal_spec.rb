@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe FundWithdrawal, type: :model do
+  it_behaves_like 'person_scopable',
+    create: ->(person_id){ create(:full_fund_withdrawal, person_id: person_id) }
+  next
+
   let(:person) { create(:empty_person) }
 
   it 'validates non null fields' do
@@ -38,52 +42,6 @@ RSpec.describe FundWithdrawal, type: :model do
     before :each do
       admin_user.tags.clear
       admin_user.save!
-    end
-
-    it "allow fund withdrawal creation only with person valid admin tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:alt_full_person_tagging).person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect do
-        fund_withdrawal = FundWithdrawal.new(person: Person.find(person1.id))
-        fund_withdrawal.amount = 1000
-        fund_withdrawal.exchange_rate_adjusted_amount = 1000
-        fund_withdrawal.currency_code = 'usd'
-        fund_withdrawal.external_id = '1'
-        fund_withdrawal.country = 'AR'
-        fund_withdrawal.withdrawal_date = DateTime.now.utc
-        fund_withdrawal.save!
-      end.to change { FundWithdrawal.count }.by(1)
-
-      expect { Person.find(person2.id) }.to raise_error(ActiveRecord::RecordNotFound)
-
-      admin_user.tags << person2.tags.first
-      admin_user.save!
-
-      expect do
-        fund_withdrawal = FundWithdrawal.new(person: Person.find(person1.id))
-        fund_withdrawal.amount = 1000
-        fund_withdrawal.exchange_rate_adjusted_amount = 1000
-        fund_withdrawal.currency_code = 'usd'
-        fund_withdrawal.external_id = '1'
-        fund_withdrawal.country = 'AR'
-        fund_withdrawal.withdrawal_date = DateTime.now.utc
-        fund_withdrawal.save!
-      end.to change { FundWithdrawal.count }.by(1)
-
-      expect do
-        fund_withdrawal = FundWithdrawal.new(person: Person.find(person2.id))
-        fund_withdrawal.amount = 1000
-        fund_withdrawal.exchange_rate_adjusted_amount = 1000
-        fund_withdrawal.currency_code = 'usd'
-        fund_withdrawal.external_id = '1'
-        fund_withdrawal.country = 'AR'
-        fund_withdrawal.withdrawal_date = DateTime.now.utc
-        fund_withdrawal.save!
-      end.to change { FundWithdrawal.count }.by(1)
     end
 
     it "allow fund withdrawal creation with person tags if admin has no tags" do
@@ -167,14 +125,11 @@ RSpec.describe FundWithdrawal, type: :model do
     end
 
     it "show fund withdrawal with admin user active tags" do
-      fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
+      fundings = fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
       person1 = fund1.person
       person3 = fund3.person
 
-      expect(FundWithdrawal.find(fund1.id)).to_not be_nil
-      expect(FundWithdrawal.find(fund2.id)).to_not be_nil
-      expect(FundWithdrawal.find(fund3.id)).to_not be_nil
-      expect(FundWithdrawal.find(fund4.id)).to_not be_nil
+      fundings.each{|f| expect(FundWithdrawal.find(f.id)).to_not be_nil }
 
       admin_user.tags << person1.tags.first
       admin_user.save!

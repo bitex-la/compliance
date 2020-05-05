@@ -13,19 +13,14 @@ class FundTransfer < ApplicationRecord
 
   has_many :attachments, as: :attached_to_fruit
 
+  include PersonScopeable
+
   def name
     "##{id}: #{source_person.name} -> #{target_person.name} (#{amount} #{currency_code})"
   end
 
-  def self.default_scope
-    unless (tags = AdminUser.current_admin_user&.active_tags)
-      return nil
-    end
-
-    return nil if tags.empty?
-
+  def self.collection_scoped_by_persons
     where(source_person_id: Person.all)
-    # TODO
     #.or(FundTransfer.where(target_person_id: Person.all))
   end
 end
