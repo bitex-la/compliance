@@ -315,26 +315,30 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
 
       if approve_issue
         seed1.issue.reload.approve!
+        admin_user.reload
         admin_user.tags.clear
-        admin_user.save!
         seed2.issue.reload.approve!
+        seed2.issue.person.reload
         if seed2.issue.person.tags.count >= 1
           seed2.issue.person.tags.delete seed2.issue.person.tags.last
         end
+        admin_user.reload
         admin_user.tags.clear
-        admin_user.save!
         seed3.issue.reload.approve!
+        admin_user.reload
         admin_user.tags.clear
-        admin_user.save!
         seed4.issue.reload.approve!
+        admin_user.reload
         admin_user.tags.clear
-        admin_user.save!
       end
 
       seed1.reload
       seed2.reload
       seed3.reload
       seed4.reload
+
+      admin_user.reload
+      admin_user.tags.clear
 
       [seed1, seed2, seed3, seed4]
     end
