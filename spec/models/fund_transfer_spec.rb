@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe FundTransfer do
   it_behaves_like 'person_scopable',
-    create: ->(person_id){
+    create: -> (person_id) {
       create(:fund_transfer, source_person_id: person_id, target_person: create(:empty_person))
     }
   next
@@ -35,22 +35,6 @@ describe FundTransfer do
 
   describe "When filter by admin tags" do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
-
-    it "allow fund transfer creation with person tags if admin has no tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-
-      expect do
-        fund = FundTransfer.new(source_person: Person.find(person1.id),
-          target_person: Person.find(person2.id))
-        fund.amount = 1000
-        fund.exchange_rate_adjusted_amount = 1000
-        fund.currency_code = 'usd'
-        fund.external_id = '1'
-        fund.transfer_date = DateTime.now.utc
-        fund.save!
-      end.to change { FundTransfer.count }.by(1)
-    end
 
     it "allow fund transfer creation without person tags if admin has no tags" do
       person1 = create(:empty_person)

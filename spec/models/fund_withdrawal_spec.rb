@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe FundWithdrawal, type: :model do
+RSpec.describe FundWithdrawal do
   it_behaves_like 'person_scopable',
-    create: ->(person_id){ create(:full_fund_withdrawal, person_id: person_id) }
+    create: -> (person_id) { create(:full_fund_withdrawal, person_id: person_id) }
   next
 
   let(:person) { create(:empty_person) }
@@ -42,36 +42,6 @@ RSpec.describe FundWithdrawal, type: :model do
     before :each do
       admin_user.tags.clear
       admin_user.save!
-    end
-
-    it "allow fund withdrawal creation with person tags if admin has no tags" do
-      person = create(:full_person_tagging).person
-
-      expect do
-        fund_withdrawal = FundWithdrawal.new(person: Person.find(person.id))
-        fund_withdrawal.amount = 1000
-        fund_withdrawal.exchange_rate_adjusted_amount = 1000
-        fund_withdrawal.currency_code = 'usd'
-        fund_withdrawal.external_id = '1'
-        fund_withdrawal.country = 'AR'
-        fund_withdrawal.withdrawal_date = DateTime.now.utc
-        fund_withdrawal.save!
-      end.to change { FundWithdrawal.count }.by(1)
-    end
-
-    it "allow fund withdrawal creation without person tags if admin has no tags" do
-      person = create(:empty_person)
-
-      expect do
-        fund_withdrawal = FundWithdrawal.new(person: Person.find(person.id))
-        fund_withdrawal.amount = 1000
-        fund_withdrawal.exchange_rate_adjusted_amount = 1000
-        fund_withdrawal.currency_code = 'usd'
-        fund_withdrawal.external_id = '1'
-        fund_withdrawal.country = 'AR'
-        fund_withdrawal.withdrawal_date = DateTime.now.utc
-        fund_withdrawal.save!
-      end.to change { FundWithdrawal.count }.by(1)
     end
 
     it "allow fund withdrawal creation without person tags if admin has tags" do
