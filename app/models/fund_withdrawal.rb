@@ -32,7 +32,6 @@ class FundWithdrawal < ApplicationRecord
   private
 
   def refresh_person_country_tagging!
-    person.fund_withdrawals.reload
     person.refresh_person_country_tagging!(country)
   end
 end
