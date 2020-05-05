@@ -58,13 +58,8 @@ class Person < ApplicationRecord
   validate :person_tag_must_be_managed_by_admin
 
   def person_tag_must_be_managed_by_admin
-    return if tags.empty?
-
-    unless (admin_user = AdminUser.current_admin_user)
-      return
-    end
-
-    return if tags.any? { |t| admin_user.can_manage_tag?(t) }
+    return unless (admin_user = AdminUser.current_admin_user)
+    return if tags.empty? || tags.any? { |t| admin_user.can_manage_tag?(t) }
 
     errors.add(:person, 'Person tags not allowed')
   end
@@ -86,15 +81,11 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def self.default_scope
-    unless (tags = AdminUser.current_admin_user&.active_tags)
-      return nil
-    end
+    return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
 
-    return nil if tags.empty?
-
-    where.not(id: PersonTagging.unscoped.pluck(:person_id).uniq)
-         .or(Person.where(id: PersonTagging.unscoped.select(:person_id).where(tag: tags)))
-         .distinct
+    where(%{id NOT IN (SELECT person_id FROM person_taggings)
+      OR id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
+      }, tags).distinct
   end
 
   def natural_docket

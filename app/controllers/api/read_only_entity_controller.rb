@@ -13,8 +13,6 @@ class Api::ReadOnlyEntityController < Api::ApiController
   end
 
   def show
-    return jsonapi_404 unless resource
-
     jsonapi_response resource
   end
 
