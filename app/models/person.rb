@@ -311,10 +311,7 @@ class Person < ApplicationRecord
 
     AdminUser.current_admin_user&.add_tag(tag)
 
-    return if tags.include?(tag)
-
-    tags << tag
-    save!
+    PersonTagging.find_or_create_by(person: self, tag: tag)
   end
 
   aasm do

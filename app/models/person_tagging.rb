@@ -13,27 +13,11 @@ class PersonTagging < ApplicationRecord
   validate :person_tag_must_be_managed_by_admin
 
   def person_tag_must_be_managed_by_admin
-    return unless person
-
-    return if person.tags.empty?
-
-    unless (admin_user = AdminUser.current_admin_user)
-      return
-    end
-
+    return unless (admin_user = AdminUser.current_admin_user)
+    return unless (person_tags = person&.tags.presence)
+    return if person_tags.any? { |t| admin_user.can_manage_tag?(t) }
     return if admin_user.can_manage_tag?(tag)
 
-    return if person.tags.any? { |t| admin_user.can_manage_tag?(t) }
-
     errors.add(:person, 'Person tags not allowed')
-  end
-
-  before_destroy :can_destroy?, prepend: true
-
-  def can_destroy?
-    return if person
-
-    errors[:base] << "Destroy not allowed"
-    throw :abort
   end
 end
