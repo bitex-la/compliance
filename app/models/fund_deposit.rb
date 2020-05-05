@@ -41,7 +41,6 @@ class FundDeposit < ApplicationRecord
   end
 
   def refresh_person_country_tagging!
-    person.fund_deposits.reload
     person.refresh_person_country_tagging!(country)
   end
 end
