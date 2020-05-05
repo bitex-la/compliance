@@ -95,8 +95,10 @@ module AffinityFinder
 
           match_names = NaturalDocket.current.where(
                           "natural_dockets.person_id <> :person_id AND
-                          #{conditions.join(' AND ')}",
-                          person_id: person.id
+                          ((FIND_IN_SET(first_name, :words) > 0 AND FIND_IN_SET(last_name, :words) > 0) OR
+                          (#{conditions.join(' AND ')}))",
+                          person_id: person.id,
+                          words: full_name.split(/\W+/).join(','),
                         )
 
           match_names.pluck(:person_id)
