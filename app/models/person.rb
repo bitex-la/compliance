@@ -60,7 +60,7 @@ class Person < ApplicationRecord
   def person_tag_must_be_managed_by_admin
     return unless (admin_user = AdminUser.current_admin_user)
     return if tags.empty? || tags.any? { |t| admin_user.can_manage_tag?(t) }
-
+    debugger
     errors.add(:person, 'Person tags not allowed')
   end
 
@@ -312,6 +312,7 @@ class Person < ApplicationRecord
     AdminUser.current_admin_user&.add_tag(tag)
 
     PersonTagging.find_or_create_by(person: self, tag: tag)
+    tags.reload
   end
 
   aasm do

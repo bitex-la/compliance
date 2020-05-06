@@ -68,6 +68,7 @@ class AdminUser < ApplicationRecord
 
   def add_tag(tag)
     admin_user_taggings.find_or_create_by(tag: tag)
+    tags.reload
   end
 
   private
