@@ -314,14 +314,21 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
       seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
 
       if approve_issue
+        admin_user.tags.clear
         seed1.issue.reload.approve!
+        admin_user.tags.clear
         seed2.issue.reload.approve!
+        admin_user.tags.clear
         if seed2.issue.person.tags.count >= 1
           seed2.issue.person.tags.delete seed2.issue.person.tags.last
         end
+        admin_user.tags.clear
         seed3.issue.reload.approve!
+        admin_user.tags.clear
         seed4.issue.reload.approve!
       end
+
+      admin_user.tags.clear
 
       seed1.reload
       seed2.reload
