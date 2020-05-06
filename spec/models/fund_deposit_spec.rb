@@ -1,6 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe FundDeposit, type: :model do
+RSpec.describe FundDeposit do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) { create(:full_fund_deposit, person_id: person_id) }
+
   let(:person) { create(:empty_person) }
 
   it 'validates non null fields' do
@@ -197,108 +200,7 @@ RSpec.describe FundDeposit, type: :model do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
-    end
-
-    it "allow fund deposit creation only with person valid admin tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:alt_full_person_tagging).person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect do
-        fund_deposit1 = FundDeposit.new(person: Person.find(person1.id))
-        fund_deposit1.amount = 1000
-        fund_deposit1.exchange_rate_adjusted_amount = 1000
-        fund_deposit1.currency_code = 'usd'
-        fund_deposit1.deposit_method_code = 'bank'
-        fund_deposit1.external_id = '1'
-        fund_deposit1.country = 'AR'
-        fund_deposit1.deposit_date = DateTime.now.utc
-        fund_deposit1.save!
-      end.to change { FundDeposit.count }.by(1)
-
-      expect { Person.find(person2.id) }.to raise_error(ActiveRecord::RecordNotFound)
-
-      admin_user.tags << person2.tags.first
-      admin_user.save!
-
-      expect do
-        fund_deposit1 = FundDeposit.new(person: Person.find(person1.id))
-        fund_deposit1.amount = 1000
-        fund_deposit1.exchange_rate_adjusted_amount = 1000
-        fund_deposit1.currency_code = 'usd'
-        fund_deposit1.deposit_method_code = 'bank'
-        fund_deposit1.external_id = '1'
-        fund_deposit1.country = 'AR'
-        fund_deposit1.deposit_date = DateTime.now.utc
-        fund_deposit1.save!
-      end.to change { FundDeposit.count }.by(1)
-
-      expect do
-        fund_deposit1 = FundDeposit.new(person: Person.find(person2.id))
-        fund_deposit1.amount = 1000
-        fund_deposit1.exchange_rate_adjusted_amount = 1000
-        fund_deposit1.currency_code = 'usd'
-        fund_deposit1.deposit_method_code = 'bank'
-        fund_deposit1.external_id = '1'
-        fund_deposit1.country = 'AR'
-        fund_deposit1.deposit_date = DateTime.now.utc
-        fund_deposit1.save!
-      end.to change { FundDeposit.count }.by(1)
-    end
-
-    it "allow fund deposit creation with person tags if admin has no tags" do
-      person = create(:full_person_tagging).person
-
-      expect do
-        fund_deposit1 = FundDeposit.new(person: Person.find(person.id))
-        fund_deposit1.amount = 1000
-        fund_deposit1.exchange_rate_adjusted_amount = 1000
-        fund_deposit1.currency_code = 'usd'
-        fund_deposit1.deposit_method_code = 'bank'
-        fund_deposit1.external_id = '1'
-        fund_deposit1.country = 'AR'
-        fund_deposit1.deposit_date = DateTime.now.utc
-        fund_deposit1.save!
-      end.to change { FundDeposit.count }.by(1)
-    end
-
-    it "allow fund deposit creation without person tags if admin has no tags" do
-      person = create(:empty_person)
-
-      expect do
-        fund_deposit1 = FundDeposit.new(person: Person.find(person.id))
-        fund_deposit1.amount = 1000
-        fund_deposit1.exchange_rate_adjusted_amount = 1000
-        fund_deposit1.currency_code = 'usd'
-        fund_deposit1.deposit_method_code = 'bank'
-        fund_deposit1.external_id = '1'
-        fund_deposit1.country = 'AR'
-        fund_deposit1.deposit_date = DateTime.now.utc
-        fund_deposit1.save!
-      end.to change { FundDeposit.count }.by(1)
-    end
-
-    it "allow fund deposit creation without person tags if admin has tags" do
-      person1 = create(:full_person_tagging).person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect do
-        fund_deposit1 = FundDeposit.new(person: Person.find(person.id))
-        fund_deposit1.amount = 1000
-        fund_deposit1.exchange_rate_adjusted_amount = 1000
-        fund_deposit1.currency_code = 'usd'
-        fund_deposit1.deposit_method_code = 'bank'
-        fund_deposit1.external_id = '1'
-        fund_deposit1.country = 'AR'
-        fund_deposit1.deposit_date = DateTime.now.utc
-        fund_deposit1.save!
-      end.to change { FundDeposit.count }.by(1)
+      admin_user
     end
 
     it "Update a fund deposit with person tags if admin has tags" do

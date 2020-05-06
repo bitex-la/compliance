@@ -51,4 +51,14 @@ shared_examples 'person_scopable' do |options|
     expect { instance_exec(allowed.id, &creator) }
       .to change { subject.class.count }.by(1)
   end
+
+  it "allow creation without person tags if admin has tags" do
+    allowed = create(:full_person_tagging).person
+
+    admin_user.tags << allowed.tags.first
+    admin_user.save!
+
+    expect { instance_exec(allowed.id, &creator) }
+      .to change { subject.class.count }.by(1)
+  end
 end

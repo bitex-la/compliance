@@ -5,7 +5,6 @@ describe FundTransfer do
     create: -> (person_id) {
       create(:fund_transfer, source_person_id: person_id, target_person: create(:empty_person))
     }
-  next
 
   let(:source_person) { create(:empty_person) }
   let(:target_person) { create(:empty_person) }
@@ -35,41 +34,6 @@ describe FundTransfer do
 
   describe "When filter by admin tags" do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
-
-    it "allow fund transfer creation without person tags if admin has no tags" do
-      person1 = create(:empty_person)
-      person2 = create(:empty_person)
-
-      expect do
-        fund = FundTransfer.new(source_person: Person.find(person1.id),
-          target_person: Person.find(person2.id))
-        fund.amount = 1000
-        fund.exchange_rate_adjusted_amount = 1000
-        fund.currency_code = 'usd'
-        fund.external_id = '1'
-        fund.transfer_date = DateTime.now.utc
-        fund.save!
-      end.to change { FundTransfer.count }.by(1)
-    end
-
-    it "allow fund transfer creation without person tags if admin has tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect do
-        fund = FundTransfer.new(source_person: Person.find(person1.id),
-          target_person: Person.find(person2.id))
-        fund.amount = 1000
-        fund.exchange_rate_adjusted_amount = 1000
-        fund.currency_code = 'usd'
-        fund.external_id = '1'
-        fund.transfer_date = DateTime.now.utc
-        fund.save!
-      end.to change { FundTransfer.count }.by(1)
-    end
 
     it "Update a fund transfer with person tags if admin has tags" do
       fund_transfer1, fund_transfer2, fund_transfer3, fund_transfer4 = setup_for_admin_tags_spec

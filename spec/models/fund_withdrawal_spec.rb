@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe FundWithdrawal do
   it_behaves_like 'person_scopable',
     create: -> (person_id) { create(:full_fund_withdrawal, person_id: person_id) }
-  next
 
   let(:person) { create(:empty_person) }
 
@@ -40,26 +39,7 @@ RSpec.describe FundWithdrawal do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
-    end
-
-    it "allow fund withdrawal creation without person tags if admin has tags" do
-      person1 = create(:full_person_tagging).person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect do
-        fund_withdrawal = FundWithdrawal.new(person: Person.find(person.id))
-        fund_withdrawal.amount = 1000
-        fund_withdrawal.exchange_rate_adjusted_amount = 1000
-        fund_withdrawal.currency_code = 'usd'
-        fund_withdrawal.external_id = '1'
-        fund_withdrawal.country = 'AR'
-        fund_withdrawal.withdrawal_date = DateTime.now.utc
-        fund_withdrawal.save!
-      end.to change { FundWithdrawal.count }.by(1)
+      admin_user
     end
 
     it "Update a fund withdrawal with person tags if admin has tags" do
@@ -95,11 +75,12 @@ RSpec.describe FundWithdrawal do
     end
 
     it "show fund withdrawal with admin user active tags" do
-      fundings = fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
+      fund1, fund2, fund3, fund4 = setup_for_admin_tags_spec
+      fundings = [fund1, fund2, fund3, fund4]
       person1 = fund1.person
       person3 = fund3.person
 
-      fundings.each{|f| expect(FundWithdrawal.find(f.id)).to_not be_nil }
+      fundings.each { |f| expect(FundWithdrawal.find(f.id)).to_not be_nil }
 
       admin_user.tags << person1.tags.first
       admin_user.save!
