@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Issue, type: :model do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) { Issue.create!(person_id: person_id) },
+    change_person: -> (obj, person_id){ obj.person_id = person_id }
+
   let(:invalid_issue) { described_class.new } 
   let(:empty_issue) { create(:basic_issue) }
   let(:basic_issue) { create(:basic_issue) }
@@ -598,333 +602,39 @@ RSpec.describe Issue, type: :model do
     end
   end
 
-  describe "When filter by admin tags" do
+  describe "when adding person country tags based on invoicing details" do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
-    before :each do
-      admin_user.tags.clear
-      admin_user.save!
-    end
-
-    it "allow issue creation only with person valid admin tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:alt_full_person_tagging).person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect do
-        issue1 = Issue.new(person: Person.find(person1.id))
-        issue1.save!
-      end.to change { Issue.count }.by(1)
-
-      expect { Person.find(person2.id) }.to raise_error(ActiveRecord::RecordNotFound)
-
-      admin_user.tags << person2.tags.first
-      admin_user.save!
-
-      expect do
-        issue1 = Issue.new(person: Person.find(person1.id))
-        issue1.save!
-      end.to change { Issue.count }.by(1)
-
-      expect do
-        issue2 = Issue.new(person: Person.find(person2.id))
-        issue2.save!
-      end.to change { Issue.count }.by(1)
-    end
-
-    it "allow issue creation with person tags if admin has no tags" do
-      person = create(:full_person_tagging).person
-
-      expect do
-        issue1 = Issue.new(person: Person.find(person.id))
-        issue1.save!
-      end.to change { Issue.count }.by(1)
-    end
-
-    it "allow issue creation without person tags if admin has no tags" do
-      person = create(:empty_person)
-
-      expect do
-        issue1 = Issue.new(person: Person.find(person.id))
-        issue1.save!
-      end.to change { Issue.count }.by(1)
-    end
-
-    it "allow issue creation without person tags if admin has tags" do
-      person = create(:full_person_tagging).person
-
-      admin_user.tags << person.tags.first
-      admin_user.save!
-
-      expect do
-        issue1 = Issue.new(person: Person.find(person.id))
-        issue1.save!
-      end.to change { Issue.count }.by(1)
-    end
-
-    it "allow locking with person tags if admin has tags" do
-      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
-      person1 = issue1.person
-      person3 = issue3.person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      %i{lock_issue renew_lock unlock_issue}.each do |action|
-        issue = Issue.find(issue1.id)
-        issue.send("#{action}!")
-
-        issue = Issue.find(issue2.id)
-        issue.send("#{action}!")
-
-        expect { Issue.find(issue3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-
-        issue = Issue.find(issue4.id)
-        issue.send("#{action}!")
-      end
-
-      admin_user.tags << person3.tags.first
-      admin_user.save!
-
-      %i{lock_issue renew_lock unlock_issue}.each do |action|
-        issue = Issue.find(issue3.id)
-        issue.send("#{action}!")
-      end
-    end
-
-    it "allow change state with person tags if admin has tags" do
-      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
-      person1 = issue1.person
-      person3 = issue3.person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      issue = Issue.find(issue1.id)
-      issue.complete!
-
-      issue = Issue.find(issue2.id)
-      issue.complete!
-
-      expect { Issue.find(issue3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-
-      issue = Issue.find(issue4.id)
-      issue.complete!
-
-      admin_user.tags << person3.tags.first
-      admin_user.save!
-
-      issue = Issue.find(issue3.id)
-      issue.complete!
-    end
-
-    it "Update a person with person tags if admin has tags" do
-      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
-      person1 = issue1.person
-      person3 = issue3.person
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      issue = Issue.find(issue1.id)
-      issue.defer_until = DateTime.now
-      issue.save!
-
-      issue = Issue.find(issue2.id)
-      issue.defer_until = DateTime.now
-      issue.save!
-
-      expect { Issue.find(issue3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-
-      issue = Issue.find(issue4.id)
-      issue.defer_until = DateTime.now
-      issue.save!
-
-      admin_user.tags << person3.tags.first
-      admin_user.save!
-
-      issue = Issue.find(issue3.id)
-      issue.defer_until = DateTime.now
-      issue.save!
-    end
-
-    it "show issue with admin user active tags" do
-      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
-      person1 = issue1.person
-      person3 = issue3.person
-
-      expect(Issue.find(issue1.id)).to_not be_nil
-      expect(Issue.find(issue2.id)).to_not be_nil
-      expect(Issue.find(issue3.id)).to_not be_nil
-      expect(Issue.find(issue4.id)).to_not be_nil
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect(Issue.find(issue1.id)).to_not be_nil
-      expect(Issue.find(issue2.id)).to_not be_nil
-      expect { Issue.find(issue3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(Issue.find(issue4.id)).to_not be_nil
-
-      admin_user.tags.delete(person1.tags.first)
-      admin_user.tags << person3.tags.first
-      admin_user.save!
-
-      expect { Issue.find(issue1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(Issue.find(issue2.id)).to_not be_nil
-      expect(Issue.find(issue3.id)).to_not be_nil
-      expect(Issue.find(issue4.id)).to_not be_nil
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      expect(Issue.find(issue1.id)).to_not be_nil
-      expect(Issue.find(issue2.id)).to_not be_nil
-      expect(Issue.find(issue3.id)).to_not be_nil
-      expect(Issue.find(issue4.id)).to_not be_nil
-    end
-
-    it "index issue with admin user active tags" do
-      issue1, issue2, issue3, issue4 = setup_for_admin_tags_spec
-      person1 = issue1.person
-      person3 = issue3.person
-
-      issues = Issue.all
-      expect(issues.count).to eq(4)
-      expect(issues[0].id).to eq(issue1.id)
-      expect(issues[1].id).to eq(issue2.id)
-      expect(issues[2].id).to eq(issue3.id)
-      expect(issues[3].id).to eq(issue4.id)
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      issues = Issue.all
-      expect(issues.count).to eq(3)
-      expect(issues[0].id).to eq(issue1.id)
-      expect(issues[1].id).to eq(issue2.id)
-      expect(issues[2].id).to eq(issue4.id)
-
-      admin_user.tags.delete(person1.tags.first)
-      admin_user.tags << person3.tags.first
-      admin_user.save!
-
-      issues = Issue.all
-      expect(issues.count).to eq(3)
-      expect(issues[0].id).to eq(issue2.id)
-      expect(issues[1].id).to eq(issue3.id)
-      expect(issues[2].id).to eq(issue4.id)
-
-      admin_user.tags << person1.tags.first
-      admin_user.save!
-
-      issues = Issue.all
-      expect(issues.count).to eq(4)
-      expect(issues[0].id).to eq(issue1.id)
-      expect(issues[1].id).to eq(issue2.id)
-      expect(issues[2].id).to eq(issue3.id)
-      expect(issues[3].id).to eq(issue4.id)
-    end
-
-    def setup_for_admin_tags_spec
-      person1 = create(:full_person_tagging).person
-      person2 = create(:empty_person)
-      person3 = create(:alt_full_person_tagging).person
-      person4 = create(:empty_person)
-      person4.tags << person1.tags.first
-      person4.tags << person3.tags.first
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-      issue3 = create(:basic_issue, person: person3)
-      issue4 = create(:basic_issue, person: person4)
-
-      [issue1, issue2, issue3, issue4]
-    end
-
-    it 'add country AR tag and create a new tag on complete' do
-      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
-      issue = seed.issue
-      expect do
-        issue.complete!
-      end.to change { Tag.count }.by(1)
-
-      expect do
-        issue.approve!
-      end.to change { Tag.count }.by(0)
-
-      issue.person.reload
-      tag = Tag.last
-      expect(tag.name).to eq 'active-in-AR'
-      expect(issue.person.tags.count).to eq(1)
-      expect(issue.person.tags.first).to eq(tag)
-    end
-
-    it 'add country CL tag and create a new tag on complete' do
-      seed = create(:full_chile_invoicing_detail_seed_with_issue)
-      issue = seed.issue
-      expect do
-        issue.complete!
-      end.to change { Tag.count }.by(1)
-
-      expect do
-        issue.approve!
-      end.to change { Tag.count }.by(0)
-
-      issue.person.reload
-      tag = Tag.last
-      expect(tag.name).to eq 'active-in-CL'
-      expect(issue.person.tags.count).to eq(1)
-      expect(issue.person.tags.first).to eq(tag)
-    end
-
-    it 'add country AR and CL tag and create new tags on complete' do
-      seed1 = create(:full_argentina_invoicing_detail_seed_with_issue)
-      issue = seed1.issue
+    it 'creates and adds tags on complete' do
+      issue = create(:full_argentina_invoicing_detail_seed_with_issue).issue
       create(:full_chile_invoicing_detail_seed_with_issue, issue: issue)
 
-      expect do
-        issue.reload.complete!
-      end.to change { Tag.count }.by(2)
+      expect{ issue.reload.complete! }.to change{ Tag.count }.by(2)
+      expect{ issue.approve! }.not_to change{ Tag.count }
 
-      expect do
-        issue.approve!
-      end.to change { Tag.count }.by(0)
+      tags = Tag.all[-2..-1]
+      expect(tags.pluck(:name)).to eq ['active-in-AR', 'active-in-CL']
 
-      issue.person.reload
-
-      tag1 = Tag.first
-      tag2 = Tag.last
-      expect(tag1.name).to eq 'active-in-AR'
-      expect(tag2.name).to eq 'active-in-CL'
-      expect(issue.person.tags.count).to eq(2)
-      expect(issue.person.tags.first).to eq(tag1)
-      expect(issue.person.tags.last).to eq(tag2)
+      expect(issue.person.tags).to eq tags
     end
 
-    it 'add country tag and create a new tag on approve' do
-      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
-      issue = seed.issue
-      expect do
-        issue.approve!
-      end.to change { Tag.count }.by(1)
+    it 'creates and adds tags on direct approval' do
+      issue = create(:full_argentina_invoicing_detail_seed_with_issue).issue
+      create(:full_chile_invoicing_detail_seed_with_issue, issue: issue)
 
-      issue.person.reload
-      tag = Tag.last
-      expect(tag.name).to eq 'active-in-AR'
-      expect(issue.person.tags.first).to eq(tag)
+      expect{ issue.reload.approve! }.to change{ Tag.count }.by(2)
+
+      tags = Tag.all[-2..-1]
+      expect(tags.pluck(:name)).to eq ['active-in-AR', 'active-in-CL']
+      expect(issue.person.tags).to eq tags
     end
 
-    it 'not add country tag and create a new tag on complete' do
+    it 'does nothing if no invoicing details' do
       issue = create(:basic_issue)
-      expect do
+      expect do 
         issue.complete!
-      end.to change { Tag.count }.by(0)
-
-      issue.person.reload
-      expect(issue.person.tags.count).to eq(0)
+        issue.approve!
+      end.not_to change{ [Tag.count, issue.person.reload.tags] }
     end
 
     it 'add country tag to person not creating a new tag on complete' do
