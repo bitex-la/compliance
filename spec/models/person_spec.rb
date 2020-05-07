@@ -314,23 +314,12 @@ RSpec.describe Person, type: :model do
     end
 
     it "Update a person with tags if admin has tags" do
-      person1, person2, person3, person4 = setup_for_admin_tags_spec
+      person1, person2, person3, person4 = people = setup_for_admin_tags_spec
 
-      person = Person.find(person1.id)
-      person.enabled = false
-      person.save!
-
-      person = Person.find(person2.id)
-      person.enabled = false
-      person.save!
-
-      person = Person.find(person3.id)
-      person.enabled = false
-      person.save!
-
-      person = Person.find(person4.id)
-      person.enabled = false
-      person.save!
+      people.each do |i|
+        p = Person.find(i.id)
+        p.update!(enabled: false)
+      end
 
       admin_user.tags << person1.tags.first
 
@@ -356,12 +345,9 @@ RSpec.describe Person, type: :model do
     end
 
     it "show person with active tags" do
-      person1, person2, person3, person4 = setup_for_admin_tags_spec
+      person1, person2, person3, person4 = people = setup_for_admin_tags_spec
 
-      expect(Person.find(person1.id)).to_not be_nil
-      expect(Person.find(person2.id)).to_not be_nil
-      expect(Person.find(person3.id)).to_not be_nil
-      expect(Person.find(person4.id)).to_not be_nil
+      people.each { |i| expect(Person.find(i.id)).to_not be_nil }
 
       admin_user.tags << person1.tags.first
 

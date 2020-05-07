@@ -145,32 +145,27 @@ RSpec.describe IssueTagging, type: :model do
       person1 = issue_tag1.issue.person
       person3 = issue_tag3.issue.person
 
-      expect(IssueTagging.find(issue_tag1.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag3.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
+      assert_accessible(issue_tag1, issue_tag2, issue_tag3, issue_tag4)
 
       admin_user.tags << person1.tags.first
-
-      expect(IssueTagging.find(issue_tag1.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
-      expect { IssueTagging.find(issue_tag3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
+      assert_accessible(issue_tag1, issue_tag2, issue_tag4)
+      assert_not_accessible(issue_tag3)
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-
-      expect { IssueTagging.find(issue_tag1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag3.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
+      assert_not_accessible(issue_tag1)
+      assert_accessible(issue_tag2, issue_tag3, issue_tag4)
 
       admin_user.tags << person1.tags.first
+      assert_accessible(issue_tag1, issue_tag2, issue_tag3, issue_tag4)
+    end
 
-      expect(IssueTagging.find(issue_tag1.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag2.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag3.id)).to_not be_nil
-      expect(IssueTagging.find(issue_tag4.id)).to_not be_nil
+    def assert_accessible(*args)
+      args.each { |i| expect(IssueTagging.find(i.id)).to_not be_nil }
+    end
+
+    def assert_not_accessible(*args)
+      args.each { |i| expect { IssueTagging.find(i.id) }.to raise_error(ActiveRecord::RecordNotFound) }
     end
 
     it "index issue tagging with admin user active tags" do
@@ -178,38 +173,17 @@ RSpec.describe IssueTagging, type: :model do
       person1 = issue_tag1.issue.person
       person3 = issue_tag3.issue.person
 
-      issues_taggings = IssueTagging.all
-      expect(issues_taggings.count).to eq(4)
-      expect(issues_taggings[0].id).to eq(issue_tag1.id)
-      expect(issues_taggings[1].id).to eq(issue_tag2.id)
-      expect(issues_taggings[2].id).to eq(issue_tag3.id)
-      expect(issues_taggings[3].id).to eq(issue_tag4.id)
+      expect(IssueTagging.all).to contain_exactly(issue_tag1, issue_tag2, issue_tag3, issue_tag4)
 
       admin_user.tags << person1.tags.first
-
-      issues_taggings = IssueTagging.all
-      expect(issues_taggings.count).to eq(3)
-      expect(issues_taggings[0].id).to eq(issue_tag1.id)
-      expect(issues_taggings[1].id).to eq(issue_tag2.id)
-      expect(issues_taggings[2].id).to eq(issue_tag4.id)
+      expect(IssueTagging.all).to contain_exactly(issue_tag1, issue_tag2, issue_tag4)
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-
-      issues_taggings = IssueTagging.all
-      expect(issues_taggings.count).to eq(3)
-      expect(issues_taggings[0].id).to eq(issue_tag2.id)
-      expect(issues_taggings[1].id).to eq(issue_tag3.id)
-      expect(issues_taggings[2].id).to eq(issue_tag4.id)
+      expect(IssueTagging.all).to contain_exactly(issue_tag2, issue_tag3, issue_tag4)
 
       admin_user.tags << person1.tags.first
-
-      issues_taggings = IssueTagging.all
-      expect(issues_taggings.count).to eq(4)
-      expect(issues_taggings[0].id).to eq(issue_tag1.id)
-      expect(issues_taggings[1].id).to eq(issue_tag2.id)
-      expect(issues_taggings[2].id).to eq(issue_tag3.id)
-      expect(issues_taggings[3].id).to eq(issue_tag4.id)
+      expect(IssueTagging.all).to contain_exactly(issue_tag1, issue_tag2, issue_tag3, issue_tag4)
     end
 
     def setup_for_admin_tags_spec
