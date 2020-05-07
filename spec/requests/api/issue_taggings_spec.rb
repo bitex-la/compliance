@@ -95,8 +95,7 @@ describe IssueTagging do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow issue tagging creation only with person valid admin tags" do
@@ -110,7 +109,6 @@ describe IssueTagging do
       alt_tag = create(:alt_issue_tag)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         api_create "/issue_taggings",
@@ -136,7 +134,6 @@ describe IssueTagging do
       expect(issue_tag).to eq(IssueTagging.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create "/issue_taggings",
@@ -198,7 +195,6 @@ describe IssueTagging do
       person = create(:full_person_tagging).person
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person)
       tag = create(:issue_tag)
@@ -219,7 +215,6 @@ describe IssueTagging do
       person3 = issue_tag3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_destroy "/issue_taggings/#{issue_tag1.id}"
       response.body.should be_blank
@@ -236,7 +231,6 @@ describe IssueTagging do
       api_get "/issue_taggings/#{issue_tag4.id}", {}, 404
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_destroy "/issue_taggings/#{issue_tag3.id}"
       response.body.should be_blank
@@ -254,7 +248,6 @@ describe IssueTagging do
       api_get("/issue_taggings/#{issue_tag4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/issue_taggings/#{issue_tag1.id}")
       api_get("/issue_taggings/#{issue_tag2.id}")
@@ -263,7 +256,6 @@ describe IssueTagging do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/issue_taggings/#{issue_tag1.id}", {}, 404)
       api_get("/issue_taggings/#{issue_tag2.id}")
@@ -271,7 +263,6 @@ describe IssueTagging do
       api_get("/issue_taggings/#{issue_tag4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/issue_taggings/#{issue_tag1.id}")
       api_get("/issue_taggings/#{issue_tag2.id}")
@@ -292,7 +283,6 @@ describe IssueTagging do
       expect(api_response.data[3].id).to eq(issue_tag1.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/issue_taggings/")
       expect(api_response.meta.total_items).to eq(3)
@@ -302,7 +292,6 @@ describe IssueTagging do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/issue_taggings/")
       expect(api_response.meta.total_items).to eq(3)
@@ -311,7 +300,6 @@ describe IssueTagging do
       expect(api_response.data[2].id).to eq(issue_tag2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/issue_taggings/")
       expect(api_response.meta.total_items).to eq(4)

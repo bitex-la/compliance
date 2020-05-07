@@ -64,8 +64,7 @@ describe FundWithdrawal do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow fund withdrawal creation only with person valid admin tags" do
@@ -73,7 +72,6 @@ describe FundWithdrawal do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       attributes = attributes_for(:full_fund_withdrawal)
 
@@ -102,7 +100,6 @@ describe FundWithdrawal do
       expect(fund).to eq(FundWithdrawal.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create '/fund_withdrawals',
@@ -166,7 +163,6 @@ describe FundWithdrawal do
       attributes = attributes_for(:full_fund_withdrawal)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         api_create '/fund_withdrawals',
@@ -186,7 +182,6 @@ describe FundWithdrawal do
 
       admin_user.tags << person1.tags.first
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       api_update "/fund_withdrawals/#{fund1.id}",
         type: 'fund_withdrawals',
@@ -223,7 +218,6 @@ describe FundWithdrawal do
         }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/fund_withdrawals/#{fund3.id}",
         type: 'fund_withdrawals',
@@ -247,7 +241,6 @@ describe FundWithdrawal do
 
       admin_user.tags << person1.tags.first
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       api_get("/fund_withdrawals/#{fund1.id}")
       api_get("/fund_withdrawals/#{fund2.id}")
@@ -256,7 +249,6 @@ describe FundWithdrawal do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/fund_withdrawals/#{fund1.id}", {}, 404)
       api_get("/fund_withdrawals/#{fund2.id}")
@@ -264,7 +256,6 @@ describe FundWithdrawal do
       api_get("/fund_withdrawals/#{fund4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_withdrawals/#{fund1.id}")
       api_get("/fund_withdrawals/#{fund2.id}")
@@ -287,7 +278,6 @@ describe FundWithdrawal do
 
       admin_user.tags << person1.tags.first
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       api_get("/fund_withdrawals/")
       expect(api_response.meta.total_items).to eq(3)
@@ -297,7 +287,6 @@ describe FundWithdrawal do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/fund_withdrawals/")
       expect(api_response.meta.total_items).to eq(3)
@@ -306,7 +295,6 @@ describe FundWithdrawal do
       expect(api_response.data[2].id).to eq(fund2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_withdrawals/")
       expect(api_response.meta.total_items).to eq(4)

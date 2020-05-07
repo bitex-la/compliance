@@ -159,8 +159,7 @@ describe Task do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow task creation only with person valid admin tags" do
@@ -168,7 +167,6 @@ describe Task do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
@@ -205,7 +203,6 @@ describe Task do
       expect(task).to eq(Task.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create('/tasks',
@@ -275,7 +272,6 @@ describe Task do
       issue = create(:basic_issue, person: person)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       workflow = create(:basic_workflow, issue: issue)
 
@@ -297,7 +293,6 @@ describe Task do
       person3 = task3.workflow.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_update "/tasks/#{task1.id}",
         type: 'tasks',
@@ -317,7 +312,6 @@ describe Task do
         attributes: { current_retries: 2 }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/tasks/#{task3.id}",
         type: 'tasks',
@@ -330,7 +324,6 @@ describe Task do
       person3 = task3.workflow.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_destroy "/tasks/#{task1.id}"
       response.body.should be_blank
@@ -347,7 +340,6 @@ describe Task do
       api_get "/tasks/#{task4.id}", {}, 404
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_destroy "/tasks/#{task3.id}"
       response.body.should be_blank
@@ -365,7 +357,6 @@ describe Task do
       api_get("/tasks/#{task4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/tasks/#{task1.id}")
       api_get("/tasks/#{task2.id}")
@@ -374,7 +365,6 @@ describe Task do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/tasks/#{task1.id}", {}, 404)
       api_get("/tasks/#{task2.id}")
@@ -382,7 +372,6 @@ describe Task do
       api_get("/tasks/#{task4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/tasks/#{task1.id}")
       api_get("/tasks/#{task2.id}")
@@ -403,7 +392,6 @@ describe Task do
       expect(api_response.data[3].id).to eq(task1.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/tasks/")
       expect(api_response.meta.total_items).to eq(3)
@@ -413,7 +401,6 @@ describe Task do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/tasks/")
       expect(api_response.meta.total_items).to eq(3)
@@ -422,7 +409,6 @@ describe Task do
       expect(api_response.data[2].id).to eq(task2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/tasks/")
       expect(api_response.meta.total_items).to eq(4)

@@ -30,8 +30,7 @@ RSpec.describe Attachment, type: :model do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow attachment creation only with person valid admin tags" do
@@ -47,7 +46,6 @@ RSpec.describe Attachment, type: :model do
         issue: issue2, add_all_attachments: false)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         attachment = Attachment.new(attached_to_seed: NaturalDocketSeed.find(seed1.id))
@@ -57,7 +55,6 @@ RSpec.describe Attachment, type: :model do
       expect { NaturalDocketSeed.find(seed2.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         attachment = Attachment.new(attached_to_seed: NaturalDocketSeed.find(seed1.id))
@@ -102,7 +99,6 @@ RSpec.describe Attachment, type: :model do
         issue: issue, add_all_attachments: false)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         attachment = Attachment.new(attached_to_seed: NaturalDocketSeed.find(seed.id))
@@ -143,7 +139,6 @@ RSpec.describe Attachment, type: :model do
       expect(Attachment.find(att4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Attachment.find(att1.id)).to_not be_nil
       expect(Attachment.find(att2.id)).to_not be_nil
@@ -152,7 +147,6 @@ RSpec.describe Attachment, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect { Attachment.find(att1.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Attachment.find(att2.id)).to_not be_nil
@@ -160,7 +154,6 @@ RSpec.describe Attachment, type: :model do
       expect(Attachment.find(att4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Attachment.find(att1.id)).to_not be_nil
       expect(Attachment.find(att2.id)).to_not be_nil
@@ -203,7 +196,6 @@ RSpec.describe Attachment, type: :model do
       expect(attachments[3].id).to eq(att4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       attachments = Attachment.all
       expect(attachments.count).to eq(3)
@@ -213,7 +205,6 @@ RSpec.describe Attachment, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       attachments = Attachment.all
       expect(attachments.count).to eq(3)
@@ -222,7 +213,6 @@ RSpec.describe Attachment, type: :model do
       expect(attachments[2].id).to eq(att4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       attachments = Attachment.all
       expect(attachments.count).to eq(4)

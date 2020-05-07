@@ -155,7 +155,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
     before :each do
       admin_user.tags.clear
-      admin_user.save!
     end
 
     describe "seeds" do
@@ -167,7 +166,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         issue2 = create(:basic_issue, person: person2)
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         type_const = seed_type.to_s.camelize.singularize.constantize
 
@@ -203,7 +201,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         end.to change { type_const.count }.by(0)
 
         admin_user.tags << person2.tags.first
-        admin_user.save!
 
         initial_attrs1 = attributes_for(later_seed)
 
@@ -274,7 +271,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         issue = create(:basic_issue, person: person)
 
         admin_user.tags << person.tags.first
-        admin_user.save!
 
         initial_attrs = attributes_for(initial_expires_seed)
 
@@ -298,7 +294,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         person3 = seed3.issue.person
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         later_attrs = attributes_for(later_seed)
         later_relations = instance_exec(&relations_proc)
@@ -334,7 +329,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_response.data.attributes.should >= later_attrs
 
         admin_user.tags << person3.tags.first
-        admin_user.save!
 
         api_update "/#{seed_type}/#{seed3.id}", {
           type: seed_type,
@@ -351,7 +345,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         person3 = seed3.issue.person
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_destroy "/#{seed_type}/#{seed1.id}"
         response.body.should be_blank
@@ -368,7 +361,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get "/#{seed_type}/#{seed4.id}", {}, 404
 
         admin_user.tags << person3.tags.first
-        admin_user.save!
 
         api_destroy "/#{seed_type}/#{seed3.id}"
         response.body.should be_blank
@@ -386,7 +378,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{seed_type}/#{seed4.id}")
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{seed_type}/#{seed1.id}")
         api_get("/#{seed_type}/#{seed2.id}")
@@ -395,7 +386,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
-        admin_user.save!
 
         api_get("/#{seed_type}/#{seed1.id}", {}, 404)
         api_get("/#{seed_type}/#{seed2.id}")
@@ -403,7 +393,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{seed_type}/#{seed4.id}")
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{seed_type}/#{seed1.id}")
         api_get("/#{seed_type}/#{seed2.id}")
@@ -424,7 +413,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         expect(api_response.data[3].id).to eq(seed1.id.to_s)
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{seed_type}/")
         expect(api_response.meta.total_items).to eq(3)
@@ -434,7 +422,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
-        admin_user.save!
 
         api_get("/#{seed_type}/")
         expect(api_response.meta.total_items).to eq(3)
@@ -443,7 +430,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         expect(api_response.data[2].id).to eq(seed2.id.to_s)
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{seed_type}/")
         expect(api_response.meta.total_items).to eq(4)
@@ -466,7 +452,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{type}/#{seed4.fruit.id}")
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{type}/#{seed1.fruit.id}")
         api_get("/#{type}/#{seed2.fruit.id}")
@@ -475,7 +460,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
-        admin_user.save!
 
         api_get("/#{type}/#{seed1.fruit.id}", {}, 404)
         api_get("/#{type}/#{seed2.fruit.id}")
@@ -483,7 +467,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         api_get("/#{type}/#{seed4.fruit.id}")
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{type}/#{seed1.fruit.id}")
         api_get("/#{type}/#{seed2.fruit.id}")
@@ -504,7 +487,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         expect(api_response.data[3].id).to eq(seed1.fruit.id.to_s)
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{type}")
         expect(api_response.meta.total_items).to eq(3)
@@ -514,7 +496,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
         admin_user.tags.delete(person1.tags.first)
         admin_user.tags << person3.tags.first
-        admin_user.save!
 
         api_get("/#{type}")
         expect(api_response.meta.total_items).to eq(3)
@@ -523,7 +504,6 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         expect(api_response.data[2].id).to eq(seed2.fruit.id.to_s)
 
         admin_user.tags << person1.tags.first
-        admin_user.save!
 
         api_get("/#{type}")
         expect(api_response.meta.total_items).to eq(4)
@@ -550,19 +530,15 @@ shared_examples "seed" do |type, initial_factory, later_factory,
       if approve_issue
         seed1.issue.reload.approve!
         admin_user.tags.clear
-        admin_user.save!
         seed2.issue.reload.approve!
         if seed2.issue.person.tags.count >= 1
           seed2.issue.person.tags.delete seed2.issue.person.tags.last
         end
         admin_user.tags.clear
-        admin_user.save!
         seed3.issue.reload.approve!
         admin_user.tags.clear
-        admin_user.save!
         seed4.issue.reload.approve!
         admin_user.tags.clear
-        admin_user.save!
       end
 
       seed1.reload

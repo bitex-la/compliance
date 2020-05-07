@@ -89,7 +89,6 @@ shared_examples "fruit_scopeable" do |type, initial_factory|
       expect(subject.class.find(seed4.fruit.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(subject.class.find(seed1.fruit.id)).to_not be_nil
       expect(subject.class.find(seed2.fruit.id)).to_not be_nil
@@ -98,7 +97,6 @@ shared_examples "fruit_scopeable" do |type, initial_factory|
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect { subject.class.find(seed1.fruit.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(subject.class.find(seed2.fruit.id)).to_not be_nil
@@ -106,7 +104,6 @@ shared_examples "fruit_scopeable" do |type, initial_factory|
       expect(subject.class.find(seed4.fruit.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(subject.class.find(seed1.fruit.id)).to_not be_nil
       expect(subject.class.find(seed2.fruit.id)).to_not be_nil
@@ -127,7 +124,6 @@ shared_examples "fruit_scopeable" do |type, initial_factory|
       expect(fruits[3].id).to eq(seed4.fruit.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       fruits = subject.class.all
       expect(fruits.count).to eq(3)
@@ -137,7 +133,6 @@ shared_examples "fruit_scopeable" do |type, initial_factory|
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       fruits = subject.class.all
       expect(fruits.count).to eq(3)
@@ -146,7 +141,6 @@ shared_examples "fruit_scopeable" do |type, initial_factory|
       expect(fruits[2].id).to eq(seed4.fruit.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       fruits = subject.class.all
       expect(fruits.count).to eq(4)

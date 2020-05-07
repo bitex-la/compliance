@@ -26,7 +26,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       issue2 = create(:basic_issue, person: person2)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         seed1 = build(initial_seed, issue: Issue.find(issue1.id))
@@ -40,7 +39,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       expect { Issue.find(issue2.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         seed1 = build(initial_seed, issue: Issue.find(issue1.id))
@@ -78,7 +76,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       issue = create(:basic_issue, person: person)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         seed = build(initial_seed, issue: Issue.find(issue.id))
@@ -92,7 +89,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       person3 = seed3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       later_attrs = attributes_for(later_seed)
 
@@ -108,7 +104,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       seed.update!(later_attrs)
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       seed = subject.class.find(seed3.id)
       seed.update!(later_attrs)
@@ -120,7 +115,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       person3 = seed3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(subject.class.find(seed1.id).destroy).to be_truthy
       expect(subject.class.find(seed2.id).destroy).to be_truthy
@@ -128,7 +122,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       expect(subject.class.find(seed4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect(subject.class.find(seed3.id).destroy).to be_truthy
     end
@@ -144,7 +137,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       expect(subject.class.find(seed4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(subject.class.find(seed1.id)).to_not be_nil
       expect(subject.class.find(seed2.id)).to_not be_nil
@@ -153,7 +145,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect { subject.class.find(seed1.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(subject.class.find(seed2.id)).to_not be_nil
@@ -161,7 +152,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       expect(subject.class.find(seed4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(subject.class.find(seed1.id)).to_not be_nil
       expect(subject.class.find(seed2.id)).to_not be_nil
@@ -182,7 +172,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       expect(seeds[3].id).to eq(seed4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       seeds = subject.class.all
       expect(seeds.count).to eq(3)
@@ -192,7 +181,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       seeds = subject.class.all
       expect(seeds.count).to eq(3)
@@ -201,7 +189,6 @@ shared_examples "seed_scopeable" do |type, initial_factory, later_factory|
       expect(seeds[2].id).to eq(seed4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       seeds = subject.class.all
       expect(seeds.count).to eq(4)

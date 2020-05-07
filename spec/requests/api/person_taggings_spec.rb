@@ -96,7 +96,6 @@ describe PersonTagging do
 
     before :each do
       admin_user.tags.clear
-      admin_user.save!
     end
 
     it "allow person tagging creation only with person valid admin tags" do
@@ -107,7 +106,6 @@ describe PersonTagging do
       alt_tag = create(:person_tag, name: 'new-tag2')
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         api_create "/person_taggings",
@@ -133,7 +131,6 @@ describe PersonTagging do
       expect(person_tag).to eq(PersonTagging.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create "/person_taggings",
@@ -192,7 +189,6 @@ describe PersonTagging do
       person = create(:full_person_tagging).person
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       tag = create(:person_tag, name: 'new-tag1')
 
@@ -212,7 +208,6 @@ describe PersonTagging do
       person3 = person_tag3.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_destroy "/person_taggings/#{person_tag1.id}"
       response.body.should be_blank
@@ -227,7 +222,6 @@ describe PersonTagging do
       api_get "/person_taggings/#{person_tag4.id}", {}, 404
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_destroy "/person_taggings/#{person_tag3.id}"
       response.body.should be_blank
@@ -245,7 +239,6 @@ describe PersonTagging do
       api_get("/person_taggings/#{person_tag4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/person_taggings/#{person_tag1.id}")
       api_get("/person_taggings/#{person_tag2.id}", {}, 404)
@@ -254,7 +247,6 @@ describe PersonTagging do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/person_taggings/#{person_tag1.id}", {}, 404)
       api_get("/person_taggings/#{person_tag2.id}", {}, 404)
@@ -262,7 +254,6 @@ describe PersonTagging do
       api_get("/person_taggings/#{person_tag4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/person_taggings/#{person_tag1.id}")
       api_get("/person_taggings/#{person_tag2.id}", {}, 404)
@@ -288,7 +279,6 @@ describe PersonTagging do
       expect(api_response.data[7].id).to eq(person1.person_taggings.first.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/person_taggings/")
       expect(api_response.meta.total_items).to eq(5)
@@ -300,7 +290,6 @@ describe PersonTagging do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/person_taggings/")
       expect(api_response.meta.total_items).to eq(5)
@@ -311,7 +300,6 @@ describe PersonTagging do
       expect(api_response.data[4].id).to eq(person3.person_taggings.first.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/person_taggings/")
       expect(api_response.meta.total_items).to eq(7)

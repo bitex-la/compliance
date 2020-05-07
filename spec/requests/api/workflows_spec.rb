@@ -177,8 +177,7 @@ describe Workflow do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow workflow creation only with person valid admin tags" do
@@ -186,7 +185,6 @@ describe Workflow do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
@@ -221,7 +219,6 @@ describe Workflow do
       expect(workflow).to eq(Workflow.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create('/workflows',
@@ -293,7 +290,6 @@ describe Workflow do
       issue = create(:basic_issue, person: person)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         api_create('/workflows',
@@ -314,7 +310,6 @@ describe Workflow do
       person3 = workflow3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_update "/workflows/#{workflow1.id}",
         type: 'workflows',
@@ -334,7 +329,6 @@ describe Workflow do
       attributes: { scope: 'admin', workflow_type: 'risk_check' }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/workflows/#{workflow3.id}",
         type: 'workflows',
@@ -347,7 +341,6 @@ describe Workflow do
       person3 = workflow3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_destroy "/workflows/#{workflow1.id}"
       response.body.should be_blank
@@ -364,7 +357,6 @@ describe Workflow do
       api_get "/workflows/#{workflow4.id}", {}, 404
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_destroy "/workflows/#{workflow3.id}"
       response.body.should be_blank
@@ -382,7 +374,6 @@ describe Workflow do
       api_get("/workflows/#{workflow4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/workflows/#{workflow1.id}")
       api_get("/workflows/#{workflow2.id}")
@@ -391,7 +382,6 @@ describe Workflow do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/workflows/#{workflow1.id}", {}, 404)
       api_get("/workflows/#{workflow2.id}")
@@ -399,7 +389,6 @@ describe Workflow do
       api_get("/workflows/#{workflow4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/workflows/#{workflow1.id}")
       api_get("/workflows/#{workflow2.id}")
@@ -420,7 +409,6 @@ describe Workflow do
       expect(api_response.data[3].id).to eq(workflow1.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/workflows/")
       expect(api_response.meta.total_items).to eq(3)
@@ -430,7 +418,6 @@ describe Workflow do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/workflows/")
       expect(api_response.meta.total_items).to eq(3)
@@ -439,7 +426,6 @@ describe Workflow do
       expect(api_response.data[2].id).to eq(workflow2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/workflows/")
       expect(api_response.meta.total_items).to eq(4)

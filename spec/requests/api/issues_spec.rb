@@ -472,8 +472,7 @@ describe Issue do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow issue creation only with person valid admin tags" do
@@ -481,7 +480,6 @@ describe Issue do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         api_create('/issues',
@@ -506,7 +504,6 @@ describe Issue do
       expect(issue).to eq(Issue.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create('/issues',
@@ -559,7 +556,6 @@ describe Issue do
       person = create(:full_person_tagging).person
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         api_create('/issues',
@@ -576,7 +572,6 @@ describe Issue do
       person3 = issue3.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       %i{lock renew_lock unlock lock_for_ever}.each do |action|
         api_request :post, "/issues/#{issue1.id}/#{action}", {}, 200
@@ -586,7 +581,6 @@ describe Issue do
       end
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       %i{lock renew_lock unlock lock_for_ever}.each do |action|
         api_request :post, "/issues/#{issue3.id}/#{action}", {}, 200
@@ -599,7 +593,6 @@ describe Issue do
       person3 = issue3.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_request :post, "/issues/#{issue1.id}/complete", {}, 200
       api_request :post, "/issues/#{issue2.id}/complete", {}, 200
@@ -607,7 +600,6 @@ describe Issue do
       api_request :post, "/issues/#{issue4.id}/complete", {}, 200
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_request :post, "/issues/#{issue3.id}/complete", {}, 200
     end
@@ -618,7 +610,6 @@ describe Issue do
       person3 = issue3.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_update "/issues/#{issue1.id}",
         type: 'issues',
@@ -642,7 +633,6 @@ describe Issue do
         attributes: { reason: IssueReason.update_expired_data }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/issues/#{issue3.id}", {
         type: 'issues',
@@ -662,7 +652,7 @@ describe Issue do
       api_get("/issues/#{issue4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
+
 
       api_get("/issues/#{issue1.id}")
       api_get("/issues/#{issue2.id}")
@@ -671,7 +661,6 @@ describe Issue do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/issues/#{issue1.id}", {}, 404)
       api_get("/issues/#{issue2.id}")
@@ -679,7 +668,6 @@ describe Issue do
       api_get("/issues/#{issue4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/issues/#{issue1.id}")
       api_get("/issues/#{issue2.id}")
@@ -701,7 +689,6 @@ describe Issue do
       expect(api_response.data[3].id).to eq(issue1.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/issues/", page: { page: 0, per_page: 4 })
       expect(api_response.meta.total_items).to eq(3)
@@ -711,7 +698,6 @@ describe Issue do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/issues/", page: { page: 0, per_page: 4 })
       expect(api_response.meta.total_items).to eq(3)
@@ -720,7 +706,6 @@ describe Issue do
       expect(api_response.data[2].id).to eq(issue2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/issues/", page: { page: 0, per_page: 4 })
       expect(api_response.meta.total_items).to eq(4)

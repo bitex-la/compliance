@@ -36,8 +36,7 @@ RSpec.describe PersonTagging, type: :model do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow person tagging creation only with person valid admin tags" do
@@ -48,7 +47,6 @@ RSpec.describe PersonTagging, type: :model do
       alt_tag = create(:person_tag, name: 'new-tag2')
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         person_tagging = PersonTagging.new(person: Person.find(person1.id), tag: tag)
@@ -58,7 +56,6 @@ RSpec.describe PersonTagging, type: :model do
       expect { Person.find(person2.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         person_tagging = PersonTagging.new(person: Person.find(person1.id), tag: alt_tag)
@@ -95,7 +92,6 @@ RSpec.describe PersonTagging, type: :model do
       person = create(:full_person_tagging).person
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       tag = create(:person_tag, name: 'new-tag1')
 
@@ -111,7 +107,6 @@ RSpec.describe PersonTagging, type: :model do
       person3 = person_tag3.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(PersonTagging.find(person_tag1.id).destroy).to be_truthy
       expect { PersonTagging.find(person_tag2.id).destroy }.to raise_error(ActiveRecord::RecordNotFound)
@@ -119,7 +114,6 @@ RSpec.describe PersonTagging, type: :model do
       expect(PersonTagging.find(person_tag4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect(PersonTagging.find(person_tag3.id).destroy).to be_truthy
     end
@@ -135,7 +129,6 @@ RSpec.describe PersonTagging, type: :model do
       expect(PersonTagging.find(person_tag4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(PersonTagging.find(person_tag1.id)).to_not be_nil
       expect { PersonTagging.find(person_tag2.id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -144,7 +137,6 @@ RSpec.describe PersonTagging, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect { PersonTagging.find(person_tag1.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect { PersonTagging.find(person_tag2.id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -152,7 +144,6 @@ RSpec.describe PersonTagging, type: :model do
       expect(PersonTagging.find(person_tag4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(PersonTagging.find(person_tag1.id)).to_not be_nil
       expect { PersonTagging.find(person_tag2.id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -178,7 +169,6 @@ RSpec.describe PersonTagging, type: :model do
       expect(person_taggings[7].id).to eq(person_tag4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       person_taggings = PersonTagging.all
       expect(person_taggings.count).to eq(5)
@@ -190,7 +180,6 @@ RSpec.describe PersonTagging, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       person_taggings = PersonTagging.all
       expect(person_taggings.count).to eq(5)
@@ -201,7 +190,6 @@ RSpec.describe PersonTagging, type: :model do
       expect(person_taggings[4].id).to eq(person_tag4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       person_taggings = PersonTagging.all
       expect(person_taggings.count).to eq(7)

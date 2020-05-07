@@ -82,8 +82,7 @@ RSpec.describe Task, type: :model do
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user.tags
     end
 
     it "allow task creation only with person valid admin tags" do
@@ -91,7 +90,6 @@ RSpec.describe Task, type: :model do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
@@ -108,7 +106,6 @@ RSpec.describe Task, type: :model do
       expect { Workflow.find(workflow2.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         task = Task.new(workflow: Workflow.find(workflow1.id))
@@ -152,7 +149,6 @@ RSpec.describe Task, type: :model do
       issue = create(:basic_issue, person: person)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       workflow = create(:basic_workflow, issue: issue)
 
@@ -169,7 +165,6 @@ RSpec.describe Task, type: :model do
       person3 = task3.workflow.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       task = Task.find(task1.id)
       task.current_retries = 2
@@ -186,7 +181,6 @@ RSpec.describe Task, type: :model do
       task.save!
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       task = Task.find(task3.id)
       task.current_retries = 2
@@ -199,7 +193,6 @@ RSpec.describe Task, type: :model do
       person3 = task3.workflow.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Task.find(task1.id).destroy).to be_truthy
       expect(Task.find(task2.id).destroy).to be_truthy
@@ -207,7 +200,6 @@ RSpec.describe Task, type: :model do
       expect(Task.find(task4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect(Task.find(task3.id).destroy).to be_truthy
     end
@@ -223,7 +215,6 @@ RSpec.describe Task, type: :model do
       expect(Task.find(task4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Task.find(task1.id)).to_not be_nil
       expect(Task.find(task2.id)).to_not be_nil
@@ -232,7 +223,6 @@ RSpec.describe Task, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect { Task.find(task1.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Task.find(task2.id)).to_not be_nil
@@ -240,7 +230,6 @@ RSpec.describe Task, type: :model do
       expect(Task.find(task4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Task.find(task1.id)).to_not be_nil
       expect(Task.find(task2.id)).to_not be_nil
@@ -261,7 +250,6 @@ RSpec.describe Task, type: :model do
       expect(tasks[3].id).to eq(task4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       tasks = Task.all
       expect(tasks.count).to eq(3)
@@ -271,7 +259,6 @@ RSpec.describe Task, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       tasks = Task.all
       expect(tasks.count).to eq(3)
@@ -280,7 +267,6 @@ RSpec.describe Task, type: :model do
       expect(tasks[2].id).to eq(task4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       tasks = Task.all
       expect(tasks.count).to eq(4)

@@ -186,7 +186,6 @@ RSpec.describe Workflow, type: :model do
 
     before :each do
       admin_user.tags.clear
-      admin_user.save!
     end
 
     it "allow workflow creation only with person valid admin tags" do
@@ -194,7 +193,6 @@ RSpec.describe Workflow, type: :model do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
@@ -209,7 +207,6 @@ RSpec.describe Workflow, type: :model do
       expect { Issue.find(issue2.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         workflow = Workflow.new(issue: Issue.find(issue1.id))
@@ -255,7 +252,6 @@ RSpec.describe Workflow, type: :model do
       issue = create(:basic_issue, person: person)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         workflow = Workflow.new(issue: Issue.find(issue.id))
@@ -271,7 +267,6 @@ RSpec.describe Workflow, type: :model do
       person3 = workflow3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       workflow = Workflow.find(workflow1.id)
       workflow.workflow_type = 'risk_check'
@@ -291,7 +286,6 @@ RSpec.describe Workflow, type: :model do
       workflow.save!
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       workflow = Workflow.find(workflow3.id)
       workflow.workflow_type = 'risk_check'
@@ -305,7 +299,6 @@ RSpec.describe Workflow, type: :model do
       person3 = workflow3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Workflow.find(workflow1.id).destroy).to be_truthy
       expect(Workflow.find(workflow2.id).destroy).to be_truthy
@@ -313,7 +306,6 @@ RSpec.describe Workflow, type: :model do
       expect(Workflow.find(workflow4.id).destroy).to be_truthy
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect(Workflow.find(workflow3.id).destroy).to be_truthy
     end
@@ -329,7 +321,6 @@ RSpec.describe Workflow, type: :model do
       expect(Workflow.find(workflow4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Workflow.find(workflow1.id)).to_not be_nil
       expect(Workflow.find(workflow2.id)).to_not be_nil
@@ -338,7 +329,6 @@ RSpec.describe Workflow, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect { Workflow.find(workflow1.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Workflow.find(workflow2.id)).to_not be_nil
@@ -346,7 +336,6 @@ RSpec.describe Workflow, type: :model do
       expect(Workflow.find(workflow4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Workflow.find(workflow1.id)).to_not be_nil
       expect(Workflow.find(workflow2.id)).to_not be_nil
@@ -367,7 +356,6 @@ RSpec.describe Workflow, type: :model do
       expect(workflows[3].id).to eq(workflow4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       workflows = Workflow.all
       expect(workflows.count).to eq(3)
@@ -377,7 +365,6 @@ RSpec.describe Workflow, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       workflows = Workflow.all
       expect(workflows.count).to eq(3)
@@ -386,7 +373,6 @@ RSpec.describe Workflow, type: :model do
       expect(workflows[2].id).to eq(workflow4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       workflows = Workflow.all
       expect(workflows.count).to eq(4)

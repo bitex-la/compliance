@@ -74,7 +74,6 @@ describe Attachment do
 
     before :each do
       admin_user.tags.clear
-      admin_user.save!
     end
 
     it "allow attachment creation only with person valid admin tags" do
@@ -82,7 +81,6 @@ describe Attachment do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
@@ -108,7 +106,6 @@ describe Attachment do
       expect(attachment).to eq(Attachment.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create "/attachments",
@@ -159,7 +156,6 @@ describe Attachment do
         issue: issue, add_all_attachments: false)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         api_create "/attachments",
@@ -200,7 +196,6 @@ describe Attachment do
       api_get("/attachments/#{att4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/attachments/#{att1.id}")
       api_get("/attachments/#{att2.id}")
@@ -209,7 +204,6 @@ describe Attachment do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/attachments/#{att1.id}", {}, 404)
       api_get("/attachments/#{att2.id}")
@@ -217,7 +211,6 @@ describe Attachment do
       api_get("/attachments/#{att4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/attachments/#{att1.id}")
       api_get("/attachments/#{att2.id}")
@@ -260,7 +253,6 @@ describe Attachment do
       expect(api_response.data[3].id).to eq(att1.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/attachments/")
       expect(api_response.meta.total_items).to eq(3)
@@ -270,7 +262,6 @@ describe Attachment do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/attachments/")
       expect(api_response.meta.total_items).to eq(3)
@@ -279,7 +270,6 @@ describe Attachment do
       expect(api_response.data[2].id).to eq(att2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/attachments/")
       expect(api_response.meta.total_items).to eq(4)

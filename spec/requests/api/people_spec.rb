@@ -638,8 +638,7 @@ describe Person do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow person creation only with admin tags" do
@@ -647,7 +646,6 @@ describe Person do
       person_tag2 = create(:alt_person_tag)
 
       admin_user.tags << person_tag1
-      admin_user.save!
 
       api_create('/people',
         type: 'people',
@@ -669,7 +667,6 @@ describe Person do
       expect(person).to eq(Person.last)
 
       admin_user.tags << person_tag2
-      admin_user.save!
 
       api_create('/people',
         type: 'people',
@@ -721,7 +718,6 @@ describe Person do
       person_tag1 = create(:person_tag)
 
       admin_user.tags << person_tag1
-      admin_user.save!
 
       api_create('/people',
         type: 'people',
@@ -732,7 +728,6 @@ describe Person do
       person1, person2, person3, person4 = setup_for_admin_tags_spec
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get "/people/#{person1.id}/download_profile", {}, 200
       api_get "/people/#{person2.id}/download_profile", {}, 200
@@ -740,7 +735,6 @@ describe Person do
       api_get "/people/#{person4.id}/download_profile", {}, 200
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get "/people/#{person3.id}/download_profile", {}, 200
     end
@@ -749,7 +743,6 @@ describe Person do
       person1, person2, person3, person4 = setup_for_admin_tags_spec
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       %i{enable disable reject}.each do |action|
         api_request :post, "/people/#{person1.id}/#{action}", {}, 200
@@ -759,7 +752,6 @@ describe Person do
       end
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       %i{enable disable reject}.each do |action|
         api_request :post, "/people/#{person3.id}/#{action}", {}, 200
@@ -790,7 +782,6 @@ describe Person do
         attributes: { enabled: true }
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_update "/people/#{person1.id}",
         type: "people",
@@ -814,7 +805,6 @@ describe Person do
         attributes: { enabled: true }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/people/#{person3.id}",
         type: "people",
@@ -833,7 +823,6 @@ describe Person do
       Person.all.map(&:expire_action_cache)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get "/people/#{person1.id}"
       api_get "/people/#{person2.id}"
@@ -844,7 +833,6 @@ describe Person do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get "/people/#{person1.id}", {}, 404
       api_get "/people/#{person2.id}"
@@ -852,7 +840,6 @@ describe Person do
       api_get "/people/#{person4.id}"
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get "/people/#{person1.id}"
       api_get "/people/#{person2.id}"
@@ -871,7 +858,6 @@ describe Person do
       expect(api_response.data[3].id).to eq(person4.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get "/people"
       expect(api_response.meta.total_items).to eq(3)
@@ -881,7 +867,6 @@ describe Person do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get "/people"
       expect(api_response.meta.total_items).to eq(3)
@@ -890,7 +875,6 @@ describe Person do
       expect(api_response.data[2].id).to eq(person4.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get "/people"
       expect(api_response.meta.total_items).to eq(4)

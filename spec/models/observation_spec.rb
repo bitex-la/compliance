@@ -129,7 +129,6 @@ RSpec.describe Observation, type: :model do
 
     before :each do
       admin_user.tags.clear
-      admin_user.save!
     end
 
     it "allow observation creation only with person valid admin tags" do
@@ -137,7 +136,6 @@ RSpec.describe Observation, type: :model do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
@@ -150,7 +148,6 @@ RSpec.describe Observation, type: :model do
       expect { Issue.find(issue2.id) }.to raise_error(ActiveRecord::RecordNotFound)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         obs = Observation.new(issue: Issue.find(issue1.id))
@@ -188,7 +185,6 @@ RSpec.describe Observation, type: :model do
       issue = create(:basic_issue, person: person)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         obs = Observation.new(issue: Issue.find(issue.id))
@@ -202,7 +198,6 @@ RSpec.describe Observation, type: :model do
       person3 = obs3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       obs = Observation.find(obs1.id)
       obs.reply = "Some reply here"
@@ -219,7 +214,6 @@ RSpec.describe Observation, type: :model do
       obs.save!
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       obs = Observation.find(obs3.id)
       obs.reply = "Some reply here"
@@ -237,7 +231,6 @@ RSpec.describe Observation, type: :model do
       expect(Observation.find(obs4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Observation.find(obs1.id)).to_not be_nil
       expect(Observation.find(obs2.id)).to_not be_nil
@@ -246,7 +239,6 @@ RSpec.describe Observation, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       expect { Observation.find(obs1.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Observation.find(obs2.id)).to_not be_nil
@@ -254,7 +246,6 @@ RSpec.describe Observation, type: :model do
       expect(Observation.find(obs4.id)).to_not be_nil
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect(Observation.find(obs1.id)).to_not be_nil
       expect(Observation.find(obs2.id)).to_not be_nil
@@ -275,7 +266,6 @@ RSpec.describe Observation, type: :model do
       expect(observations[3].id).to eq(obs4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       observations = Observation.all
       expect(observations.count).to eq(3)
@@ -285,7 +275,6 @@ RSpec.describe Observation, type: :model do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       observations = Observation.all
       expect(observations.count).to eq(3)
@@ -294,7 +283,6 @@ RSpec.describe Observation, type: :model do
       expect(observations[2].id).to eq(obs4.id)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       observations = Observation.all
       expect(observations.count).to eq(4)

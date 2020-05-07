@@ -90,8 +90,7 @@ describe Observation do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow observation creation only with person valid admin tags" do
@@ -99,7 +98,6 @@ describe Observation do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       issue1 = create(:basic_issue, person: person1)
       issue2 = create(:basic_issue, person: person2)
@@ -139,7 +137,6 @@ describe Observation do
       expect(obs).to eq(Observation.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create "/observations", {
@@ -221,7 +218,6 @@ describe Observation do
       attributes = attributes_for(:robot_observation)
 
       admin_user.tags << person.tags.first
-      admin_user.save!
 
       expect do
         api_create "/observations", {
@@ -243,7 +239,6 @@ describe Observation do
       person3 = obs3.issue.person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_update "/observations/#{obs1.id}",
         type: 'observations',
@@ -267,7 +262,6 @@ describe Observation do
         attributes: { reply: "Some reply here" }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/observations/#{obs3.id}",
         type: 'observations',
@@ -286,7 +280,6 @@ describe Observation do
       api_get("/observations/#{obs4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/observations/#{obs1.id}")
       api_get("/observations/#{obs2.id}")
@@ -295,7 +288,6 @@ describe Observation do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/observations/#{obs1.id}", {}, 404)
       api_get("/observations/#{obs2.id}")
@@ -303,7 +295,6 @@ describe Observation do
       api_get("/observations/#{obs4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/observations/#{obs1.id}")
       api_get("/observations/#{obs2.id}")
@@ -324,7 +315,6 @@ describe Observation do
       expect(api_response.data[3].id).to eq(obs1.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/observations/")
       expect(api_response.meta.total_items).to eq(3)
@@ -334,7 +324,6 @@ describe Observation do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/observations/")
       expect(api_response.meta.total_items).to eq(3)
@@ -343,7 +332,6 @@ describe Observation do
       expect(api_response.data[2].id).to eq(obs2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/observations/")
       expect(api_response.meta.total_items).to eq(4)

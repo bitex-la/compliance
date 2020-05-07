@@ -68,8 +68,7 @@ describe FundTransfer do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow fund transfer creation only with person valid admin tags" do
@@ -78,7 +77,6 @@ describe FundTransfer do
       person3 = create(:empty_person)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       attributes = attributes_for(:full_fund_transfer)
 
@@ -109,7 +107,7 @@ describe FundTransfer do
       expect(fund).to eq(FundTransfer.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
+      
 
       expect do
         api_create '/fund_transfers',
@@ -179,7 +177,6 @@ describe FundTransfer do
       attributes = attributes_for(:full_fund_transfer)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         api_create '/fund_transfers',
@@ -198,7 +195,6 @@ describe FundTransfer do
       person3 = fund_transfer3.source_person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_update "/fund_transfers/#{fund_transfer1.id}",
         type: 'fund_transfers',
@@ -231,7 +227,6 @@ describe FundTransfer do
         }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/fund_transfers/#{fund_transfer3.id}",
         type: 'fund_transfers',
@@ -252,7 +247,6 @@ describe FundTransfer do
       api_get("/fund_transfers/#{fund_transfer4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_transfers/#{fund_transfer1.id}")
       api_get("/fund_transfers/#{fund_transfer2.id}")
@@ -261,7 +255,6 @@ describe FundTransfer do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/fund_transfers/#{fund_transfer1.id}", {}, 404)
       api_get("/fund_transfers/#{fund_transfer2.id}")
@@ -269,7 +262,6 @@ describe FundTransfer do
       api_get("/fund_transfers/#{fund_transfer4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_transfers/#{fund_transfer1.id}")
       api_get("/fund_transfers/#{fund_transfer2.id}")
@@ -290,7 +282,6 @@ describe FundTransfer do
       expect(api_response.data[3].id).to eq(fund_transfer1.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_transfers/")
       expect(api_response.meta.total_items).to eq(3)
@@ -300,7 +291,6 @@ describe FundTransfer do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/fund_transfers/")
       expect(api_response.meta.total_items).to eq(3)
@@ -309,7 +299,6 @@ describe FundTransfer do
       expect(api_response.data[2].id).to eq(fund_transfer2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_transfers/")
       expect(api_response.meta.total_items).to eq(4)

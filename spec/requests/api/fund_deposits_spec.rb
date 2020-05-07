@@ -73,8 +73,7 @@ describe FundDeposit do
     let(:admin_user) { create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     it "allow fund deposit creation only with person valid admin tags" do
@@ -82,7 +81,6 @@ describe FundDeposit do
       person2 = create(:alt_full_person_tagging).person
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       attributes = attributes_for(:full_fund_deposit)
 
@@ -111,7 +109,6 @@ describe FundDeposit do
       expect(fund).to eq(FundDeposit.last)
 
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       expect do
         api_create '/fund_deposits',
@@ -175,7 +172,6 @@ describe FundDeposit do
       attributes = attributes_for(:full_fund_deposit)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       expect do
         api_create '/fund_deposits',
@@ -195,7 +191,6 @@ describe FundDeposit do
 
       admin_user.tags << person1.tags.first
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       api_update "/fund_deposits/#{fund_deposit1.id}",
         type: 'fund_deposits',
@@ -232,7 +227,6 @@ describe FundDeposit do
         }
 
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_update "/fund_deposits/#{fund_deposit3.id}",
         type: 'fund_deposits',
@@ -256,7 +250,6 @@ describe FundDeposit do
 
       admin_user.tags << person1.tags.first
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       api_get("/fund_deposits/#{fund_deposit1.id}")
       api_get("/fund_deposits/#{fund_deposit2.id}")
@@ -265,7 +258,6 @@ describe FundDeposit do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/fund_deposits/#{fund_deposit1.id}", {}, 404)
       api_get("/fund_deposits/#{fund_deposit2.id}")
@@ -273,7 +265,6 @@ describe FundDeposit do
       api_get("/fund_deposits/#{fund_deposit4.id}")
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_deposits/#{fund_deposit1.id}")
       api_get("/fund_deposits/#{fund_deposit2.id}")
@@ -296,7 +287,6 @@ describe FundDeposit do
 
       admin_user.tags << person1.tags.first
       admin_user.tags << person2.tags.first
-      admin_user.save!
 
       api_get("/fund_deposits/")
       expect(api_response.meta.total_items).to eq(3)
@@ -306,7 +296,6 @@ describe FundDeposit do
 
       admin_user.tags.delete(person1.tags.first)
       admin_user.tags << person3.tags.first
-      admin_user.save!
 
       api_get("/fund_deposits/")
       expect(api_response.meta.total_items).to eq(3)
@@ -315,7 +304,6 @@ describe FundDeposit do
       expect(api_response.data[2].id).to eq(fund_deposit2.id.to_s)
 
       admin_user.tags << person1.tags.first
-      admin_user.save!
 
       api_get("/fund_deposits/")
       expect(api_response.meta.total_items).to eq(4)
