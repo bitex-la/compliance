@@ -15,7 +15,7 @@ describe ChileInvoicingDetailSeed do
 
   it_behaves_like 'observable', :full_chile_invoicing_detail_seed_with_issue
 
-  it_behaves_like('seed_model', :chile_invoicing_details,
+  it_behaves_like 'seed_scopeable', :chile_invoicing_details,
     :full_chile_invoicing_detail,
-    :alt_full_chile_invoicing_detail)
+    :alt_full_chile_invoicing_detail
 end

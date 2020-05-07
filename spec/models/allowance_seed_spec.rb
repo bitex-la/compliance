@@ -6,7 +6,7 @@ describe AllowanceSeed do
 
   it_behaves_like 'observable'
 
-  it_behaves_like 'seed_model',
+  it_behaves_like 'seed_scopeable',
     :allowances,
     :salary_allowance,
     :alt_salary_allowance

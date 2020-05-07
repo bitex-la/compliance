@@ -12,6 +12,10 @@ RSpec.describe Identification, type: :model do
 
   it_behaves_like 'archived_fruit', :identifications, :full_natural_person_identification
 
+  it_behaves_like 'fruit_scopeable',
+    :identifications,
+    :full_natural_person_identification
+
   it 'is not valid without a person' do
     expect(invalid_identification).to_not be_valid
   end

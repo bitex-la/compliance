@@ -10,7 +10,7 @@ describe AffinitySeed do
 
   it_behaves_like 'observable'
 
-  it_behaves_like 'seed_model', :affinities, :full_affinity, :alt_full_affinity
+  it_behaves_like 'seed_scopeable', :affinities, :full_affinity, :alt_full_affinity
 
   it_behaves_like 'archived_seed', :full_affinity
 

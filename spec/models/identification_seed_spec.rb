@@ -26,7 +26,7 @@ describe IdentificationSeed do
     public_registry_extra_data: ' 344343'
   }
 
-  it_behaves_like 'seed_model',
+  it_behaves_like 'seed_scopeable',
     :identifications,
     :full_natural_person_identification,
     :alt_full_natural_person_identification

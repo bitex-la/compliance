@@ -20,7 +20,7 @@ describe RiskScoreSeed do
 
   it_behaves_like 'observable'
 
-  it_behaves_like 'seed_model',
+  it_behaves_like 'seed_scopeable',
     :risk_scores,
     :full_risk_score,
     :alt_full_risk_score

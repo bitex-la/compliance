@@ -26,7 +26,7 @@ RSpec.describe NoteSeed, type: :model do
     body: '  The body  ',
   }
 
-  it_behaves_like 'seed_model',
+  it_behaves_like 'seed_scopeable',
     :notes,
     :full_note,
     :alt_full_note

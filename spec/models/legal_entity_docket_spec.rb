@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe LegalEntityDocket, type: :model do
+  it_behaves_like 'fruit_scopeable', :legal_entity_dockets,
+    :full_legal_entity_docket
+
   let(:person) { create(:empty_person) }
   let(:invalid_docket) { described_class.new }
   let(:valid_docket)   { 

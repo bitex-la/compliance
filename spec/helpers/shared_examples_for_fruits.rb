@@ -67,3 +67,129 @@ shared_examples 'archived_fruit' do |fruit, seed_type|
     expect(fruit_class.archived(person).include?(seed2.fruit)).to be_falsey
   end
 end
+
+shared_examples "fruit_scopeable" do |type, initial_factory|
+  initial_seed = "#{initial_factory}_seed"
+
+  describe "When filter by admin tags" do
+    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+    before :each do
+      admin_user
+    end
+
+    it "show #{type} with admin user active tags" do
+      seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+      person1 = seed1.issue.person
+      person3 = seed3.issue.person
+
+      expect(subject.class.find(seed1.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed2.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed3.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed4.fruit.id)).to_not be_nil
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      expect(subject.class.find(seed1.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed2.fruit.id)).to_not be_nil
+      expect { subject.class.find(seed3.fruit.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(subject.class.find(seed4.fruit.id)).to_not be_nil
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      expect { subject.class.find(seed1.fruit.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(subject.class.find(seed2.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed3.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed4.fruit.id)).to_not be_nil
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      expect(subject.class.find(seed1.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed2.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed3.fruit.id)).to_not be_nil
+      expect(subject.class.find(seed4.fruit.id)).to_not be_nil
+    end
+
+    it "index #{type} with admin user active tags" do
+      seed1, seed2, seed3, seed4 = setup_for_admin_tags_spec(initial_seed)
+      person1 = seed1.issue.person
+      person3 = seed3.issue.person
+
+      fruits = subject.class.all
+      expect(fruits.count).to eq(4)
+      expect(fruits[0].id).to eq(seed1.fruit.id)
+      expect(fruits[1].id).to eq(seed2.fruit.id)
+      expect(fruits[2].id).to eq(seed3.fruit.id)
+      expect(fruits[3].id).to eq(seed4.fruit.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      fruits = subject.class.all
+      expect(fruits.count).to eq(3)
+      expect(fruits[0].id).to eq(seed1.fruit.id)
+      expect(fruits[1].id).to eq(seed2.fruit.id)
+      expect(fruits[2].id).to eq(seed4.fruit.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+      admin_user.save!
+
+      fruits = subject.class.all
+      expect(fruits.count).to eq(3)
+      expect(fruits[0].id).to eq(seed2.fruit.id)
+      expect(fruits[1].id).to eq(seed3.fruit.id)
+      expect(fruits[2].id).to eq(seed4.fruit.id)
+
+      admin_user.tags << person1.tags.first
+      admin_user.save!
+
+      fruits = subject.class.all
+      expect(fruits.count).to eq(4)
+      expect(fruits[0].id).to eq(seed1.fruit.id)
+      expect(fruits[1].id).to eq(seed2.fruit.id)
+      expect(fruits[2].id).to eq(seed3.fruit.id)
+      expect(fruits[3].id).to eq(seed4.fruit.id)
+    end
+  end
+
+  def setup_for_admin_tags_spec(initial_seed)
+    person1 = create(:full_person_tagging).person
+    person2 = create(:empty_person)
+    person3 = create(:alt_full_person_tagging).person
+    person4 = create(:empty_person)
+    person4.tags << person1.tags.first
+    person4.tags << person3.tags.first
+
+    seed1 = create(initial_seed, issue: create(:basic_issue, person: person1))
+    seed2 = create(initial_seed, issue: create(:basic_issue, person: person2))
+    seed3 = create(initial_seed, issue: create(:basic_issue, person: person3))
+    seed4 = create(initial_seed, issue: create(:basic_issue, person: person4))
+
+    admin_user.tags.clear
+    seed1.issue.reload.approve!
+    admin_user.tags.clear
+    seed2.issue.reload.approve!
+    admin_user.tags.clear
+    if seed2.issue.person.tags.count >= 1
+      seed2.issue.person.tags.delete seed2.issue.person.tags.last
+    end
+    admin_user.tags.clear
+    seed3.issue.reload.approve!
+    admin_user.tags.clear
+    seed4.issue.reload.approve!
+
+    admin_user.tags.clear
+
+    seed1.reload
+    seed2.reload
+    seed3.reload
+    seed4.reload
+
+    [seed1, seed2, seed3, seed4]
+  end
+end
