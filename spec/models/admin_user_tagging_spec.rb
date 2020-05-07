@@ -7,7 +7,7 @@ RSpec.describe AdminUserTagging, type: :model do
   it 'validates non null fields' do
     invalid = AdminUserTagging.new
     expect(invalid).not_to be_valid
-    expect(invalid.errors.keys).to match_array(%i[
+    expect(invalid.errors.keys).to eq %i[admin_user tag]
       admin_user tag ])
   end
 
