@@ -21,8 +21,7 @@ shared_examples "seed_model" do |type, initial_factory, later_factory|
     let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
     before :each do
-      admin_user.tags.clear
-      admin_user.save!
+      admin_user
     end
 
     describe "seeds" do

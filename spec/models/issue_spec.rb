@@ -631,10 +631,10 @@ RSpec.describe Issue, type: :model do
 
     it 'does nothing if no invoicing details' do
       issue = create(:basic_issue)
-      expect do 
+      expect do
         issue.complete!
         issue.approve!
-      end.not_to change{ [Tag.count, issue.person.reload.tags] }
+      end.not_to change { [Tag.count, issue.person.reload.tags.count] }
     end
 
     it 'add country tag to person not creating a new tag on complete' do

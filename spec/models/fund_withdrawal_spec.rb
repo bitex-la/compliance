@@ -39,20 +39,20 @@ RSpec.describe FundWithdrawal do
   it 'creates person country tags if needed, and applies them only if needed' do
     bob = create(:empty_person)
 
-    expect{ create(:full_fund_withdrawal, person: bob) }
+    expect { create(:full_fund_withdrawal, person: bob) }
       .to change { Tag.count }.by(1)
 
     tag = Tag.last
     expect(tag.name).to eq 'active-in-AR'
     expect(bob.tags.first).to eq(tag)
 
-    alice = create(:empty_person) 
-    expect{ create(:full_fund_withdrawal, person: alice) }
-      .not_to change{ Tag.count }
+    alice = create(:empty_person)
+    expect { create(:full_fund_withdrawal, person: alice) }
+      .not_to change { Tag.count }
 
     expect(alice.tags.first).to eq(tag)
 
-    expect{ create(:full_fund_withdrawal, person: alice) }
+    expect { create(:full_fund_withdrawal, person: alice) }
       .not_to change{ alice.tags }
   end
 end

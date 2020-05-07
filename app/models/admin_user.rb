@@ -67,6 +67,8 @@ class AdminUser < ApplicationRecord
   end
 
   def add_tag(tag)
+    return if admin_user_taggings.empty?
+
     admin_user_taggings.find_or_create_by(tag: tag)
     tags.reload
   end
