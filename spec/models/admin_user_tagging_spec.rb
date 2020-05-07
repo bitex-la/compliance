@@ -8,7 +8,6 @@ RSpec.describe AdminUserTagging, type: :model do
     invalid = AdminUserTagging.new
     expect(invalid).not_to be_valid
     expect(invalid.errors.keys).to eq %i[admin_user tag]
-      admin_user tag ])
   end
 
   it 'is valid with an admin user and tag' do
