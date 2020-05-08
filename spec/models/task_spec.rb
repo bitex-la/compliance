@@ -84,29 +84,4 @@ RSpec.describe Task, type: :model do
       expect(basic_task.state).to eq("failed")
     end
   end
-
-  describe "When filter by admin tags" do
-    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
-
-    before :each do
-      admin_user.tags
-    end
-
-    it "Destroy a task with person tags if admin has tags" do
-      task1, task2, task3, task4 = setup_for_admin_tags_spec
-      person1 = task1.workflow.issue.person
-      person3 = task3.workflow.issue.person
-
-      admin_user.tags << person1.tags.first
-
-      expect(Task.find(task1.id).destroy).to be_truthy
-      expect(Task.find(task2.id).destroy).to be_truthy
-      expect { Task.find(task3.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(Task.find(task4.id).destroy).to be_truthy
-
-      admin_user.tags << person3.tags.first
-
-      expect(Task.find(task3.id).destroy).to be_truthy
-    end
-  end
 end

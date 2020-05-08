@@ -186,31 +186,4 @@ RSpec.describe Workflow, type: :model do
       expect(basic_workflow).to have_state(:started)
     end
   end
-
-  describe "When filter by admin tags" do
-    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
-
-    before :each do
-      admin_user
-    end
-
-    it "Destroy a task with person tags if admin has tags" do
-      workflow1, workflow2, workflow3, workflow4 = setup_for_admin_tags_spec
-      person1 = workflow1.issue.person
-      person3 = workflow3.issue.person
-
-      admin_user.tags << person1.tags.first
-      expect(described_class.find(workflow1.id).destroy).to be_truthy
-      expect(described_class.find(workflow2.id).destroy).to be_truthy
-      expect(described_class.find(workflow4.id).destroy).to be_truthy
-      assert_not_accessible(workflow3)
-
-      admin_user.tags << person3.tags.first
-      expect(described_class.find(workflow3.id).destroy).to be_truthy
-    end
-
-    def assert_not_accessible(*args)
-      args.each { |i| expect { described_class.find(i.id) }.to raise_error(ActiveRecord::RecordNotFound) }
-    end
-  end
 end

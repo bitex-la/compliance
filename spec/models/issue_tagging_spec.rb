@@ -52,27 +52,4 @@ RSpec.describe IssueTagging, type: :model do
     
     expect(Issue.by_person_tag person_tag.id).to include issue
   end
-
-  describe "When filter by admin tags" do
-    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
-
-    before :each do
-      admin_user
-    end
-
-    it "Destroy a issue tagging with person tags if admin has tags" do
-      issue_tag1, issue_tag2, issue_tag3, issue_tag4 = setup_for_admin_tags_spec
-      person1 = issue_tag1.issue.person
-      person3 = issue_tag3.issue.person
-
-      admin_user.tags << person1.tags.first
-      expect(IssueTagging.find(issue_tag1.id).destroy).to be_truthy
-      expect(IssueTagging.find(issue_tag2.id).destroy).to be_truthy
-      expect(IssueTagging.find(issue_tag4.id).destroy).to be_truthy
-      assert_not_accessible(issue_tag3)
-
-      admin_user.tags << person3.tags.first
-      expect(IssueTagging.find(issue_tag3.id).destroy).to be_truthy
-    end
-  end
 end
