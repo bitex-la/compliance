@@ -18,6 +18,7 @@ class AffinityKind
     [65, :payee, :payer],
     [70, :payer, :payee],
     [75, :provider, :customer],
+    [80, :same_person],
   ]
 
   def name
