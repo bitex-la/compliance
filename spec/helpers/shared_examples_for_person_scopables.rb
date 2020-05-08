@@ -65,7 +65,7 @@ shared_examples 'person_scopable' do |options|
     resource = instance_exec(allowed.id, &creator)
 
     expect do
-      options[:change_person].call(resource, forbidden.id)
+      instance_exec(resource, forbidden.id, &options[:change_person])
       resource.save!
     end.to raise_error(ActiveRecord::RecordInvalid)
   end
@@ -80,7 +80,7 @@ shared_examples 'person_scopable' do |options|
     admin_user.tags.clear
 
     expect do
-      options[:change_person].call(resource, another.id)
+      instance_exec(resource, another.id, &options[:change_person])
       resource.save!
     end.not_to raise_error
   end
@@ -95,7 +95,7 @@ shared_examples 'person_scopable' do |options|
     expect(untagged.reload.tags).to be_empty
 
     expect do
-      options[:change_person].call(resource, untagged.id)
+      instance_exec(resource, untagged.id, &options[:change_person])
       resource.save!
     end.not_to raise_error
   end

@@ -7,6 +7,7 @@ module Tagging
 
     validates taggable_type, presence: true
     validates :tag,
+      presence: true,
       uniqueness: { 
         scope: taggable_type,
         message: "can't contain duplicates in the same #{taggable_type}"
