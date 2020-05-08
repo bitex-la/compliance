@@ -26,8 +26,9 @@ RSpec.describe NoteSeed, type: :model do
     body: '  The body  ',
   }
 
-  it_behaves_like 'seed_scopeable',
-    :notes,
-    :full_note,
-    :alt_full_note
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_note_seed, issue: issue)
+    }
 end

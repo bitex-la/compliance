@@ -17,7 +17,9 @@ describe ArgentinaInvoicingDetailSeed do
 
   it_behaves_like 'observable', :full_argentina_invoicing_detail_seed_with_issue
 
-  it_behaves_like 'seed_scopeable', :argentina_invoicing_details,
-    :full_argentina_invoicing_detail,
-    :alt_full_argentina_invoicing_detail
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_argentina_invoicing_detail_seed, issue: issue)
+    }
 end

@@ -16,5 +16,9 @@ describe PhoneSeed do
     note:  'please do not call on Sundays ',
   }
 
-  it_behaves_like 'seed_scopeable', :phones, :full_phone, :alt_full_phone
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_phone_seed, issue: issue)
+    }
 end

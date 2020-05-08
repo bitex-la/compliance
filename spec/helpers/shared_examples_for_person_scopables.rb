@@ -165,7 +165,7 @@ shared_examples 'person_scopable' do |options|
     expect(subject.class.count).to eq 2
   end
 
-  it "index workflow with admin user active tags" do
+  it "index  with admin user active tags" do
     person1 = create(:full_person_tagging).person
     person2 = create(:empty_person)
     person3 = create(:alt_full_person_tagging).person
@@ -175,6 +175,10 @@ shared_examples 'person_scopable' do |options|
     resource2 = instance_exec(person2.id, &creator)
     resource3 = instance_exec(person3.id, &creator)
     resource4 = instance_exec(person4.id, &creator)
+
+    # Creating the resource and adding tags to it may tag the current
+    # admin user, so we need to clear all tags here.
+    admin_user.tags.clear
 
     expect(subject.class.all).to contain_exactly(resource1, resource2, resource3, resource4)
 

@@ -24,8 +24,11 @@ describe LegalEntityDocketSeed do
     legal_name: 'Crypto Sports Holdings  '
   }
 
-  it_behaves_like 'seed_scopeable', :legal_entity_dockets,
-    :full_legal_entity_docket, :alt_full_legal_entity_docket
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_legal_entity_docket_seed, issue: issue)
+    }
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid

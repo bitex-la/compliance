@@ -20,8 +20,9 @@ describe RiskScoreSeed do
 
   it_behaves_like 'observable'
 
-  it_behaves_like 'seed_scopeable',
-    :risk_scores,
-    :full_risk_score,
-    :alt_full_risk_score
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_risk_score_seed, issue: issue)
+    }
 end
