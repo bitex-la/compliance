@@ -80,13 +80,7 @@ module Garden
 
       default_scope { joins(:issue).distinct }
 
-      after_save{
-        begin
-          person.expire_action_cache
-        rescue Exception => e
-          debugger
-        end
-      }
+      after_save { person.expire_action_cache }
 
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')

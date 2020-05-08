@@ -5,11 +5,7 @@ RSpec.describe IssueTagging, type: :model do
     create: -> (person_id) { 
       issue = with_untagged_admin{ create(:basic_issue, person_id: person_id) }
       create(:some_issue_tagging, issue_id: issue.id)
-    },
-    change_person: -> (obj, person_id){
-      obj.issue_id = with_untagged_admin{ create(:basic_issue, person_id: person_id) }
     }
-  next
 
   let(:issue) { create(:basic_issue) }
   let(:tag) { create(:issue_tag) }
@@ -64,89 +60,18 @@ RSpec.describe IssueTagging, type: :model do
       admin_user
     end
 
-    it "allow issue tagging creation only with person valid admin tags" do
-      person1 = create(:full_person_tagging).person
-      person2 = create(:alt_full_person_tagging).person
-
-      issue1 = create(:basic_issue, person: person1)
-      issue2 = create(:basic_issue, person: person2)
-
-      tag = create(:issue_tag)
-      alt_tag = create(:alt_issue_tag)
-
-      admin_user.tags << person1.tags.first
-
-      expect do
-        issue1 = IssueTagging.new(issue: Issue.find(issue1.id), tag: tag)
-        issue1.save!
-      end.to change { IssueTagging.count }.by(1)
-
-      expect { Issue.find(issue2.id) }.to raise_error(ActiveRecord::RecordNotFound)
-
-      admin_user.tags << person2.tags.first
-
-      expect do
-        issue1 = IssueTagging.new(issue: Issue.find(issue1.id), tag: alt_tag)
-        issue1.save!
-      end.to change { IssueTagging.count }.by(1)
-
-      expect do
-        issue1 = IssueTagging.new(issue: Issue.find(issue2.id), tag: tag)
-        issue1.save!
-      end.to change { IssueTagging.count }.by(1)
-    end
-
-    it "allow issue tagging creation with person tags if admin has no tags" do
-      person = create(:full_person_tagging).person
-      issue = create(:basic_issue, person: person)
-      tag = create(:issue_tag)
-
-      expect do
-        issue1 = IssueTagging.new(issue: Issue.find(issue.id), tag: tag)
-        issue1.save!
-      end.to change { IssueTagging.count }.by(1)
-    end
-
-    it "allow issue tagging creation without person tags if admin has no tags" do
-      person = create(:empty_person)
-
-      issue = create(:basic_issue, person: person)
-      tag = create(:issue_tag)
-
-      expect do
-        issue1 = IssueTagging.new(issue: Issue.find(issue.id), tag: tag)
-        issue1.save!
-      end.to change { IssueTagging.count }.by(1)
-    end
-
-    it "allow issue tagging creation without person tags if admin has tags" do
-      person = create(:full_person_tagging).person
-
-      admin_user.tags << person.tags.first
-
-      issue = create(:basic_issue, person: person)
-      tag = create(:issue_tag)
-
-      expect do
-        issue1 = IssueTagging.new(issue: Issue.find(issue.id), tag: tag)
-        issue1.save!
-      end.to change { IssueTagging.count }.by(1)
-    end
-
     it "Destroy a issue tagging with person tags if admin has tags" do
       issue_tag1, issue_tag2, issue_tag3, issue_tag4 = setup_for_admin_tags_spec
       person1 = issue_tag1.issue.person
       person3 = issue_tag3.issue.person
 
       admin_user.tags << person1.tags.first
-
       expect(IssueTagging.find(issue_tag1.id).destroy).to be_truthy
       expect(IssueTagging.find(issue_tag2.id).destroy).to be_truthy
-      expect { IssueTagging.find(issue_tag3.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(IssueTagging.find(issue_tag4.id).destroy).to be_truthy
+      assert_not_accessible(issue_tag3)
 
       admin_user.tags << person3.tags.first
-
       expect(IssueTagging.find(issue_tag3.id).destroy).to be_truthy
     end
 

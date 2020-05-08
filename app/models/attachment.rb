@@ -54,9 +54,9 @@ class Attachment < ApplicationRecord
     /rar|RAR\z/,
   ]
 
-
   def attached_to_something
     return unless attached_to.nil?
+
     errors.add(:base, 'must_be_attached_to_something')
   end
 
@@ -68,6 +68,7 @@ class Attachment < ApplicationRecord
     # sure that once the person is set, it cannot be nulled again.
     # We check for person instead of person_id so that the admin access rules are applied.
     return unless person_id_was.presence && person.nil?
+
     errors.add(:base, 'cant_unassign_person')
   end
 

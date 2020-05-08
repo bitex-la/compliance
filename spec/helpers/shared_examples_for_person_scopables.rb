@@ -1,5 +1,7 @@
 shared_examples 'person_scopable' do |options|
   creator = options[:create]
+  change_person = options[:change_person]
+
   let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
   let(:allowed) do
@@ -59,18 +61,22 @@ shared_examples 'person_scopable' do |options|
   end
 
   it "forbids updating resources with a forbidden person" do
+    next unless change_person
+
     # We create an admin tagging to ensure tagged access rules still apply
     # even after we remove access for the 'allowed' user.
     forbidden = create(:alt_full_person_tagging).person
     resource = instance_exec(allowed.id, &creator)
 
     expect do
-      instance_exec(resource, forbidden.id, &options[:change_person])
+      instance_exec(resource, forbidden.id, &change_person)
       resource.save!
     end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "allows an untagged admin to update person to be anyone" do
+    next unless change_person
+
     person = create(:full_person_tagging).person
     another = create(:alt_full_person_tagging).person
     resource = instance_exec(person.id, &creator)
@@ -80,12 +86,14 @@ shared_examples 'person_scopable' do |options|
     admin_user.tags.clear
 
     expect do
-      instance_exec(resource, another.id, &options[:change_person])
+      instance_exec(resource, another.id, &change_person)
       resource.save!
     end.not_to raise_error
   end
 
   it "allows a tagged admin to update person to be an untagged person" do
+    next unless change_person
+
     create(:admin_tagging_to_apply_rules, admin_user: admin_user)
     resource = instance_exec(allowed.id, &creator)
 
@@ -95,7 +103,7 @@ shared_examples 'person_scopable' do |options|
     expect(untagged.reload.tags).to be_empty
 
     expect do
-      instance_exec(resource, untagged.id, &options[:change_person])
+      instance_exec(resource, untagged.id, &change_person)
       resource.save!
     end.not_to raise_error
   end

@@ -35,7 +35,7 @@ FactoryBot.define do
 
       factory :some_issue_tag do
         sequence :name do |n|
-          "person-tag-number-#{n}"
+          "issue-tag-number-#{n}"
         end
       end
 
