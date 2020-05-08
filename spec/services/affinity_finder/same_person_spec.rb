@@ -132,15 +132,18 @@ describe AffinityFinder::SamePerson do
     it 'matches when another records full name are a subset of person sub name' do
       person_a = create_natural_person_with_docket('Juan', 'Perez')
       person_b = create_natural_person_with_docket('Juan Antonio', 'Perez')
+      person_c = create_natural_person_with_docket('antonio', 'juan Perez')
 
       expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to match_array(
-        [person_a.id]
+        [person_a.id, person_c.id]
       )
     end
 
     it 'returns empty array when no matches are found' do
       person_a = create_natural_person_with_docket('Juan', 'Perez')
       person_b = create_natural_person_with_docket('Juana', 'Molina')
+      person_c = create_natural_person_with_docket('Juan Carlos', 'Molina')
+      person_d = create_natural_person_with_docket('Juan Antonio', 'Molina')
 
       legal_person_a = create_legal_person_with_docket('Empresa', nil)
       legal_person_b = create_legal_person_with_docket('La Empresa', nil)
@@ -149,6 +152,10 @@ describe AffinityFinder::SamePerson do
       legal_person_d = create_legal_person_with_docket(nil, 'ACME S.A.')
 
       expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to eq(
+        []
+      )
+
+      expect(AffinityFinder::SamePerson.with_matched_names(person_c)).to eq(
         []
       )
 

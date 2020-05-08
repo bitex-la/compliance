@@ -1,15 +1,15 @@
 module AffinityFinder
   class SamePerson
-    # Crear servicio orquestador que llama a este servicio
-
     # Returns Array[Int] (person_ids of orphans if any)
     def self.call(person_id)
       person = Person.find(person_id)
 
+      # find uniq ids of persons matchin name or identification
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
       return nil if matched_ids.empty?
+
 
       persons_ids_linked_by_affinity = []
       matched_ids.each do |match_id|
@@ -19,6 +19,7 @@ module AffinityFinder
 
         # check if there is a same_person affinity
         # already linked to this affinity_person
+        # i.e. an affinity father
         if found_affinity = Affinity.find_by(
           related_person_id: affinity_person.id,
           kind: 'same_person'
@@ -35,6 +36,8 @@ module AffinityFinder
 
         # Crear issues por cada
 
+        # all persons linked to this affinity_person
+        # will be stored in order to bypass in next iteration
         persons_ids_linked_by_affinity << Affinity.where(
           person_id: affinity_person_id,
           kind: 'same_person'
@@ -75,10 +78,6 @@ module AffinityFinder
 
     # Returns Array[Int] (matched Person Ids)
     def self.with_matched_names(person)
-      # By using CONCAT we are not taking advantage of any index
-      # (YET -->)In the newest versions of MySQL 8.0 and MariaDB 10,
-      # you can index "virtual" columns.
-
       case person.person_type
         when :natural_person
           return [] if person.natural_dockets.current.count == 0
@@ -95,10 +94,10 @@ module AffinityFinder
 
           match_names = NaturalDocket.current.where(
                           "natural_dockets.person_id <> :person_id AND
-                          ((FIND_IN_SET(first_name, :words) > 0 AND FIND_IN_SET(last_name, :words) > 0) OR
+                          ((first_name IN (:words) AND last_name IN (:words)) OR
                           (#{conditions.join(' AND ')}))",
                           person_id: person.id,
-                          words: full_name.split(/\W+/).join(','),
+                          words: full_name.split(/\W+/),
                         )
 
           match_names.pluck(:person_id)
@@ -132,9 +131,20 @@ module AffinityFinder
     def create_same_person_issue(related_person, person)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
-      # TODO...
 
-      issue = person.issues.build
+      # Is there a quick way to find an existing
+      pending_issue_ids = person.issues.admin_pending.pluck(:id)
+      return if AffinitySeed.where(
+                  issue_id: pending_issue_ids,
+                  related_person: related_person,
+                  affinity_kind: AffinityKind.find_by_code(:same_person)
+      ).count > 0
+
+      issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
+      issue.affinity_seeds.build(
+        related_person: related_person,
+        affinity_kind: AffinityKind.find_by_code(:same_person)
+      )
 
       # TODO create same_person_affinity_seed in issue
 
