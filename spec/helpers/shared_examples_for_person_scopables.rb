@@ -164,32 +164,4 @@ shared_examples 'person_scopable' do |options|
 
     expect(subject.class.count).to eq 2
   end
-
-  it "index  with admin user active tags" do
-    person1 = create(:full_person_tagging).person
-    person2 = create(:empty_person)
-    person3 = create(:alt_full_person_tagging).person
-    person4 = create(:empty_person)
-
-    resource1 = instance_exec(person1.id, &creator)
-    resource2 = instance_exec(person2.id, &creator)
-    resource3 = instance_exec(person3.id, &creator)
-    resource4 = instance_exec(person4.id, &creator)
-
-    # Creating the resource and adding tags to it may tag the current
-    # admin user, so we need to clear all tags here.
-    admin_user.tags.clear
-
-    expect(subject.class.all).to contain_exactly(resource1, resource2, resource3, resource4)
-
-    admin_user.tags << person1.tags.first
-    expect(subject.class.all).to contain_exactly(resource1, resource2, resource4)
-
-    admin_user.tags.delete(person1.tags.first)
-    admin_user.tags << person3.tags.first
-    expect(subject.class.all).to contain_exactly(resource2, resource3, resource4)
-
-    admin_user.tags << person1.tags.first
-    expect(subject.class.all).to contain_exactly(resource1, resource2, resource3, resource4)
-  end
 end
