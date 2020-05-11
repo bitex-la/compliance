@@ -59,7 +59,7 @@ class Person < ApplicationRecord
 
   def person_tag_must_be_managed_by_admin
     return if tags.empty? ||
-      tags.any? { |t| AdminUser.current_admin_user.can_manage_tag?(t) }
+      tags.any? { |t| AdminUser.current_admin_user&.can_manage_tag?(t) }
 
     errors.add(:person, 'Person tags not allowed')
   end
@@ -309,7 +309,7 @@ class Person < ApplicationRecord
     tag_name = "active-in-#{country}"
     tag = Tag.find_or_create_by(tag_type: :person, name: tag_name)
 
-    AdminUser.current_admin_user.add_tag(tag)
+    AdminUser.current_admin_user&.add_tag(tag)
 
     PersonTagging.find_or_create_by(person: self, tag: tag)
     tags.reload
