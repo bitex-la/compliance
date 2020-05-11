@@ -5,9 +5,7 @@ RSpec.describe Note, type: :model do
 
   it_behaves_like 'archived_fruit', :notes, :full_note
 
-  it_behaves_like 'fruit_scopeable',
-    :notes,
-    :full_note
+  it_behaves_like 'person_scopable_fruit', :full_note
 
   it 'is not valid without body' do
     expect(described_class.new(person: person, body: nil))

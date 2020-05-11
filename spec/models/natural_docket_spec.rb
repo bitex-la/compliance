@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe NaturalDocket, type: :model do
-  it_behaves_like 'fruit_scopeable', :natural_dockets,
-    :full_natural_docket
+  it_behaves_like 'person_scopable_fruit', :full_natural_docket
 
   let(:person) { create(:empty_person) }
   let(:invalid_docket) { described_class.new }

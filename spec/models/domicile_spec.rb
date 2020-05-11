@@ -7,7 +7,7 @@ RSpec.describe Domicile, type: :model do
 
   it_behaves_like 'archived_fruit', :domiciles, :full_domicile
 
-  it_behaves_like 'fruit_scopeable', :domiciles, :full_domicile
+  it_behaves_like 'person_scopable_fruit', :full_domicile
 
   it 'is not valid without a person' do
     expect(invalid_domicile).to_not be_valid

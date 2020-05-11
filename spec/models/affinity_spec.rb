@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Affinity do
-  it_behaves_like 'person_scopable_fruit'
+  it_behaves_like 'person_scopable_fruit', :full_affinity
 
   it_behaves_like 'archived_fruit', :affinities, :full_affinity
 
