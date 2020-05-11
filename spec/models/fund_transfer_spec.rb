@@ -5,7 +5,7 @@ describe FundTransfer do
     create: -> (person_id) {
       create(:fund_transfer,
         source_person_id: person_id,
-        target_person: create(:empty_person)
+        target_person: create(:full_person_tagging, tag: create(:some_person_tag)).person
       )
     },
     change_person: -> (obj, person_id){ obj.source_person_id = person_id }
