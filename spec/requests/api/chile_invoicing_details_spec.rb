@@ -26,10 +26,10 @@ describe ChileInvoicingDetail do
     :chile_invoicing_detail_seeds,
     :full_chile_invoicing_detail_seed_with_person
 
-  it_behaves_like('seed', :chile_invoicing_details,
+  it_behaves_like 'seed', :chile_invoicing_details,
     :full_chile_invoicing_detail,
-    :alt_full_chile_invoicing_detail)
+    :alt_full_chile_invoicing_detail
 
-  it_behaves_like('has_many fruit', :chile_invoicing_details,
-    :full_chile_invoicing_detail)
+  it_behaves_like 'has_many fruit', :chile_invoicing_details,
+    :full_chile_invoicing_detail
 end

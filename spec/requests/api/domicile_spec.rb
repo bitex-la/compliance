@@ -26,7 +26,7 @@ describe Domicile do
     :domicile_seeds,
     :full_domicile_seed_with_person
 
-  it_behaves_like('seed', :domiciles, :full_domicile, :alt_full_domicile)
+  it_behaves_like 'seed', :domiciles, :full_domicile, :alt_full_domicile
 
-  it_behaves_like('has_many fruit', :domiciles, :full_domicile)
+  it_behaves_like 'has_many fruit', :domiciles, :full_domicile
 end
