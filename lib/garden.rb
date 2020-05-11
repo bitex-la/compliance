@@ -33,6 +33,12 @@ module Garden
       cattr_accessor :naming { Naming.new(name) }
       belongs_to :issue
       has_one :person, through: :issue
+      def person
+        # If a seed has an issue, it has a person. Even before it's been saved.
+        # has_one through seems to be ignoring the in-memory object.
+        issue&.person || super
+      end
+
       belongs_to :fruit, class_name: naming.fruit, optional: true
       has_many :attachments, as: :attached_to_seed
 

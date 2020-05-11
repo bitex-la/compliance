@@ -3,26 +3,39 @@ require 'rails_helper'
 describe Attachment do
   it_behaves_like 'person_scopable',
     create: -> (person_id) {
-      issue = create(:basic_issue, person_id: person_id)
-      seed = create(:full_natural_docket_seed, issue: issue, add_all_attachments: false)
-      issue.approve!
-      fruit = seed.reload.fruit
+      fruit = with_untagged_admin do
+        issue = create(:basic_issue, person_id: person_id)
+        seed = create(:full_natural_docket_seed, issue: issue, add_all_attachments: false)
+        issue.approve!
+        seed.reload.fruit
+      end
       create(:jpg_attachment, thing: fruit)
     },
     change_person: -> (obj, person_id){
-      issue = create(:basic_issue, person_id: person_id)
-      seed = create(:full_natural_docket_seed, issue: issue, add_all_attachments: false)
-      issue.approve!
-      obj.attached_to_fruit = seed.reload.fruit
+      fruit = with_untagged_admin do
+        issue = create(:basic_issue, person_id: person_id)
+        seed = create(:full_natural_docket_seed, issue: issue, add_all_attachments: false)
+        issue.approve!
+        seed.reload.fruit
+      end
+      obj.attached_to_fruit = fruit
     }
 
   it_behaves_like 'person_scopable',
     create: -> (person_id) {
-      issue = create(:basic_issue, person_id: person_id)
-      seed = create(:full_natural_docket_seed, issue: issue, add_all_attachments: false)
-      Attachment.create!(attached_to_seed: seed)
+      seed = with_untagged_admin do
+        issue = create(:basic_issue, person_id: person_id)
+        create(:full_natural_docket_seed, issue: issue, add_all_attachments: false)
+      end
+      create(:jpg_attachment, thing: seed)
     },
-    change_person: -> (obj, person_id){ obj.person_id = person_id }
+    change_person: -> (obj, person_id){
+      seed = with_untagged_admin do
+        issue = create(:basic_issue, person_id: person_id)
+        create(:full_natural_docket_seed, issue: issue, add_all_attachments: false)
+      end
+      obj.attached_to_seed = seed
+    }
 
   it 'is valid when attached to something' do
     phone = create(:full_natural_person).reload.phones.first
