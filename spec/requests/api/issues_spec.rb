@@ -74,6 +74,14 @@ describe Issue do
       })
     end
 
+    it 'does not reuse previous valid admin user' do
+      api_get "/issues" # This is authenticated via token and assigns a current admin user.
+      expect(AdminUser.current_admin_user).to be_nil
+      get "/api/issues"
+      assert_response 403
+      expect(AdminUser.current_admin_user).to be_nil
+    end
+
     it 'responds with an Unprocessable Entity when body is empty' do
       api_request :post, "/issues", {}, 422
     end
