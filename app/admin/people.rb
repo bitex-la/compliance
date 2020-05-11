@@ -93,7 +93,7 @@ ActiveAdmin.register Person do
 
   form do |f|
     if resource.new_record?
-      AdminUser.current_admin_user&.tags&.each do |t|
+      AdminUser.current_admin_user.tags.each do |t|
         resource.person_taggings.build(tag: t)
       end
     end

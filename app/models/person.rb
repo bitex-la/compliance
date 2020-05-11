@@ -58,7 +58,6 @@ class Person < ApplicationRecord
   validate :person_tag_must_be_managed_by_admin
 
   def person_tag_must_be_managed_by_admin
-    return unless (admin_user = AdminUser.current_admin_user)
     return if tags.empty? || tags.any? { |t| admin_user.can_manage_tag?(t) }
 
     errors.add(:person, 'Person tags not allowed')
@@ -81,7 +80,7 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def self.default_scope
-    return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
+    return unless (tags = AdminUser.current_admin_user.active_tags.presence)
 
     where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
       OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
@@ -309,7 +308,7 @@ class Person < ApplicationRecord
     tag_name = "active-in-#{country}"
     tag = Tag.find_or_create_by(tag_type: :person, name: tag_name)
 
-    AdminUser.current_admin_user&.add_tag(tag)
+    AdminUser.current_admin_user.add_tag(tag)
 
     PersonTagging.find_or_create_by(person: self, tag: tag)
     tags.reload

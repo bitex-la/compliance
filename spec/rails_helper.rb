@@ -93,7 +93,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
-    AdminUser.current_admin_user = nil
+    AdminUser.current_admin_user = create(:admin_user)
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
     DownloadHelpers::clear_downloads

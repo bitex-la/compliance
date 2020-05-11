@@ -13,7 +13,6 @@ class PersonTagging < ApplicationRecord
   validate :person_tag_must_be_managed_by_admin
 
   def person_tag_must_be_managed_by_admin
-    return unless (admin_user = AdminUser.current_admin_user)
     return unless person&.tags.presence
     return if admin_user.can_manage_tag?(tag)
 

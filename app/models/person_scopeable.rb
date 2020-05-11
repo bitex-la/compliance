@@ -3,7 +3,8 @@ module PersonScopeable
 
   class_methods do
     def default_scope
-      return unless AdminUser.current_admin_user&.active_tags.presence
+      return unless AdminUser.current_admin_user.active_tags.presence
+
       collection_scoped_by_persons
     end
 
