@@ -58,8 +58,9 @@ class Person < ApplicationRecord
   validate :person_tag_must_be_managed_by_admin
 
   def person_tag_must_be_managed_by_admin
+    return unless (admin_user = AdminUser.current_admin_user)
     return if tags.empty? ||
-      tags.any? { |t| AdminUser.current_admin_user&.can_manage_tag?(t) }
+      tags.any? { |t| admin_user.can_manage_tag?(t) }
 
     errors.add(:person, 'Person tags not allowed')
   end
