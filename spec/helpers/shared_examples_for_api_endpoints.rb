@@ -11,6 +11,8 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   it "Gets seed with observation" do
     issue = create(:basic_issue)
+    person = issue.person
+
     initial_attrs = attributes_for(initial_expires_seed)
 
     initial_relations = instance_exec(&relations_proc)
@@ -38,6 +40,8 @@ shared_examples "seed" do |type, initial_factory, later_factory,
 
   it "Creates an expiring seed" do
     issue = create(:basic_issue)
+    person = issue.person
+
     initial_attrs = attributes_for(initial_expires_seed)
 
     initial_relations = instance_exec(&relations_proc)
@@ -75,12 +79,12 @@ shared_examples "seed" do |type, initial_factory, later_factory,
   it "Destroy a #{seed_type}" do
     seed = create(initial_seed, issue: create(:basic_issue))
     api_destroy "/#{seed_type}/#{seed.id}"
-
+    
     response.body.should be_blank
 
     api_get "/#{seed_type}/#{seed.id}", {}, 404
   end
-
+   
   it "Creates, updates and approves #{seed_type}" do
     issue = create(:basic_issue)
     person = issue.person

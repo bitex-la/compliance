@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe Person do
+  let(:admin_user) { create(:admin_user) }
 
   it_behaves_like 'max people allowed request limit',
     :people,
@@ -495,6 +496,7 @@ describe Person do
     it 'responds 404 when the person does not exist' do
       api_get "/people/1", {}, 404
     end
+
 
     it 'create new person with tags' do
       person_tag = create(:person_tag)
