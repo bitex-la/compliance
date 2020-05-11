@@ -89,5 +89,5 @@ describe Attachment do
       pending
       fail
     end
-  end
+  end    
 end

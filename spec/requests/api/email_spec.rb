@@ -26,7 +26,7 @@ describe Email do
     :email_seeds,
     :full_email_seed_with_person
 
-  it_behaves_like 'seed', :emails, :full_email, :alt_full_email
+  it_behaves_like('seed', :emails, :full_email, :alt_full_email)
 
-  it_behaves_like 'has_many fruit', :emails, :full_email
+  it_behaves_like('has_many fruit', :emails, :full_email)
 end

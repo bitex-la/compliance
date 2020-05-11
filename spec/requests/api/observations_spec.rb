@@ -86,3 +86,4 @@ describe Observation do
     api_response.data.attributes.state.should == 'answered'
   end
 end
+
