@@ -64,14 +64,7 @@ class Attachment < ApplicationRecord
   end
 
   def person_cannot_be_removed_once_set
-    # The person is optional for an attachment, as it will always be
-    # set to something after saving the attachment.
-    # TODO: I don't know why the person is not set on a before_validation.
-    # But to make it compatible with other person scopables, we make
-    # sure that once the person is set, it cannot be nulled again.
-    # We check for person instead of person_id so that the admin access rules are applied.
     return unless person_id_was.presence && person.nil?
-
     errors.add(:base, 'cant_unassign_person')
   end
 

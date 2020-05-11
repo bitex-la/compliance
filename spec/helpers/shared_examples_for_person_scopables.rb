@@ -14,6 +14,8 @@ shared_examples 'person_scopable' do |options|
     admin_user
   end
 
+  it_behaves_like 'person_scopable_readonly', options
+
   it 'can only create for allowed persons' do
     # Admin Users can only create resources for persons
     # with whom they share at least one tag.
@@ -107,6 +109,20 @@ shared_examples 'person_scopable' do |options|
       resource.save!
     end.not_to raise_error
   end
+end
+
+shared_examples 'person_scopable_readonly' do |options|
+  creator = options[:create]
+
+  let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+  let(:allowed) do
+    create(:full_person_tagging).person.tap do |p|
+      admin_user.tags << p.tags.first
+    end
+  end
+
+  before(:each){ admin_user }
 
   it "allow fetching only if admin can manage the associated person by tags" do
     # We create an admin tagging to ensure tagged access rules still apply
@@ -164,4 +180,16 @@ shared_examples 'person_scopable' do |options|
 
     expect(subject.class.count).to eq 2
   end
+end
+
+shared_examples 'person_scopable_fruit' do |factory|
+  it_behaves_like 'person_scopable_readonly',
+    create: -> (person_id) {
+      with_untagged_admin do
+        issue = create(:basic_issue, person_id: person_id)
+        seed = create("#{factory}_seed", issue: issue, add_all_attachments: false)
+        issue.approve!
+        seed.reload.fruit
+      end
+    }
 end
