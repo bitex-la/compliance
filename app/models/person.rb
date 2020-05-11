@@ -81,7 +81,7 @@ class Person < ApplicationRecord
   enum risk: %i(low medium high)
 
   def self.default_scope
-    return unless (tags = AdminUser.current_admin_user.active_tags.presence)
+    return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
 
     where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
       OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
