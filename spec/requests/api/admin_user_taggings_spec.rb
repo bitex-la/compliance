@@ -52,7 +52,7 @@ describe AdminUserTagging do
 
     admin_user_tagging = AdminUserTagging.first
 
-    json_response.should >= {
+    expect(json_response).to eq(
       data: {
         id: '1',
         type: 'admin_user_tagging',
@@ -75,7 +75,7 @@ describe AdminUserTagging do
           }
         }
       }
-    }
+    )
 
     expect(admin_user_tagging.admin_user).to eq admin
     expect(admin_user_tagging.tag).to eq tag
