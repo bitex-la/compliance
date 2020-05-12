@@ -66,7 +66,7 @@ module Garden
 
       def expires_at_cannot_be_in_the_past
         return if expires_at.nil?
-        validation_date = created_at.try(:to_date) || Date.today
+        validation_date = created_at&.localtime&.to_date || Date.today
         return if expires_at >= validation_date
         errors.add(:expires_at, "can't be in the past")
       end

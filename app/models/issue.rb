@@ -29,7 +29,7 @@ class Issue < ApplicationRecord
   validate :defer_until_cannot_be_in_the_past
 
   def defer_until_cannot_be_in_the_past
-    validation_date = created_at.try(:to_date) || Date.today
+    validation_date = created_at&.localtime&.to_date || Date.today
     return if defer_until >= validation_date
     errors.add(:defer_until, "can't be in the past")
   end
@@ -237,7 +237,7 @@ class Issue < ApplicationRecord
     event :complete do
       transitions from: [:draft, :new], to: :new
 
-      after do 
+      after do
         refresh_person_country_tagging!
       end
     end
@@ -276,7 +276,7 @@ class Issue < ApplicationRecord
       
       transitions from: [:draft, :new, :answered, :approved], to: :approved, guard: :all_workflows_performed?
 
-      after do 
+      after do
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
