@@ -6,7 +6,7 @@ RSpec.describe Issue, type: :model do
   let(:basic_issue) { create(:basic_issue) }
   let(:future_issue) { create(:future_issue) }
   let(:invalid_future_issue) { described_class.new(person: create(:empty_person),
-    defer_until: Date.current - 1.days) }
+    defer_until: 1.day.ago) }
 
   it 'is not valid without a person' do
     expect(invalid_issue).to_not be_valid
@@ -483,7 +483,7 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue.lock_issue!).to be true
       Timecop.travel (interval + 1.minutes).from_now
       AdminUser.current_admin_user = other_admin_user
-      defer = Date.current + 20.days
+      defer = 20.days.from_now.to_date
       basic_issue.defer_until = defer
       expect(basic_issue).to be_valid
       basic_issue.save!
@@ -493,11 +493,11 @@ RSpec.describe Issue, type: :model do
     it 'can save changes if locked by me and not expired' do
       expect(basic_issue.lock_issue!).to be true
       Timecop.travel (interval + 1.minutes).from_now
-      defer = Date.current + 20.days
+      defer = 20.days.from_now.to_date
       basic_issue.defer_until = defer
       expect(basic_issue).to be_valid
       basic_issue.save!
-      expect(basic_issue.defer_until).to eq defer
+      expect(basic_issue.defer_until).to eq defer.to_date
     end
 
     it 'can lock issue with no expiration if is not locked' do
@@ -590,7 +590,7 @@ RSpec.describe Issue, type: :model do
     it 'can save changes if locked with no expiration by me' do
       expect(basic_issue.lock_issue!(false)).to be true
       Timecop.travel (interval + 1.minutes).from_now
-      defer = Date.current + 20.days
+      defer = 20.days.from_now.to_date
       basic_issue.defer_until = defer
       expect(basic_issue).to be_valid
       basic_issue.save!
