@@ -497,7 +497,7 @@ RSpec.describe Issue, type: :model do
       basic_issue.defer_until = defer
       expect(basic_issue).to be_valid
       basic_issue.save!
-      expect(basic_issue.defer_until).to eq defer.to_date
+      expect(basic_issue.defer_until).to eq defer
     end
 
     it 'can lock issue with no expiration if is not locked' do
