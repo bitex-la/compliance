@@ -8,54 +8,37 @@ module AffinityFinder
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
-      return nil if matched_ids.empty?
+      affinity_persons = matched_affinity_person(matched_ids)
 
+      return if affinity_persons.empty?
+
+      affinity_persons.each do |affinity_person|
+        create_same_person_issue(person, affinity_person)
+      end
+    end
+
+    def self.matched_affinity_persons(matched_ids)
+      return nil if matched_ids.empty?
 
       persons_ids_linked_by_affinity = []
       matched_ids.each do |match_id|
         continue if persons_ids_linked_by_affinity.include?(match_id)
 
-        affinity_person = person.find(match_id)
+        affinity_person = Person.find(match_id)
 
         # check if there is a same_person affinity
         # already linked to this affinity_person
         # i.e. an affinity father
-        if found_affinity = Affinity.find_by(
-          related_person_id: affinity_person.id,
-          kind: 'same_person'
+        found_affinity = affinity_person.affinites.find_by(
+          affinity_kind_id: AffinityKind.find_by_code('same_person').id
         )
-          affinity_person = found_affinity.person
-        end
 
-        # TODO: chequear validez de affinities preexistentes si person
-        # tiene affinities same_person activos y marcarlos de alguna manera
-        # para invalidarlos si person es hijo. En caso de que sea Padre
-        # se debe marcar a los related_persons de los affinities a expirar
-        # para correr en cada related_person el affinity creator de same_person
-        create_same_person_issue(person, affinity_person)
+        affinity_person = found_affinity&.related_person || affinity_person
 
-        # Crear issues por cada
-
-        # all persons linked to this affinity_person
-        # will be stored in order to bypass in next iteration
         persons_ids_linked_by_affinity << Affinity.where(
-          person_id: affinity_person_id,
-          kind: 'same_person'
-        ).pluck(:related_person_id)
-
-        # PRIMER CASO
-          # verifico si hay affinity a otra person,
-          # si lo tiene creo issue con el person padre.
-          # creo issue con primera person_id encontrada
-          # baneo los person_id que esta primera person tenga como
-          # affinities same_person black_list
-        # CASOS SIGUIENTES
-          # fijarme si esta en black_list continue
-          # verifico si hay affinity a otra person,
-          # si lo tiene creo issue con el person padre.
-          # Antes de crear issue verificar issue pendiente de aprobar con la misma affinity entre las mismas persons
-          # Issue con AffinitySeed same_person relacionando a la persona nueva con el
-          # paso issue a complete
+          related_person_id: affinity_person.id,
+          affinity_kind_id: AffinityKind.find_by_code('same_person').id
+        ).pluck(:person_id)
       end
     end
 
@@ -128,26 +111,24 @@ module AffinityFinder
       end
     end
 
-    def create_same_person_issue(related_person, person)
+    def self.create_same_person_issue(person, affinity_person)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
 
-      # Is there a quick way to find an existing
-      pending_issue_ids = person.issues.admin_pending.pluck(:id)
+      # Question: I wonder if it's a better way
+      # to find pendings issues other than this? 👇
+      pending_issue_ids = affinity_person.issues.admin_pending.pluck(:id)
       return if AffinitySeed.where(
                   issue_id: pending_issue_ids,
-                  related_person: related_person,
+                  related_person: person,
                   affinity_kind: AffinityKind.find_by_code(:same_person)
       ).count > 0
 
-      issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
+      issue = affinity_person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.affinity_seeds.build(
-        related_person: related_person,
+        related_person: person,
         affinity_kind: AffinityKind.find_by_code(:same_person)
       )
-
-      # TODO create same_person_affinity_seed in issue
-
     end
   end
 end

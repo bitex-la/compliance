@@ -62,3 +62,4 @@ build-iPhoneSimulator/
 
 config/settings.yml
 .vscode/launch.json
+.vscode/settings.json

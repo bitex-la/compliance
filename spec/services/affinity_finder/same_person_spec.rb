@@ -166,8 +166,20 @@ describe AffinityFinder::SamePerson do
     end
   end
 
+  describe '.matched_affinity_persons' do
+    it 'get matched affinity persons'
+  end
+
   describe '.call' do
-    it 'creates a same_person AffinitySeed issue when found matches'
+    it 'creates a same_person AffinitySeed issue when found exact matches' do
+      person_a = create_person_with_identification('number_a')
+      person_b = create_person_with_identification('number_a')
+
+      expect do
+        AffinityFinder::SamePerson.call(person_b.id)
+      end.to change{person_b.issues.count}.by(1)
+    end
+
 
     # Ejemplo de cambio de datos de padre e hijo en affinities
     # PERSONA A NOMBRE IGUAL DNI DISTINTO
@@ -243,3 +255,33 @@ def add_id_to_person(person, number)
   seed.issue.approve!
   person.reload
 end
+
+
+      # TODO: return person ids with same_person affinity
+      # related_to person_id (potential orphans same_person affinity persons)
+
+      # TODO: chequear validez de affinities preexistentes si person
+      # tiene affinities same_person activos y marcarlos de alguna manera
+      # para invalidarlos si person es hijo. En caso de que sea Padre
+      # se debe marcar a los related_persons de los affinities a expirar
+      # para correr en cada related_person el affinity creator de same_person
+
+      # Crear issues por cada
+
+      # all persons linked to this affinity_person
+      # will be stored in order to bypass in next iteration
+
+
+      # PRIMER CASO
+        # verifico si hay affinity a otra person,
+        # si lo tiene creo issue con el person padre.
+        # creo issue con primera person_id encontrada
+        # baneo los person_id que esta primera person tenga como
+        # affinities same_person black_list
+      # CASOS SIGUIENTES
+        # fijarme si esta en black_list continue
+        # verifico si hay affinity a otra person,
+        # si lo tiene creo issue con el person padre.
+        # Antes de crear issue verificar issue pendiente de aprobar con la misma affinity entre las mismas persons
+        # Issue con AffinitySeed same_person relacionando a la persona nueva con el
+        # paso issue a complete
