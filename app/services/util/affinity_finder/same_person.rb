@@ -17,9 +17,14 @@ module AffinityFinder
       end
     end
 
+    # return person_ids with no same_person
+    # affinity related_to other persons (i.e. only fathers)
+    # params matched_ids Array[Int] -> person_ids
+    # Returns Array[Int]
     def self.matched_affinity_persons(matched_ids)
       return nil if matched_ids.empty?
 
+      affinity_persons = []
       persons_ids_linked_by_affinity = []
       matched_ids.each do |match_id|
         continue if persons_ids_linked_by_affinity.include?(match_id)
@@ -29,7 +34,7 @@ module AffinityFinder
         # check if there is a same_person affinity
         # already linked to this affinity_person
         # i.e. an affinity father
-        found_affinity = affinity_person.affinites.find_by(
+        found_affinity = affinity_person.affinities.find_by(
           affinity_kind_id: AffinityKind.find_by_code('same_person').id
         )
 
@@ -39,7 +44,10 @@ module AffinityFinder
           related_person_id: affinity_person.id,
           affinity_kind_id: AffinityKind.find_by_code('same_person').id
         ).pluck(:person_id)
+        affinity_persons << affinity_person.id
       end
+
+      affinity_persons.uniq
     end
 
     # Returns Array[Int] (matched Person Ids)

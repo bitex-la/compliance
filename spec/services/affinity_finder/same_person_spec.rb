@@ -167,7 +167,31 @@ describe AffinityFinder::SamePerson do
   end
 
   describe '.matched_affinity_persons' do
-    it 'get matched affinity persons'
+    it 'get matched affinity persons' do
+      person_a = create(:basic_issue).reload.person
+      person_b = create(:basic_issue).reload.person
+      create(:full_affinity, person: person_b, affinity_kind_code: 'same_person')
+      person_c = person_b.affinities.first.related_person
+
+
+
+      expect(AffinityFinder::SamePerson.matched_affinity_persons(
+        [person_a.id, person_b.id]
+      )).to match_array(
+        [person_a.id, person_c.id]
+      )
+      expect(AffinityFinder::SamePerson.matched_affinity_persons(
+        [person_a.id, person_b.id, person_c.id]
+      )).to match_array(
+        [person_a.id, person_c.id]
+      )
+
+      expect(AffinityFinder::SamePerson.matched_affinity_persons(
+        [person_a.id, person_c.id]
+      )).to match_array(
+        [person_a.id, person_c.id]
+      )
+    end
   end
 
   describe '.call' do

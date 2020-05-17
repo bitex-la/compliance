@@ -2,14 +2,14 @@ require 'rails_helper'
 
 describe Affinity do
   it_behaves_like 'archived_fruit', :affinities, :full_affinity
-  
+
   it 'has a custom name_body' do
     person = create(:basic_issue).reload.person
     create(:full_affinity, person: person)
       .name.should =~ /Affinity#[0-9]*?: business_partner/
   end
 
-  it 'validates that affinity kind cannot be repeated between two people' do 
+  it 'validates that affinity kind cannot be repeated between two people' do
     person = create(:basic_issue).reload.person
       create(:full_affinity, person: person)
 
@@ -50,7 +50,7 @@ describe Affinity do
     expect(repeated_one.errors[:base]).to eq ['affinity_already_exists']
   end
 
-  it 'validate that cannot link to itself' do 
+  it 'validate that cannot link to itself' do
     person = create(:empty_person)
     related_person = create(:empty_person)
     fruit = described_class.new(
@@ -64,7 +64,7 @@ describe Affinity do
   end
 
   describe 'when calculate inverse of relationships' do
-    it 'returns the inverse kind of a person that is the related on' do 
+    it 'returns the inverse kind of a person that is the related on' do
       person = create(:basic_issue).reload.person
       create(:full_affinity, person: person)
 
@@ -75,8 +75,8 @@ describe Affinity do
       ).to eq :business_partner_of
     end
 
-    %i(spouse business_partner couple manager immediate_family 
-      extended_family other partner 
+    %i(spouse business_partner couple manager immediate_family
+      extended_family other partner same_person
     ).each do |kind|
       it "get symmetrical affinity for #{kind} with _of suffix" do
         person = create(:basic_issue).reload.person
