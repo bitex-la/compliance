@@ -182,7 +182,7 @@ describe Issue do
     end
 
     it 'updates an issue defer until' do
-      issue = create(:basic_issue, defer_until: Date.today)
+      issue = create(:basic_issue, defer_until: Date.current)
 
       defer_until = 1.day.from_now.to_date
       expect do
