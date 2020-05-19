@@ -245,6 +245,30 @@ RSpec.describe Issue, type: :model do
 
       expect(NoteSeed.others_active_seeds(issue)).to_not include issue.reload.note_seeds.first
     end
+
+    it 'Reject person on new_client issue rejection' do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person, reason: IssueReason.new_client)
+      expect(person.state).to eq("new")
+      issue.reject!
+      expect(person.state).to eq("rejected")
+    end
+
+    it 'Do not change person state on non new_client issue rejection' do
+      reasons = [IssueReason.further_clarification,
+        IssueReason.update_expired_data,
+        IssueReason.update_by_client,
+        IssueReason.new_risk_information
+      ]
+
+      reasons.each do |reason|
+        person = create(:empty_person)
+        issue = create(:basic_issue, person: person, reason: reason)
+        expect(person.state).to eq("new")
+        issue.reject!
+        expect(person.state).to eq("new")
+      end
+    end
   end
 
   describe "when transitioning" do

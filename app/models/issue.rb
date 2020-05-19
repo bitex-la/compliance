@@ -261,8 +261,11 @@ class Issue < ApplicationRecord
     event :reject do
       transitions from: [:draft, :new, :observed, :answered, :rejected], to: :rejected
 
-      after do 
-        log_state_change(:reject_issue) if aasm.from_state != :rejected
+      after do
+        if aasm.from_state != :rejected
+          person.reject! if reason == IssueReason.new_client
+          log_state_change(:reject_issue)
+        end
       end
     end
 
