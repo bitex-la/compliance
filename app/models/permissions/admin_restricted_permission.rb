@@ -15,7 +15,8 @@ module Permissions
 
     def allowed_actions
       actions = {
-        EventLog => [:view_menu]
+        EventLog => [:view_menu],
+        AdminUser => [:read]
       }
       actions.default = []
       actions

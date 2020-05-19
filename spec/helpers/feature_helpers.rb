@@ -6,6 +6,14 @@ module FeatureHelpers
     click_button 'Login'
   end
 
+  def logout
+    visit '/logout'
+  end
+
+  def login_admin(params = {})
+    login_as create(:admin_user, params)
+  end
+
   def fill_seed(kind, attributes, has_many = true, index = 0)
     attributes.each do |key, value|
       if has_many
