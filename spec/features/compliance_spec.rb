@@ -1112,7 +1112,9 @@ describe 'an admin user' do
     csv = File.read(DownloadHelpers::download)
     expect(csv).to_not include('API TOKEN')
     expect(csv).to_not include(super_admin_user.api_token)
+    expect(csv).not_to include("Encrypted password")
     expect(csv).to_not include(super_admin_user.encrypted_password)
+    expect(csv).not_to include("Reset password token")
   end
 
   it 'keeps track of usage allowances' do

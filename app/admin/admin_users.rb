@@ -114,7 +114,6 @@ ActiveAdmin.register AdminUser do
   show do
     attributes_table do
       row :email
-      row :reset_password_token
       row :reset_password_sent_at
       row :remember_created_at
       row :sign_in_count
@@ -133,7 +132,6 @@ ActiveAdmin.register AdminUser do
   csv do
     column :id
     column :email
-    column :reset_password_token
     column :reset_password_sent_at
     column :remember_created_at
     column :sign_in_count
