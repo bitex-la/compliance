@@ -9,7 +9,7 @@ FactoryBot.define do
     end
 
     factory :future_issue do
-      defer_until { Date.today + 1.months }
+      defer_until { 1.month.from_now }
     end
   end
 
