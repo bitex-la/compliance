@@ -25,7 +25,7 @@ describe 'an admin user' do
     click_link 'Admin Users'
 
     within "tr[id='admin_user_#{AdminUser.first.id}'] td[class='col col-actions']" do
-      click_link 'Edit'
+      click_link 'View'
     end
 
     click_link 'Grant Restricted access'
