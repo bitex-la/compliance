@@ -2,6 +2,10 @@
 
 module Permissions
   class AdminPermission < RestrictedPermission
+    def initialize(user)
+      super(user)
+    end
+
     def allowed_classes 
       super +
       [

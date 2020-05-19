@@ -2,6 +2,10 @@
 
 module Permissions
   class RestrictedPermission < PermissionBase
+    def initialize(user)
+      super(user)
+    end
+
     def allowed_classes
       [
         Issue,
