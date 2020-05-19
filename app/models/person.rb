@@ -28,7 +28,7 @@ class Person < ApplicationRecord
   }.each do |relationship|
     has_many relationship, -> {
       where("#{relationship}.replaced_by_id is NULL")
-      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.today)
+      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.current)
     }
 
     has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify

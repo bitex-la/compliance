@@ -17,8 +17,8 @@ class Issue < ApplicationRecord
     parent.table[:reason_id]
   end
 
-  before_validation do 
-    self.defer_until ||= Date.today
+  before_validation do
+    self.defer_until ||= Date.current
     self.reason ||= IssueReason.further_clarification
   end
 
@@ -29,8 +29,9 @@ class Issue < ApplicationRecord
   validate :defer_until_cannot_be_in_the_past
 
   def defer_until_cannot_be_in_the_past
-    validation_date = created_at.try(:to_date) || Date.today
+    validation_date = created_at.try(:to_date) || Date.current
     return if defer_until >= validation_date
+
     errors.add(:defer_until, "can't be in the past")
   end
 
@@ -188,15 +189,15 @@ class Issue < ApplicationRecord
   }
 
   scope :future_all, -> { 
-    where('defer_until > ?', Date.today)
+    where('defer_until > ?', Date.current)
   }
 
   scope :future, -> { 
-    active_states.where('defer_until > ?', Date.today)
+    active_states.where('defer_until > ?', Date.current)
   }
   
   scope :current, -> { 
-    where('defer_until <= ?', Date.today)
+    where('defer_until <= ?', Date.current)
   }
 
   def self.ransackable_scopes(auth_object = nil)
