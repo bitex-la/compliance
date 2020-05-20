@@ -26,6 +26,8 @@ class Observation < ApplicationRecord
   validate :validate_scope_integrity
   validate :validate_issue_correspondence
 
+  # We add this default_scope to allow others default_scopes
+  # to cascade and apply admin taggings rules to the current query
   default_scope { joins(:issue) }
 
   def self.ransackable_scopes(auth_object = nil)

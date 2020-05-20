@@ -84,6 +84,8 @@ module Garden
         observations.destroy_all
       end
 
+      # We add this default_scope to allow others default_scopes
+      # to cascade and apply admin taggings rules to the current query
       default_scope { joins(:issue).distinct }
 
       after_save { person.expire_action_cache }

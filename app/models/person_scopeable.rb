@@ -9,7 +9,7 @@ module PersonScopeable
     end
 
     def collection_scoped_by_persons
-      where(person_id: Person.all)
+      where(person_id: Person.by_admin_user_tags)
     end
   end
 end

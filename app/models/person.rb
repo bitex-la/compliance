@@ -81,13 +81,19 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
+  # This default_scope allow filter person with allowed
+  # admin tags
   def self.default_scope
+    Person.by_admin_user_tags
+  end
+
+  scope :by_admin_user_tags, -> {
     return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
 
     where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
       OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
       }, tags).distinct
-  end
+  }
 
   def natural_docket
     natural_dockets.last

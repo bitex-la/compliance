@@ -20,7 +20,7 @@ class FundTransfer < ApplicationRecord
   end
 
   def self.collection_scoped_by_persons
-    where(source_person_id: Person.all)
-      .or(FundTransfer.where(target_person_id: Person.all))
+    where(source_person_id: Person.by_admin_user_tags)
+      .or(FundTransfer.where(target_person_id: Person.by_admin_user_tags))
   end
 end

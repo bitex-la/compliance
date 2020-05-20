@@ -8,6 +8,8 @@ class Task < ApplicationRecord
 
   validates :task_type, presence: true
 
+  # We add this default_scope to allow others default_scopes
+  # to cascade and apply admin taggings rules to the current query
   default_scope { joins(:workflow, workflow: :issue) }
 
   aasm do
