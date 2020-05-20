@@ -61,9 +61,8 @@ class AdminUser < ApplicationRecord
   end
 
   def can_manage_tag?(tag)
-    AdminUser.where(%{not exists (select id from admin_user_taggings where admin_user_id = ?) 
-      or exists (select id from admin_user_taggings where admin_user_id = ? and tag_id = ?)}, self.id, self.id, tag.id)
-      .exists?
+    !admin_user_taggings.exists? ||
+      admin_user_taggings.where(tag: tag).exists?
   end
 
   def add_tag(tag)
