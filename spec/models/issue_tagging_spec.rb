@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe IssueTagging, type: :model do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) { 
+      issue = with_untagged_admin{ create(:basic_issue, person_id: person_id) }
+      create(:some_issue_tagging, issue_id: issue.id)
+    }
+
   let(:issue) { create(:basic_issue) }
   let(:tag) { create(:issue_tag) }
   let(:person_tag) { create(:person_tag) }

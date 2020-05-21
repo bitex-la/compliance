@@ -4,6 +4,7 @@ ActiveAdmin.register AdminUser do
   permit_params do
     params = [:password, :password_confirmation]
     params << [:email, :max_people_allowed] if authorized?(:full_update, AdminUser)
+    params << [admin_user_taggings_attributes: [:tag_id, :id]] if authorized?(:full_update, AdminUser)
     params
   end
 
@@ -77,6 +78,9 @@ ActiveAdmin.register AdminUser do
   filter :current_sign_in_at
   filter :sign_in_count
   filter :created_at
+  filter :tags_id, as: :select,
+    collection: proc { Tag.people },
+    multiple: true
 
   action_item :enable_otp, only: :show do
     next unless authorized? :enable_otp, resource
@@ -108,14 +112,23 @@ ActiveAdmin.register AdminUser do
       f.input :password_confirmation
       f.input :max_people_allowed if authorized?(:full_update, AdminUser)
     end
+
+    if authorized?(:full_update, AdminUser)
+      ArbreHelpers::Form.has_many_form self, f, :admin_user_taggings,
+        new_button_text: "Add New Tag" do |cf, context|
+          cf.input :tag, as:  :select, collection: Tag.people
+      end
+    end
+
     f.actions
   end
 
   show do
     attributes_table do
+      row :id
       row :email
-      row :reset_password_sent_at
-      row :remember_created_at
+      row :role_type
+      row :otp_enabled
       row :sign_in_count
       row :current_sign_in_at
       row :last_sign_in_at
@@ -123,9 +136,12 @@ ActiveAdmin.register AdminUser do
       row :last_sign_in_ip
       row :created_at
       row :updated_at
-      row :otp_enabled
-      row :role_type
-      row :max_people_allowed
+      if authorized?(:full_read, resource)
+        row :max_people_allowed
+        row :tags do
+          resource.tags.pluck(:name).join(' - ')
+        end
+      end
     end
   end
 
@@ -144,6 +160,9 @@ ActiveAdmin.register AdminUser do
     column :otp_enabled
     column :role_type
     column :max_people_allowed
+    column :tags do
+      resource.tags.pluck(:name).join(' - ')
+    end
   end
 
   sidebar 'OTP info', only: :show, if: -> { authorized?(:enable_otp, resource) } do

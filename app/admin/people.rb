@@ -92,6 +92,12 @@ ActiveAdmin.register Person do
   end
 
   form do |f|
+    if resource.new_record?
+      AdminUser.current_admin_user.tags.each do |t|
+        resource.person_taggings.build(tag: t)
+      end
+    end
+    
     if resource.issues.empty? && resource.persisted?
       div class: 'flash flash_danger' do
         "This person has no created issues. Please create a new issue to add information."
@@ -129,6 +135,9 @@ ActiveAdmin.register Person do
     column :risk
     column :regularity
     column :person_type
+    column(:tags) do |o|
+      o.tags.pluck(:name).join(' - ')
+    end
     column :created_at
     column :updated_at
     actions

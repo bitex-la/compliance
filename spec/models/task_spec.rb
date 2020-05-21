@@ -1,6 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Task, type: :model do 
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      workflow = create(:basic_workflow, issue: issue)
+      create(:basic_task, workflow: workflow)
+    }
+
   let(:invalid_task) { described_class.new }
   let(:basic_task) { create(:basic_task) }
 

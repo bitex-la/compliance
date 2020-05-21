@@ -25,5 +25,10 @@ RSpec.describe NoteSeed, type: :model do
     title: '  A long spaced title   ',
     body: '  The body  ',
   }
-end
 
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_note_seed, issue: issue)
+    }
+end

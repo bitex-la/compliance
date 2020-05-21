@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe Workflow, type: :model do 
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:basic_workflow, issue: issue)
+    }
+
   let(:invalid_workflow) { described_class.new }
   let(:basic_workflow) { create(:basic_workflow) }
 
