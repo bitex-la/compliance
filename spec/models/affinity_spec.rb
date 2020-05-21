@@ -1,8 +1,10 @@
 require 'rails_helper'
 
 describe Affinity do
+  it_behaves_like 'person_scopable_fruit', :full_affinity
+
   it_behaves_like 'archived_fruit', :affinities, :full_affinity
-  
+
   it 'has a custom name_body' do
     person = create(:basic_issue).reload.person
     create(:full_affinity, person: person)

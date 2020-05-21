@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Issue, type: :model do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) { Issue.create!(person_id: person_id) },
+    change_person: -> (obj, person_id){ obj.person_id = person_id }
+
   let(:invalid_issue) { described_class.new } 
   let(:empty_issue) { create(:basic_issue) }
   let(:basic_issue) { create(:basic_issue) }
@@ -178,6 +182,7 @@ RSpec.describe Issue, type: :model do
       person = create(:new_natural_person, :with_new_client_reason)
       
       person.issues.reload.last.approve!
+      person.reload
       expect(person.enabled).to be_truthy
       expect(person.state).to eq('enabled')
 
@@ -595,6 +600,74 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue).to be_valid
       basic_issue.save!
       expect(basic_issue.defer_until).to eq defer
+    end
+  end
+
+  describe "when adding person country tags based on invoicing details" do
+    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+    it 'creates and adds tags on complete' do
+      issue = create(:full_argentina_invoicing_detail_seed_with_issue).issue
+      create(:full_chile_invoicing_detail_seed_with_issue, issue: issue)
+
+      expect{ issue.reload.complete! }.to change{ Tag.count }.by(2)
+      expect{ issue.approve! }.not_to change{ Tag.count }
+
+      tags = Tag.all[-2..-1]
+      expect(tags.pluck(:name)).to eq ['active-in-AR', 'active-in-CL']
+
+      expect(issue.person.tags).to eq tags
+    end
+
+    it 'creates and adds tags on direct approval' do
+      issue = create(:full_argentina_invoicing_detail_seed_with_issue).issue
+      create(:full_chile_invoicing_detail_seed_with_issue, issue: issue)
+
+      expect{ issue.reload.approve! }.to change{ Tag.count }.by(2)
+
+      tags = Tag.all[-2..-1]
+      expect(tags.pluck(:name)).to eq ['active-in-AR', 'active-in-CL']
+      expect(issue.person.tags).to eq tags
+    end
+
+    it 'does nothing if no invoicing details' do
+      issue = create(:basic_issue)
+      expect do
+        issue.complete!
+        issue.approve!
+      end.not_to change { [Tag.count, issue.person.reload.tags.count] }
+    end
+
+    it 'add country tag to person not creating a new tag on complete' do
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+
+      expect do
+        issue.complete!
+      end.to change { Tag.count }.by(0)
+
+      issue.person.reload
+      expect(issue.person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag to person if already exists on complete' do
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+      issue.person.tags << tag
+      issue.person.save!
+
+      expect do
+        issue.complete!
+      end.to change { PersonTagging.count }.by(0)
+
+      issue.person.reload
+      expect(issue.person.tags.count).to eq(1)
     end
   end
 end

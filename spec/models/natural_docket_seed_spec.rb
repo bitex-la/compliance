@@ -12,6 +12,12 @@ describe NaturalDocketSeed do
 
   it_behaves_like 'observable', :full_natural_docket_seed_with_issue
 
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_natural_docket_seed, issue: issue)
+    }
+
   %i(first_name last_name nationality
     job_title job_description
   ).each do |attr|

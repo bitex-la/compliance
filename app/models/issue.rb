@@ -45,6 +45,8 @@ class Issue < ApplicationRecord
   belongs_to :lock_admin_user, class_name: "AdminUser", foreign_key: "lock_admin_user_id", optional: true
   validate :locked_issue_cannot_changed
 
+  include PersonScopeable
+
   def locked_issue_cannot_changed
     return unless locked
     return if lock_expired?
@@ -235,6 +237,10 @@ class Issue < ApplicationRecord
 
     event :complete do
       transitions from: [:draft, :new], to: :new
+
+      after do 
+        refresh_person_country_tagging!
+      end
     end
 
     event :observe do
@@ -275,6 +281,7 @@ class Issue < ApplicationRecord
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
+          refresh_person_country_tagging!
         end
       end
     end
@@ -323,6 +330,9 @@ class Issue < ApplicationRecord
   end
 
   def harvest_all!
+    # We never want to risk losing fruits for harvesting an old issue instance.
+    # Old instances shouldn't happen in prod, mostly in specs, but just in case.
+    reload
     HAS_MANY.each{|assoc| send(assoc).map(&:harvest!) }
     HAS_ONE.each{|assoc| send(assoc).try(:harvest!) }
   end
@@ -376,6 +386,16 @@ class Issue < ApplicationRecord
       :natural_person
     elsif legal_entity_docket_seed_id
       :legal_entity
+    end
+  end
+
+  def refresh_person_country_tagging!
+    if argentina_invoicing_detail_seed
+      person.refresh_person_country_tagging!('AR')
+    end
+
+    if chile_invoicing_detail_seed
+      person.refresh_person_country_tagging!('CL')
     end
   end
 

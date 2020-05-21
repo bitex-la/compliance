@@ -26,6 +26,12 @@ describe IdentificationSeed do
     public_registry_extra_data: ' 344343'
   }
 
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_natural_person_identification_seed, issue: issue)
+    }
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

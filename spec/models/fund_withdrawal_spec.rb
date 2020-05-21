@@ -1,6 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe FundWithdrawal, type: :model do
+RSpec.describe FundWithdrawal do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) { create(:full_fund_withdrawal, person_id: person_id) },
+    change_person: -> (obj, person_id){ obj.person_id = person_id }
+
   let(:person) { create(:empty_person) }
 
   it 'validates non null fields' do
@@ -30,5 +34,25 @@ RSpec.describe FundWithdrawal, type: :model do
     object = build(:fund_withdrawal, person: person, withdrawal_date: nil)
     expect(object).to_not be_valid
     expect(object.errors.messages.keys.first).to eq(:withdrawal_date)
+  end
+
+  it 'creates person country tags if needed, and applies them only if needed' do
+    bob = create(:empty_person)
+
+    expect { create(:full_fund_withdrawal, person: bob) }
+      .to change { Tag.count }.by(1)
+
+    tag = Tag.last
+    expect(tag.name).to eq 'active-in-AR'
+    expect(bob.tags.first).to eq(tag)
+
+    alice = create(:empty_person)
+    expect { create(:full_fund_withdrawal, person: alice) }
+      .not_to change { Tag.count }
+
+    expect(alice.tags.first).to eq(tag)
+
+    expect { create(:full_fund_withdrawal, person: alice) }
+      .not_to change{ alice.tags }
   end
 end

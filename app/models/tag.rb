@@ -26,11 +26,11 @@ class Tag < ApplicationRecord
 
   def can_destroy?
     return unless {
-      "person" => PersonTagging,
-      "issue" => IssueTagging
-    }[tag_type].where(tag: self).exists?
+      'person' => [PersonTagging, AdminUserTagging],
+      'issue' => [IssueTagging]
+    }[tag_type].any? { |t| t.where(tag: self).exists? }
 
-    errors[:base] << "Can't be destroy because there are relations with #{tag_type} created"
+    errors[:base] << "Can't be destroy because there are relations created"
     throw :abort
   end
 end
