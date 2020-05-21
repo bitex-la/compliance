@@ -92,7 +92,7 @@ describe Affinity do
       end
     end
 
-    %i(payee owner customer stakeholder payer provider).each do |kind|
+    %i(payee owner customer stakeholder payer provider compliance_liaison).each do |kind|
       it "get non-symmetrical affinity of #{kind}" do
         person = create(:basic_issue).reload.person
         create(:full_affinity, person: person, affinity_kind_code: kind)
