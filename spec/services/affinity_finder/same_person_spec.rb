@@ -173,8 +173,6 @@ describe AffinityFinder::SamePerson do
       create(:full_affinity, person: person_b, affinity_kind_code: 'same_person')
       person_c = person_b.affinities.first.related_person
 
-
-
       expect(AffinityFinder::SamePerson.matched_affinity_persons(
         [person_a.id, person_b.id]
       )).to match_array(
@@ -202,6 +200,11 @@ describe AffinityFinder::SamePerson do
       expect do
         AffinityFinder::SamePerson.call(person_b.id)
       end.to change{person_b.issues.count}.by(1)
+
+      # check that no issue is created if another one is pending
+      expect do
+        AffinityFinder::SamePerson.call(person_b.id)
+      end.to change{person_b.issues.count}.by(0)
     end
 
 

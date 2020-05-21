@@ -8,12 +8,12 @@ module AffinityFinder
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
-      affinity_persons = matched_affinity_person(matched_ids)
+      affinity_persons_ids = matched_affinity_persons(matched_ids)
 
-      return if affinity_persons.empty?
+      return if affinity_persons_ids.empty?
 
-      affinity_persons.each do |affinity_person|
-        create_same_person_issue(person, affinity_person)
+      affinity_persons_ids.each do |affinity_person_id|
+        create_same_person_issue(person, Person.find(affinity_person_id))
       end
     end
 
@@ -125,18 +125,27 @@ module AffinityFinder
 
       # Question: I wonder if it's a better way
       # to find pendings issues other than this? 👇
-      pending_issue_ids = affinity_person.issues.admin_pending.pluck(:id)
-      return if AffinitySeed.where(
-                  issue_id: pending_issue_ids,
-                  related_person: person,
-                  affinity_kind: AffinityKind.find_by_code(:same_person)
-      ).count > 0
+      # pending_issue_ids = affinity_person.issues.where(
 
-      issue = affinity_person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
+      # ).pluck(:id)
+
+      # maybe using affinity_exist? issue's method
+      # if affinity_exist?(issue.person, related_person, affinity_kind) ||
+      #   affinity_exist?(related_person, issue.person, affinity_kind)
+
+      # existing_affinities = AffinitySeed.where(
+      #             related_person: affinity_person,
+      #             affinity_kind_id: AffinityKind.find_by_code(:same_person).id
+      # )
+
+
+      issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.affinity_seeds.build(
-        related_person: person,
+        related_person: affinity_person,
         affinity_kind: AffinityKind.find_by_code(:same_person)
       )
+
+      issue.save
     end
   end
 end
