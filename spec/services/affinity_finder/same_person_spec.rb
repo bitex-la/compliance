@@ -205,8 +205,13 @@ describe AffinityFinder::SamePerson do
       expect do
         AffinityFinder::SamePerson.call(person_b.id)
       end.to change{person_b.issues.count}.by(0)
+
+      expect(AffinityFinder::SamePerson.call(person_b.id)).to eq([])
     end
 
+    it 'returns orphans same_person affinity persons' do
+      # TODO: test with existing same_person relationships
+    end
 
     # Ejemplo de cambio de datos de padre e hijo en affinities
     # PERSONA A NOMBRE IGUAL DNI DISTINTO
