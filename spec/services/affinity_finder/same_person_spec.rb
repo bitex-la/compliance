@@ -166,25 +166,25 @@ describe AffinityFinder::SamePerson do
     end
   end
 
-  describe '.matched_affinity_persons' do
+  describe '.related_persons' do
     it 'get matched affinity persons' do
       person_a = create(:basic_issue).reload.person
       person_b = create(:basic_issue).reload.person
       create(:full_affinity, person: person_b, affinity_kind_code: 'same_person')
       person_c = person_b.affinities.first.related_person
 
-      expect(AffinityFinder::SamePerson.matched_affinity_persons(
+      expect(AffinityFinder::SamePerson.related_persons(
         [person_a.id, person_b.id]
       )).to match_array(
         [person_a.id, person_c.id]
       )
-      expect(AffinityFinder::SamePerson.matched_affinity_persons(
+      expect(AffinityFinder::SamePerson.related_persons(
         [person_a.id, person_b.id, person_c.id]
       )).to match_array(
         [person_a.id, person_c.id]
       )
 
-      expect(AffinityFinder::SamePerson.matched_affinity_persons(
+      expect(AffinityFinder::SamePerson.related_persons(
         [person_a.id, person_c.id]
       )).to match_array(
         [person_a.id, person_c.id]
@@ -201,16 +201,25 @@ describe AffinityFinder::SamePerson do
         AffinityFinder::SamePerson.call(person_b.id)
       end.to change{person_b.issues.count}.by(1)
 
+      # TODO: test affinity relationship (person_a father of b)
+
       # check that no issue is created if another one is pending
       expect do
         AffinityFinder::SamePerson.call(person_b.id)
       end.to change{person_b.issues.count}.by(0)
 
       expect(AffinityFinder::SamePerson.call(person_b.id)).to eq([])
+
+      # TODO: test affinity relationship of a father:
+      # call affinity finder on person_c, check affinity
+      # relationship (person c father of d)
     end
+
+
 
     it 'returns orphans same_person affinity persons' do
       # TODO: test with existing same_person relationships
+      # TODO: test existing affinities invalidations
     end
 
     # Ejemplo de cambio de datos de padre e hijo en affinities
@@ -297,6 +306,9 @@ end
       # para invalidarlos si person es hijo. En caso de que sea Padre
       # se debe marcar a los related_persons de los affinities a expirar
       # para correr en cada related_person el affinity creator de same_person
+
+
+
 
       # Crear issues por cada
 

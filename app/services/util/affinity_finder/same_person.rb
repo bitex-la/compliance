@@ -8,45 +8,51 @@ module AffinityFinder
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
-      affinity_persons_ids = matched_affinity_persons(matched_ids)
+      related_persons_ids = related_persons(matched_ids)
 
-      # TODO: get all existing same_person childrens of person
+      children_ids =  same_person_affinity_childrens(person_id).pluck(:person_id)
 
-      if affinity_persons_ids.empty?
-        return # TODO: RETURN ALL CURRENT SAME_PERSON AFF CHILDRENS OF person (all orphans)
+      if related_persons_ids.empty?
+        # return all current same_person
+        # affinity childrens (all orphans)
+        return children_ids
       end
 
-      affinity_persons_ids.each do |affinity_person_id|
-        # TODO: if is an existing children remove from orphans array
-        create_same_person_issue(person, Person.find(affinity_person_id))
+      related_persons_ids.each do |related_person_id|
+        # if is an existing children remove from orphans array and move on
+        next if children_ids.delete(related_person_id)
+
+        create_same_person_issue(person, Person.find(related_person_id))
       end
+
+      children_ids
     end
 
     # affinity related_to other persons (i.e. only fathers)
     # params matched_ids Array[Int] -> person_ids
     # Returns Array[Int] person_ids with no same_person
-    def self.matched_affinity_persons(matched_ids)
+    def self.related_persons(matched_ids)
       return nil if matched_ids.empty?
 
-      affinity_persons = []
+      related_persons = []
       persons_ids_linked_by_affinity = []
       matched_ids.each do |match_id|
         continue if persons_ids_linked_by_affinity.include?(match_id)
 
-        affinity_person = same_name_affinity_person_father(match_id)
+        related_person = same_name_affinity_person_father(match_id)
 
         persons_ids_linked_by_affinity.push(
-          same_name_affinity_person_childrens(affinity_person.id).pluck(:person_id)
+          same_person_affinity_childrens(related_person.id).pluck(:person_id)
         )
 
-        affinity_persons << affinity_person.id
+        related_persons << related_person.id
       end
 
-      affinity_persons.uniq
+      related_persons.uniq
     end
 
     # returns [?Person]
-    def self.same_name_affinity_person_childrens(person_id)
+    def self.same_person_affinity_childrens(person_id)
       Affinity.where(
         related_person_id: person_id,
         affinity_kind_id: AffinityKind.find_by_code('same_person').id
@@ -136,34 +142,19 @@ module AffinityFinder
       end
     end
 
-    def self.create_same_person_issue(person, affinity_person)
+    def self.create_same_person_issue(person, related_person)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
-
-      # Question: I wonder if it's a better way
-      # to find pendings issues other than this? 👇
-      # pending_issue_ids = affinity_person.issues.where(
-
-      # ).pluck(:id)
-
-      # maybe using affinity_exist? issue's method
-      # if affinity_exist?(issue.person, related_person, affinity_kind) ||
-      #   affinity_exist?(related_person, issue.person, affinity_kind)
-
-      # existing_affinities = AffinitySeed.where(
-      #             related_person: affinity_person,
-      #             affinity_kind_id: AffinityKind.find_by_code(:same_person).id
-      # )
-
-      # TODO: check if there is an existing pending issue with this affinity_person
+      affinity_kind = AffinityKind.find_by_code(:same_person)
 
       issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
-      issue.affinity_seeds.build(
-        related_person: affinity_person,
-        affinity_kind: AffinityKind.find_by_code(:same_person)
+      affinity = issue.affinity_seeds.build(
+        related_person: related_person,
+        affinity_kind: affinity_kind
       )
 
-      issue.save!
+      # save unless affinity is already defined
+      issue.save! unless affinity.affinity_defined?(issue, related_person, affinity_kind)
     end
   end
 end
