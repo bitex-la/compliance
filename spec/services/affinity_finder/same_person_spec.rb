@@ -207,15 +207,32 @@ describe AffinityFinder::SamePerson do
       expect do
         AffinityFinder::SamePerson.call(person_b.id)
       end.to change{person_b.issues.count}.by(0)
-
-      expect(AffinityFinder::SamePerson.call(person_b.id)).to eq([])
-
-      # TODO: test affinity relationship of a father:
-      # call affinity finder on person_c, check affinity
-      # relationship (person c father of d)
     end
 
+    it 'creates a same_person AffinitySeed issue on childrens' do
+      person_a = create_natural_person_with_docket('Juan', 'Molina')
+      person_b = create_natural_person_with_docket('Juan Carlos', 'Molina')
+      person_c = create_natural_person_with_docket('Juan Antonio', 'Molina')
 
+      expect do
+        AffinityFinder::SamePerson.call(person_a.id)
+      end.to change{person_b.issues.count}.by(1)
+
+      affinity_b = person_b.issues.last.affinity_seeds.first
+      affinity_c = person_c.issues.last.affinity_seeds.first
+      affinity_kind = AffinityKind.find_by_code(:same_person)
+
+      expect(affinity_b).to have_attributes({
+        related_person_id: person_a.id,
+        affinity_kind_id: affinity_kind.id
+      })
+      expect(affinity_c).to have_attributes({
+        related_person_id: person_a.id,
+        affinity_kind_id: affinity_kind.id
+      })
+
+      # TODO: Check edge case of an existing children related to a father by ID Number
+    end
 
     it 'returns orphans same_person affinity persons' do
       # TODO: test with existing same_person relationships

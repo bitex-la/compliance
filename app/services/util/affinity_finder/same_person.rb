@@ -22,7 +22,9 @@ module AffinityFinder
         # if is an existing children remove from orphans array and move on
         next if children_ids.delete(related_person_id)
 
-        create_same_person_issue(person, Person.find(related_person_id))
+        (children_id, father_id) = [person.id, related_person_id].sort
+
+        create_same_person_issue(father_id, children_id)
       end
 
       children_ids
@@ -142,9 +144,11 @@ module AffinityFinder
       end
     end
 
-    def self.create_same_person_issue(person, related_person)
+    def self.create_same_person_issue(person_id, related_person_id)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
+      person = Person.find(person_id)
+      related_person = Person.find(related_person_id)
       affinity_kind = AffinityKind.find_by_code(:same_person)
 
       issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
