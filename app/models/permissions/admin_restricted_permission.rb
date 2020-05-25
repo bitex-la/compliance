@@ -7,19 +7,15 @@ module Permissions
     end
 
     def allowed_classes
-      super + 
-      [
-        EventLog
-      ]
+      super +
+        [EventLog]
     end
 
     def allowed_actions
-      actions = {
+      Hash.new([]).merge(
         EventLog => [:view_menu],
         AdminUser => [:read]
-      }
-      actions.default = []
-      actions
+      )
     end
   end
 end

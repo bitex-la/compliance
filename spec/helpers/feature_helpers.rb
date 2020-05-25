@@ -8,6 +8,7 @@ module FeatureHelpers
 
   def logout
     visit '/logout'
+    expect(page.current_path).to eq('/login')
   end
 
   def login_admin(params = {})

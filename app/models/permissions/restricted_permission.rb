@@ -28,11 +28,9 @@ module Permissions
     end
 
     def allowed_actions
-      actions = {
+      Hash.new([]).merge(
         AdminUser => [:read]
-      }
-      actions.default = []
-      actions
+      )
     end
   end
 end
