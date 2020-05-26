@@ -15,4 +15,10 @@ describe PhoneSeed do
     country: 'AR ',
     note:  'please do not call on Sundays ',
   }
+
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_phone_seed, issue: issue)
+    }
 end

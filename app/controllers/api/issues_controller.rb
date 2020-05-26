@@ -2,7 +2,7 @@ class Api::IssuesController < Api::ApiController
   def index
     scope = Issue.current
       .includes(*build_eager_load_list)
-      .order(updated_at: :desc)
+      .order(updated_at: :desc, id: :desc)
       .ransack(params[:filter])
       .result
       

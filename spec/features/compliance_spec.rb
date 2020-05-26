@@ -3,6 +3,19 @@ require 'rails_helper'
 describe 'an admin user' do
   let(:admin_user) { create(:admin_user) }
   let(:super_admin_user) { create(:super_admin_user) }
+
+  it 'cleans up the current admin user after responding' do
+    login_as super_admin_user
+    visit '/'
+    expect(page).to have_content 'Dashboard'
+    visit '/api/issues'
+    expect(page).to have_content 'total_items'
+    visit '/'
+    click_link 'Logout'
+    expect(page).to have_content 'Signed out successfully'
+    visit '/api/issues'
+    expect(page).to have_content 'forbidden'
+  end
   
   it 'restrict another admin user' do 
     restricted_user = create(:admin_user)

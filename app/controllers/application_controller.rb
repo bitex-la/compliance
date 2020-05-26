@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :set_current_user
   before_action :verify_request, except: [:index, :create, :new, :batch_action]
+  after_action :clear_current_user
 
   private
 
@@ -13,6 +14,10 @@ class ApplicationController < ActionController::Base
     else
       AdminUser.current_admin_user = current_admin_user
     end
+  end
+
+  def clear_current_user
+    AdminUser.current_admin_user = nil
   end
 
   def verify_request

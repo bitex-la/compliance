@@ -2,13 +2,19 @@ require 'rails_helper'
 require 'helpers/shared_examples_for_models'
 
 RSpec.describe Observation, type: :model do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:robot_observation, issue: issue)
+    }
+
   %i(abandon dismiss reject).each do |event|
     it "scoped by admin return only observations who belongs to active issues, skip observations for issues in #{event} state" do
       issue = create(:basic_issue)
       another_issue = create(:basic_issue)
       worldcheck_observation = create(:admin_world_check_observation, issue: issue)
-      risk_observation = create(:chainalysis_observation, issue: another_issue)
-      
+      create(:chainalysis_observation, issue: another_issue)
+
       Observation.admin_pending.count.should == 2
       another_issue.send("#{event}!")
       Observation.admin_pending.count.should == 1

@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 describe Affinity do
+  it_behaves_like 'person_scopable_fruit', :full_affinity
+
   it_behaves_like 'archived_fruit', :affinities, :full_affinity
 
   it 'has a custom name_body' do
@@ -90,7 +92,7 @@ describe Affinity do
       end
     end
 
-    %i(payee owner customer stakeholder payer provider).each do |kind|
+    %i(payee owner customer stakeholder payer provider compliance_liaison).each do |kind|
       it "get non-symmetrical affinity of #{kind}" do
         person = create(:basic_issue).reload.person
         create(:full_affinity, person: person, affinity_kind_code: kind)

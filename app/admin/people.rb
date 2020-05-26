@@ -92,6 +92,12 @@ ActiveAdmin.register Person do
   end
 
   form do |f|
+    if resource.new_record?
+      AdminUser.current_admin_user.tags.each do |t|
+        resource.person_taggings.build(tag: t)
+      end
+    end
+    
     if resource.issues.empty? && resource.persisted?
       div class: 'flash flash_danger' do
         "This person has no created issues. Please create a new issue to add information."
@@ -129,6 +135,9 @@ ActiveAdmin.register Person do
     column :risk
     column :regularity
     column :person_type
+    column(:tags) do |o|
+      o.tags.pluck(:name).join(' - ')
+    end
     column :created_at
     column :updated_at
     actions
@@ -244,14 +253,78 @@ ActiveAdmin.register Person do
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, :emails, 'envelope')
       ArbreHelpers::Fruit.fruit_collection_show_tab(self, :risk_scores, 'exclamation-triangle')
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Deposit', resource.fund_deposits.count, 'university') do
+      fund_movements_count =  resource.fund_deposits.count + 
+                              resource.fund_withdrawals.count +
+                              resource.received_transfers.count + 
+                              resource.sent_transfers.count
+
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Movements', fund_movements_count, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do
           table_for resource.fund_deposits do           
+            column :deposit_date
             column :amount
             column :currency
             column :exchange_rate_adjusted_amount
             column :deposit_method
-            column :external_id
+            column :country
+            column 'External Id' do |o|
+              o.external_id
+            end
+          end
+        end
+
+        panel 'Fund Withdrawals' , class: 'fund_withdrawals' do
+          table_for resource.fund_withdrawals do           
+            column :withdrawal_date
+            column :amount
+            column :currency
+            column :exchange_rate_adjusted_amount
+            column :country
+            column 'External Id' do |o|
+              o.external_id
+            end
+          end
+        end
+
+        panel 'Received Transfers' , class: 'received_transfers' do
+          table_for resource.received_transfers do           
+            column :transfer_date
+            column :source_person
+            column :amount
+            column :currency
+            column :exchange_rate_adjusted_amount
+            column 'External Id' do |o|
+              o.external_id
+            end
+          end
+        end
+
+        panel 'Sent Transfers' , class: 'sent_transfers' do
+          table_for resource.sent_transfers do           
+            column :transfer_date
+            column :target_person
+            column :amount
+            column :currency
+            column :exchange_rate_adjusted_amount
+            column 'External Id' do |o|
+              o.external_id
+            end
+          end
+        end
+      end
+
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Archived Fruits', resource.archived_fruits.count, 'archive') do
+        panel 'Archived Fruits' , class: 'archived_fruits' do
+          table_for resource.archived_fruits do           
+            column :id
+            column 'Type' do |o|
+              o.class
+            end
+            column :created_at
+            column :archived_at
+            column 'Action' do |o|
+              link_to 'View', o
+            end
           end
         end
       end

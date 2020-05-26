@@ -26,7 +26,11 @@ class Person < ApplicationRecord
     affinities
     risk_scores
   }.each do |relationship|
-    has_many relationship, -> { where("#{relationship}.replaced_by_id is NULL AND #{relationship}.archived_at is NULL") }
+    has_many relationship, -> {
+      where("#{relationship}.replaced_by_id is NULL")
+      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.current)
+    }
+
     has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
   end
 
@@ -51,6 +55,16 @@ class Person < ApplicationRecord
   has_many :tags, through: :person_taggings
   accepts_nested_attributes_for :person_taggings, allow_destroy: true
 
+  validate :person_tag_must_be_managed_by_admin
+
+  def person_tag_must_be_managed_by_admin
+    return unless (admin_user = AdminUser.current_admin_user)
+    return if tags.empty? ||
+      tags.any? { |t| admin_user.can_manage_tag?(t) }
+
+    errors.add(:person, 'Person tags not allowed')
+  end
+
   def replaceable_fruits
     %i[
       natural_dockets
@@ -66,6 +80,20 @@ class Person < ApplicationRecord
   end
 
   enum risk: %i(low medium high)
+
+  # This default_scope allow filter person with allowed
+  # admin tags
+  def self.default_scope
+    Person.by_admin_user_tags
+  end
+
+  scope :by_admin_user_tags, -> {
+    return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
+
+    where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
+      OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
+      }, tags).distinct
+  }
 
   def natural_docket
     natural_dockets.last
@@ -184,6 +212,20 @@ class Person < ApplicationRecord
       notes.current
   end
 
+  def archived_fruits
+    Domicile.archived(self) +
+      Identification.archived(self) +
+      NaturalDocket.archived(self) +
+      LegalEntityDocket.archived(self) +
+      Allowance.archived(self) +
+      Phone.archived(self) +
+      Email.archived(self) +
+      Affinity.archived(self) +
+      ArgentinaInvoicingDetail.archived(self) +
+      ChileInvoicingDetail.archived(self) +
+      Note.archived(self)
+  end
+
   def all_attachments
     attachments
       .where("attached_to_seed_id is null AND attached_to_fruit_id is not null")
@@ -202,11 +244,11 @@ class Person < ApplicationRecord
   end
 
   def all_affinities
-    Affinity.where("person_id = ? OR related_person_id = ?", id, id)
+    Affinity.where(person: self).or(Affinity.where(related_person: self))
   end
 
   def public_notes
-    Note.where("person_id = ? AND public = true", id)
+    Note.where(person: self, public: true)
   end
 
   def email_for_export
@@ -268,6 +310,16 @@ class Person < ApplicationRecord
 
     EventLog.log_entity!(self, AdminUser.current_admin_user,
       EventLogKind.update_person_regularity) if should_log
+  end
+
+  def refresh_person_country_tagging!(country)
+    tag_name = "active-in-#{country}"
+    tag = Tag.find_or_create_by(tag_type: :person, name: tag_name)
+
+    AdminUser.current_admin_user&.add_tag(tag)
+
+    PersonTagging.find_or_create_by(person: self, tag: tag)
+    tags.reload
   end
 
   aasm do

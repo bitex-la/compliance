@@ -1,6 +1,15 @@
 require 'rails_helper'
 
-RSpec.describe FundTransfer, type: :model do
+describe FundTransfer do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      create(:fund_transfer,
+        source_person_id: person_id,
+        target_person: create(:full_person_tagging, tag: create(:some_person_tag)).person
+      )
+    },
+    change_person: -> (obj, person_id){ obj.source_person_id = person_id }
+
   let(:source_person) { create(:empty_person) }
   let(:target_person) { create(:empty_person) }
 
@@ -8,7 +17,8 @@ RSpec.describe FundTransfer, type: :model do
     invalid = FundTransfer.new
     expect(invalid).not_to be_valid
     expect(invalid.errors.keys).to match_array(%i[
-      currency source_person target_person amount exchange_rate_adjusted_amount external_id transfer_date
+      currency source_person target_person amount
+      exchange_rate_adjusted_amount external_id transfer_date
     ])
   end
 

@@ -23,8 +23,11 @@ class FundDeposit < ApplicationRecord
 
   has_many :attachments, as: :attached_to_fruit
 
+  after_save :refresh_person_country_tagging!
   after_save :refresh_person_regularity!
   after_save { person.expire_action_cache }
+
+  include PersonScopeable
 
   def name
     "##{id}: #{amount} #{currency_code} #{deposit_method_code}"
@@ -35,5 +38,9 @@ class FundDeposit < ApplicationRecord
   def refresh_person_regularity!
     person.fund_deposits.reload
     person.refresh_person_regularity!
+  end
+
+  def refresh_person_country_tagging!
+    person.refresh_person_country_tagging!(country)
   end
 end

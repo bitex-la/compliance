@@ -110,6 +110,7 @@ Rails.application.routes.draw do
     %i(
       person_taggings
       issue_taggings
+      admin_user_taggings
     ).each do |entities|
       resources entities, except: [:new, :edit, :update]
     end

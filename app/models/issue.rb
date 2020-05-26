@@ -17,8 +17,8 @@ class Issue < ApplicationRecord
     parent.table[:reason_id]
   end
 
-  before_validation do 
-    self.defer_until ||= Date.today
+  before_validation do
+    self.defer_until ||= Date.current
     self.reason ||= IssueReason.further_clarification
   end
 
@@ -29,8 +29,9 @@ class Issue < ApplicationRecord
   validate :defer_until_cannot_be_in_the_past
 
   def defer_until_cannot_be_in_the_past
-    validation_date = created_at.try(:to_date) || Date.today
+    validation_date = created_at.try(:to_date) || Date.current
     return if defer_until >= validation_date
+
     errors.add(:defer_until, "can't be in the past")
   end
 
@@ -43,6 +44,8 @@ class Issue < ApplicationRecord
 
   belongs_to :lock_admin_user, class_name: "AdminUser", foreign_key: "lock_admin_user_id", optional: true
   validate :locked_issue_cannot_changed
+
+  include PersonScopeable
 
   def locked_issue_cannot_changed
     return unless locked
@@ -186,15 +189,15 @@ class Issue < ApplicationRecord
   }
 
   scope :future_all, -> { 
-    where('defer_until > ?', Date.today)
+    where('defer_until > ?', Date.current)
   }
 
   scope :future, -> { 
-    active_states.where('defer_until > ?', Date.today)
+    active_states.where('defer_until > ?', Date.current)
   }
   
   scope :current, -> { 
-    where('defer_until <= ?', Date.today)
+    where('defer_until <= ?', Date.current)
   }
 
   def self.ransackable_scopes(auth_object = nil)
@@ -234,6 +237,10 @@ class Issue < ApplicationRecord
 
     event :complete do
       transitions from: [:draft, :new], to: :new
+
+      after do 
+        refresh_person_country_tagging!
+      end
     end
 
     event :observe do
@@ -260,8 +267,11 @@ class Issue < ApplicationRecord
     event :reject do
       transitions from: [:draft, :new, :observed, :answered, :rejected], to: :rejected
 
-      after do 
-        log_state_change(:reject_issue) if aasm.from_state != :rejected
+      after do
+        if aasm.from_state != :rejected
+          person.reject! if reason == IssueReason.new_client
+          log_state_change(:reject_issue)
+        end
       end
     end
 
@@ -274,6 +284,7 @@ class Issue < ApplicationRecord
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
+          refresh_person_country_tagging!
         end
       end
     end
@@ -322,6 +333,9 @@ class Issue < ApplicationRecord
   end
 
   def harvest_all!
+    # We never want to risk losing fruits for harvesting an old issue instance.
+    # Old instances shouldn't happen in prod, mostly in specs, but just in case.
+    reload
     HAS_MANY.each{|assoc| send(assoc).map(&:harvest!) }
     HAS_ONE.each{|assoc| send(assoc).try(:harvest!) }
   end
@@ -378,6 +392,16 @@ class Issue < ApplicationRecord
     end
   end
 
+  def refresh_person_country_tagging!
+    if argentina_invoicing_detail_seed
+      person.refresh_person_country_tagging!('AR')
+    end
+
+    if chile_invoicing_detail_seed
+      person.refresh_person_country_tagging!('CL')
+    end
+  end
+
   private
 
   def lock_expired?
@@ -428,6 +452,12 @@ class Issue < ApplicationRecord
       :'person.allowances.attachments',
       :'person.fund_deposits',
       :'person.fund_deposits.attachments',
+      :'person.fund_withdrawals',
+      :'person.fund_withdrawals.attachments',
+      :'person.sent_transfers',
+      :'person.sent_transfers.attachments',
+      :'person.received_transfers',
+      :'person.received_transfers.attachments',
       :'person.risk_scores',
       :'person.risk_scores.attachments',
       :natural_docket_seed,
