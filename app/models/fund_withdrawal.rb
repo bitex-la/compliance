@@ -1,5 +1,6 @@
 class FundWithdrawal < ApplicationRecord
   include Loggable
+  include PersonScopeable
 
   validates :country, country: true
   validates :external_id, presence: true
@@ -13,6 +14,7 @@ class FundWithdrawal < ApplicationRecord
 
   has_many :attachments, as: :attached_to_fruit
 
+  after_save :refresh_person_country_tagging!
   after_save { person.expire_action_cache }
 
   validate :withdrawal_date_cannot_be_in_the_future
@@ -25,5 +27,11 @@ class FundWithdrawal < ApplicationRecord
 
   def name
     "##{id}: #{amount} #{currency_code} #{country}"
+  end
+
+  private
+
+  def refresh_person_country_tagging!
+    person.refresh_person_country_tagging!(country)
   end
 end

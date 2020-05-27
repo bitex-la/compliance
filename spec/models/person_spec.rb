@@ -210,4 +210,255 @@ RSpec.describe Person, type: :model do
       end
     end
   end
+
+  describe "When filter by admin tags" do
+    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+    before :each do
+      admin_user
+    end
+
+    it "allow person creation only with admin tags" do
+      person_tag1 = create(:person_tag)
+      person_tag2 = create(:alt_person_tag)
+
+      admin_user.tags << person_tag1
+
+      expect do
+        person1 = Person.new
+        person1.tags << person_tag1
+        person1.save!
+      end.to change { Person.count }.by(1)
+
+      expect do
+        person2 = Person.new
+        person2.tags << person_tag2
+        expect(person2).to_not be_valid
+        expect(person2.errors[:person]).to eq(['Person tags not allowed'])
+      end.to change { Person.count }.by(0)
+
+      admin_user.tags << person_tag2
+
+      expect do
+        person3 = Person.new
+        person3.tags << person_tag1
+        person3.save!
+      end.to change { Person.count }.by(1)
+
+      expect do
+        person4 = Person.new
+        person4.tags << person_tag2
+        person4.save!
+      end.to change { Person.count }.by(1)
+    end
+
+    it "allow person creation with tags if admin has no tags" do
+      person_tag1 = create(:person_tag)
+      person_tag2 = create(:alt_person_tag)
+
+      expect do
+        person1 = Person.new
+        person1.tags << person_tag1
+        person1.save!
+      end.to change { Person.count }.by(1)
+
+      expect do
+        person2 = Person.new
+        person2.tags << person_tag2
+        person2.save!
+      end.to change { Person.count }.by(1)
+    end
+
+    it "allow person creation without tags if admin has no tags" do
+      expect do
+        person = Person.new
+        person.save!
+      end.to change { Person.count }.by(1)
+    end
+
+    it "allow person creation without tags if admin has tags" do
+      person_tag = create(:person_tag)
+
+      admin_user.tags << person_tag
+
+      expect do
+        person = Person.new
+        person.save!
+      end.to change { Person.count }.by(1)
+    end
+
+    it "allow change state with person tags if admin has tags" do
+      person1, person2, person3, person4 = setup_for_admin_tags_spec
+
+      admin_user.tags << person1.tags.first
+
+      %i{enable disable reject}.each do |action|
+        person = Person.find(person1.id)
+        person.send("#{action}!")
+
+        person = Person.find(person2.id)
+        person.send("#{action}!")
+
+        expect { Person.find(person3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+        person = Person.find(person4.id)
+        person.send("#{action}!")
+      end
+
+      admin_user.tags << person3.tags.first
+
+      %i{enable disable reject}.each do |action|
+        person = Person.find(person3.id)
+        person.send("#{action}!")
+      end
+    end
+
+    it "Update a person with tags if admin has tags" do
+      person1, person2, person3, person4 = people = setup_for_admin_tags_spec
+
+      people.each do |i|
+        p = Person.find(i.id)
+        p.update!(enabled: false)
+      end
+
+      admin_user.tags << person1.tags.first
+
+      person = Person.find(person1.id)
+      person.enabled = false
+      person.save!
+
+      person = Person.find(person2.id)
+      person.enabled = false
+      person.save!
+
+      expect { Person.find(person3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+      person = Person.find(person4.id)
+      person.enabled = false
+      person.save!
+
+      admin_user.tags << person3.tags.first
+
+      person = Person.find(person3.id)
+      person.enabled = false
+      person.save!
+    end
+
+    it "show person with active tags" do
+      person1, person2, person3, person4 = people = setup_for_admin_tags_spec
+
+      people.each { |i| expect(Person.find(i.id)).to_not be_nil }
+
+      admin_user.tags << person1.tags.first
+
+      expect(Person.find(person1.id)).to_not be_nil
+      expect(Person.find(person2.id)).to_not be_nil
+      expect { Person.find(person3.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(Person.find(person4.id)).to_not be_nil
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+
+      expect { Person.find(person1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(Person.find(person2.id)).to_not be_nil
+      expect(Person.find(person3.id)).to_not be_nil
+      expect(Person.find(person4.id)).to_not be_nil
+
+      admin_user.tags << person1.tags.first
+
+      expect(Person.find(person1.id)).to_not be_nil
+      expect(Person.find(person2.id)).to_not be_nil
+      expect(Person.find(person3.id)).to_not be_nil
+      expect(Person.find(person4.id)).to_not be_nil
+    end
+
+    it "index person with active tags" do
+      person1, person2, person3, person4 = setup_for_admin_tags_spec
+
+      persons = Person.all
+      expect(persons.count).to eq(4)
+      expect(persons[0].id).to eq(person1.id)
+      expect(persons[1].id).to eq(person2.id)
+      expect(persons[2].id).to eq(person3.id)
+      expect(persons[3].id).to eq(person4.id)
+
+      admin_user.tags << person1.tags.first
+
+      persons = Person.all
+      expect(persons.count).to eq(3)
+      expect(persons[0].id).to eq(person1.id)
+      expect(persons[1].id).to eq(person2.id)
+      expect(persons[2].id).to eq(person4.id)
+
+      admin_user.tags.delete(person1.tags.first)
+      admin_user.tags << person3.tags.first
+
+      persons = Person.all
+      expect(persons.count).to eq(3)
+      expect(persons[0].id).to eq(person2.id)
+      expect(persons[1].id).to eq(person3.id)
+      expect(persons[2].id).to eq(person4.id)
+
+      admin_user.tags << person1.tags.first
+
+      persons = Person.all
+      expect(persons.count).to eq(4)
+      expect(persons[0].id).to eq(person1.id)
+      expect(persons[1].id).to eq(person2.id)
+      expect(persons[2].id).to eq(person3.id)
+      expect(persons[3].id).to eq(person4.id)
+    end
+
+    it 'add country tag and create a new tag' do
+      person = create(:empty_person)
+
+      expect do
+        person.refresh_person_country_tagging!('AR')
+      end.to change { Tag.count }.by(1)
+
+      person.reload
+      tag = Tag.last
+      expect(tag.name).to eq 'active-in-AR'
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'add country tag to person not creating a new tag' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      expect do
+        person.refresh_person_country_tagging!('AR')
+      end.to change { Tag.count }.by(0)
+
+      person.reload
+      expect(person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag to person if already exists' do
+      person = create(:empty_person)
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+      person.tags << tag
+      person.save!
+
+      expect do
+        person.refresh_person_country_tagging!('AR')
+      end.to change { PersonTagging.count }.by(0)
+
+      person.reload
+      expect(person.tags.count).to eq(1)
+    end
+
+    def setup_for_admin_tags_spec
+      person1 = create(:full_person_tagging).person
+      person2 = create(:empty_person)
+      person3 = create(:alt_full_person_tagging).person
+      person4 = create(:empty_person)
+      person4.tags << person1.tags.first
+      person4.tags << person3.tags.first
+
+      [person1, person2, person3, person4]
+    end
+  end
 end

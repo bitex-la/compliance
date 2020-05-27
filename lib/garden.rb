@@ -33,6 +33,12 @@ module Garden
       cattr_accessor :naming { Naming.new(name) }
       belongs_to :issue
       has_one :person, through: :issue
+      def person
+        # If a seed has an issue, it has a person. Even before it's been saved.
+        # has_one through seems to be ignoring the in-memory object.
+        issue&.person || super
+      end
+
       belongs_to :fruit, class_name: naming.fruit, optional: true
       has_many :attachments, as: :attached_to_seed
 
@@ -78,7 +84,11 @@ module Garden
         observations.destroy_all
       end
 
-      after_save{ person.expire_action_cache }
+      # We add this default_scope to allow others default_scopes
+      # to cascade and apply admin taggings rules to the current query
+      default_scope { joins(:issue).distinct }
+
+      after_save { person.expire_action_cache }
 
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
@@ -116,7 +126,7 @@ module Garden
         end
       else
         old_fruits =  fruit.person.send(self.class.naming.plural)
-          .current.where('id != ?', fruit.id)
+          .current.where.not(id: fruit.id).distinct(false)
 
         if respond_to?(:copy_attachments)
           if copy_attachments
@@ -147,6 +157,7 @@ module Garden
 
   module Fruit
     extend ActiveSupport::Concern
+    include PersonScopeable
 
     included do
       belongs_to :person
@@ -177,7 +188,7 @@ module Garden
       end
 
       def others_for_person
-        self.class.where(person: person, replaced_by: nil).where("id != ?", self)
+        self.class.where(person: person, replaced_by: nil).where.not(id: self)
       end
 
       def issue

@@ -23,6 +23,10 @@ class Workflow < ApplicationRecord
   validates :workflow_type, presence: true
   validates :scope, inclusion: { in: scopes }
 
+  # We add this default_scope to allow others default_scopes
+  # to cascade and apply admin taggings rules to the current query
+  default_scope { joins(:issue) }
+
   scope :running, -> {
     joins(:issue)
     .where(aasm_state: 'started')

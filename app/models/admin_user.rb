@@ -12,6 +12,10 @@ class AdminUser < ApplicationRecord
   has_secure_token :api_token
   after_initialize :set_api_token
 
+  has_many :admin_user_taggings
+  has_many :tags, through: :admin_user_taggings
+  accepts_nested_attributes_for :admin_user_taggings, allow_destroy: true
+
   def is_restricted?
     role_type == "restricted"
   end
@@ -50,6 +54,22 @@ class AdminUser < ApplicationRecord
 
     self.otp_secret_key = ROTP::Base32.random_base32
     save!
+  end
+
+  def active_tags
+    admin_user_taggings.pluck(:tag_id)
+  end
+
+  def can_manage_tag?(tag)
+    !admin_user_taggings.exists? ||
+      admin_user_taggings.where(tag: tag).exists?
+  end
+
+  def add_tag(tag)
+    return if admin_user_taggings.empty?
+
+    admin_user_taggings.find_or_create_by(tag: tag)
+    tags.reload
   end
 
   private

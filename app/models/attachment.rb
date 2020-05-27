@@ -1,15 +1,21 @@
 class Attachment < ApplicationRecord
-  belongs_to :person, optional: true
+  belongs_to :person
   belongs_to :attached_to_fruit, polymorphic: true, optional: true
   belongs_to :attached_to_seed, polymorphic: true, optional: true
   has_attached_file :document, optional: true
   before_validation :strip_accents
 
-  after_commit :relate_to_person
-  before_save :classify_type
+  before_validation :relate_to_person
   before_validation :classify_type
 
   validate :attached_to_something
+  validates :person, presence: true
+  validate :person_cannot_be_removed_once_set
+
+  before_save :classify_type
+  after_save{ person.expire_action_cache }
+
+  include PersonScopeable
 
   def self.attachable_to_fruits
    %w(domicile phone email note
@@ -51,10 +57,15 @@ class Attachment < ApplicationRecord
     /rar|RAR\z/,
   ]
 
-
   def attached_to_something
     return unless attached_to.nil?
+
     errors.add(:base, 'must_be_attached_to_something')
+  end
+
+  def person_cannot_be_removed_once_set
+    return unless person_id_was.presence && person.nil?
+    errors.add(:base, 'cant_unassign_person')
   end
 
   def document_url
@@ -96,16 +107,14 @@ class Attachment < ApplicationRecord
   end
 
   private
+
   def relate_to_person
-    unless destroyed?
-      if issue
-        self.update_column(:person_id, issue.person_id)
-        person.expire_action_cache
-      end
-    end
+    self.person_id = attached_to&.person&.id
   end
 
   def classify_type
+    # If the attached to type is set via jsonapi, we need to convert it
+    # to the corresponding rails type.
     unless self.attached_to_seed_type.nil?
       self.attached_to_seed_type = self.attached_to_seed_type.camelize.singularize
     end 
