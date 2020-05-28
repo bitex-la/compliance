@@ -25,7 +25,7 @@ describe 'an admin user' do
     click_link 'Admin Users'
 
     within "tr[id='admin_user_#{AdminUser.first.id}'] td[class='col col-actions']" do
-      click_link 'Edit'
+      click_link 'View'
     end
 
     click_link 'Grant Restricted access'
@@ -1103,7 +1103,7 @@ describe 'an admin user' do
     expect(page).to_not have_text super_admin_user.api_token
   end
 
-  it "don't show api token for admin users in csv export" do
+  it "don't show sensible data for admin users in csv export" do
     login_as super_admin_user
 
     click_link 'Admin Users'
@@ -1112,6 +1112,9 @@ describe 'an admin user' do
     csv = File.read(DownloadHelpers::download)
     expect(csv).to_not include('API TOKEN')
     expect(csv).to_not include(super_admin_user.api_token)
+    expect(csv).not_to include("Encrypted password")
+    expect(csv).to_not include(super_admin_user.encrypted_password)
+    expect(csv).not_to include("Reset password token")
   end
 
   it 'keeps track of usage allowances' do
