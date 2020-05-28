@@ -26,9 +26,11 @@ module Permission
       klass = subject.class == Class ? subject : subject.class
 
       permission = self.find_by_code(user.role_type)
-        .provider.constantize.new
+        .provider.constantize.new(user)
 
-      return true if [:read, :create, :update].include?(action) && 
+      return true if permission.allowed_instances[action].include?(subject)
+
+      return true if [:read, :create, :update].include?(action) &&
         permission.allowed_classes.include?(klass)
 
       permission.allowed_actions[klass].include?(action)

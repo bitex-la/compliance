@@ -2,6 +2,10 @@
 
 module Permissions
   class RestrictedPermission < PermissionBase
+    def initialize(user)
+      super(user)
+    end
+
     def allowed_classes
       [
         Issue,
@@ -24,11 +28,9 @@ module Permissions
     end
 
     def allowed_actions
-      actions = {
+      Hash.new([]).merge(
         AdminUser => [:read]
-      }
-      actions.default = []
-      actions
+      )
     end
   end
 end
