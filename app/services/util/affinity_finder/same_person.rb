@@ -116,7 +116,7 @@ module AffinityFinder
                           words: full_name.split(/\W+/),
                         )
 
-          match_names.pluck(:person_id)
+          match_names.pluck(:person_id).uniq
         when :legal_entity
           return [] if person.legal_entity_dockets.current.count == 0
 

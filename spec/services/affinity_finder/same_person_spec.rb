@@ -201,43 +201,79 @@ describe AffinityFinder::SamePerson do
         AffinityFinder::SamePerson.call(person_b.id)
       end.to change{person_b.issues.count}.by(1)
 
-      # TODO: test affinity relationship (person_a father of b)
-
       # check that no issue is created if another one is pending
       expect do
+        # explain why this edge case (ie. create person_b)
         AffinityFinder::SamePerson.call(person_b.id)
       end.to change{person_b.issues.count}.by(0)
     end
 
-    it 'creates a same_person AffinitySeed issue on childrens' do
+    it 'creates a same_person AffinitySeed issue on children' do
       person_a = create_natural_person_with_docket('Juan', 'Molina')
       person_b = create_natural_person_with_docket('Juan Carlos', 'Molina')
-      person_c = create_natural_person_with_docket('Juan Antonio', 'Molina')
 
       expect do
+        # this could be triggered if person_a was
+        # updated with a new natural_person_docket
         AffinityFinder::SamePerson.call(person_a.id)
       end.to change{person_b.issues.count}.by(1)
 
       affinity_b = person_b.issues.last.affinity_seeds.first
-      affinity_c = person_c.issues.last.affinity_seeds.first
       affinity_kind = AffinityKind.find_by_code(:same_person)
 
       expect(affinity_b).to have_attributes({
         related_person_id: person_a.id,
         affinity_kind_id: affinity_kind.id
       })
-      expect(affinity_c).to have_attributes({
-        related_person_id: person_a.id,
-        affinity_kind_id: affinity_kind.id
-      })
-
-      # TODO: Check edge case of an existing children related to a father by ID Number
     end
+
+    # agregar caso con un padre y un hijo con affinity ya creado
+    # y testeo person_a en donde la relación existente se archiva
+    # hay que crear estado con issues aprobados y el affinity creado
+    # puedo llamar al call para crear la issue y aprobarla
+    # issue.add_seeds_replacing(fruits) unless params[:fruits].blank?
+    # agregar el archived_at al affinity_seed
+    # issue SIN APROBAR
+    # crear luego dos issues con affinities hacia person_a
 
     it 'returns orphans same_person affinity persons' do
+      # person_a -> person_b
+
+      # person_a -> person_c
+
+      # si no encuentra b ni c, devolver b y c
       # TODO: test with existing same_person relationships
       # TODO: test existing affinities invalidations
+      # Do we have to use archived attribute in issues?
     end
+
+    # TODO: Check edge case of an existing children related to a father by ID Number
+    it 'found same-name affinity in children of a same-dni father' do
+      # Fact: person_b -> person_c (same dni CUIL)
+      # FOUND same_name affinity person_a -> person_c
+      #
+      # create issue in person_c related_to person_a?
+      # what about person_b, father of existing affinity?
+      #
+      # Ideal outcome:
+      # person_a -> person_b
+      # person_a -> person_c
+    end
+
+    # Escenario person_a -> b -> c
+    # call (b)
+
+
+    # person_a (JUAN)(DNI 123) -> person_b (JUANA) (DNI 123)
+
+    # person_c (JUANA)(DNI 456)
+
+
+
+
+    # si encuentro relacion de affinity
+
+
 
     # Ejemplo de cambio de datos de padre e hijo en affinities
     # PERSONA A NOMBRE IGUAL DNI DISTINTO
@@ -314,18 +350,78 @@ def add_id_to_person(person, number)
   person.reload
 end
 
+=begin
+  Possible scenarios
 
-      # TODO: return person ids with same_person affinity
-      # related_to person_id (potential orphans same_person affinity persons)
+  A. Exact match
 
-      # TODO: chequear validez de affinities preexistentes si person
-      # tiene affinities same_person activos y marcarlos de alguna manera
-      # para invalidarlos si person es hijo. En caso de que sea Padre
-      # se debe marcar a los related_persons de los affinities a expirar
-      # para correr en cada related_person el affinity creator de same_person
+             +----------------------+
+    Before:  | Person_A (id ABC123) |
+             +----------------------+
+
+    Action: a Person_B has set a new id to ABC123
+
+    After: Issue is created in Person_A with affinity same_person
+           with realted_person: Person_B.
+           If issue is approved:
+             +----------------------+    +---------------------+
+             | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+             +----------------------+    +---------------------+
+
+  B. Partial match with existing relation
+
+             +----------------------+    +---------------------+
+    Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+             +----------------------+    +---------------------+
+
+    Action: a Person_C has set a new id to BC12
+
+    After: Issue is created in Person_A with affinity same_person
+           with realted_person: Person_C
+           If issue is approved:
+             +----------------------+    +----------------------+
+             | Person_A (id ABC123) | -> | Person_B (id ABC123) |
+             +----------------------+\   +----------------------+
+                                      \   +--------------------+
+                                       -> | Person_C (id BC12) |
+                                          +--------------------+
+
+  C. Inverse partial match with existing relation
+
+             +----------------------+    +---------------------+
+    Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+             +----------------------+    +---------------------+
+
+    Action: a Person_C has set a new id to XABC1234Z
+
+    After: Issue is created in Person_A with affinity same_person
+           with realted_person: Person_C
+           If issue is approved:
+             +----------------------+    +----------------------+
+             | Person_A (id ABC123) | -> | Person_B (id ABC123) |
+             +----------------------+\   +----------------------+
+                                      \   +-------------------------+
+                                       -> | Person_C (id XABC1234Z) |
+                                          +-------------------------+
+
+  D. Father with existing child change id and break relationship with child
+
+             +----------------------+    +---------------------+
+    Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+             +----------------------+    +---------------------+
+
+    Action: Person_A has a new id DEF456
+
+    After: Issue is created in Person_A to replace existing affinity with
+           Person_B setting archived_at attribute to issue created date
+           If issue is approved:
+
+             +----------------------+    +---------------------+
+             | Person_A (id DEF456) |    | Person_B(id ABC123) |
+             +----------------------+    +---------------------+
 
 
-
+=end
 
       # Crear issues por cada
 
