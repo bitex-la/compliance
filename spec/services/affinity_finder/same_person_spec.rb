@@ -260,6 +260,18 @@ describe AffinityFinder::SamePerson do
         AffinityFinder::SamePerson.call(person_c.id)
       end.to change{person_a.issues.count}.by(1)
 
+      # C. Inverse partial match with existing relation
+
+      #   Action: a Person_D has set a new id to XABC1234Z
+
+      #   After: Issue is created in Person_A with affinity same_person
+      #         with realted_person: Person_D
+
+      person_d = create_person_with_identification('XABC1234Z')
+
+      expect do
+        AffinityFinder::SamePerson.call(person_d.id)
+      end.to change{person_a.issues.count}.by(1)
     end
 
     it 'creates a same_person AffinitySeed issue on children' do
@@ -467,14 +479,89 @@ end
     Action: Person_A has a new id DEF456
 
     After: Issue is created in Person_A to replace existing affinity with
-           Person_B setting archived_at attribute to issue created date
+           Person_B, setting archived_at attribute to issue created date
            If issue is approved:
 
              +----------------------+    +---------------------+
              | Person_A (id DEF456) |    | Person_B(id ABC123) |
              +----------------------+    +---------------------+
 
+  E. Person with existing same_person child change id, break relationship with child and
+     found match with 3 persons with existing same_person affinity
 
+             +----------------------+    +----------------------+
+    Before:  | Person_B (id ABC123) | -> | Person_C (id ABC123) |
+             +----------------------+    +----------------------+
+
+             +----------------------+    +----------------------+
+             | Person_A (id DEF456) | -> | Person_D (id DEF456) |
+             +----------------------+\   +----------------------+
+                                      \   +-------------------------+
+                                       -> | Person_E (id DEF456)    |
+                                          +-------------------------+
+
+
+    Action: Person_B has a new id DEF456
+    ALERT TO DISCUSS:
+    After: Issue is created in Person_B to replace existing affinity with
+           Person_C, setting archived_at attribute to issue created date  (???)
+           Also Issue is created in Person_A with affinity same_person
+           with realted_person: Person_B
+
+           CREATE 2 ISSUES HERE? or JUST THE AFFINITY ONE THAT TRIGGERS THE ARCHIVED WHEN APPROVED?
+           HOW WOULD WE KNOW THAT THE CURRENT AFFINITY BETWEEN B AND C HAS TO BE ARCHIVED?
+
+                                  +----------------------+
+           If issue is approved:  | Person_C (id ABC123) |
+                                  +----------------------+
+             +----------------------+    +----------------------+
+             | Person_A (id DEF456) | -> | Person_D (id DEF456) |
+             +----------------------+\   +----------------------+
+                                   \  \   +-------------------------+
+                                    \  -> | Person_E (id DEF456)    |
+                                     \    +-------------------------+
+                                      \   +-------------------------+
+                                       -> | Person_B (id DEF456)    |
+                                          +-------------------------+
+
+  F. Person with existing same_person affinity change id, break relationship with father and
+     found match with 3 persons with existing same_person affinity. This Person is older than
+     the matches
+
+             +----------------------+    +----------------------+
+    Before:  | Person_A (id ABC123) | -> | Person_B (id ABC123) |
+             +----------------------+    +----------------------+
+
+             +----------------------+    +----------------------+
+             | Person_C (id DEF456) | -> | Person_D (id DEF456) |
+             +----------------------+\   +----------------------+
+                                      \   +----------------------+
+                                       -> | Person_E (id DEF456) |
+                                          +----------------------+
+
+
+    Action: Person_B has a new id DEF456
+    ALERT TO DISCUSS:
+    After: Issue is created in Person_A to replace existing affinity with
+           Person_B, setting archived_at attribute to issue created date (???)
+           Also Issue is created in Person_B with affinity same_person
+           with Person_C. When this issue is approved, the existing relationship
+           bettween C, D and E will be reorganized
+
+           CREATE 2 ISSUES HERE? or JUST THE AFFINITY ONE THAT TRIGGERS THE ARCHIVED WHEN APPROVED?
+
+                                  +----------------------+
+           If issue is approved:  | Person_C (id ABC123) |
+                                  +----------------------+
+             +----------------------+    +----------------------+
+             | Person_B (id DEF456) | -> | Person_C (id DEF456) |
+             +----------------------+\   +----------------------+
+                                   \  \   +-------------------------+
+                                    \  -> | Person_D (id DEF456)    |
+                                     \    +-------------------------+
+                                      \   +-------------------------+
+                                       -> | Person_E (id DEF456)    |
+                                          +-------------------------+
 =end
 
       # Crear issues por cada
