@@ -10,19 +10,22 @@ module AffinityFinder
 
       related_persons_ids = related_persons(matched_ids)
 
-      children_ids =  same_person_affinity_childrens(person_id).pluck(:person_id)
+      children_ids =  same_person_affinity_childrens(person_id).pluck(:related_person_id)
 
-      if related_persons_ids.empty?
+      if matched_ids.empty?
         # return all current same_person
         # affinity childrens (all orphans)
         return children_ids
       end
 
-      related_persons_ids.each do |related_person_id|
+      matched_ids.each do |match_person_id|
         # if is an existing children remove from orphans array and move on
-        next if children_ids.delete(related_person_id)
+        next if children_ids.delete(match_person_id)
 
-        (children_id, father_id) = [person.id, related_person_id].sort
+        # check if match_person_id has a same_person father
+        match_person = same_person_affinity_father(match_person_id)
+
+        (father_id, children_id) = [person.id, match_person.id].sort
 
         create_same_person_issue(father_id, children_id)
       end
@@ -56,9 +59,17 @@ module AffinityFinder
     # returns [?Person]
     def self.same_person_affinity_childrens(person_id)
       Affinity.where(
-        related_person_id: person_id,
+        person_id: person_id,
         affinity_kind_id: AffinityKind.find_by_code('same_person').id
       )
+    end
+
+    # returns Person
+    def self.same_person_affinity_father(person_id)
+      Affinity.where(
+        related_person_id: person_id,
+        affinity_kind_id: AffinityKind.find_by_code('same_person').id
+      ).first || Person.find(person_id)
     end
 
     # returns Person
