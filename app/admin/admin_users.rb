@@ -61,12 +61,14 @@ ActiveAdmin.register AdminUser do
     column :otp_enabled
     column :current_sign_in_at
     column :sign_in_count
-    column :max_people_allowed
-    column(:person_view_count) do |o|
-      o.request_limit_set.length
-    end
-    column(:rejected_person_view_count) do |o|
-      o.request_limit_rejected_set.length
+    if authorized?(:full_read, AdminUser)
+      column :max_people_allowed
+      column(:person_view_count) do |o|
+        o.request_limit_set.length
+      end
+      column(:rejected_person_view_count) do |o|
+        o.request_limit_rejected_set.length
+      end
     end
     column :created_at
     actions
@@ -159,9 +161,11 @@ ActiveAdmin.register AdminUser do
     column :updated_at
     column :otp_enabled
     column :role_type
-    column :max_people_allowed
-    column :tags do
-      resource.tags.pluck(:name).join(' - ')
+    if authorized?(:full_read, AdminUser)
+      column :max_people_allowed
+      column :tags do |o|
+        o.tags.pluck(:name).join(' - ')
+      end
     end
   end
 
