@@ -1,4 +1,4 @@
-class TagsUpdater
+module TagsUpdater
   def self.perform
     Person.find_each do |person|
       Rails.logger.info "Processing person #{person.id}"
