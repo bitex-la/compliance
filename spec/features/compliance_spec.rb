@@ -991,7 +991,7 @@ describe 'an admin user' do
       person.reload.identifications.count == 2
     end
 
-    it 'can remove existing seeds' do
+    it 'can remove existing attachments' do
       person = create :new_natural_person
       issue = person.issues.reload.first
 
@@ -1063,6 +1063,61 @@ describe 'an admin user' do
       person.allowances.first.weight.should == AllowanceSeed.last.weight
       person.identifications.first.number.should == IdentificationSeed.last.number
     end
+  end
+
+  it 'can edit an issue' do
+    person = create(:full_natural_person).reload
+    issue = create(:full_natural_person_issue, person: person)
+
+    login_as admin_user
+
+    click_on 'Draft'
+    within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
+      click_link(issue.id)
+    end
+    
+    click_link "Edit"
+
+    find('li[title="Natural dockets"] a').click
+
+    fill_seed('natural_docket', {
+      first_name: 'Joe',
+      last_name: 'Jameson',
+      birth_date: "1975-01-15"
+    }, false)
+    
+ 
+    find('li[title="Domiciles"] a').click
+    
+    select_with_search(
+      '#issue_domicile_seeds_attributes_0_replaces_input',
+      Domicile.first.name
+    )
+
+    within ".has_many_container.domicile_seeds" do
+      fill_seed('domicile', {
+        country: 'AR',
+        state: 'Buenos Aires',
+        city: 'C.A.B.A',
+        street_address: 'Triunvirato',
+        street_number: '2300',
+        postal_code: '1254',
+        floor: '',
+        apartment: ''
+      })
+    end
+
+    click_button "Update Issue"
+
+    click_link "Edit"
+
+    find('li[title="Domiciles"] a').click
+
+    click_link 'Remove'
+
+    page.driver.browser.switch_to.alert.accept
+
+    expect(page).to have_content('Domicile seed was successfully destroyed.')
   end
 
   it 'manually enables/disables and sets risk for a person' do

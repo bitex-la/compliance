@@ -167,5 +167,15 @@ describe 'a restricted admin user' do
       expect(page).to_not have_selector(:link_or_button, 'Abandon')
       expect(page).to_not have_selector(:link_or_button, 'Reject')
     end
+
+    click_link "Edit"
+
+    find('li[title="Domiciles"] a').click
+
+    click_link 'Remove'
+
+    page.driver.browser.switch_to.alert.accept
+
+    expect(page).to have_content('Domicile seed was successfully destroyed.')
   end
 end
