@@ -93,7 +93,7 @@ Warden::Manager.after_authentication scope: :admin_user do |user, warden, option
   next unless user.otp_enabled?
 
   proxy = Devise::Hooks::Proxy.new(warden)
-  unless user.authenticate_otp(warden.request.params.dig(:admin_user, :otp))
+  unless user.authenticate_otp(warden.request.params.dig(:admin_user, :otp) || '')
     proxy.sign_out(:admin_user)
     throw :warden, scope: :admin_user, message: 'Invalid OTP'
   end
