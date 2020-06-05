@@ -160,7 +160,7 @@ describe 'a restricted admin user' do
     end
 
     click_button "Update Issue"
-    
+
     within(".action_items") do
       expect(page).to_not have_selector(:link_or_button, 'Approve')
       expect(page).to_not have_selector(:link_or_button, 'Dismiss')
@@ -172,9 +172,9 @@ describe 'a restricted admin user' do
 
     find('li[title="Domiciles"] a').click
 
-    click_link 'Remove'
-
-    page.driver.browser.switch_to.alert.accept
+    accept_alert do
+      click_link 'Remove'
+    end
 
     expect(page).to have_content('Domicile seed was successfully destroyed.')
   end

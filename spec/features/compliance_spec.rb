@@ -1113,9 +1113,9 @@ describe 'an admin user' do
 
     find('li[title="Domiciles"] a').click
 
-    click_link 'Remove'
-
-    page.driver.browser.switch_to.alert.accept
+    accept_alert do
+      click_link 'Remove'
+    end
 
     expect(page).to have_content('Domicile seed was successfully destroyed.')
   end
