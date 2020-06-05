@@ -176,6 +176,8 @@ describe 'a restricted admin user' do
       click_link 'Remove'
     end
 
-    expect(page).to have_content('Domicile seed was successfully destroyed.')
+    Capybara.using_wait_time(10) do
+      expect(page).to have_content('Domicile seed was successfully destroyed.')
+    end
   end
 end
