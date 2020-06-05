@@ -209,6 +209,12 @@ class PersonProfile
 
     def generate
       Prawn::Document.new(margin: 15) do |pdf|
+        pdf.font_families.update(
+          "Helvetica" => {
+            :normal => Rails.root.join("app/assets/fonts/Helvetica.ttf")
+          }
+        )
+
         pdf.text "Bitex", color: "1b80c4", size: 42, align: :center
 
         pdf.text("Profile", styles: [:bold], size: 24)
