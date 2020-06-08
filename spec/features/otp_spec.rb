@@ -26,7 +26,7 @@ describe 'an admin user' do
 
     super_admin_user.reload
     
-    within '#otp_sidebar_section' do
+    within '#otp-info_sidebar_section' do
       expect(page).to have_content 'Otp'
       expect(page).to have_content super_admin_user.otp_secret_key
     end
@@ -36,8 +36,8 @@ describe 'an admin user' do
       expect(page).to have_content 'OTP enabled'
     end
     
-    within '#otp_sidebar_section' do
-      expect(page).to have_content 'OTP is enabled'
+    within '#otp-info_sidebar_section' do
+      expect(page).to have_content 'OTP already enabled'
     end
 
     click_link 'Logout'
@@ -57,8 +57,8 @@ describe 'an admin user' do
       click_link 'View'
     end
 
-    within '#otp_sidebar_section' do
-      expect(page).to have_content 'OTP is enabled'
+    within '#otp-info_sidebar_section' do
+      expect(page).to have_content 'OTP already enabled'
     end
 
     click_link 'Disable OTP'

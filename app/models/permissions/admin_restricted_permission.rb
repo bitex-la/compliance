@@ -2,19 +2,20 @@
 
 module Permissions
   class AdminRestrictedPermission < RestrictedPermission
+    def initialize(user)
+      super(user)
+    end
+
     def allowed_classes
-      super + 
-      [
-        EventLog
-      ]
+      super +
+        [EventLog]
     end
 
     def allowed_actions
-      actions = {
-        EventLog => [:view_menu]
-      }
-      actions.default = []
-      actions
+      Hash.new([]).merge(
+        EventLog => [:view_menu],
+        AdminUser => [:read]
+      )
     end
   end
 end
