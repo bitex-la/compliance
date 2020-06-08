@@ -274,116 +274,106 @@ describe AffinityFinder::SamePerson do
       end.to change{person_a.issues.count}.by(1)
     end
 
-    it 'creates a same_person AffinitySeed issue on children' do
-      person_a = create_natural_person_with_docket('Juan', 'Molina')
-      person_b = create_natural_person_with_docket('Juan Carlos', 'Molina')
+    it 'breaks existing relationship with children' do
+      # D. Father with existing child change id and break relationship with child
+
+      #            +----------------------+    +---------------------+
+      #   Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+      #            +----------------------+    +---------------------+
+
+      #   Action: Person_A has a new id DEF456
+
+      #   After: Issue is created in Person_A to replace existing affinity with
+      #          Person_B, setting archived_at attribute to issue created date
+      #          If issue is approved:
+
+      #            +----------------------+    +---------------------+
+      #            | Person_A (id DEF456) |    | Person_B(id ABC123) |
+      #            +----------------------+    +---------------------+
+      person_a = create_person_with_identification('ABC123')
+      person_b = create_person_with_identification('ABC123')
+      AffinityFinder::SamePerson.call(person_b.id)
+      person_a.issues.last.approve!
+
+      current_same_person_affinity = person_a.affinities.last
+
+      change_person_identification(person_a, 'DEF456')
 
       expect do
-        # this could be triggered if person_a was
-        # updated with a new natural_person_docket
         AffinityFinder::SamePerson.call(person_a.id)
-      end.to change{person_b.issues.count}.by(1)
+      end.to change{person_a.issues.count}.by(1)
 
-      affinity_b = person_b.issues.last.affinity_seeds.first
+      affinity_seed = person_a.issues.last.affinity_seeds.first
       affinity_kind = AffinityKind.find_by_code(:same_person)
 
-      expect(affinity_b).to have_attributes({
-        related_person_id: person_a.id,
-        affinity_kind_id: affinity_kind.id
+      expect(affinity_seed).to have_attributes({
+        related_person_id: person_b.id,
+        affinity_kind_id: affinity_kind.id,
+        replaces: current_same_person_affinity,
+        archived_at: person_a.issues.created_at
       })
     end
 
-    # agregar caso con un padre y un hijo con affinity ya creado
-    # y testeo person_a en donde la relación existente se archiva
-    # hay que crear estado con issues aprobados y el affinity creado
-    # puedo llamar al call para crear la issue y aprobarla
-    # issue.add_seeds_replacing(fruits) unless params[:fruits].blank?
-    # agregar el archived_at al affinity_seed
-    # issue SIN APROBAR
-    # crear luego dos issues con affinities hacia person_a
+    it 'creates new affinity with existing father' do
+      # E. Person with existing same_person child change id, break relationship with child and
+      #     found match with 3 persons with existing same_person affinity
 
-    it 'returns orphans same_person affinity persons' do
-      # person_a -> person_b
+      #             +----------------------+    +----------------------+
+      #     Before: | Person_B (id ABC123) | -> | Person_C (id ABC123) |
+      #             +----------------------+    +----------------------+
 
-      # person_a -> person_c
+      #             +----------------------+    +----------------------+
+      #             | Person_A (id DEF456) | -> | Person_D (id DEF456) |
+      #             +----------------------+\   +----------------------+
+      #                                      \   +-----------------------+
+      #                                       -> | Person_E (id DEF456)  |
+      #                                          +-----------------------+
 
-      # si no encuentra b ni c, devolver b y c
-      # TODO: test with existing same_person relationships
-      # TODO: test existing affinities invalidations
-      # Do we have to use archived attribute in issues?
+
+      #     Action: Person_B has a new id DEF456
+
+      #     After: Issue is created in Person_A with affinity same_person
+      #           with realted_person: Person_B. On issue approval, Person_B relationship
+      #           with Person_C will be archived
+
+      #                                  +----------------------+
+      #           If issue is approved:  | Person_C (id ABC123) |
+      #                                  +----------------------+
+      #             +----------------------+    +----------------------+
+      #             | Person_A (id DEF456) | -> | Person_D (id DEF456) |
+      #             +----------------------+\   +----------------------+
+      #                                   \  \   +-------------------------+
+      #                                    \  -> | Person_E (id DEF456)    |
+      #                                     \    +-------------------------+
+      #                                      \   +-------------------------+
+      #                                       -> | Person_B (id DEF456)    |
+      #                                          +-------------------------+
+
+      person_a = create_person_with_identification('DEF456')
+      person_b = create_person_with_identification('ABC123')
+      person_c = create_person_with_identification('ABC123')
+      person_d = create_person_with_identification('DEF456')
+      person_e = create_person_with_identification('DEF456')
+
+      AffinityFinder::SamePerson.call(person_a.id)
+      person_a.issues.last.approve!
+      AffinityFinder::SamePerson.call(person_b.id)
+      person_b.issues.last.approve!
+
+      change_person_identification(person_b, 'DEF456')
+
+      expect do
+        AffinityFinder::SamePerson.call(person_b.id)
+      end.to change{person_a.issues.count}.by(1)
+
+      affinity_seed = person_a.issues.last.affinity_seeds.first
+      affinity_kind = AffinityKind.find_by_code(:same_person)
+
+      expect(affinity_seed).to have_attributes({
+        related_person_id: person_b.id,
+        affinity_kind_id: affinity_kind.id
+      })
     end
-
-    # TODO: Check edge case of an existing children related to a father by ID Number
-    it 'found same-name affinity in children of a same-dni father' do
-      # Fact: person_b -> person_c (same dni CUIL)
-      # FOUND same_name affinity person_a -> person_c
-      #
-      # create issue in person_c related_to person_a?
-      # what about person_b, father of existing affinity?
-      #
-      # Ideal outcome:
-      # person_a -> person_b
-      # person_a -> person_c
-    end
-
-    # Escenario person_a -> b -> c
-    # call (b)
-
-
-    # person_a (JUAN)(DNI 123) -> person_b (JUANA) (DNI 123)
-
-    # person_c (JUANA)(DNI 456)
-
-
-
-
-    # si encuentro relacion de affinity
-
-
-
-    # Ejemplo de cambio de datos de padre e hijo en affinities
-    # PERSONA A NOMBRE IGUAL DNI DISTINTO
-    # PERSONA B NOMBRE IGUAL DNI DISTINTO (Persona A es padre)
-
-    # PERSONA F NOMBRE DIST DNI DIST
-    # PERSONA G NOMBRE DIST DNI IGUAL A (Persona A es padre)
-
-    # PERSONA H NOMBRE IGUAL PERSONA F  DNI IGUAL A B (Persona A y F padre)
-
-    # PERSONA H cambia NOMBRE o # PERSONA F cambia NOMBRE
-
-
-    # Creates an issue with AffinitySeed affinity_kind_code: :same_person
-    # expiration??
-
-    # Ejemplo de cambio de person que es padre e hijo a la vez
-    # PERSONA A
-    # PERSONA B NOMBRE = A DNI DISTINTO (Persona A es padre)
-    # PERSONA C NOMBRE DIST DNI = B (Persona B es padre)
-    # PERSONA D NOMBRE DIST DNI = B (Persona B es padre)
-    # PERSONA E DNI DIST (303) (NO HAY AFFINITY)
-    # EDITO PERSONA
-    # Ecuentro Affinities.
-    #    - Si es hijo, marco para archivar.
-    #    - Si es padre, marco para archivar.
-
-    #  previo A -> B -> C   B -> D
-
-    #  CAMBIO DNI DE B A 303
-    #  ISSUE B -> E (same_person por DNI)
-    #  ISSUE B seed affinity (archived_at fecha created_at de este issue)
-    #          COPIAR ALGUNOS ATTR DEl fruit a reemplazar (ver ejemplos ya existentes)
-    #          este seed tiene que reemplazar (replaces) al fruto B -> C
-    #  ISSUE B seed affinity (archived_at fecha created_at de este issue)
-    #          este seed tiene que reemplazar (replaces) al fruto B -> D
-    #  ISSUE C -> D affinity same_person
-
-
-
-
-    # EJEMPLO: Persona A es padre de B por mismo DNI
-    # cambio DNI a B. Creo Issue para comunicar a compliance
-    # para expirar affinity same_person de A a B.
   end
 end
 
@@ -392,6 +382,17 @@ def create_person_with_identification(number)
                   number: number)
   seed.issue.approve!
   seed.issue.person.reload
+end
+
+def change_person_identification(person, number)
+  issue = create(:basic_issue, person_id: person.id)
+  create(
+    :full_natural_person_identification_seed,
+    issue: issue,
+    number: number,
+    replaces: person.identifications.last
+  )
+  issue.approve!
 end
 
 def create_natural_person_with_docket(first_name, last_name)
@@ -496,20 +497,16 @@ end
              +----------------------+    +----------------------+
              | Person_A (id DEF456) | -> | Person_D (id DEF456) |
              +----------------------+\   +----------------------+
-                                      \   +-------------------------+
-                                       -> | Person_E (id DEF456)    |
-                                          +-------------------------+
+                                      \   +-----------------------+
+                                       -> | Person_E (id DEF456)  |
+                                          +-----------------------+
 
 
     Action: Person_B has a new id DEF456
-    ALERT TO DISCUSS:
-    After: Issue is created in Person_B to replace existing affinity with
-           Person_C, setting archived_at attribute to issue created date  (???)
-           Also Issue is created in Person_A with affinity same_person
-           with realted_person: Person_B
 
-           CREATE 2 ISSUES HERE? or JUST THE AFFINITY ONE THAT TRIGGERS THE ARCHIVED WHEN APPROVED?
-           HOW WOULD WE KNOW THAT THE CURRENT AFFINITY BETWEEN B AND C HAS TO BE ARCHIVED?
+    After: Issue is created in Person_A with affinity same_person
+           with realted_person: Person_B. On issue approval, Person_B relationship
+           with Person_C will be archived
 
                                   +----------------------+
            If issue is approved:  | Person_C (id ABC123) |
@@ -542,13 +539,12 @@ end
 
     Action: Person_B has a new id DEF456
     ALERT TO DISCUSS:
-    After: Issue is created in Person_A to replace existing affinity with
-           Person_B, setting archived_at attribute to issue created date (???)
-           Also Issue is created in Person_B with affinity same_person
+    After: Issue is created in Person_B with affinity same_person
            with Person_C. When this issue is approved, the existing relationship
            bettween C, D and E will be reorganized
 
            CREATE 2 ISSUES HERE? or JUST THE AFFINITY ONE THAT TRIGGERS THE ARCHIVED WHEN APPROVED?
+           NO
 
                                   +----------------------+
            If issue is approved:  | Person_C (id ABC123) |
@@ -562,6 +558,68 @@ end
                                       \   +-------------------------+
                                        -> | Person_E (id DEF456)    |
                                           +-------------------------+
+
+  G. Father with existing childs change id and break relationship with childs and create new one
+
+             +----------------------+    +---------------------+
+    Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+             +----------------------+    +---------------------+
+                                      \   +----------------------+
+                                       -> | Person_C (id ABC123) |
+                                          +----------------------+
+             +----------------------+
+             | Person_D (id DEF456) |
+             +----------------------+
+
+    Action: Person_A has a new id DEF456
+
+    After: Issue is created in Person_A with affinity same_person to Person_D
+
+           If issue is approved:
+
+             Person_B -> Person_C
+
+             +----------------------+      +---------------------+
+             | Person_A (id DEF456) |  ->  | Person_D(id DEF456) |
+             +----------------------+      +---------------------+
+
+    ALERT TO DISCUSS: Somehow we must archived existing relationship between A, B and C
+                      and create new affinity between B and C (on issue approval)
+                      Evaluar si hijos que quedan huerfanos tienen datos distintos (nombre/dni)
+                      Nuevo caso (I) igual a este pero con relacion existente entre A y D con matcheo
+                      por nombre y Person E con un DNI igual a A. A con 4 hijos (2 dni y 2 nombre)
+
+  H. New Person with name affinity to an id affinity child
+
+             +----------------------+    +---------------------+
+    Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+             |  (name John P.)      |    |  (name: Juan Perez) |
+             +----------------------+    +---------------------+
+
+             +----------------------+
+             | Person_C (id DEF456) |
+             |  (name: Juan Perez)  |
+             +----------------------+
+
+    Action: Person_C is created with id DEF456 and name Juan Perez
+
+    After: Issue is created in Person_A with affinity same_person (name) to Person_C
+
+           If issue is approved:
+
+             +----------------------+    +---------------------+
+             | Person_A (id ABC123) | -> | Person_B(id ABC123) |
+             |  (name John P.)      |    |  (name: Juan Perez) |
+             +----------------------+    +---------------------+
+                                     \   +----------------------+
+                                      -> | Person_C (id DEF456) |
+                                         |  (name: Juan Perez)  |
+                                         +----------------------+
+
+    ALERT TO DISCUSS: Somehow we must transform ISSUE in Person_B with an issue approved
+                      in Person_A pointing to Person_C (???????????)
+
+
 =end
 
       # Crear issues por cada

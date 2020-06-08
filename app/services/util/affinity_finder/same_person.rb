@@ -1,6 +1,8 @@
 module AffinityFinder
   class SamePerson
-    # Returns Array[Int] (person_ids of orphans if any)
+    # Returns Array[Int] (person_ids of orphans if any) DEPRECATED
+    # Returns VOID (all arrengements on children are going to happen
+    # in issue approval process)
     def self.call(person_id)
       person = Person.find(person_id)
 
@@ -11,12 +13,6 @@ module AffinityFinder
       related_persons_ids = related_persons(matched_ids)
 
       children_ids =  same_person_affinity_childrens(person_id).pluck(:related_person_id)
-
-      if matched_ids.empty?
-        # return all current same_person
-        # affinity childrens (all orphans)
-        return children_ids
-      end
 
       matched_ids.each do |match_person_id|
         # if is an existing children remove from orphans array and move on
@@ -30,7 +26,7 @@ module AffinityFinder
         create_same_person_issue(father_id, children_id)
       end
 
-      children_ids
+      create_archived_issues_on_orphans(person, children_ids)
     end
 
     # affinity related_to other persons (i.e. only fathers)
@@ -170,6 +166,25 @@ module AffinityFinder
 
       # save unless affinity is already defined
       issue.save! unless affinity.affinity_defined?(issue, related_person, affinity_kind)
+    end
+
+    def self.create_archived_issues_on_orphans(person, orphan_ids)
+      affinity_kind = AffinityKind.find_by_code(:same_person)
+      orphan_ids.each do |orphan_id|
+        current_affinity = person.affinities.find_by!(
+          related_person_id: orphan_id,
+          affinity_kind_id: affinity_kind.id
+        )
+        issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
+        affinity = issue.affinity_seeds.build(
+          related_person_id: orphan_id,
+          affinity_kind: affinity_kind,
+          replaces: current_affinity,
+          archived_at: issue.created_at
+        )
+
+        issue.save!
+      end
     end
   end
 end
