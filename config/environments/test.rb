@@ -42,9 +42,6 @@ Rails.application.configure do
 
   config.cache_store = :redis_cache_store, { url: Settings.redis.cache_url,
     namespace: Settings.redis.namespace,
-    connect_timeout: 30,  # Defaults to 20 seconds
-    read_timeout:    0.2, # Defaults to 1 second
-    write_timeout:   0.2, # Defaults to 1 second
     expires_in: 60.minutes,
     pool_size: Settings.redis.pool_size,
 

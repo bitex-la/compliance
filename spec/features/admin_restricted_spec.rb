@@ -160,12 +160,24 @@ describe 'a restricted admin user' do
     end
 
     click_button "Update Issue"
-    
+
     within(".action_items") do
       expect(page).to_not have_selector(:link_or_button, 'Approve')
       expect(page).to_not have_selector(:link_or_button, 'Dismiss')
       expect(page).to_not have_selector(:link_or_button, 'Abandon')
       expect(page).to_not have_selector(:link_or_button, 'Reject')
+    end
+
+    click_link "Edit"
+
+    find('li[title="Domiciles"] a').click
+
+    accept_alert do
+      click_link 'Remove'
+    end
+
+    Capybara.using_wait_time(10) do
+      expect(page).to have_content('Domicile seed was successfully destroyed.')
     end
   end
 end

@@ -23,13 +23,26 @@ module Permissions
         PhoneSeed,
         EmailSeed,
         FundDeposit,
+        FundTransfer,
+        FundWithdrawal,
         Attachment
       ]
     end
 
     def allowed_actions
       Hash.new([]).merge(
-        AdminUser => [:read]
+        AdminUser => [:read],
+        NaturalDocketSeed => [:destroy],
+        LegalEntityDocketSeed => [:destroy],
+        DomicileSeed => [:destroy],
+        IdentificationSeed => [:destroy],
+        AllowanceSeed => [:destroy],
+        AffinitySeed => [:destroy],
+        ArgentinaInvoicingDetailSeed => [:destroy],
+        ChileInvoicingDetailSeed => [:destroy],
+        RiskScoreSeed => [:destroy],
+        PhoneSeed => [:destroy],
+        EmailSeed => [:destroy]
       )
     end
   end
