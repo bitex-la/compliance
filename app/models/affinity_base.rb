@@ -12,8 +12,8 @@ class AffinityBase < ApplicationRecord
   end
 
   def affinity_exist?(person, related_one, kind)
-    Affinity.where(person: person, related_person: related_one, 
-      affinity_kind_id: kind.try(:id))
+    Affinity.where(person: person, related_person: related_one,
+      affinity_kind_id: kind.try(:id), archived_at: archived_at)
       .where.not(id: id).count > 0
   end
 end

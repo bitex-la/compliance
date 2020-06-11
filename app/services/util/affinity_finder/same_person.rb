@@ -10,10 +10,9 @@ module AffinityFinder
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
-      related_persons_ids = related_persons(matched_ids)
-
       children_ids =  same_person_affinity_childrens(person_id).pluck(:related_person_id)
 
+      issues_created = false
       matched_ids.each do |match_person_id|
         # if is an existing children remove from orphans array and move on
         next if children_ids.delete(match_person_id)
@@ -23,10 +22,11 @@ module AffinityFinder
 
         (father_id, children_id) = [person.id, match_person.id].sort
 
-        create_same_person_issue(father_id, children_id)
+        create_same_person_issue!(father_id, children_id)
+        issues_created = true
       end
 
-      create_archived_issues_on_orphans(person, children_ids)
+      create_archived_issues_on_orphans(person, children_ids) unless issues_created
     end
 
     # affinity related_to other persons (i.e. only fathers)
@@ -37,10 +37,11 @@ module AffinityFinder
 
       related_persons = []
       persons_ids_linked_by_affinity = []
+
       matched_ids.each do |match_id|
         continue if persons_ids_linked_by_affinity.include?(match_id)
 
-        related_person = same_name_affinity_person_father(match_id)
+        related_person = same_person_affinity_father(match_id)
 
         persons_ids_linked_by_affinity.push(
           same_person_affinity_childrens(related_person.id).pluck(:person_id)
@@ -62,24 +63,14 @@ module AffinityFinder
 
     # returns Person
     def self.same_person_affinity_father(person_id)
-      Affinity.where(
-        related_person_id: person_id,
-        affinity_kind_id: AffinityKind.find_by_code('same_person').id
-      ).first || Person.find(person_id)
-    end
-
-    # returns Person
-    def self.same_name_affinity_person_father(person_id)
-      affinity_person = Person.find(person_id)
-
-      # check if there is a same_person affinity
-      # already linked to this affinity_person
-      # i.e. an affinity father
-      found_affinity = affinity_person.affinities.find_by(
-        affinity_kind_id: AffinityKind.find_by_code('same_person').id
-      )
-
-      found_affinity&.related_person || affinity_person
+      if (affinity = Affinity.find_by(
+                                related_person_id: person_id,
+                                affinity_kind_id: AffinityKind.find_by_code('same_person').id
+                              ))
+        return affinity.person
+      else
+        return Person.find(person_id)
+      end
     end
 
     # Returns Array[Int] (matched Person Ids)
@@ -151,7 +142,7 @@ module AffinityFinder
       end
     end
 
-    def self.create_same_person_issue(person_id, related_person_id)
+    def self.create_same_person_issue!(person_id, related_person_id)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
       person = Person.find(person_id)
@@ -180,7 +171,7 @@ module AffinityFinder
           related_person_id: orphan_id,
           affinity_kind: affinity_kind,
           replaces: current_affinity,
-          archived_at: issue.created_at
+          archived_at: Date.current
         )
 
         issue.save!
