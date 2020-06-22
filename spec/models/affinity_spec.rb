@@ -11,7 +11,7 @@ describe Affinity do
       .name.should =~ /Affinity#[0-9]*?: business_partner/
   end
 
-  it 'validates that affinity kind cannot be repeated between two people' do 
+  it 'validates that affinity kind cannot be repeated between two people' do
     person = create(:basic_issue).reload.person
       create(:full_affinity, person: person)
 
@@ -25,6 +25,20 @@ describe Affinity do
 
     expect(repeated_one).to_not be_valid
     expect(repeated_one.errors[:base]).to eq ['affinity_already_exists']
+  end
+
+  it 'allow affinity kind can be repeated between two people if the first one is archived' do 
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_archived_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+
+    repeated_one = described_class.new(
+      person: seed.issue.person,
+      related_person: related_person,
+      affinity_kind_code: :business_partner
+    )
+
+    expect(repeated_one).to be_valid
   end
 
   it 'allows to have more than one relationship between two persons with a different kind' do
