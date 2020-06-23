@@ -79,6 +79,23 @@ describe Affinity do
     expect(fruit.errors[:base]).to eq ['cannot_link_to_itself']
   end
 
+  it 'all_affinities do not incluide archived affinities' do
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_archived_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+
+    expect(seed.issue.person.reload.all_affinities).to be_empty
+    expect(related_person.reload.all_affinities).to be_empty
+  end
+
+  it 'related_affinities do not incluide archived affinities' do
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_archived_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+
+    expect(seed.issue.person.reload.related_affinities).to be_empty
+  end
+
   describe 'when calculate inverse of relationships' do
     it 'returns the inverse kind of a person that is the related on' do 
       person = create(:basic_issue).reload.person

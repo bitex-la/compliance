@@ -244,11 +244,15 @@ class Person < ApplicationRecord
   end
 
   def all_affinities
-    Affinity.where(person: self).or(Affinity.where(related_person: self))
+    Affinity.current.where(person: self).or(related_affinities)
+  end
+
+  def related_affinities
+    Affinity.current.where(related_person: self)
   end
 
   def public_notes
-    Note.where(person: self, public: true)
+    Note.current.where(person: self, public: true)
   end
 
   def email_for_export
