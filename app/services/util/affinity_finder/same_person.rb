@@ -104,7 +104,7 @@ module AffinityFinder
           ) if !docket.commercial_name.blank?
           legal_match_conditions.push(
             'LOWER(legal_name) = :legal_name'
-          ) if docket.legal_name && !docket.legal_name.empty?
+          ) if !docket.legal_name.blank?
 
           legal_matches = LegalEntityDocket.current.where.not(person: person)
 
