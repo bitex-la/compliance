@@ -94,14 +94,14 @@ module AffinityFinder
 
           match_names.pluck(:person_id).uniq
         when :legal_entity
-          return [] if person.legal_entity_dockets.current.count == 0
+          return [] if person.legal_entity_dockets.count == 0
 
           docket = person.legal_entity_docket
 
           legal_match_conditions = []
           legal_match_conditions.push(
             'LOWER(commercial_name) = :commercial_name'
-          ) if docket.commercial_name && !docket.commercial_name.empty?
+          ) if !docket.commercial_name.blank?
           legal_match_conditions.push(
             'LOWER(legal_name) = :legal_name'
           ) if docket.legal_name && !docket.legal_name.empty?
