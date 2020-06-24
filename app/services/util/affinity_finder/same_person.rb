@@ -26,7 +26,7 @@ module AffinityFinder
 
         (father_id, children_id) = [person.id, matched_person.id].sort
 
-        create_same_person_issue!(father_id, children_id)
+        create_same_person_issue(father_id, children_id)
         issues_created = true
       end
 
@@ -120,7 +120,7 @@ module AffinityFinder
       end
     end
 
-    def self.create_same_person_issue!(person_id, related_person_id)
+    def self.create_same_person_issue(person_id, related_person_id)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
       person = Person.find(person_id)
