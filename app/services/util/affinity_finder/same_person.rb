@@ -128,7 +128,7 @@ module AffinityFinder
       affinity_kind = AffinityKind.same_person
 
       issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
-      affinity = issue.affinity_seeds.build(
+      issue.affinity_seeds.build(
         related_person: related_person,
         affinity_kind: affinity_kind
       )
