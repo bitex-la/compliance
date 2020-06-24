@@ -94,7 +94,7 @@ module AffinityFinder
 
           match_names.pluck(:person_id).uniq
         when :legal_entity
-          return [] if person.legal_entity_dockets.current.count == 0
+          return [] if person.legal_entity_dockets.count == 0
 
           docket = person.legal_entity_docket
 
