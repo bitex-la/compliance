@@ -125,7 +125,7 @@ module AffinityFinder
       # for the same persons with same affinity seed
       person = Person.find(person_id)
       related_person = Person.find(related_person_id)
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
       affinity = issue.affinity_seeds.build(
