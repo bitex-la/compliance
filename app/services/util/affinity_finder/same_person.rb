@@ -137,7 +137,7 @@ module AffinityFinder
     end
 
     def self.create_archived_issues_on_orphans(person, orphan_ids)
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
       orphan_ids.each do |orphan_id|
         current_affinity = person.affinities.find_by!(
           related_person_id: orphan_id,
