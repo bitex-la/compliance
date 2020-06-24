@@ -43,7 +43,7 @@ module AffinityFinder
 
     # returns Person
     def self.same_person_affinity_father(person_id)
-      affinity = Affinity.find_by(
+      affinity = Affinity.current.find_by(
         related_person_id: person_id,
         affinity_kind_id: AffinityKind.same_person.id
       )
