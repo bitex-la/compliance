@@ -72,7 +72,7 @@ module AffinityFinder
     def self.with_matched_names(person)
       case person.person_type
         when :natural_person
-          return [] if person.natural_dockets.current.count == 0
+          return [] if person.natural_dockets.count == 0
 
           full_name = person.natural_dockets.current.last.name_body
 
