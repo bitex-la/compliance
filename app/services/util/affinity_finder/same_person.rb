@@ -3,14 +3,12 @@ module AffinityFinder
     # Returns Array[Int] (person_ids of orphans if any) DEPRECATED
     # Returns VOID (all arrengements on children are going to happen
     # in issue approval process)
-    def self.call(person_id)
-      person = Person.find(person_id)
-
+    def self.call(person)
       # find uniq ids of persons matchin name or identification
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
-      children_ids =  same_person_affinity_childrens(person_id).pluck(:related_person_id)
+      children_ids =  same_person_affinity_childrens(person.id).pluck(:related_person_id)
 
       issues_created = false
       matched_ids.each do |matched_person_id|
