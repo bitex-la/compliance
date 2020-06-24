@@ -74,7 +74,7 @@ module AffinityFinder
         when :natural_person
           return [] if person.natural_dockets.count == 0
 
-          full_name = person.natural_dockets.current.last.name_body
+          full_name = person.natural_docket.name_body
 
           conditions = []
           full_name.split(/\W+/).each do |word|
