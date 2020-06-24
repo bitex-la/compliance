@@ -101,7 +101,7 @@ module AffinityFinder
           legal_match_conditions = []
           legal_match_conditions.push(
             'LOWER(commercial_name) = :commercial_name'
-          ) if docket.commercial_name && !docket.commercial_name.empty?
+          ) if !docket.commercial_name.blank?
           legal_match_conditions.push(
             'LOWER(legal_name) = :legal_name'
           ) if docket.legal_name && !docket.legal_name.empty?
