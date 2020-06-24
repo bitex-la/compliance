@@ -96,7 +96,7 @@ module AffinityFinder
         when :legal_entity
           return [] if person.legal_entity_dockets.current.count == 0
 
-          docket = person.legal_entity_dockets.current.last
+          docket = person.legal_entity_docket
 
           legal_match_conditions = []
           legal_match_conditions.push(
