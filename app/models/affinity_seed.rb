@@ -11,8 +11,8 @@ class AffinitySeed < AffinityBase
 
   def linked_once_by_affinity
     return if issue.nil?
-    return unless affinity_exist?(issue.person, related_person, affinity_kind) ||
-                  affinity_exist?(related_person, issue.person, affinity_kind)
+    return unless affinity_exist?(issue.person, related_person, affinity_kind, archived_at) ||
+                  affinity_exist?(related_person, issue.person, affinity_kind, archived_at)
 
     errors.add(:base, 'affinity_already_exists')
   end
