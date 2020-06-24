@@ -45,7 +45,7 @@ module AffinityFinder
     def self.same_person_affinity_father(person_id)
       affinity = Affinity.find_by(
         related_person_id: person_id,
-        affinity_kind_id: AffinityKind.find_by_code('same_person').id
+        affinity_kind_id: AffinityKind.same_person.id
       )
 
       affinity&.person
