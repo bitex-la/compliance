@@ -24,14 +24,13 @@ module Permissions
         Email,
         Note,
         Tag
-      ] 
+      ]
     end
 
     def allowed_actions
-      Hash.new([]).merge(
+      super.merge(
         Issue => [:complete, :approve, :reject, :dismiss, :abandon],
         Person => [:enable, :disable, :reject, :download_profile_basic, :download_profile_full],
-        AdminUser => [:read],
         Tag => [:destroy],
         Workflow => [:finish],
         PersonTagging => [:destroy],
