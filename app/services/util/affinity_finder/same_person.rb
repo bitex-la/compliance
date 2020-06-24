@@ -35,7 +35,7 @@ module AffinityFinder
 
     # returns [?Person]
     def self.same_person_affinity_childrens(person_id)
-      Affinity.where(
+      Affinity.current.where(
         person_id: person_id,
         affinity_kind_id: AffinityKind.same_person.id
       )
