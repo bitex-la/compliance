@@ -8,7 +8,9 @@ module AffinityFinder
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
-      children_ids =  same_person_affinity_childrens(person.id).pluck(:related_person_id)
+      children_ids =  person.affinities.where(
+                        affinity_kind_id: AffinityKind.same_person.id
+                      ).pluck(:related_person_id)
 
       issues_created = false
       matched_ids.each do |matched_person_id|
@@ -31,14 +33,6 @@ module AffinityFinder
       end
 
       create_archived_issues_on_orphans(person, children_ids) unless issues_created
-    end
-
-    # returns [?Person]
-    def self.same_person_affinity_childrens(person_id)
-      Affinity.current.where(
-        person_id: person_id,
-        affinity_kind_id: AffinityKind.same_person.id
-      )
     end
 
     # returns Person
