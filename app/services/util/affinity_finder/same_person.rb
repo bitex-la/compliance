@@ -19,7 +19,13 @@ module AffinityFinder
 
         # check if match_person_id has a same_person father
         # and is included in matched array
-        affinity_father = same_person_affinity_father(matched_person_id)
+        affinity_father = Person
+                          .find(matched_person_id)
+                          .related_affinities
+                          .find_by(
+                            affinity_kind_id: AffinityKind.same_person.id
+                          )&.person
+
         if affinity_father && matched_ids.include?(affinity_father.id)
           matched_person = affinity_father
         else
@@ -33,16 +39,6 @@ module AffinityFinder
       end
 
       create_archived_issues_on_orphans(person, children_ids) unless issues_created
-    end
-
-    # returns Person
-    def self.same_person_affinity_father(person_id)
-      affinity = Affinity.current.find_by(
-        related_person_id: person_id,
-        affinity_kind_id: AffinityKind.same_person.id
-      )
-
-      affinity&.person
     end
 
     # Returns Array[Int] (matched Person Ids)
