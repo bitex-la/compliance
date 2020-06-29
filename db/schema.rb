@@ -363,10 +363,10 @@ ActiveRecord::Schema.define(version: 2020_04_09_160444) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
-    t.string "external_id"
+    t.string "external_id", null: false
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
-    t.datetime "deposit_date"
-    t.string "country"
+    t.datetime "deposit_date", null: false
+    t.string "country", null: false
     t.index ["person_id", "country"], name: "index_fund_deposits_on_person_id_and_country"
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"

@@ -42,14 +42,29 @@ describe AffinitySeed do
     expect(seed.errors[:base]).to eq ['affinity_already_exists']
   end
 
+  it 'allow a seed with same people and kind if archived fruit already exist' do
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_archived_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+
+    issue = create(:basic_issue, person: seed.issue.person)
+    seed2 = described_class.new(
+      issue: issue,
+      related_person: related_person,
+      affinity_kind_code: :business_partner
+    )
+
+    expect(seed2).to be_valid
+  end
+
   it 'validates that we cannot add two identical affinities in a same issue' do
     issue = create(:basic_issue)
-    person = issue.person
     related_person = create(:empty_person)
 
-    seed = create(:affinity_seed, affinity_kind_code: :business_partner, 
+    create(:affinity_seed, affinity_kind_code: :business_partner,
       issue: issue, related_person: related_person)
-    repeated_one = build(:affinity_seed, affinity_kind_code: :business_partner, 
+
+      repeated_one = build(:affinity_seed, affinity_kind_code: :business_partner,
       issue: issue, related_person: related_person)
 
     expect(repeated_one).to_not be_valid
@@ -62,10 +77,10 @@ describe AffinitySeed do
     issue_two = create(:basic_issue, person: person)
     related_person = create(:empty_person)
 
-    seed = create(:affinity_seed, affinity_kind_code: :business_partner, 
+    create(:affinity_seed, affinity_kind_code: :business_partner,
       issue: issue, related_person: related_person)
 
-    repeated_one = build(:affinity_seed, affinity_kind_code: :business_partner, 
+    repeated_one = build(:affinity_seed, affinity_kind_code: :business_partner,
       issue: issue_two, related_person: related_person)
 
     expect(repeated_one).to_not be_valid
@@ -81,7 +96,7 @@ describe AffinitySeed do
     expect(repeated_one.save).to be true
   end
 
-  it 'validate that cannot link to itself' do 
+  it 'validate that cannot link to itself' do
     person = create(:empty_person)
     issue = create(:basic_issue, person: person)
     seed = described_class.new(
