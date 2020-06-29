@@ -11,9 +11,14 @@ class AffinityBase < ApplicationRecord
     "#{affinity_kind} #{related_person.try(:name)}"
   end
 
-  def affinity_exist?(person, related_one, kind)
-    Affinity.current.where(person: person, related_person: related_one, 
+  def affinity_exist?(person, related_one, kind, archived_at)
+    affinities = Affinity.current.where(person: person,
+      related_person: related_one,
       affinity_kind_id: kind.try(:id))
-      .where.not(id: id).count > 0
+      .where.not(id: id)
+      .pluck(:archived_at)
+
+    # Only allow to create duplicate affinities if the new one has archive_date
+    !affinities.count.zero? && !(affinities.first.nil? && !archived_at.nil?)
   end
 end
