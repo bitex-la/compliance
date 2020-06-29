@@ -2,7 +2,7 @@ class FundDeposit < ApplicationRecord
   include Loggable
 
   validates :country, country: true
-  validates :deposit_date, presence: true, on: :create
+  validates :deposit_date, presence: true
   validates :external_id, presence: true
   validates :deposit_method, inclusion: { in: DepositMethod.all }
   validates :currency, inclusion: { in: Currency.all }
