@@ -31,18 +31,6 @@ RSpec.describe FundDeposit do
     expect(object.errors.messages.keys.first).to eq(:deposit_date)
   end
 
-  it 'is valid update a deposit without deposit_date' do
-    old_fund_deposit = build(:fund_deposit, deposit_date: nil, person: create(:empty_person))
-    old_fund_deposit.save(validate: false)
-    old_fund_deposit.update!(amount: 303.00)
-
-    expect(old_fund_deposit).to be_valid
-
-    old_fund_deposit.reload
-
-    expect(old_fund_deposit.amount).to eq(303.00)
-  end
-
   it 'logs creation of fund deposits' do
     object = create(:full_fund_deposit, person: person)
     assert_logging(object, :create_entity, 1)
