@@ -561,14 +561,18 @@ describe AffinityFinder::SamePerson do
       AffinityFinder::SamePerson.call(person_a)
       person_a.issues.last.approve!
 
-      person_c = create_natural_person_with_docket('John', '')
-      change_person_name(person_a, 'John', '')
+      person_c = create_natural_person_with_docket('John', 'Doe')
+      change_person_name(person_a, 'John', 'Doe')
+
       AffinityFinder::SamePerson.call(person_c)
+
       person_a.issues.last.approve!
 
-      person_d = create_natural_person_with_docket('Jona', '')
+      person_d = create_natural_person_with_docket('Jona', 'Brother')
 
-      change_person_name(person_a, 'Jona', '')
+      change_person_name(person_a, 'Jona', 'Brother')
+
+      person_a.reload
 
       expect do
         AffinityFinder::SamePerson.call(person_a)
@@ -635,6 +639,9 @@ describe AffinityFinder::SamePerson do
 
       change_person_name(person_d, 'John', '')
       change_person_name(person_f, 'John', '')
+
+      person_d.reload
+      person_f.reload
 
       expect do
         AffinityFinder::SamePerson.call(person_d)
