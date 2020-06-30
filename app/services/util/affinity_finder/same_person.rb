@@ -118,12 +118,10 @@ module AffinityFinder
     def self.create_same_person_issue(person, related_person)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
-      affinity_kind = AffinityKind.same_person
-
       issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.affinity_seeds.build(
         related_person: related_person,
-        affinity_kind: affinity_kind
+        affinity_kind: AffinityKind.same_person
       )
 
       issue.save
