@@ -337,6 +337,7 @@ describe AffinityFinder::SamePerson do
       person_b.issues.last.approve!
 
       change_person_identification(person_b, 'DEF456')
+      person_b.reload
 
       expect do
         AffinityFinder::SamePerson.call(person_b)
@@ -457,6 +458,7 @@ describe AffinityFinder::SamePerson do
       person_a.issues[-2].approve!
 
       change_person_identification(person_a, 'DEF456')
+      person_a.reload
 
       expect do
         AffinityFinder::SamePerson.call(person_a)
@@ -562,7 +564,9 @@ describe AffinityFinder::SamePerson do
       person_a.issues.last.approve!
 
       person_c = create_natural_person_with_docket('John', 'Doe')
+
       change_person_name(person_a, 'John', 'Doe')
+      person_a.reload
 
       AffinityFinder::SamePerson.call(person_c)
 

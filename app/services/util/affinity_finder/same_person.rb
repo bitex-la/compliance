@@ -27,9 +27,9 @@ module AffinityFinder
           matched_person = Person.find(matched_person_id)
         end
 
-        (father_id, children_id) = [person.id, matched_person.id].sort
+        (father, children) = [person, matched_person].sort_by {|p| p.id}
 
-        create_same_person_issue(father_id, children_id)
+        create_same_person_issue(father, children)
         issues_created = true
       end
 
@@ -115,11 +115,9 @@ module AffinityFinder
       end
     end
 
-    def self.create_same_person_issue(person_id, related_person_id)
+    def self.create_same_person_issue(person, related_person)
       # create issue only if there is not a pending
       # for the same persons with same affinity seed
-      person = Person.find(person_id)
-      related_person = Person.find(related_person_id)
       affinity_kind = AffinityKind.same_person
 
       issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
@@ -138,9 +136,10 @@ module AffinityFinder
           related_person_id: orphan_id,
           affinity_kind_id: affinity_kind.id
         )
+
         issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
         affinity = issue.affinity_seeds.build(
-          related_person_id: orphan_id,
+          related_person: Person.find(orphan_id),
           affinity_kind: affinity_kind,
           replaces: current_affinity,
           archived_at: Date.current
