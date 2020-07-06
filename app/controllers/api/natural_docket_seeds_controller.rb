@@ -3,6 +3,18 @@ class Api::NaturalDocketSeedsController < Api::EntityController
     NaturalDocketSeed
   end
 
+  def create
+    mapper = get_mapper
+    return jsonapi_422 unless mapper.data
+
+    mapper.data.remote_ip = request.env['REMOTE_ADDR']
+    if mapper.data.save
+      jsonapi_response mapper.data, options_for_response, 201
+    else
+      json_response mapper.all_errors, 422
+    end
+  end
+
   protected
 
   def related_person
