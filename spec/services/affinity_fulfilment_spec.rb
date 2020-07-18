@@ -20,23 +20,11 @@ describe Util::AffinityFulfilment do
       person_a = create_person_with_identification('number_a')
       person_b = create_person_with_identification('number_a')
 
+      AffinityFinder::SamePerson.call(person_b)
+
       expect do
-        AffinityFinder::SamePerson.call(person_b)
-      end.to change{person_a.issues.count}.by(1)
-
-      affinity_seed = person_a.issues.last.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
-
-      expect(affinity_seed).to have_attributes({
-        related_person_id: person_b.id,
-        affinity_kind_id: affinity_kind.id
-      })
-
-      # check that no issue is created if another one is pending
-      expect do
-        # explain why this edge case (ie. create person_b)
-        AffinityFinder::SamePerson.call(person_b)
-      end.to change{person_a.issues.count}.by(0)
+        person_a.issues.last.approve!
+      end.to change{person_a.affinities.count}.by(1)
     end
 
     it 'fulfil a new same_person AffinitySeed on a person with existing affinity relation' do
@@ -65,9 +53,16 @@ describe Util::AffinityFulfilment do
 
       person_c = create_person_with_identification('BC12')
 
+      AffinityFinder::SamePerson.call(person_c)
+
       expect do
-        AffinityFinder::SamePerson.call(person_c)
-      end.to change{person_a.issues.count}.by(1)
+        person_a.issues.last.approve!
+      end.to change{person_a.affinities.count}.by(1)
+
+      expect(person_a.affinities.last).to have_attributes({
+        related_person_id: person_c.id,
+        affinity_kind_id: AffinityKind.find_by_code(:same_person).id
+      })
 
       # C. Inverse partial match with existing relation
 
@@ -78,9 +73,16 @@ describe Util::AffinityFulfilment do
 
       person_d = create_person_with_identification('XABC1234Z')
 
+      AffinityFinder::SamePerson.call(person_d)
+
       expect do
-        AffinityFinder::SamePerson.call(person_d)
-      end.to change{person_a.issues.count}.by(1)
+        person_a.issues.last.approve!
+      end.to change{person_a.affinities.count}.by(1)
+
+      expect(person_a.affinities.last).to have_attributes({
+        related_person_id: person_d.id,
+        affinity_kind_id: AffinityKind.find_by_code(:same_person).id
+      })
     end
 
     it 'fulfil an archive affinity seed' do
@@ -108,20 +110,13 @@ describe Util::AffinityFulfilment do
 
       change_person_identification(person_a, 'DEF456')
 
+      AffinityFinder::SamePerson.call(person_a)
+
       expect do
-        AffinityFinder::SamePerson.call(person_a)
-      end.to change{person_a.issues.count}.by(1)
+        person_a.issues.last.approve!
+      end.to change{person_a.affinities.count}.by(-1)
 
-      affinity_seed = person_a.issues.last.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
-
-      expect(affinity_seed).to have_attributes({
-        related_person_id: person_b.id,
-        affinity_kind_id: affinity_kind.id,
-        replaces: current_same_person_affinity
-      })
-      # ,
-      #   archived_at: person_a.issues.last.created_at  .
+      expect(person_b.related_affinities).to be_empty
     end
 
     it 'fulfil affinity with existing father' do

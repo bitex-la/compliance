@@ -68,7 +68,7 @@ class Issue < ApplicationRecord
       next false if locked? && !locked_by_me? && !lock_expired?
       self.locked = true
       self.lock_admin_user = AdminUser.current_admin_user
-      self.lock_expiration = with_expiration ? Issue.lock_expiration_interval_minutes.from_now : nil 
+      self.lock_expiration = with_expiration ? Issue.lock_expiration_interval_minutes.from_now : nil
       save!(:validate => false)
       true
     end
@@ -112,7 +112,7 @@ class Issue < ApplicationRecord
       .where(entity: self, verb_id: EventLogKind.send(:observe_issue).id)
       .last
 
-    if has_open_observations? 
+    if has_open_observations?
       last_obv = observations.where(aasm_state: 'new').last
       if !last_logged
         log_state_change(:observe_issue)
@@ -166,7 +166,7 @@ class Issue < ApplicationRecord
       :person,
       *HAS_MANY,
       *HAS_ONE
-    ) 
+    )
   }
 
   {
@@ -174,8 +174,8 @@ class Issue < ApplicationRecord
     fresh: :new,
     answered: :answered,
     observed: :observed
-  }.each do |k,v| 
-    scope k, -> { current.with_relations.where('issues.aasm_state=?', v) }  
+  }.each do |k,v|
+    scope k, -> { current.with_relations.where('issues.aasm_state=?', v) }
   end
 
   scope :active, ->(yes=true){
@@ -188,15 +188,15 @@ class Issue < ApplicationRecord
     )
   }
 
-  scope :future_all, -> { 
+  scope :future_all, -> {
     where('defer_until > ?', Date.current)
   }
 
-  scope :future, -> { 
+  scope :future, -> {
     active_states.where('defer_until > ?', Date.current)
   }
-  
-  scope :current, -> { 
+
+  scope :current, -> {
     where('defer_until <= ?', Date.current)
   }
 
@@ -208,20 +208,20 @@ class Issue < ApplicationRecord
     %i(by_person_tag)
   end
 
-  scope :by_person_type, -> (type) { 
+  scope :by_person_type, -> (type) {
     if type == "natural"
-      left_outer_joins(:natural_docket_seed) 
-        .left_outer_joins(:person =>  :natural_dockets) 
+      left_outer_joins(:natural_docket_seed)
+        .left_outer_joins(:person =>  :natural_dockets)
         .where("natural_docket_seeds.id is not null or natural_dockets.id is not null")
     elsif type == "legal"
-      left_outer_joins(:legal_entity_docket_seed) 
-        .left_outer_joins(:person =>  :legal_entity_dockets) 
+      left_outer_joins(:legal_entity_docket_seed)
+        .left_outer_joins(:person =>  :legal_entity_dockets)
         .where("legal_entity_docket_seeds.id is not null or legal_entity_dockets.id is not null")
     end
   }
 
-  scope :by_person_tag, -> (*tags) { 
-    left_outer_joins(:person => :person_taggings) 
+  scope :by_person_tag, -> (*tags) {
+    left_outer_joins(:person => :person_taggings)
       .where("person_taggings.tag_id IN (?)", tags)
   }
 
@@ -238,7 +238,7 @@ class Issue < ApplicationRecord
     event :complete do
       transitions from: [:draft, :new], to: :new
 
-      after do 
+      after do
         refresh_person_country_tagging!
       end
     end
@@ -250,8 +250,8 @@ class Issue < ApplicationRecord
     event :answer do
       # Admins and migrations may create "already answered" observations.
       transitions from: [:observed, :draft, :new, :answered], to: :answered
-    
-      after do 
+
+      after do
         log_state_change(:answer_issue) if aasm.from_state != :answered
       end
     end
@@ -259,7 +259,7 @@ class Issue < ApplicationRecord
     event :dismiss do
       transitions from: [:draft, :new, :answered, :observed, :dismissed], to: :dismissed
 
-      after do 
+      after do
         log_state_change(:dismiss_issue) if aasm.from_state != :dismissed
       end
     end
@@ -277,12 +277,13 @@ class Issue < ApplicationRecord
 
     event :approve do
       before{ harvest_all! if aasm.from_state != :approved }
-      
+
       transitions from: [:draft, :new, :answered, :approved], to: :approved, guard: :all_workflows_performed?
 
-      after do 
+      after do
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
+          fulfil_affinity_relationships!
           log_state_change(:approve_issue)
           refresh_person_country_tagging!
         end
@@ -291,8 +292,8 @@ class Issue < ApplicationRecord
 
     event :abandon do
       transitions from: [:draft, :new, :observed, :answered, :abandoned], to: :abandoned
-      
-      after do 
+
+      after do
         log_state_change(:abandon_issue) if aasm.from_state != :abandoned
       end
     end
@@ -313,7 +314,7 @@ class Issue < ApplicationRecord
 
   def all_workflows_performed?
     return true if workflows.empty?
-    workflows.all? {|workflow| workflow.performed?} 
+    workflows.all? {|workflow| workflow.performed?}
   end
 
   def state
@@ -376,14 +377,14 @@ class Issue < ApplicationRecord
 
     all
   end
-  
+
   def all_seeds
     HAS_MANY.map{|a| send(a).try(:to_a) }.compact.flatten +
       HAS_ONE.map{|a| send(a) }.compact
   end
 
   def for_person_type
-    return person.person_type if person && person.person_type 
+    return person.person_type if person && person.person_type
 
     if natural_docket_seed_id
       :natural_person
@@ -402,11 +403,18 @@ class Issue < ApplicationRecord
     end
   end
 
+  def fulfil_affinity_relationships!
+    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.find_by_code(:same_person)
+
+    # check relationships with new affinity
+    return
+  end
+
   private
 
   def lock_expired?
     return false if lock_expiration.nil?
-    DateTime.now >= lock_expiration 
+    DateTime.now >= lock_expiration
   end
 
   def log_state_change(verb)
