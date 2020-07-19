@@ -184,6 +184,8 @@ describe Util::AffinityFulfilment do
       })
 
       expect(person_c.related_affinities).to be_empty
+      expect(person_c.affinities).to be_empty
+      expect(person_b.affinities).to be_empty
     end
 
     it 'fulfil affinity with existing father as a father' do
@@ -209,7 +211,7 @@ describe Util::AffinityFulfilment do
       #         bettween C, D and E will be reorganized
 
       #                                +----------------------+
-      #         If issue is approved:  | Person_C (id ABC123) |
+      #         If issue is approved:  | Person_A (id ABC123) |
       #                                +----------------------+
       #           +----------------------+    +----------------------+
       #           | Person_B (id DEF456) | -> | Person_C (id DEF456) |
@@ -234,19 +236,19 @@ describe Util::AffinityFulfilment do
 
       change_person_identification(person_b, 'DEF456')
 
-      expect do
-        AffinityFinder::SamePerson.call(person_b)
-      end.to change{Issue.count}.by(1)
+      AffinityFinder::SamePerson.call(person_b)
+      person_b.reload
 
-      issue = Issue.last
-      expect(issue.person_id).to be(person_b.id)
-      affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      person_b.issues.last.approve!
 
-      expect(affinity_seed).to have_attributes({
-        related_person_id: person_c.id,
-        affinity_kind_id: affinity_kind.id
-      })
+      expect(person_a.related_affinities).to be_empty
+      expect(person_a.affinities).to be_empty
+
+      expect(person_b.affinities.pluck(:related_person_id)).to match_array([
+        person_c.id, person_d.id, person_e.id
+      ])
+
+      expect(person_c.affinities).to be_empty
     end
 
     it 'fulfil affinity with another person breaking relationship with existing childrens' do
@@ -274,12 +276,6 @@ describe Util::AffinityFulfilment do
       #           | Person_A (id DEF456) |  ->  | Person_D(id DEF456) |
       #           +----------------------+      +---------------------+
 
-      #   ALERT TO DISCUSS: Somehow we must archived existing relationship between A, B and C
-      #                     and create new affinity between B and C (on issue approval)
-      #                     Evaluar si hijos que quedan huerfanos tienen datos distintos (nombre/dni)
-      #                     Nuevo caso (I) igual a este pero con relacion existente entre A y D con matcheo
-      #                     por nombre y Person E con un DNI igual a A. A con 4 hijos (2 dni y 2 nombre)
-
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
       person_c = create_person_with_identification('ABC123')
@@ -292,19 +288,21 @@ describe Util::AffinityFulfilment do
       change_person_identification(person_a, 'DEF456')
       person_a.reload
 
+      AffinityFinder::SamePerson.call(person_a)
+      person_a.reload
+
       expect do
-        AffinityFinder::SamePerson.call(person_a)
-      end.to change{Issue.count}.by(1)
+        person_a.issues.last.approve!
+      end.to change{Issue.count}.by(3)
 
-      issue = Issue.last
-      expect(issue.person_id).to be(person_a.id)
-      affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      expect(person_a.affinities.pluck(:related_person_id)).to match_array([
+        person_c.id
+      ])
 
-      expect(affinity_seed).to have_attributes({
-        related_person_id: person_d.id,
-        affinity_kind_id: affinity_kind.id
-      })
+      expect(person_b.related_affinities).to be_empty
+      expect(person_b.affinities.pluck(:related_person_id)).to match_array([
+        person_d.id
+      ])
     end
 
     it 'fulfil affinity with existing children' do
