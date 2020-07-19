@@ -172,16 +172,18 @@ describe Util::AffinityFulfilment do
       expect do
         AffinityFinder::SamePerson.call(person_b)
       end.to change{Issue.count}.by(1)
+      person_a.reload
 
-      issue = Issue.last
-      expect(issue.person_id).to be(person_a.id)
-      affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      expect do
+        person_a.issues.last.approve!
+      end.to change{Issue.count}.by(1)
 
-      expect(affinity_seed).to have_attributes({
+      expect(person_a.affinities.last).to have_attributes({
         related_person_id: person_b.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: AffinityKind.find_by_code(:same_person).id
       })
+
+      expect(person_c.related_affinities).to be_empty
     end
 
     it 'fulfil affinity with existing father as a father' do

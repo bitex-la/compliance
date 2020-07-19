@@ -1,6 +1,8 @@
 class Affinity < AffinityBase
   include Garden::Fruit
 
+  scope :by_kind, -> (code){ where(affinity_kind_id: AffinityKind.find_by_code(code.to_sym).id) }
+
   def not_linked_to_itself
     return unless related_person.try(:id) == person.id
 

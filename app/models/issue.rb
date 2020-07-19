@@ -276,14 +276,18 @@ class Issue < ApplicationRecord
     end
 
     event :approve do
-      before{ harvest_all! if aasm.from_state != :approved }
+      before do
+        if aasm.from_state != :approved
+          fulfil_affinity_relationships!
+          harvest_all!
+        end
+      end
 
       transitions from: [:draft, :new, :answered, :approved], to: :approved, guard: :all_workflows_performed?
 
       after do
         if aasm.from_state != :approved
           person.enable! if reason == IssueReason.new_client
-          fulfil_affinity_relationships!
           log_state_change(:approve_issue)
           refresh_person_country_tagging!
         end
@@ -406,8 +410,7 @@ class Issue < ApplicationRecord
   def fulfil_affinity_relationships!
     return unless affinity_seeds&.first&.affinity_kind == AffinityKind.find_by_code(:same_person)
 
-    # check relationships with new affinity
-    return
+    Util::AffinityFulfilment.call(affinity_seeds)
   end
 
   private
