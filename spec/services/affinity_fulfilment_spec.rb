@@ -178,10 +178,13 @@ describe Util::AffinityFulfilment do
         person_a.issues.last.approve!
       end.to change{Issue.count}.by(1)
 
-      expect(person_a.affinities.last).to have_attributes({
-        related_person_id: person_b.id,
-        affinity_kind_id: AffinityKind.find_by_code(:same_person).id
-      })
+      person_a.reload
+
+      expect(person_a.affinities.pluck(:related_person_id)).to match_array([
+        person_d.id, person_e.id, person_b.id
+      ])
+
+      person_c.reload
 
       expect(person_c.related_affinities).to be_empty
       expect(person_c.affinities).to be_empty
@@ -294,14 +297,16 @@ describe Util::AffinityFulfilment do
       expect do
         person_a.issues.last.approve!
       end.to change{Issue.count}.by(3)
+      person_a.reload
 
       expect(person_a.affinities.pluck(:related_person_id)).to match_array([
-        person_c.id
+        person_d.id
       ])
+      person_b.reload
 
       expect(person_b.related_affinities).to be_empty
       expect(person_b.affinities.pluck(:related_person_id)).to match_array([
-        person_d.id
+        person_c.id
       ])
     end
 
@@ -339,19 +344,17 @@ describe Util::AffinityFulfilment do
 
       person_c = create_natural_person_with_docket('Juan', 'Perez')
 
+      AffinityFinder::SamePerson.call(person_c)
+      person_a.reload
+
       expect do
-        AffinityFinder::SamePerson.call(person_c)
-      end.to change{Issue.count}.by(1)
+        person_a.issues.last.approve!
+      end.to change{Issue.count}.by(3)
+      person_a.reload
 
-      issue = Issue.last
-      expect(issue.person_id).to be(person_b.id)
-      affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
-
-      expect(affinity_seed).to have_attributes({
-        related_person_id: person_c.id,
-        affinity_kind_id: affinity_kind.id
-      })
+      expect(person_a.affinities.pluck(:related_person_id)).to match_array([
+        person_b.id, person_c.id
+      ])
     end
 
     it 'fulfil affinity with new children' do
@@ -386,8 +389,6 @@ describe Util::AffinityFulfilment do
       #             | Person_C (name john) |
       #             +----------------------+
 
-      #     ALERT TO CHECK: Somehow we must archived existing relationship between A and C when issue is approved
-
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
       AffinityFinder::SamePerson.call(person_a)
@@ -408,9 +409,19 @@ describe Util::AffinityFulfilment do
 
       person_a.reload
 
+      AffinityFinder::SamePerson.call(person_a)
+
+      person_a.reload
+
       expect do
-        AffinityFinder::SamePerson.call(person_a)
-      end.to change{Issue.count}.by(1)
+        person_a.issues.last.approve!
+      end.to change{Issue.count}.by(3)
+
+      person_a.reload
+
+      expect(person_a.affinities.pluck(:related_person_id)).to match_array([
+        person_b.id, person_c.id
+      ])
 
       issue = Issue.last
       expect(issue.person_id).to be(person_a.id)
