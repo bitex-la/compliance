@@ -1,10 +1,10 @@
 class AdminUser < ApplicationRecord
-  enum role_type: [:restricted, :admin, :super_admin, :marketing, :admin_restricted]
+  include StaticModels::BelongsTo
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, 
-         :recoverable, :rememberable, :trackable, :validatable
+  devise :database_authenticatable, :recoverable,
+    :rememberable, :trackable, :validatable
 
   has_one_time_password
   attr_accessor :otp
@@ -16,17 +16,7 @@ class AdminUser < ApplicationRecord
   has_many :tags, through: :admin_user_taggings
   accepts_nested_attributes_for :admin_user_taggings, allow_destroy: true
 
-  def is_restricted?
-    role_type == "restricted"
-  end
-
-  def is_super_admin?
-    role_type == "super_admin"
-  end
-
-  def is_in_role?(role)
-    role_type == role
-  end
+  belongs_to :admin_role, required: true
 
   def request_limit_set
     now = Time.now
