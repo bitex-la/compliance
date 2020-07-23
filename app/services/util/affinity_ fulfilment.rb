@@ -31,7 +31,9 @@ class Util::AffinityFulfilment
       related_person_affinities = related_person.affinities.by_kind(:same_person)
       related_person_affinities.each do |related_person_affinity|
         archive_affinity!(related_person_affinity)
-        build_same_person_affinity!(affinity_seed.person, related_person_affinity.related_person)
+        if (same_person_match(person, related_person_affinity.related_person))
+          build_same_person_affinity!(person, related_person_affinity.related_person)
+        end
       end
       related_person_related_affinities = related_person.related_affinities.by_kind(:same_person)
       related_person_related_affinities.each do |related_person_related_affinity|
