@@ -178,4 +178,22 @@ describe 'a compliance role admin user' do
       expect(page).to have_content('Domicile seed was successfully destroyed.')
     end
   end
+
+  it 'cannot edit tag' do
+    login_as compliance_admin_user
+
+    click_link 'Tags'
+    click_link 'New'
+
+    fill_in "tag_name", with: 'person-tag1'
+
+    select_with_search("#tag_tag_type_input", "Person")
+
+    click_button 'Create Tag'
+
+    expect(page).to have_content('Tag was successfully created.')
+
+    expect(page).not_to have_content('Edit Tag')
+    expect(page).not_to have_content('Delete Tag')
+  end
 end

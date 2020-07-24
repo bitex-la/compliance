@@ -148,4 +148,11 @@ describe 'AdminUser', js: true do
       logout
     end
   end
+
+  describe 'restricted role' do
+    it 'redirect to login' do
+      login_admin(admin_role: AdminRole.restricted)
+      expect(current_path).to eq("/login")
+    end
+  end
 end

@@ -21,11 +21,11 @@ module Abilities
         RiskScore,
         Phone,
         Email,
-        Note]
+        Note,
+        Tag]
 
       can :manage, [Person,
         Issue,
-        Tag,
         NaturalDocketSeed,
         LegalEntityDocketSeed,
         DomicileSeed,
@@ -41,6 +41,8 @@ module Abilities
         NoteSeed,
         PersonTagging,
         IssueTagging]
+
+      can :create, Tag
 
       can :read, user
       can :enable_otp, user
