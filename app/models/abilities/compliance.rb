@@ -42,6 +42,7 @@ module Abilities
         PersonTagging,
         IssueTagging]
 
+      can :full_read, Person
       can :create, Tag
 
       can :read, user

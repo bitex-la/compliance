@@ -6,6 +6,7 @@ module Abilities
     def initialize(user)
       can :read, ActiveAdmin::Page, name: 'Dashboard'
       can :read, [Issue, Person, Observation]
+      can :full_read, Person
       can :read, user
       can :enable_otp, user
       can :update, user

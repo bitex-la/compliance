@@ -7,6 +7,7 @@ module Abilities
       can :create, [Issue, Person]
       can :update, Issue
       can :complete, Issue
+      can :full_read, Person
 
       can :manage, [
         NaturalDocketSeed,

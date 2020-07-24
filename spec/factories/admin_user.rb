@@ -13,6 +13,10 @@ FactoryBot.define do
     factory :commercial_admin_user do
       admin_role AdminRole.commercial
     end
+
+    factory :marketing_admin_user do
+      admin_role AdminRole.marketing
+    end
   end
 
   factory :other_admin_user, class: 'AdminUser' do
