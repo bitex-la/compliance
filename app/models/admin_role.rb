@@ -9,6 +9,6 @@ class AdminRole
     [4,   :operations,             'operations',  'dashboards'],
     [5,   :commercial,             'commercial',  'dashboards'],
     [6,   :security,               'security',    'admin_users'],
-    [7,   :restricted,             'restricted',  'people']
+    [7,   :restricted,             'restricted',  'logout']
   ]
 end

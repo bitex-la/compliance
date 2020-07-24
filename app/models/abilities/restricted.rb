@@ -4,7 +4,7 @@ module Abilities
     include CanCan::Ability
 
     def initialize(user)
-      can :read, Person
+      cannot :manage, :all
     end
   end
 end

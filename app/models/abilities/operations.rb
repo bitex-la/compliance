@@ -5,12 +5,13 @@ module Abilities
 
     def initialize(user)
       can :read, [Issue, Person]
-      can :read, user
       can :create, [Issue, Person]
       can :update, Issue
+      can :complete, Issue
+
+      can :read, user
       can :enable_otp, user
       can :update, user
-      can :complete, Issue
     end
   end
 end
