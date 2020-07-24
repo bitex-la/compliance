@@ -1130,7 +1130,7 @@ describe 'an admin user' do
   end
 
   it "don't show api token for admin users in view page" do
-    login_as compliance_admin_user
+    login_as admin_user
 
     click_link 'Admin Users'
     within("#admin_user_#{admin_user.id} td.col.col-actions") do
@@ -1143,7 +1143,7 @@ describe 'an admin user' do
   end
 
   it "don't show sensible data for admin users in csv export" do
-    login_as compliance_admin_user
+    login_as admin_user
 
     click_link 'Admin Users'
     click_link 'CSV'
