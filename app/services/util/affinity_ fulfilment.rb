@@ -2,6 +2,9 @@ class Util::AffinityFulfilment
   def self.call(affinity_seeds)
     # Determine if this affinity_seed should be process as is
     # or must be changed. Also check if other affinities must be archived
+    #
+    # I only evaluate the first one because the same_person affinity process
+    # only creates one affinity_seed per issue
     affinity_seed = affinity_seeds.first
 
     unless affinity_seed.archived_at
@@ -10,23 +13,27 @@ class Util::AffinityFulfilment
       person = affinity_seed.person
       current_affinities = person.affinities.by_kind(:same_person)
 
-      # if the first related person don't match,
-      # the rest will not match either
-      first_current_affinity = current_affinities.first
-      unless first_current_affinity && same_person_match(person, first_current_affinity.related_person)
-        current_affinities.each do |current_affinity|
+      orphans = []
+
+      current_affinities.each do |current_affinity|
+        unless same_person_match(person, current_affinity.related_person)
           archive_affinity!(current_affinity)
-          unless current_affinity == first_current_affinity
-            build_same_person_affinity!(
-              first_current_affinity.related_person,
-              current_affinity.related_person
-            )
-          end
+          orphans.push(current_affinity.related_person)
+        end
+      end
+
+      # if the result is more than one orphan,
+      # build same_person affinity between them
+      if orphans.count > 1
+        sorted_orphans = orphans.sort_by {|p| p.id}
+        father = sorted_orphans.shift
+        sorted_orphans.each do |orphan|
+          build_same_person_affinity!(father, orphan)
         end
       end
 
       # archive previous same_person affinity and related_affinities
-      # of related person
+      # of related person if not match with current father
       related_person = affinity_seed.related_person
       related_person_affinities = related_person.affinities.by_kind(:same_person)
       related_person_affinities.each do |related_person_affinity|
@@ -35,14 +42,35 @@ class Util::AffinityFulfilment
           build_same_person_affinity!(person, related_person_affinity.related_person)
         end
       end
+
       related_person_related_affinities = related_person.related_affinities.by_kind(:same_person)
       related_person_related_affinities.each do |related_person_related_affinity|
         next if related_person_related_affinity == affinity_seed.fruit
         archive_affinity!(related_person_related_affinity)
+        if (same_person_match(person, related_person_related_affinity.related_person))
+          build_same_person_affinity!(person, related_person_related_affinity.related_person)
+        end
       end
     end
 
     return
+  end
+
+  def self.after_process(affinity_seeds)
+    # This method evaluates the existing same_person relationship
+    # of the new children
+
+    # I only evaluate the first one because the same_person affinity process
+    # only creates one affinity_seed per issue
+    affinity_seed = affinity_seeds.first
+
+    # if person has a same_person father, move his children/s
+    if ( father_affinity = affinity_seed.person.related_affinities.by_kind(:same_person).first )
+      affinity_seed.person.affinities.by_kind(:same_person).each do |children_affinity|
+        archive_affinity!(children_affinity)
+        build_same_person_affinity!(father_affinity.person, children_affinity.related_person)
+      end
+    end
   end
 
   private

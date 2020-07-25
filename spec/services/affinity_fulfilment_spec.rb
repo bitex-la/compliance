@@ -239,19 +239,22 @@ describe Util::AffinityFulfilment do
 
       change_person_identification(person_b, 'DEF456')
 
-      AffinityFinder::SamePerson.call(person_b)
-      person_b.reload
+      expect do
+        AffinityFinder::SamePerson.call(person_b)
+      end.to change{person_b.issues.count}.by(1)
 
+      person_b.reload
       person_b.issues.last.approve!
 
-      expect(person_a.related_affinities).to be_empty
-      expect(person_a.affinities).to be_empty
+      person_b.reload
+      expect(person_b.related_affinities).to be_empty
+
+      person_c.reload
+      expect(person_c.affinities).to be_empty
 
       expect(person_b.affinities.pluck(:related_person_id)).to match_array([
         person_c.id, person_d.id, person_e.id
       ])
-
-      expect(person_c.affinities).to be_empty
     end
 
     it 'fulfil affinity with another person breaking relationship with existing childrens' do
@@ -345,13 +348,16 @@ describe Util::AffinityFulfilment do
       person_c = create_natural_person_with_docket('Juan', 'Perez')
 
       AffinityFinder::SamePerson.call(person_c)
-      person_a.reload
+      person_b.reload
 
       expect do
-        person_a.issues.last.approve!
-      end.to change{Issue.count}.by(3)
-      person_a.reload
+        person_b.issues.last.approve!
+      end.to change{Issue.count}.by(2)
 
+      person_b.reload
+      expect(person_b.affinities).to be_empty
+
+      person_a.reload
       expect(person_a.affinities.pluck(:related_person_id)).to match_array([
         person_b.id, person_c.id
       ])
@@ -412,26 +418,17 @@ describe Util::AffinityFulfilment do
       AffinityFinder::SamePerson.call(person_a)
 
       person_a.reload
-
       expect do
         person_a.issues.last.approve!
-      end.to change{Issue.count}.by(3)
+      end.to change{Issue.count}.by(1)
 
       person_a.reload
-
       expect(person_a.affinities.pluck(:related_person_id)).to match_array([
-        person_b.id, person_c.id
+        person_b.id, person_d.id
       ])
 
-      issue = Issue.last
-      expect(issue.person_id).to be(person_a.id)
-      affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
-
-      expect(affinity_seed).to have_attributes({
-        related_person_id: person_d.id,
-        affinity_kind_id: affinity_kind.id
-      })
+      person_c.reload
+      expect(person_c.related_affinities).to be_empty
     end
 
     it 'fulfil affinity linked with existing relationship' do
@@ -468,8 +465,6 @@ describe Util::AffinityFulfilment do
       #                                     -> | Person_F (name john, id ABC123) |
       #                                        +---------------------------------+
 
-      #   ALERT TO CHECK: Somehow we must archived existing relationship between A and C when issue is approved
-
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
       AffinityFinder::SamePerson.call(person_a)
@@ -488,27 +483,27 @@ describe Util::AffinityFulfilment do
       person_d.reload
       person_f.reload
 
-      expect do
-        AffinityFinder::SamePerson.call(person_d)
-      end.to change{person_d.issues.count}.by(1)
+
+      AffinityFinder::SamePerson.call(person_d)
 
       person_d.issues.last.approve!
 
       change_person_identification(person_f, 'ABC123')
 
+      AffinityFinder::SamePerson.call(person_f)
+
+      person_a.reload
       expect do
-        AffinityFinder::SamePerson.call(person_f)
+        person_a.issues.last.approve!
       end.to change{Issue.count}.by(1)
 
-      issue = Issue.last
-      expect(issue.person_id).to be(person_a.id)
-      affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      person_a.reload
+      expect(person_a.affinities.pluck(:related_person_id)).to match_array([
+        person_b.id, person_d.id, person_e.id, person_f.id
+      ])
 
-      expect(affinity_seed).to have_attributes({
-        related_person_id: person_f.id,
-        affinity_kind_id: affinity_kind.id
-      })
+      person_d.reload
+      expect(person_d.affinities).to be_empty
     end
   end
 end

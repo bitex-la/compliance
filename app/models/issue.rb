@@ -278,7 +278,7 @@ class Issue < ApplicationRecord
     event :approve do
       before do
         if aasm.from_state != :approved
-          fulfil_affinity_relationships!
+          fulfil_affinity_relationships
           harvest_all!
         end
       end
@@ -287,6 +287,7 @@ class Issue < ApplicationRecord
 
       after do
         if aasm.from_state != :approved
+          fulfil_affinity_after_process
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
           refresh_person_country_tagging!
@@ -407,10 +408,16 @@ class Issue < ApplicationRecord
     end
   end
 
-  def fulfil_affinity_relationships!
+  def fulfil_affinity_relationships
     return unless affinity_seeds&.first&.affinity_kind == AffinityKind.find_by_code(:same_person)
 
     Util::AffinityFulfilment.call(affinity_seeds)
+  end
+
+  def fulfil_affinity_after_process
+    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.find_by_code(:same_person)
+
+    Util::AffinityFulfilment.after_process(affinity_seeds)
   end
 
   private
