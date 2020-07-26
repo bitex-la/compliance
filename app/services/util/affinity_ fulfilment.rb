@@ -64,11 +64,16 @@ class Util::AffinityFulfilment
     # only creates one affinity_seed per issue
     affinity_seed = affinity_seeds.first
 
-    # if person has a same_person father, move his children/s
+    # if person has a same_person father, and still matches, move his children/s
+    # if not, archive the affinity
     if ( father_affinity = affinity_seed.person.related_affinities.by_kind(:same_person).first )
-      affinity_seed.person.affinities.by_kind(:same_person).each do |children_affinity|
-        archive_affinity!(children_affinity)
-        build_same_person_affinity!(father_affinity.person, children_affinity.related_person)
+      if (same_person_match(father_affinity.person, affinity_seed.person))
+        affinity_seed.person.affinities.by_kind(:same_person).each do |children_affinity|
+          archive_affinity!(children_affinity)
+          build_same_person_affinity!(father_affinity.person, children_affinity.related_person)
+        end
+      else
+        archive_affinity!(father_affinity)
       end
     end
   end
@@ -101,8 +106,8 @@ class Util::AffinityFulfilment
   def self.match_by_identification(id1, id2)
     if (id1 && id2)
       return (
-        id1.downcase.match(id2.downcase) ||
-        id2.downcase.match(id1.downcase)
+        !!id1.downcase.match(id2.downcase) ||
+        !!id2.downcase.match(id1.downcase)
       )
     end
     return false
@@ -111,8 +116,8 @@ class Util::AffinityFulfilment
   def self.match_by_name(name1, name2)
     if (name1 && name2)
       return (
-        Regexp.union(name1.downcase.split(/\W+/)).match(name2.downcase) ||
-        Regexp.union(name2.downcase.split(/\W+/)).match(name1.downcase)
+        !!Regexp.union(name1.downcase.split(/\W+/)).match(name2.downcase) ||
+        !!Regexp.union(name2.downcase.split(/\W+/)).match(name1.downcase)
       )
     end
     return false

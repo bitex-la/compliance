@@ -239,12 +239,12 @@ describe Util::AffinityFulfilment do
 
       change_person_identification(person_b, 'DEF456')
 
-      expect do
-        AffinityFinder::SamePerson.call(person_b)
-      end.to change{person_b.issues.count}.by(1)
+      AffinityFinder::SamePerson.call(person_b)
 
       person_b.reload
-      person_b.issues.last.approve!
+      expect do
+        person_b.issues.last.approve!
+      end.to change{Issue.count}.by(5)
 
       person_b.reload
       expect(person_b.related_affinities).to be_empty
@@ -252,6 +252,11 @@ describe Util::AffinityFulfilment do
       person_c.reload
       expect(person_c.affinities).to be_empty
 
+      person_a.reload
+      expect(person_a.affinities).to be_empty
+      expect(person_a.related_affinities).to be_empty
+
+      person_b.reload
       expect(person_b.affinities.pluck(:related_person_id)).to match_array([
         person_c.id, person_d.id, person_e.id
       ])
