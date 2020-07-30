@@ -19,7 +19,7 @@ describe 'an admin user' do
     expect(page.current_path).to eq("/people/#{person.id}")
 
     open_download_profile_actions_menu('Basic')
-    DownloadHelpers::wait_for_download
-    expect(File.basename(DownloadHelpers::download)).to eq('person_1_kyc_files.zip')
+    DownloadHelpers.wait_for_download
+    expect(File.basename(DownloadHelpers.download)).to eq('person_1_kyc_files.zip')
   end
 end
