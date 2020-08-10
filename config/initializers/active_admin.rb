@@ -5,7 +5,7 @@ ActiveAdmin.setup do |config|
   # for each of the active admin pages.
   #
   config.site_title = "Compliance"
-  config.authorization_adapter = "AdminAccessAuthorization"
+  config.authorization_adapter = ActiveAdmin::CanCanAdapter
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
@@ -297,6 +297,13 @@ end
 module ActiveAdmin 
   class BaseController
     before_action { params.permit! }
+  end
+
+  class CanCanAdapter
+    def cancan_ability
+      klass = "Abilities::#{user.admin_role.code.to_s.camelize}".constantize
+      @cancan_ability ||= klass.new(user)
+    end
   end
 
   module Filters

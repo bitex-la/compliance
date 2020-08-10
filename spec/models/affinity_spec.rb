@@ -11,7 +11,7 @@ describe Affinity do
       .name.should =~ /Affinity#[0-9]*?: business_partner/
   end
 
-  it 'validates that affinity kind cannot be repeated between two people' do 
+  it 'validates that affinity kind cannot be repeated between two people' do
     person = create(:basic_issue).reload.person
       create(:full_affinity, person: person)
 
@@ -25,6 +25,38 @@ describe Affinity do
 
     expect(repeated_one).to_not be_valid
     expect(repeated_one.errors[:base]).to eq ['affinity_already_exists']
+  end
+
+  it 'allow affinity kind can be repeated between two people if the first one is archived' do 
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_archived_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+
+    repeated_one = described_class.new(
+      person: seed.issue.person,
+      related_person: related_person,
+      affinity_kind_code: :business_partner
+    )
+
+    expect(repeated_one).to be_valid
+  end
+
+  it 'allow replace affinity with archived one' do
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+    person = seed.issue.person
+    issue = person.issues.build
+    issue.affinity_seeds.build(
+      related_person: related_person,
+      affinity_kind: seed.affinity_kind,
+      replaces: person.affinities.first,
+      archived_at: Date.current
+    )
+    expect(issue.valid?).to be_truthy
+    issue.save!
+    issue.approve!
+    expect(issue).to be_approved
   end
 
   it 'allows to have more than one relationship between two persons with a different kind' do
@@ -63,6 +95,23 @@ describe Affinity do
 
     expect(fruit.save).to be false
     expect(fruit.errors[:base]).to eq ['cannot_link_to_itself']
+  end
+
+  it 'all_affinities do not incluide archived affinities' do
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_archived_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+
+    expect(seed.issue.person.reload.all_affinities).to be_empty
+    expect(related_person.reload.all_affinities).to be_empty
+  end
+
+  it 'related_affinities do not incluide archived affinities' do
+    related_person = create(:light_natural_person)
+    seed = create(:full_affinity_archived_seed_with_issue, related_person: related_person)
+    seed.issue.approve!
+
+    expect(seed.issue.person.reload.related_affinities).to be_empty
   end
 
   describe 'when calculate inverse of relationships' do

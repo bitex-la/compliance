@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_09_160444) do
+ActiveRecord::Schema.define(version: 2020_07_23_175323) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -52,8 +52,8 @@ ActiveRecord::Schema.define(version: 2020_04_09_160444) do
     t.string "api_token"
     t.string "otp_secret_key"
     t.boolean "otp_enabled", default: false
-    t.integer "role_type", default: 0, null: false
     t.integer "max_people_allowed"
+    t.integer "admin_role_id", default: 7, null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -363,10 +363,10 @@ ActiveRecord::Schema.define(version: 2020_04_09_160444) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
-    t.string "external_id"
+    t.string "external_id", null: false
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
-    t.datetime "deposit_date"
-    t.string "country"
+    t.datetime "deposit_date", null: false
+    t.string "country", null: false
     t.index ["person_id", "country"], name: "index_fund_deposits_on_person_id_and_country"
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"

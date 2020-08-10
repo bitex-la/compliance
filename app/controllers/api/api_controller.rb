@@ -16,6 +16,7 @@ class Api::ApiController < ApplicationController
   end
 
   def validate_restricted_user
-    return jsonapi_403 if !allow_restricted_user && AdminUser.current_admin_user.is_restricted?
+    return jsonapi_403 if !allow_restricted_user && 
+      AdminUser.current_admin_user.admin_role != AdminRole.admin
   end
 end
