@@ -1,6 +1,6 @@
 ActiveAdmin.register EventLog do
-  menu priority: 7, if: -> { authorized?(:view_menu, EventLog) }
-  
+  menu priority: 7
+
   actions :show, :index
 
   filter :entity_id

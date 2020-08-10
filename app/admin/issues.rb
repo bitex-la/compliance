@@ -31,10 +31,13 @@ ActiveAdmin.register Issue do
 
   config.clear_action_items!
   action_item :new, only: [:index] do
+    next unless authorized? :create, Issue
+
     link_to 'New', new_person_issue_path(person)
   end
 
   action_item :edit, only: [:show] do
+    next unless authorized? :update, Issue
     next unless resource.editable?
     link_to 'Edit', edit_person_issue_path(person, resource)
   end

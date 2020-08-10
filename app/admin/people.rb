@@ -76,10 +76,14 @@ ActiveAdmin.register Person do
   scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
 
   action_item :add_person_information, only: %i(show edit) do
+    next unless authorized? :create, Issue
+
     link_to 'Add Person Information', new_with_fruits_person_issues_path(resource)
   end
 
   action_item :view_person_issues, only: %i(show edit) do
+    next unless authorized? :read, Issue
+    
     link_to 'View Person Issues', person_issues_path(resource)
   end
 
@@ -140,7 +144,7 @@ ActiveAdmin.register Person do
     end
     column :created_at
     column :updated_at
-    actions
+    actions if authorized? :full_read, Person
   end
 
   csv do

@@ -8,8 +8,8 @@ class Affinity < AffinityBase
   end
 
   def linked_once_by_affinity
-    return unless affinity_exist?(person, related_person, affinity_kind) ||
-      affinity_exist?(related_person, person, affinity_kind)
+    return unless affinity_exist?(person, related_person, affinity_kind, archived_at) ||
+      affinity_exist?(related_person, person, affinity_kind, archived_at)
 
     errors.add(:base, 'affinity_already_exists')
   end
