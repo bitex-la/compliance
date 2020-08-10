@@ -5,6 +5,7 @@ require 'capybara/rspec'
 require 'aasm/rspec'
 require 'strip_attributes/matchers'
 ENV['RAILS_ENV'] ||= 'test'
+ENV["TZ"] = "UTC"
 require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
@@ -74,7 +75,7 @@ RSpec.configure do |config|
     browser_options.profile = profile
     browser_options.profile['browser.download.dir'] = DownloadHelpers::PATH.to_s
     browser_options.profile['browser.download.folderList'] = 2
-    browser_options.profile['browser.helperApps.neverAsk.saveToDisk'] = 'application/zip'
+    browser_options.profile['browser.helperApps.neverAsk.saveToDisk'] = 'text/csv; application/zip'
 
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: browser_options)
   end

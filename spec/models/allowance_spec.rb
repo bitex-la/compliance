@@ -1,9 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe Allowance, type: :model do
+describe Allowance do
   let(:person) {create(:empty_person)}
   let(:invalid_allowance) { described_class.new }
   let(:valid_allowance)   { create(:allowance, person: person, kind: Currency.find_by_code('ars')) }
+
+  it_behaves_like 'archived_fruit', :allowances, :salary_allowance
+
+  it_behaves_like 'person_scopable_fruit', :salary_allowance
 
   it 'is not valid without a person' do
     expect(invalid_allowance).to_not be_valid

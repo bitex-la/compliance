@@ -1,32 +1,27 @@
 require 'rails_helper'
 
 describe 'an admin user' do
+  let(:compliance_admin_user) { create(:compliance_admin_user) }
   let(:admin_user) { create(:admin_user) }
-  let(:super_admin_user) { create(:super_admin_user) }
-  
-  it 'restrict another admin user' do 
-    restricted_user = create(:admin_user)
-    login_as super_admin_user
 
-    expect(restricted_user.is_restricted?).to be_falsey
-    click_link 'Admin Users'
-
-    within "tr[id='admin_user_#{AdminUser.first.id}'] td[class='col col-actions']" do
-      click_link 'Edit'
-    end
-
-    click_link 'Grant Restricted access'
-    expect(restricted_user.reload.is_restricted?).to be_truthy
-
-    click_link 'Grant Admin access'
-    expect(restricted_user.reload.is_restricted?).to be_falsey
+  it 'cleans up the current admin user after responding' do
+    login_as admin_user
+    visit '/'
+    expect(page).to have_content 'Dashboard'
+    visit '/api/issues'
+    expect(page).to have_content 'total_items'
+    visit '/'
+    click_link 'Logout'
+    expect(page).to have_content 'Signed out successfully'
+    visit '/api/issues'
+    expect(page).to have_content 'forbidden'
   end
 
   it 'creates a new natural person and its issue via admin' do
-    AdminUser.current_admin_user = admin_user
+    AdminUser.current_admin_user = compliance_admin_user
     observation_reason = create(:human_world_check_reason)
-   
-    login_as admin_user
+
+    login_as compliance_admin_user
 
     click_link 'People'
     click_link 'New Person'
@@ -43,7 +38,7 @@ describe 'an admin user' do
 
     click_link 'Add Person Information'
     click_button 'Create new issue'
-    
+
     fulfil_new_issue_form
     add_observation(observation_reason, 'Please check this guy on world check')
 
@@ -164,153 +159,154 @@ describe 'an admin user' do
     end
   end
 
-  it 'creates a new natural person and its issue via admin with workflows' do
-    AdminUser.current_admin_user = admin_user
-    observation_reason = create(:human_world_check_reason)
+  # TODO: Uncomment when workflow implementation are ready for production
+  # it 'creates a new natural person and its issue via admin with workflows' do
+  #   AdminUser.current_admin_user = admin_user
+  #   observation_reason = create(:human_world_check_reason)
    
-    login_as admin_user
+  #   login_as compliance_admin_user
 
-    click_link 'People'
-    click_link 'New Person'
-    click_button 'Create Person'
+  #   click_link 'People'
+  #   click_link 'New Person'
+  #   click_button 'Create Person'
 
-    Person.count.should == 1
+  #   Person.count.should == 1
 
-    visit '/'
-    click_link 'People'
-    click_link 'All'
-    within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
-      click_link 'View'
-    end
+  #   visit '/'
+  #   click_link 'People'
+  #   click_link 'All'
+  #   within "tr[id='person_#{Person.first.id}'] td[class='col col-actions']" do
+  #     click_link 'View'
+  #   end
 
-    click_link 'Add Person Information'
-    click_button 'Create new issue'
+  #   click_link 'Add Person Information'
+  #   click_button 'Create new issue'
     
-    fulfil_new_issue_form true
+  #   fulfil_new_issue_form true
 
-    click_button "Update Issue"
-    click_link "Edit"
+  #   click_button "Update Issue"
+  #   click_link "Edit"
 
-    issue = Issue.last
-    assert_logging(issue, :create_entity, 1)
+  #   issue = Issue.last
+  #   assert_logging(issue, :create_entity, 1)
 
-    # Fake here that an implementor set workflow tasks
-    task_one = create(:basic_task, workflow: issue.workflows.first)
-    task_two = create(:basic_task, workflow: issue.workflows.first)
+  #   # Fake here that an implementor set workflow tasks
+  #   task_one = create(:basic_task, workflow: issue.workflows.first)
+  #   task_two = create(:basic_task, workflow: issue.workflows.first)
 
-    %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
-      issue.send(seed).count.should == 1
-      issue.send(seed).first.attachments.count == 1
-    end
+  #   %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
+  #     issue.send(seed).count.should == 1
+  #     issue.send(seed).first.attachments.count == 1
+  #   end
 
-    issue.identification_seeds.first.attachments
-      .first.document_file_name.should == 'an_simple_????.jpg'
+  #   issue.identification_seeds.first.attachments
+  #     .first.document_file_name.should == 'an_simple_????.jpg'
 
-    issue.domicile_seeds.first.attachments
-      .first.document_file_name.should == 'an_simple_????.zip'
+  #   issue.domicile_seeds.first.attachments
+  #     .first.document_file_name.should == 'an_simple_????.zip'
 
-    issue.allowance_seeds.first.attachments
-      .first.document_file_name.should == 'an_simple_????.gif'
+  #   issue.allowance_seeds.first.attachments
+  #     .first.document_file_name.should == 'an_simple_????.gif'
 
-    issue.natural_docket_seed.should == NaturalDocketSeed.last
-    issue.should be_draft
+  #   issue.natural_docket_seed.should == NaturalDocketSeed.last
+  #   issue.should be_draft
     
-    find('li[title="Risk scores"] a').click
+  #   find('li[title="Risk scores"] a').click
 
-    within '.external_links' do
-      expect(page).to have_content 'Link #1'
-      expect(page).to have_content 'Link #2'
-    end
+  #   within '.external_links' do
+  #     expect(page).to have_content 'Link #1'
+  #     expect(page).to have_content 'Link #2'
+  #   end
 
-    within '.extra_info' do
-      expect(page)
-        .to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
-    end
+  #   within '.extra_info' do
+  #     expect(page)
+  #       .to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
+  #     expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
+  #   end
 
-    assert_logging(issue, :update_entity, 5)
-    issue.reload.should be_draft
+  #   assert_logging(issue, :update_entity, 5)
+  #   issue.reload.should be_draft
 
-    expect(page).to_not have_content("Approve")
+  #   expect(page).to_not have_content("Approve")
 
-    task_one.start!
-    task_one.update!(output: 'All ok')
-    task_one.finish!
+  #   task_one.start!
+  #   task_one.update!(output: 'All ok')
+  #   task_one.finish!
 
-    click_button "Update Issue"
-    click_link "Edit"
+  #   click_button "Update Issue"
+  #   click_link "Edit"
 
-    find('li[title="Workflows"] a').click
-    expect(page).to have_content("workflow completed at 50%")
+  #   find('li[title="Workflows"] a').click
+  #   expect(page).to have_content("workflow completed at 50%")
     
-    task_two.start!
-    task_two.update!(output: 'All ok')
-    task_two.finish!
+  #   task_two.start!
+  #   task_two.update!(output: 'All ok')
+  #   task_two.finish!
 
-    issue.complete!
+  #   issue.complete!
 
-    #fake here that issue goes to answered
-    issue.workflows.first.finish!
+  #   #fake here that issue goes to answered
+  #   issue.workflows.first.finish!
 
-    expect(issue.reload.state).to eq 'new'
+  #   expect(issue.reload.state).to eq 'new'
 
-    click_button "Update Issue"
-    click_link "Edit"
+  #   click_button "Update Issue"
+  #   click_link "Edit"
 
-    find('li[title="Workflows"] a').click
-    expect(page).to have_content("workflow completed at 100%")
+  #   find('li[title="Workflows"] a').click
+  #   expect(page).to have_content("workflow completed at 100%")
 
-    click_link "Cancel"
+  #   click_link "Cancel"
 
-    expect(page).to have_content("Approve")
-    click_link "Approve"
+  #   expect(page).to have_content("Approve")
+  #   click_link "Approve"
     
-    visit "/people/#{issue.person.id}"
+  #   visit "/people/#{issue.person.id}"
     
-    issue.reload.should be_approved
-    assert_logging(issue, :update_entity, 17)
-    expect(issue.person.enabled).to be_falsey
-    expect(issue.person.state).to eq('new')
-    assert_logging(issue.person, :enable_person, 0)
+  #   issue.reload.should be_approved
+  #   assert_logging(issue, :update_entity, 17)
+  #   expect(issue.person.enabled).to be_falsey
+  #   expect(issue.person.state).to eq('new')
+  #   assert_logging(issue.person, :enable_person, 0)
 
-    find('li[title="Risk scores"] a').click
+  #   find('li[title="Risk scores"] a').click
 
-    within '.external_links' do
-      expect(page).to have_content 'Link #1'
-      expect(page).to have_content 'Link #2'
-    end
+  #   within '.external_links' do
+  #     expect(page).to have_content 'Link #1'
+  #     expect(page).to have_content 'Link #2'
+  #   end
 
-    within '.extra_info' do
-      expect(page).to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
-    end
+  #   within '.extra_info' do
+  #     expect(page).to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
+  #     expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
+  #   end
 
-    click_link 'Enable'
+  #   click_link 'Enable'
 
-    expect(issue.person.reload.enabled).to be_truthy
-    expect(issue.person.state).to eq('enabled')
-    assert_logging(issue.person, :enable_person, 1)
+  #   expect(issue.person.reload.enabled).to be_truthy
+  #   expect(issue.person.state).to eq('enabled')
+  #   assert_logging(issue.person, :enable_person, 1)
     
-    click_link 'Edit Person'
-    click_link 'Disable'
-    assert_logging(issue.person, :enable_person, 1)
-    assert_logging(issue.person, :disable_person, 1)
-    expect(issue.person.reload.enabled).to be_falsey
-    expect(issue.person.state).to eq('disabled')
+  #   click_link 'Edit Person'
+  #   click_link 'Disable'
+  #   assert_logging(issue.person, :enable_person, 1)
+  #   assert_logging(issue.person, :disable_person, 1)
+  #   expect(issue.person.reload.enabled).to be_falsey
+  #   expect(issue.person.state).to eq('disabled')
 
-    click_link 'Edit Person'
-    click_link 'Enable'
+  #   click_link 'Edit Person'
+  #   click_link 'Enable'
 
-    expect(issue.person.reload.enabled).to be_truthy
-    expect(issue.person.state).to eq('enabled')
-    assert_logging(issue.person, :enable_person, 2)
+  #   expect(issue.person.reload.enabled).to be_truthy
+  #   expect(issue.person.state).to eq('enabled')
+  #   assert_logging(issue.person, :enable_person, 2)
 
-    visit "/allowances/#{issue.person.allowances.first.id}"
+  #   visit "/allowances/#{issue.person.allowances.first.id}"
     
-    within '#page_title' do
-      expect(page).to have_content 'Allowance#1'
-    end
-  end
+  #   within '#page_title' do
+  #     expect(page).to have_content 'Allowance#1'
+  #   end
+  # end
 
   it 'reviews a newly created customer' do
     person = create :new_natural_person
@@ -331,7 +327,7 @@ describe 'an admin user' do
     assert_logging(issue, :update_entity, 1)
 
     # Admin does not see it as pending
-    login_as admin_user
+    login_as compliance_admin_user
 
     expect(page).to have_content 'Signed in successfully.'
     click_on 'Observed'
@@ -460,7 +456,7 @@ describe 'an admin user' do
   it "Edits a customer by creating a new issue" do
     observation_reason = create(:human_world_check_reason)
     person = create(:full_natural_person)
-    login_as admin_user
+    login_as compliance_admin_user
 
     click_link 'People'
     click_link 'All'
@@ -651,7 +647,7 @@ describe 'an admin user' do
     issue.complete!
     assert_logging(issue, :create_entity, 1)
     assert_logging(issue, :update_entity, 1)
-    login_as admin_user
+    login_as compliance_admin_user
     click_on "Fresh"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Dismiss'
@@ -666,7 +662,7 @@ describe 'an admin user' do
     expect(person.state).to eq('enabled')
     issue = person.issues.reload.last
     issue.complete!
-    login_as admin_user
+    login_as compliance_admin_user
     click_on 'Answered'
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Reject'
@@ -683,7 +679,7 @@ describe 'an admin user' do
     issue = create(:full_natural_person_issue, person: person)
     observation = create(:robot_observation, issue: issue)
 
-    login_as admin_user
+    login_as compliance_admin_user
     assert_logging(issue, :create_entity, 1)
 
     click_on 'Observed'
@@ -727,7 +723,7 @@ describe 'an admin user' do
       issue: issue)
 
     issue.reload.should be_observed  
-    login_as admin_user
+    login_as compliance_admin_user
 
     click_on 'Observed'
     within("#issue_#{issue.id} td.col.col-id") do
@@ -809,7 +805,7 @@ describe 'an admin user' do
     issue.reload.should be_observed
     assert_logging(issue.reload, :observe_issue, 1)
 
-    login_as admin_user
+    login_as compliance_admin_user
     
     # Admin clicks in the observation to see the issue detail
     click_on 'Observed'
@@ -843,7 +839,7 @@ describe 'an admin user' do
     assert_logging(issue, :create_entity, 1)
     assert_logging(issue, :update_entity, 1)
 
-    login_as admin_user
+    login_as compliance_admin_user
     click_on 'Answered'
     
     visit "/people/#{person.id}/issues/#{issue.id}"
@@ -863,7 +859,7 @@ describe 'an admin user' do
       person = create(:full_natural_person).reload
       issue = create(:full_natural_person_issue, person: person)
 
-      login_as admin_user
+      login_as compliance_admin_user
       click_on 'Draft'
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
@@ -917,7 +913,7 @@ describe 'an admin user' do
       person = create(:full_natural_person)
       issue = create(:basic_issue, person: person)
 
-      login_as admin_user
+      login_as compliance_admin_user
       click_on 'Draft'
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
@@ -977,12 +973,12 @@ describe 'an admin user' do
       person.reload.identifications.count == 2
     end
 
-    it 'can remove existing seeds' do
+    it 'can remove existing attachments' do
       person = create :new_natural_person
       issue = person.issues.reload.first
 
       # Admin does not see it as pending
-      login_as admin_user
+      login_as compliance_admin_user
 
       expect(page).to have_content 'Signed in successfully.'
 
@@ -1051,10 +1047,67 @@ describe 'an admin user' do
     end
   end
 
+  it 'can edit an issue' do
+    person = create(:full_natural_person).reload
+    issue = create(:full_natural_person_issue, person: person)
+
+    login_as compliance_admin_user
+
+    click_on 'Draft'
+    within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
+      click_link(issue.id)
+    end
+    
+    click_link "Edit"
+
+    find('li[title="Natural dockets"] a').click
+
+    fill_seed('natural_docket', {
+      first_name: 'Joe',
+      last_name: 'Jameson',
+      birth_date: "1975-01-15"
+    }, false)
+    
+ 
+    find('li[title="Domiciles"] a').click
+    
+    select_with_search(
+      '#issue_domicile_seeds_attributes_0_replaces_input',
+      Domicile.first.name
+    )
+
+    within ".has_many_container.domicile_seeds" do
+      fill_seed('domicile', {
+        country: 'AR',
+        state: 'Buenos Aires',
+        city: 'C.A.B.A',
+        street_address: 'Triunvirato',
+        street_number: '2300',
+        postal_code: '1254',
+        floor: '',
+        apartment: ''
+      })
+    end
+
+    click_button "Update Issue"
+
+    click_link "Edit"
+
+    find('li[title="Domiciles"] a').click
+
+    accept_alert do
+      click_link 'Remove'
+    end
+
+    Capybara.using_wait_time(10) do
+      expect(page).to have_content('Domicile seed was successfully destroyed.')
+    end
+  end
+
   it 'manually enables/disables and sets risk for a person' do
     person = create(:full_natural_person)
 
-    login_as admin_user
+    login_as compliance_admin_user
 
     click_link 'People'
     click_link 'All'
@@ -1074,6 +1127,33 @@ describe 'an admin user' do
     person.reload.should_not be_enabled
     expect(person.state).to eq('disabled')
     person.risk.should == 'low'
+  end
+
+  it "don't show api token for admin users in view page" do
+    login_as admin_user
+
+    click_link 'Admin Users'
+    within("#admin_user_#{admin_user.id} td.col.col-actions") do
+      click_link 'View'
+    end
+
+    expect(page.current_path).to eq("/admin_users/#{admin_user.id}")
+    expect(page).to_not have_text 'API TOKEN'
+    expect(page).to_not have_text admin_user.api_token
+  end
+
+  it "don't show sensible data for admin users in csv export" do
+    login_as admin_user
+
+    click_link 'Admin Users'
+    click_link 'CSV'
+    DownloadHelpers::wait_for_download
+    csv = File.read(DownloadHelpers::download)
+    expect(csv).to_not include('API TOKEN')
+    expect(csv).to_not include(admin_user.api_token)
+    expect(csv).not_to include("Encrypted password")
+    expect(csv).to_not include(admin_user.encrypted_password)
+    expect(csv).not_to include("Reset password token")
   end
 
   it 'keeps track of usage allowances' do

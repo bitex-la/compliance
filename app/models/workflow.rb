@@ -20,6 +20,13 @@ class Workflow < ApplicationRecord
     tasks.destroy_all
   end
 
+  validates :workflow_type, presence: true
+  validates :scope, inclusion: { in: scopes }
+
+  # We add this default_scope to allow others default_scopes
+  # to cascade and apply admin taggings rules to the current query
+  default_scope { joins(:issue) }
+
   scope :running, -> {
     joins(:issue)
     .where(aasm_state: 'started')
@@ -62,31 +69,32 @@ class Workflow < ApplicationRecord
   end
 
   def name
-   "Workflow ##{id} - #{workflow_type}"
+    "Workflow ##{id} - #{workflow_type}"
   end
 
   def state
     aasm_state
   end
-  
+
   def all_task_in_final_state?
-    tasks.all? {|task| task.performed? || task.failed?}
+    tasks.all? { |task| task.performed? || task.failed? }
   end
 
   def all_tasks_performed?
-    tasks.all? {|task| task.performed?}
+    tasks.all?(&:performed?)
   end
-  
+
   def any_task_failed?
-    tasks.any? {|task| task.failed? && !task.can_retry?}
+    tasks.any? { |task| task.failed? && !task.can_retry? }
   end
 
   def completed_tasks
-    tasks.select{|x| x.performed?}
+    tasks.select(&:performed?)
   end
 
   def completness_ratio
     return 0 if tasks.empty?
+
     (completed_tasks.count.fdiv(tasks.count) * 100).round
   end
 end

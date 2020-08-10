@@ -66,6 +66,12 @@ RSpec.describe Tag, type: :model do
     expect(tag.destroy).to eq(false)
   end
 
+  it 'can not destroy if admin_tagging exists' do
+    tag = create(:person_tag)
+    admin_tagging = create(:full_admin_user_tagging, tag: tag)
+    expect(tag.destroy).to eq(false)
+  end
+
   it 'can destroy if relation not exists' do
     tag = create(:person_tag)
     expect(tag.destroy).to eq(tag)

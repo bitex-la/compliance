@@ -10,4 +10,12 @@ RSpec.describe EmailSeed, type: :model do
   }
 
   it_behaves_like 'observable', :full_email_seed_with_issue
+
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_email_seed, issue: issue)
+    }
+
+  it_behaves_like 'archived_seed', :full_email
 end

@@ -14,9 +14,9 @@ FactoryBot.define do
       thing unless thing.class.name.include?('Seed')
     end
 
-    person do
+    person_id do
       next unless thing
-      thing.class.name.include?('Seed') ? thing.issue.person : thing.person
+      thing.class.name.include?('Seed') ? thing.issue.person_id : thing.person_id
     end
 
     %i(bmp jpg png gif pdf zip).each do |type|

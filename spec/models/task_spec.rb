@@ -1,14 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe Task, type: :model do 
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      workflow = create(:basic_workflow, issue: issue)
+      create(:basic_task, workflow: workflow)
+    }
+
   let(:invalid_task) { described_class.new }
   let(:basic_task) { create(:basic_task) }
 
   it 'is not valid without a workflow' do
     expect(invalid_task).to_not be_valid
+    expect(invalid_task.errors[:workflow]).to eq ["must exist"]
+    expect(invalid_task.errors[:task_type]).to eq ["can't be blank"]
   end
 
-  it 'is valid with a workflow' do
+  it 'is valid with a workflow and type' do
     expect(basic_task).to be_valid
   end
 

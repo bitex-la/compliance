@@ -3,14 +3,7 @@ class RedirectController < ApplicationController
     if current_admin_user.nil?
       redirect_to '/login'
     else
-      root_page =
-        case current_admin_user.role_type
-        when 'marketing'
-          '/people'
-        else
-          '/dashboards'
-        end
-      redirect_to root_page
+      redirect_to "/#{current_admin_user.admin_role.root_page}"
     end
   end
 end

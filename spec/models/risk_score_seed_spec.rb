@@ -7,6 +7,9 @@ describe RiskScoreSeed do
       issue: create(:basic_issue)
     )
   }
+
+  it_behaves_like 'archived_seed', :full_risk_score
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end
@@ -16,4 +19,10 @@ describe RiskScoreSeed do
   end
 
   it_behaves_like 'observable'
+
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_risk_score_seed, issue: issue)
+    }
 end

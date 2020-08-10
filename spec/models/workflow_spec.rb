@@ -1,14 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe Workflow, type: :model do 
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:basic_workflow, issue: issue)
+    }
+
   let(:invalid_workflow) { described_class.new }
   let(:basic_workflow) { create(:basic_workflow) }
 
-  it 'is not valid without an issue' do
+  it 'is not valid without an issue, scope or type' do
     expect(invalid_workflow).to_not be_valid
+    expect(invalid_workflow.errors[:issue]).to eq ["must exist"]
+    expect(invalid_workflow.errors[:scope]).to eq ["is not included in the list"]
+    expect(invalid_workflow.errors[:workflow_type]).to eq ["can't be blank"]
   end
 
-  it 'is valid with an issue' do
+  it 'is valid with an issue, scope and type' do
     expect(basic_workflow).to be_valid
   end
 
@@ -18,6 +27,22 @@ RSpec.describe Workflow, type: :model do
     workflow = task.workflow.reload
     workflow.destroy!
     expect(Task.count).to eq(0)
+  end
+
+  it 'completness ratio should be 0 if tasks are not performed' do
+    task = create(:basic_task)
+    workflow = task.workflow.reload
+    expect(workflow.completness_ratio).to eq 0
+  end
+
+  it 'completness ratio should be 100 if tasks are performed' do
+    task = create(:basic_task)
+    workflow = task.workflow.reload
+    task.start!
+    task.update!(output: 'all ok!')
+    task.finish!
+    expect(workflow.reload.completness_ratio).to eq 100
+    expect(workflow.all_tasks_performed?).to be_truthy
   end
 
   describe 'when transitioning' do 
@@ -53,7 +78,7 @@ RSpec.describe Workflow, type: :model do
       3.times do 
         create(:basic_task, workflow: basic_workflow)
       end
-      
+
       basic_workflow.reload.tasks.first.start!
       expect(basic_workflow).to have_state(:started)
       basic_workflow.tasks.first.update!(output: 'all ok!')
@@ -81,8 +106,8 @@ RSpec.describe Workflow, type: :model do
       client_observation = create(:observation, issue: issue)
 
       basic_workflow.reload.tasks
-        .each {|task| task.start!; task.update!(output: 'all clear!') ; task.finish!}
-      
+        .each { |task| task.start!; task.update!(output: 'all clear!'); task.finish! }
+
       expect(issue.reload).to have_state(:observed)
       expect(basic_workflow).to have_state(:started)
     end
@@ -115,7 +140,7 @@ RSpec.describe Workflow, type: :model do
       end
 
       issue = basic_workflow.issue
-  
+
       expect(issue.locked).to be false
       expect(issue.lock_admin_user).to be nil
       expect(issue.lock_expiration).to be nil

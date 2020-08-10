@@ -11,6 +11,8 @@ RSpec.describe DomicileSeed, type: :model do
 
   it_behaves_like 'observable'
 
+  it_behaves_like 'archived_seed', :full_domicile
+
   %i(country state city street_address street_number
     postal_code floor apartment
   ).each do |attr|
@@ -27,6 +29,12 @@ RSpec.describe DomicileSeed, type: :model do
     floor: ' 5 ',
     apartment: 'A '
   }
+
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) {
+      issue = create(:basic_issue, person_id: person_id)
+      create(:full_domicile_seed, issue: issue)
+    }
 
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid

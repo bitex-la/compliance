@@ -3,39 +3,32 @@ FactoryBot.define do
     email     { Faker::Internet.email }
     password  { 'mysecurepassword' }
     api_token { 'my_super_secure_token_for_testing' }
-    role_type { "admin" }
+    admin_role AdminRole.admin
     max_people_allowed { 1000 }
-  end
 
-  factory :other_admin_user, class: 'AdminUser' do
-    email     { Faker::Internet.email }
-    password  { 'mysecurepassword' }
-    api_token { 'my_other_super_secure_token_for_testing' }
-    role_type { "admin" }
-    max_people_allowed { 1000 }
-  end
+    factory :operations_admin_user do
+      admin_role AdminRole.operations
+    end
 
-  factory :restricted_admin_user, class: 'AdminUser' do
-    email     { Faker::Internet.email }
-    password  { 'myrestrictedpassword' }
-    api_token { 'my_restricted_token_for_testing' }
-    role_type { "restricted" }
-    max_people_allowed { 1000 }
-  end
+    factory :commercial_admin_user do
+      admin_role AdminRole.commercial
+    end
 
-  factory :super_admin_user, class: 'AdminUser' do
-    email     { Faker::Internet.email }
-    password  { 'mysecurepassword' }
-    api_token { 'my_super_admin_secure_token_for_testing' }
-    role_type { "super_admin" }
-    max_people_allowed { 1000 }
-  end
+    factory :marketing_admin_user do
+      admin_role AdminRole.marketing
+    end
 
-  factory :limited_people_allowed_admin_user, class: 'AdminUser' do
-    email     { Faker::Internet.email }
-    password  { 'mysecurepassword' }
-    api_token { 'my_super_admin_secure_token_for_testing' }
-    role_type { "super_admin" }
-    max_people_allowed { 3 }
+    factory :compliance_admin_user do
+      admin_role AdminRole.compliance
+    end
+
+    factory :other_admin_user do
+      api_token { 'my_other_super_secure_token_for_testing' }
+    end
+
+    factory :limited_people_allowed_admin_user do
+      api_token { 'my_super_admin_secure_token_for_testing' }
+      max_people_allowed { 3 }
+    end
   end
 end

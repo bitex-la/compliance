@@ -33,6 +33,12 @@ module Garden
       cattr_accessor :naming { Naming.new(name) }
       belongs_to :issue
       has_one :person, through: :issue
+      def person
+        # If a seed has an issue, it has a person. Even before it's been saved.
+        # has_one through seems to be ignoring the in-memory object.
+        issue&.person || super
+      end
+
       belongs_to :fruit, class_name: naming.fruit, optional: true
       has_many :attachments, as: :attached_to_seed
 
@@ -60,7 +66,7 @@ module Garden
 
       def expires_at_cannot_be_in_the_past
         return if expires_at.nil?
-        validation_date = created_at.try(:to_date) || Date.today
+        validation_date = created_at.try(:to_date) || Date.current
         return if expires_at >= validation_date
         errors.add(:expires_at, "can't be in the past")
       end
@@ -78,7 +84,11 @@ module Garden
         observations.destroy_all
       end
 
-      after_save{ person.expire_action_cache }
+      # We add this default_scope to allow others default_scopes
+      # to cascade and apply admin taggings rules to the current query
+      default_scope { joins(:issue).distinct }
+
+      after_save { person.expire_action_cache }
 
       def name
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
@@ -116,7 +126,7 @@ module Garden
         end
       else
         old_fruits =  fruit.person.send(self.class.naming.plural)
-          .current.where('id != ?', fruit.id)
+          .current.where.not(id: fruit.id).distinct(false)
 
         if respond_to?(:copy_attachments)
           if copy_attachments
@@ -138,16 +148,16 @@ module Garden
     end
 
     def create_deferred_issue(fruit)
-      new_issue = issue.person.issues.create(defer_until: expires_at, state: 'new')
+      defer_until = expires_at < Date.current ? nil : expires_at
+      new_issue = issue.person.issues.create(defer_until: defer_until, state: 'new')
       new_issue.add_seeds_replacing([fruit])
       new_issue.save!
     end
-
-    
   end
 
   module Fruit
     extend ActiveSupport::Concern
+    include PersonScopeable
 
     included do
       belongs_to :person
@@ -162,8 +172,15 @@ module Garden
 
       scope :current, -> { 
         where(replaced_by_id: nil)
-          .includes(:attachments)
-          .order(updated_at: :desc) 
+        .where("archived_at is NULL OR archived_at > ?", Date.current)
+        .includes(:attachments)
+        .order(updated_at: :desc) 
+      }
+
+      scope :archived, ->(person) { 
+        where("archived_at <= ?", Date.current)
+        .where(person: person)
+        .order(archived_at: :desc) 
       }
 
       def previous_versions
@@ -171,7 +188,7 @@ module Garden
       end
 
       def others_for_person
-        self.class.where(person: person, replaced_by: nil).where("id != ?", self)
+        self.class.where(person: person, replaced_by: nil).where.not(id: self)
       end
 
       def issue

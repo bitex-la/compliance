@@ -49,7 +49,7 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :debug
+  config.log_level = :info
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
@@ -59,9 +59,6 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
   config.cache_store = :redis_cache_store, { url: Settings.redis.cache_url,
     namespace: Settings.redis.namespace,
-    connect_timeout: 30,  # Defaults to 20 seconds
-    read_timeout:    0.2, # Defaults to 1 second
-    write_timeout:   0.2, # Defaults to 1 second
     expires_in: 10.minutes,
     pool_size: Settings.redis.pool_size,
 

@@ -1,12 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe Issue, type: :model do
+  it_behaves_like 'person_scopable',
+    create: -> (person_id) { Issue.create!(person_id: person_id) },
+    change_person: -> (obj, person_id){ obj.person_id = person_id }
+
   let(:invalid_issue) { described_class.new } 
   let(:empty_issue) { create(:basic_issue) }
   let(:basic_issue) { create(:basic_issue) }
   let(:future_issue) { create(:future_issue) }
   let(:invalid_future_issue) { described_class.new(person: create(:empty_person),
-    defer_until: Date.today - 1.days) }
+    defer_until: 1.day.ago) }
 
   it 'is not valid without a person' do
     expect(invalid_issue).to_not be_valid
@@ -77,6 +81,20 @@ RSpec.describe Issue, type: :model do
     empty_issue.note_seeds.create(title:'title', body: 'body', expires_at: 1.month.ago)
     expect(empty_issue).to_not be_valid
     expect(empty_issue.errors.messages.keys.first).to eq(:"note_seeds.expires_at")
+  end
+
+  it 'create deferred issue with valid defer_until if seed expire_at is in the past' do
+    empty_issue.note_seeds.create(title:'title', body: 'body', expires_at: 1.month.from_now)
+    empty_issue.save
+    empty_issue.reload
+
+    Timecop.travel 3.months.from_now
+
+    expect do
+      empty_issue.approve!
+    end.to change { Issue.count }.by(1)
+
+    expect(Issue.last.defer_until).to eq Date.current
   end
 
   describe 'when transitioning' do
@@ -164,6 +182,7 @@ RSpec.describe Issue, type: :model do
       person = create(:new_natural_person, :with_new_client_reason)
       
       person.issues.reload.last.approve!
+      person.reload
       expect(person.enabled).to be_truthy
       expect(person.state).to eq('enabled')
 
@@ -230,6 +249,30 @@ RSpec.describe Issue, type: :model do
       expect(NoteSeed.others_active_seeds(issue)).to include issue3.reload.note_seeds.first
 
       expect(NoteSeed.others_active_seeds(issue)).to_not include issue.reload.note_seeds.first
+    end
+
+    it 'Reject person on new_client issue rejection' do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person, reason: IssueReason.new_client)
+      expect(person.state).to eq("new")
+      issue.reject!
+      expect(person.state).to eq("rejected")
+    end
+
+    it 'Do not change person state on non new_client issue rejection' do
+      reasons = [IssueReason.further_clarification,
+        IssueReason.update_expired_data,
+        IssueReason.update_by_client,
+        IssueReason.new_risk_information
+      ]
+
+      reasons.each do |reason|
+        person = create(:empty_person)
+        issue = create(:basic_issue, person: person, reason: reason)
+        expect(person.state).to eq("new")
+        issue.reject!
+        expect(person.state).to eq("new")
+      end
     end
   end
 
@@ -363,38 +406,6 @@ RSpec.describe Issue, type: :model do
     end
   end
 
-  describe "when looking for people who had problems answering" do
-    it 'has a scope for changed_after_observation' do
-      issue = create(:full_natural_person_issue, person: create(:empty_person))
-      create(:observation, issue: issue)
-      issue.reload.should be_observed
-
-      Issue.changed_after_observation.size.should == 0
-      Timecop.travel 10.minutes.from_now
-      issue.domicile_seeds.first.update(street_address: "Something")
-      Issue.changed_after_observation.count.should == 1
-    end
-
-    it 'ignores answered issues' do
-      issue = create(:full_natural_person_issue, person: create(:empty_person))
-      create(:observation, issue: issue, reply: 'text')
-
-      Issue.changed_after_observation.size.should == 0
-
-      Timecop.travel 10.minutes.from_now
-      issue.domicile_seeds.first.update(street_address: "Something")
-
-      Timecop.travel 10.minutes.from_now
-      create(:observation, issue: issue)
-
-      Issue.changed_after_observation.size.should == 0
-
-      Timecop.travel 10.minutes.from_now
-      issue.domicile_seeds.first.update(street_address: "Something else")
-      Issue.changed_after_observation.size.should == 1
-    end
-  end
-
   describe "when locks and unlock issues" do
     let(:admin_user) { create(:admin_user) }
     let(:other_admin_user) { create(:other_admin_user) }
@@ -501,7 +512,7 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue.lock_issue!).to be true
       Timecop.travel (interval + 1.minutes).from_now
       AdminUser.current_admin_user = other_admin_user
-      defer = Date.today + 20.days
+      defer = 20.days.from_now.to_date
       basic_issue.defer_until = defer
       expect(basic_issue).to be_valid
       basic_issue.save!
@@ -511,7 +522,7 @@ RSpec.describe Issue, type: :model do
     it 'can save changes if locked by me and not expired' do
       expect(basic_issue.lock_issue!).to be true
       Timecop.travel (interval + 1.minutes).from_now
-      defer = Date.today + 20.days
+      defer = 20.days.from_now.to_date
       basic_issue.defer_until = defer
       expect(basic_issue).to be_valid
       basic_issue.save!
@@ -608,11 +619,79 @@ RSpec.describe Issue, type: :model do
     it 'can save changes if locked with no expiration by me' do
       expect(basic_issue.lock_issue!(false)).to be true
       Timecop.travel (interval + 1.minutes).from_now
-      defer = Date.today + 20.days
+      defer = 20.days.from_now.to_date
       basic_issue.defer_until = defer
       expect(basic_issue).to be_valid
       basic_issue.save!
       expect(basic_issue.defer_until).to eq defer
+    end
+  end
+
+  describe "when adding person country tags based on invoicing details" do
+    let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
+
+    it 'creates and adds tags on complete' do
+      issue = create(:full_argentina_invoicing_detail_seed_with_issue).issue
+      create(:full_chile_invoicing_detail_seed_with_issue, issue: issue)
+
+      expect{ issue.reload.complete! }.to change{ Tag.count }.by(2)
+      expect{ issue.approve! }.not_to change{ Tag.count }
+
+      tags = Tag.all[-2..-1]
+      expect(tags.pluck(:name)).to eq ['active-in-AR', 'active-in-CL']
+
+      expect(issue.person.tags).to eq tags
+    end
+
+    it 'creates and adds tags on direct approval' do
+      issue = create(:full_argentina_invoicing_detail_seed_with_issue).issue
+      create(:full_chile_invoicing_detail_seed_with_issue, issue: issue)
+
+      expect{ issue.reload.approve! }.to change{ Tag.count }.by(2)
+
+      tags = Tag.all[-2..-1]
+      expect(tags.pluck(:name)).to eq ['active-in-AR', 'active-in-CL']
+      expect(issue.person.tags).to eq tags
+    end
+
+    it 'does nothing if no invoicing details' do
+      issue = create(:basic_issue)
+      expect do
+        issue.complete!
+        issue.approve!
+      end.not_to change { [Tag.count, issue.person.reload.tags.count] }
+    end
+
+    it 'add country tag to person not creating a new tag on complete' do
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+
+      expect do
+        issue.complete!
+      end.to change { Tag.count }.by(0)
+
+      issue.person.reload
+      expect(issue.person.tags.first).to eq(tag)
+    end
+
+    it 'not add country tag to person if already exists on complete' do
+      tag_name = 'active-in-AR'
+      tag = Tag.create(tag_type: :person, name: tag_name)
+
+      seed = create(:full_argentina_invoicing_detail_seed_with_issue)
+      issue = seed.issue
+      issue.person.tags << tag
+      issue.person.save!
+
+      expect do
+        issue.complete!
+      end.to change { PersonTagging.count }.by(0)
+
+      issue.person.reload
+      expect(issue.person.tags.count).to eq(1)
     end
   end
 end

@@ -15,9 +15,12 @@ ActiveAdmin.register Issue do
     column(:person_state)do |o|
       o.person.state
     end
-    column(:reason) do |o| 
-      tags =  o.tags.any? ?  "(#{o.tags.pluck(:name).join(' - ')})" : "" 
+    column(:reason) do |o|
+      tags = o.tags.any? ? "(#{o.tags.pluck(:name).join(' - ')})" : ''
       "#{o.reason} #{tags}"
+    end
+    column(:person_tags) do |o| 
+      o.person.tags.pluck(:name).join(' - ')
     end
     column(:state)
     column(:created_at)
@@ -28,10 +31,13 @@ ActiveAdmin.register Issue do
 
   config.clear_action_items!
   action_item :new, only: [:index] do
+    next unless authorized? :create, Issue
+
     link_to 'New', new_person_issue_path(person)
   end
 
   action_item :edit, only: [:show] do
+    next unless authorized? :update, Issue
     next unless resource.editable?
     link_to 'Edit', edit_person_issue_path(person, resource)
   end
@@ -44,7 +50,6 @@ ActiveAdmin.register Issue do
   scope :abandoned
   scope :rejected
   scope :approved
-  scope :changed_after_observation
   scope :future
 
   collection_action :new_with_fruits, method: :get do
@@ -166,6 +171,9 @@ ActiveAdmin.register Issue do
             attributes_table_for resource do
               row :created_at
               row :updated_at
+              row :person_tags do  
+                resource.person.tags.pluck(:name).join(' - ')
+              end
             end
           end
         end
@@ -173,7 +181,7 @@ ActiveAdmin.register Issue do
         f.inputs "Issue" do
           f.input :reason, as: :select, collection: IssueReason.all unless f.object.persisted?
           f.input :defer_until, as: :datepicker, datepicker_options: {
-              min_date: Date.today }
+              min_date: Date.current }
 
           ArbreHelpers::Form.has_many_form self, f, :issue_taggings, 
             new_button_text: "Add New Tag" do |cf, context|
@@ -188,6 +196,7 @@ ActiveAdmin.register Issue do
               nf.input :public 
               nf.input :body, input_html: {rows: 3}
               nf.input :expires_at, as: :datepicker
+              nf.input :archived_at, as: :datepicker
               ArbreHelpers::Attachment.has_many_attachments(context, nf)
             end
           end
@@ -207,31 +216,32 @@ ActiveAdmin.register Issue do
         end
       end
 
-      ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
-        ArbreHelpers::Form.has_many_form self, f, :workflows do |wf, context|
-          wf.template.concat(
-            Arbre::Context.new({}, wf.template){
-              li do
-                ArbreHelpers::Workflow.render_workflow_progress(self, "workflow", wf.object)
-              end
-            }.to_s
-          )
-          wf.input :scope
-          wf.input :workflow_type
-          if !wf.object.new_record?
-            wf.input :state, input_html: { disabled: wf.object.persisted? } 
-            if wf.object.may_finish? || wf.object.may_start?
-              wf.template.concat(
-                Arbre::Context.new({}, wf.template){
-                  li do
-                    link_to 'Mark as finished', [:finish, wf.object], class: 'button', method: :post
-                  end
-              }.to_s)
-            end
-          end  
-          ArbreHelpers::Task.has_many_tasks(context, wf)
-        end
-      end
+      # TODO: Uncomment when workflow implementation are ready for production
+      # ArbreHelpers::Layout.tab_with_counter_for(self, 'Workflows', resource.workflows.count, 'arrows-alt') do
+      #   ArbreHelpers::Form.has_many_form self, f, :workflows do |wf, context|
+      #     wf.template.concat(
+      #       Arbre::Context.new({}, wf.template){
+      #         li do
+      #           ArbreHelpers::Workflow.render_workflow_progress(self, "workflow", wf.object)
+      #         end
+      #       }.to_s
+      #     )
+      #     wf.input :scope
+      #     wf.input :workflow_type
+      #     if !wf.object.new_record?
+      #       wf.input :state, input_html: { disabled: wf.object.persisted? } 
+      #       if wf.object.may_finish? || wf.object.may_start?
+      #         wf.template.concat(
+      #           Arbre::Context.new({}, wf.template){
+      #             li do
+      #               link_to 'Mark as finished', [:finish, wf.object], class: 'button', method: :post
+      #             end
+      #         }.to_s)
+      #       end
+      #     end  
+      #     ArbreHelpers::Task.has_many_tasks(context, wf)
+      #   end
+      # end
       
       if resource.for_person_type == :legal_entity || resource.for_person_type.nil?
         ArbreHelpers::Seed.seed_collection_and_fruits_edit_tab(self, 'industry', LegalEntityDocketSeed) do
@@ -247,6 +257,7 @@ ActiveAdmin.register Issue do
                 label: "Move existing Legal Entity Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
+            sf.input :archived_at, as: :datepicker
             ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
             ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
@@ -275,6 +286,7 @@ ActiveAdmin.register Issue do
                 label: "Move existing Natural Person Docket attachments to the new one"
             end
             sf.input :expires_at, as: :datepicker
+            sf.input :archived_at, as: :datepicker
             ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
             ArbreHelpers::Attachment.has_many_attachments(self, sf)
           end
@@ -293,6 +305,7 @@ ActiveAdmin.register Issue do
           sf.input :apartment
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :domiciles
           sf.input :expires_at, as: :datepicker
+          sf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -308,6 +321,7 @@ ActiveAdmin.register Issue do
           sf.input :public_registry_extra_data
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :identifications
           sf.input :expires_at, as: :datepicker
+          sf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -319,6 +333,7 @@ ActiveAdmin.register Issue do
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
           sf.input :expires_at, as: :datepicker
+          sf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, sf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, sf)
         end
@@ -336,6 +351,7 @@ ActiveAdmin.register Issue do
           ArbreHelpers::Replacement.fields_for_replaces self, af,
             :argentina_invoicing_details
           af.input :expires_at, as: :datepicker
+          af.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, af, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(self, af)
         end
@@ -350,6 +366,7 @@ ActiveAdmin.register Issue do
           cf.input :comuna
           ArbreHelpers::Replacement.fields_for_replaces self, cf, :chile_invoicing_details
           cf.input :expires_at, as: :datepicker
+          cf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, cf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(self, cf)
         end
@@ -371,6 +388,7 @@ ActiveAdmin.register Issue do
           end
           ArbreHelpers::Replacement.fields_for_replaces context, rf, :affinities
           rf.input :expires_at, as: :datepicker
+          rf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, rf, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, rf)
         end
@@ -388,6 +406,7 @@ ActiveAdmin.register Issue do
             pf.input :replaces, collection: current
           end
           pf.input :expires_at, as: :datepicker
+          pf.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, pf, :observations, true)
         end
       end
@@ -400,6 +419,7 @@ ActiveAdmin.register Issue do
             ef.input :replaces, collection: current
           end
           ef.input :expires_at, as: :datepicker
+          ef.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, ef, :observations, true)
         end
       end
@@ -429,6 +449,7 @@ ActiveAdmin.register Issue do
             rs.input :extra_info 
           end
           rs.input :expires_at, as: :datepicker
+          rs.input :archived_at, as: :datepicker
           ArbreHelpers::Observation.has_many_observations(self, rs, :observations, true)
           ArbreHelpers::Attachment.has_many_attachments(context, rs)
         end
@@ -461,6 +482,9 @@ ActiveAdmin.register Issue do
               row :tags do  
                 resource.tags.pluck(:name).join(' - ')
               end
+              row :person_tags do  
+                resource.person.tags.pluck(:name).join(' - ')
+              end
             end
           end
         end
@@ -470,7 +494,7 @@ ActiveAdmin.register Issue do
           h3 "Current Note Seeds"
           if seeds = resource.note_seeds.presence
             ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
-              attributes_table_for d, :public,  :fruit, :created_at, :updated_at
+              attributes_table_for d, :public,  :fruit, :created_at, :updated_at, :expires_at
               para d.body
               ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
             end

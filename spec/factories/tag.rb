@@ -7,6 +7,12 @@ FactoryBot.define do
         name { 'this-is-a-person-tag-1' }
       end
 
+      factory :some_person_tag do
+        sequence :name do |n|
+          "person-tag-number-#{n}"
+        end
+      end
+
       factory :alt_person_tag do
         name { 'this-is-a-person-tag-alt' }
       end
@@ -24,6 +30,16 @@ FactoryBot.define do
       tag_type { :issue }
 
       factory :issue_tag do
+        name { 'this-is-a-issue-tag-1' }
+      end
+
+      factory :some_issue_tag do
+        sequence :name do |n|
+          "issue-tag-number-#{n}"
+        end
+      end
+
+      factory :alt_issue_tag do
         name { 'this-is-a-issue-tag-2' }
       end
     end

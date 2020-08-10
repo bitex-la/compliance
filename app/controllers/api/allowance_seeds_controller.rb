@@ -21,7 +21,8 @@ class Api::AllowanceSeedsController < Api::EntityController
         :copy_attachments,
         :replaces,
         :issue,
-        :expires_at
+        :expires_at,
+        :archived_at
       ]
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_05_182658) do
+ActiveRecord::Schema.define(version: 2020_07_23_175323) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -24,6 +24,16 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.index ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id"
     t.index ["namespace"], name: "index_active_admin_comments_on_namespace"
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
+  end
+
+  create_table "admin_user_taggings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "admin_user_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_user_id", "tag_id"], name: "index_admin_user_taggings_on_admin_user_id_and_tag_id", unique: true
+    t.index ["admin_user_id"], name: "index_admin_user_taggings_on_admin_user_id"
+    t.index ["tag_id"], name: "index_admin_user_taggings_on_tag_id"
   end
 
   create_table "admin_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -42,8 +52,8 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.string "api_token"
     t.string "otp_secret_key"
     t.boolean "otp_enabled", default: false
-    t.integer "role_type", default: 0, null: false
     t.integer "max_people_allowed"
+    t.integer "admin_role_id", default: 7, null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -56,6 +66,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.date "archived_at"
     t.index ["affinity_seed_id"], name: "index_affinities_on_affinity_seed_id"
     t.index ["person_id"], name: "index_affinities_on_person_id"
     t.index ["related_person_id"], name: "index_affinities_on_related_person_id"
@@ -72,6 +83,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.integer "fruit_id"
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["fruit_id"], name: "index_affinity_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_affinity_seeds_on_issue_id"
     t.index ["related_person_id"], name: "index_affinity_seeds_on_related_person_id"
@@ -89,6 +101,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.boolean "copy_attachments"
     t.integer "kind_id"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["fruit_id"], name: "index_allowance_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_allowance_seeds_on_replaces_id"
@@ -103,6 +116,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.integer "kind_id"
+    t.date "archived_at"
     t.index ["issue_id"], name: "index_allowances_on_issue_id"
     t.index ["person_id"], name: "index_allowances_on_person_id"
     t.index ["replaced_by_id"], name: "index_allowances_on_replaced_by_id"
@@ -123,6 +137,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.string "address"
     t.string "country", null: false
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["address"], name: "index_argentina_invoicing_detail_seeds_on_address"
     t.index ["country"], name: "index_argentina_invoicing_detail_seeds_on_country"
     t.index ["fruit_id"], name: "index_argentina_invoicing_detail_seeds_on_fruit_id"
@@ -148,6 +163,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.string "full_name", null: false
     t.string "address"
     t.string "country", null: false
+    t.date "archived_at"
     t.index ["address"], name: "index_argentina_invoicing_details_on_address"
     t.index ["country"], name: "index_argentina_invoicing_details_on_country"
     t.index ["full_name"], name: "index_argentina_invoicing_details_on_full_name"
@@ -192,6 +208,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.boolean "copy_attachments"
     t.integer "vat_status_id"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["comuna"], name: "index_chile_invoicing_detail_seeds_on_comuna"
     t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
     t.index ["giro"], name: "index_chile_invoicing_detail_seeds_on_giro"
@@ -212,6 +229,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.integer "vat_status_id"
+    t.date "archived_at"
     t.index ["comuna"], name: "index_chile_invoicing_details_on_comuna"
     t.index ["giro"], name: "index_chile_invoicing_details_on_giro"
     t.index ["issue_id"], name: "index_chile_invoicing_details_on_issue_id"
@@ -248,6 +266,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.integer "replaces_id"
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["city"], name: "index_domicile_seeds_on_city"
     t.index ["country"], name: "index_domicile_seeds_on_country"
     t.index ["fruit_id"], name: "index_domicile_seeds_on_fruit_id"
@@ -274,6 +293,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.date "archived_at"
     t.index ["city"], name: "index_domiciles_on_city"
     t.index ["country"], name: "index_domiciles_on_country"
     t.index ["issue_id"], name: "index_domiciles_on_issue_id"
@@ -296,6 +316,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["address"], name: "index_email_seeds_on_address"
     t.index ["email_kind_id"], name: "index_email_seeds_on_email_kind_id"
     t.index ["fruit_id"], name: "index_email_seeds_on_fruit_id"
@@ -311,6 +332,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.date "archived_at"
     t.index ["address"], name: "index_emails_on_address"
     t.index ["email_kind_id"], name: "index_emails_on_email_kind_id"
     t.index ["issue_id"], name: "index_emails_on_issue_id"
@@ -341,10 +363,41 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
-    t.string "external_id"
+    t.string "external_id", null: false
     t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
+    t.datetime "deposit_date", null: false
+    t.string "country", null: false
+    t.index ["person_id", "country"], name: "index_fund_deposits_on_person_id_and_country"
     t.index ["person_id"], name: "index_fund_deposits_on_person_id"
     t.index ["replaced_by_id"], name: "index_fund_deposits_on_replaced_by_id"
+  end
+
+  create_table "fund_transfers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "source_person_id", null: false
+    t.bigint "target_person_id", null: false
+    t.decimal "amount", precision: 20, scale: 8, null: false
+    t.datetime "transfer_date", null: false
+    t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
+    t.integer "currency_id", null: false
+    t.string "external_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_person_id"], name: "index_fund_transfers_on_source_person_id"
+    t.index ["target_person_id"], name: "index_fund_transfers_on_target_person_id"
+  end
+
+  create_table "fund_withdrawals", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.decimal "amount", precision: 20, scale: 8, null: false
+    t.integer "currency_id", null: false
+    t.decimal "exchange_rate_adjusted_amount", precision: 20, scale: 8, null: false
+    t.datetime "withdrawal_date", null: false
+    t.string "country", null: false
+    t.string "external_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id", "country"], name: "index_fund_withdrawals_on_person_id_and_country"
+    t.index ["person_id"], name: "index_fund_withdrawals_on_person_id"
   end
 
   create_table "fundings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -374,6 +427,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.string "public_registry_extra_data"
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
     t.index ["identification_kind_id"], name: "index_identification_seeds_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
@@ -394,6 +448,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.string "public_registry_authority"
     t.string "public_registry_book"
     t.string "public_registry_extra_data"
+    t.date "archived_at"
     t.index ["identification_kind_id"], name: "index_identifications_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identifications_on_issue_id"
     t.index ["issuer"], name: "index_identifications_on_issuer"
@@ -440,6 +495,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["commercial_name"], name: "index_legal_entity_docket_seeds_on_commercial_name"
     t.index ["country"], name: "index_legal_entity_docket_seeds_on_country"
     t.index ["fruit_id"], name: "index_legal_entity_docket_seeds_on_fruit_id"
@@ -458,6 +514,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.date "archived_at"
     t.index ["commercial_name"], name: "index_legal_entity_dockets_on_commercial_name"
     t.index ["country"], name: "index_legal_entity_dockets_on_country"
     t.index ["issue_id"], name: "index_legal_entity_dockets_on_issue_id"
@@ -483,6 +540,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.text "politically_exposed_reason", limit: 4294967295
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["birth_date"], name: "index_natural_docket_seeds_on_birth_date"
     t.index ["first_name", "last_name"], name: "index_natural_docket_seeds_on_first_name_and_last_name"
     t.index ["first_name"], name: "index_natural_docket_seeds_on_first_name"
@@ -510,6 +568,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.text "job_description", limit: 4294967295
     t.boolean "politically_exposed"
     t.text "politically_exposed_reason", limit: 4294967295
+    t.date "archived_at"
     t.index ["birth_date"], name: "index_natural_dockets_on_birth_date"
     t.index ["first_name", "last_name"], name: "index_natural_dockets_on_first_name_and_last_name"
     t.index ["first_name"], name: "index_natural_dockets_on_first_name"
@@ -533,6 +592,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.boolean "copy_attachments"
     t.date "expires_at"
     t.boolean "public", default: false, null: false
+    t.date "archived_at"
     t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_note_seeds_on_replaces_id"
@@ -548,6 +608,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.boolean "public", default: false, null: false
+    t.date "archived_at"
     t.index ["issue_id"], name: "index_notes_on_issue_id"
     t.index ["person_id"], name: "index_notes_on_person_id"
     t.index ["replaced_by_id"], name: "index_notes_on_replaced_by_id"
@@ -622,6 +683,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.bigint "fruit_id"
     t.boolean "copy_attachments"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["country"], name: "index_phone_seeds_on_country"
     t.index ["fruit_id"], name: "index_phone_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_phone_seeds_on_issue_id"
@@ -642,6 +704,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.bigint "issue_id"
+    t.date "archived_at"
     t.index ["country"], name: "index_phones_on_country"
     t.index ["issue_id"], name: "index_phones_on_issue_id"
     t.index ["number"], name: "index_phones_on_number"
@@ -662,6 +725,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.boolean "copy_attachments"
     t.bigint "issue_id"
     t.date "expires_at"
+    t.date "archived_at"
     t.index ["fruit_id"], name: "index_risk_score_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_risk_score_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_risk_score_seeds_on_replaces_id"
@@ -677,6 +741,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
+    t.date "archived_at"
     t.index ["issue_id"], name: "index_risk_scores_on_issue_id"
     t.index ["person_id"], name: "index_risk_scores_on_person_id"
     t.index ["replaced_by_id"], name: "index_risk_scores_on_replaced_by_id"
@@ -713,6 +778,8 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
     t.index ["issue_id"], name: "index_workflows_on_issue_id"
   end
 
+  add_foreign_key "admin_user_taggings", "admin_users"
+  add_foreign_key "admin_user_taggings", "tags"
   add_foreign_key "affinities", "affinities", column: "replaced_by_id"
   add_foreign_key "affinities", "affinity_seeds"
   add_foreign_key "affinities", "people"
@@ -750,6 +817,9 @@ ActiveRecord::Schema.define(version: 2019_11_05_182658) do
   add_foreign_key "emails", "people"
   add_foreign_key "event_logs", "admin_users"
   add_foreign_key "fund_deposits", "people"
+  add_foreign_key "fund_transfers", "people", column: "source_person_id"
+  add_foreign_key "fund_transfers", "people", column: "target_person_id"
+  add_foreign_key "fund_withdrawals", "people"
   add_foreign_key "fundings", "fundings", column: "replaced_by_id"
   add_foreign_key "fundings", "issues"
   add_foreign_key "fundings", "people"

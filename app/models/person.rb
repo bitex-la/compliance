@@ -26,13 +26,18 @@ class Person < ApplicationRecord
     affinities
     risk_scores
   }.each do |relationship|
-    has_many relationship, -> { where("#{relationship}.replaced_by_id is NULL") }
+    has_many relationship, -> {
+      where("#{relationship}.replaced_by_id is NULL")
+      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.current)
+    }
+
     has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
   end
 
   HAS_MANY_PLAIN = %i{
     issues
     fund_deposits
+    fund_withdrawals
     attachments
   }.each do |relationship|
     has_many relationship
@@ -40,12 +45,25 @@ class Person < ApplicationRecord
 
   HAS_MANY = HAS_MANY_REPLACEABLE + HAS_MANY_PLAIN
 
+  has_many :received_transfers, :class_name => 'FundTransfer', :foreign_key => 'target_person_id'
+  has_many :sent_transfers, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
+
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
 
   has_many :person_taggings
   has_many :tags, through: :person_taggings
   accepts_nested_attributes_for :person_taggings, allow_destroy: true
+
+  validate :person_tag_must_be_managed_by_admin
+
+  def person_tag_must_be_managed_by_admin
+    return unless (admin_user = AdminUser.current_admin_user)
+    return if tags.empty? ||
+      tags.any? { |t| admin_user.can_manage_tag?(t) }
+
+    errors.add(:person, 'Person tags not allowed')
+  end
 
   def replaceable_fruits
     %i[
@@ -62,6 +80,20 @@ class Person < ApplicationRecord
   end
 
   enum risk: %i(low medium high)
+
+  # This default_scope allow filter person with allowed
+  # admin tags
+  def self.default_scope
+    Person.by_admin_user_tags
+  end
+
+  scope :by_admin_user_tags, -> {
+    return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
+
+    where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
+      OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
+      }, tags).distinct
+  }
 
   def natural_docket
     natural_dockets.last
@@ -83,7 +115,7 @@ class Person < ApplicationRecord
     %i(natural legal)
   end
 
-  scope :by_person_type, -> (type){ 
+  scope :by_person_type, -> (type){
     {
       natural: left_outer_joins(:natural_dockets)
         .left_outer_joins(:issues =>  :natural_docket_seed)
@@ -180,6 +212,20 @@ class Person < ApplicationRecord
       notes.current
   end
 
+  def archived_fruits
+    Domicile.archived(self) +
+      Identification.archived(self) +
+      NaturalDocket.archived(self) +
+      LegalEntityDocket.archived(self) +
+      Allowance.archived(self) +
+      Phone.archived(self) +
+      Email.archived(self) +
+      Affinity.archived(self) +
+      ArgentinaInvoicingDetail.archived(self) +
+      ChileInvoicingDetail.archived(self) +
+      Note.archived(self)
+  end
+
   def all_attachments
     attachments
       .where("attached_to_seed_id is null AND attached_to_fruit_id is not null")
@@ -198,11 +244,21 @@ class Person < ApplicationRecord
   end
 
   def all_affinities
-    Affinity.where("person_id = ? OR related_person_id = ?", id, id)
+    Affinity.current.where(person: self).or(related_affinities)
+  end
+
+  def related_affinities
+    Affinity.current.where(related_person: self)
   end
 
   def public_notes
-    Note.where("person_id = ? AND public = true", id)
+    Note.current.where(person: self, public: true)
+  end
+
+  def email_for_export
+    email = emails.find { |e| e.email_kind == EmailKind.authentication } ||
+            emails.last
+    email&.address
   end
 
   def self.suggest(keyword, page = 1, per_page = 20)
@@ -236,14 +292,14 @@ class Person < ApplicationRecord
     sum, count = fund_deposits.pluck(Arel.sql('sum(exchange_rate_adjusted_amount), count(*)')).first
 
     self.regularity = PersonRegularity.all.reverse
-      .find {|x| x.applies? sum,count} 
+      .find {|x| x.applies? sum,count}
 
     should_log = regularity_id_changed?
 
     if should_log
       issue = issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.risk_score_seeds.build(
-        score: regularity.code, 
+        score: regularity.code,
         provider: 'open_compliance',
         extra_info: {
           regularity_funding_amount: regularity.funding_amount.to_d,
@@ -256,8 +312,18 @@ class Person < ApplicationRecord
 
     save!
 
-    EventLog.log_entity!(self, AdminUser.current_admin_user, 
+    EventLog.log_entity!(self, AdminUser.current_admin_user,
       EventLogKind.update_person_regularity) if should_log
+  end
+
+  def refresh_person_country_tagging!(country)
+    tag_name = "active-in-#{country}"
+    tag = Tag.find_or_create_by(tag_type: :person, name: tag_name)
+
+    AdminUser.current_admin_user&.add_tag(tag)
+
+    PersonTagging.find_or_create_by(person: self, tag: tag)
+    tags.reload
   end
 
   aasm do
@@ -329,7 +395,8 @@ class Person < ApplicationRecord
   def self.eager_person_entities
     entities = []
     HAS_MANY
-      .reject{|x| [:attachments, :issues, :fund_deposits].include? x}
+      .reject{|x| [:attachments, :issues, :fund_deposits, :fund_withdrawals,
+                   :received_transfers, :sent_transfers].include? x}
       .map(&:to_s).each do |fruit|
       entities.push("#{fruit}": eager_fruit_entities)
     end
@@ -351,6 +418,9 @@ class Person < ApplicationRecord
       :observations
     ])
     entities.push(fund_deposits: :attachments)
+    entities.push(fund_withdrawals: :attachments)
+    entities.push(received_transfers: :attachments)
+    entities.push(sent_transfers: :attachments)
     entities
   end
 
@@ -365,13 +435,13 @@ class Person < ApplicationRecord
       :identifications,
       :natural_dockets,
       :legal_entity_dockets,
-      :allowances, 
-      :phones, 
-      :emails, 
+      :allowances,
+      :phones,
+      :emails,
       :affinities,
-      :argentina_invoicing_details, 
-      :chile_invoicing_details, 
-      :notes, 
+      :argentina_invoicing_details,
+      :chile_invoicing_details,
+      :notes,
       :attachments,
       :regularity
     ]

@@ -12,7 +12,6 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   scope :dismissed
   scope :rejected
   scope :approved
-  scope :changed_after_observation
   scope :future
   scope :all
 
@@ -40,12 +39,15 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     column(:person) do |o|
       link_to o.person.person_info, o.person
     end
-    column(:person_state)do |o|
+    column(:person_state) do |o|
       o.person.state
     end
-    column(:reason) do |o| 
-      tags =  o.tags.any? ?  "(#{o.tags.pluck(:name).join(' - ')})" : "" 
+    column(:reason) do |o|
+      tags = o.tags.any? ? "(#{o.tags.pluck(:name).join(' - ')})" : ''
       "#{o.reason} #{tags}"
+    end
+    column(:person_tags) do |o|
+      o.person.tags.pluck(:name).join(' - ')
     end
     column(:state)
     column(:created_at)

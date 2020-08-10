@@ -41,11 +41,14 @@ describe Person do
             chile_invoicing_details: {data: []},
             allowances: {data: []},
             fund_deposits: {data: []},
+            fund_withdrawals: {data: []},
             phones: {data: []},
+            received_transfers: {data: []},
             emails: {data: []},
             notes: {data: []},
             affinities: {data: []},
             risk_scores: {data: []},
+            sent_transfers: {data: []},
             attachments: {data: []},
             tags: {data: []}
           }
@@ -108,6 +111,9 @@ describe Person do
           fund_deposits: {data: person.fund_deposits.map{ |x|
             {id: x.id.to_s, type: "fund_deposits" }
           }},
+          fund_withdrawals: {data: person.fund_withdrawals.map{ |x|
+            {id: x.id.to_s, type: "fund_withdrawals" }
+          }},
           argentina_invoicing_details: {data: person.argentina_invoicing_details.map { |x|
             {id: x.id.to_s, type: 'argentina_invoicing_details'}
           }},
@@ -117,6 +123,7 @@ describe Person do
           phones: {data: person.phones.map { |x|
             {id: x.id.to_s, type: 'phones'}
           }},
+          received_transfers: {data: []},
           emails: {data: person.emails.map { |x|
             {id: x.id.to_s, type: 'emails'}
           }},
@@ -129,6 +136,7 @@ describe Person do
           risk_scores: {data: person.risk_scores.map{ |x|
             {id: x.id.to_s, type: "risk_scores" }
           }},
+          sent_transfers: {data: []},
           attachments: {data: issue.person.attachments.map { |x|
             {id: x.id.to_s, type: "attachments"}
           }},
@@ -196,6 +204,7 @@ describe Person do
             postal_code: "1432",
             floor: "5",
             apartment: "A",
+            archived_at: nil,
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z'
           },
@@ -221,6 +230,7 @@ describe Person do
             public_registry_authority: nil,
             public_registry_book: nil,
             public_registry_extra_data: nil,
+            archived_at: nil,
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z'
           },
@@ -249,6 +259,7 @@ describe Person do
             job_description: 'Build cool open source software',
             politically_exposed: false,
             politically_exposed_reason: nil,
+            archived_at: nil,
             birth_date: person.natural_dockets.first.birth_date.to_formatted_s,
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z'
@@ -315,6 +326,7 @@ describe Person do
           attributes: {
             number:  '+5491125410470',
             phone_kind_code: 'main',
+            archived_at: nil,
             country: 'AR',
             has_whatsapp: true,
             has_telegram: false,
@@ -339,6 +351,7 @@ describe Person do
           id: person.emails.first.id.to_s,
           attributes: {
             address:  person.emails.first.address,
+            archived_at: nil,
             email_kind_code: 'authentication',
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z'
@@ -361,6 +374,7 @@ describe Person do
           id: person.affinities.first.id.to_s,
           attributes: {
             affinity_kind_code: person.affinities.first.affinity_kind.to_s,
+            archived_at: nil,
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z'
           },
@@ -395,6 +409,7 @@ describe Person do
             country: "AR",
             full_name: "Julio Iglesias",
             address: "Jujuy 3421",
+            archived_at: nil,
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z'
           },
@@ -417,6 +432,7 @@ describe Person do
           attributes: {
             public: false,
             title:  'my nickname',
+            archived_at: nil,
             body:   'Please call me by my nickname: Mr. Bond',
             created_at: '2018-01-01T00:00:00.000Z',
             updated_at: '2018-01-01T00:00:00.000Z'
