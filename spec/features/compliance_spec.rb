@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 describe 'an admin user' do
+  let(:compliance_admin_user) { create(:compliance_admin_user) }
   let(:admin_user) { create(:admin_user) }
-  let(:super_admin_user) { create(:super_admin_user) }
 
   it 'cleans up the current admin user after responding' do
-    login_as super_admin_user
+    login_as admin_user
     visit '/'
     expect(page).to have_content 'Dashboard'
     visit '/api/issues'
@@ -16,30 +16,12 @@ describe 'an admin user' do
     visit '/api/issues'
     expect(page).to have_content 'forbidden'
   end
-  
-  it 'restrict another admin user' do 
-    restricted_user = create(:admin_user)
-    login_as super_admin_user
-
-    expect(restricted_user.is_restricted?).to be_falsey
-    click_link 'Admin Users'
-
-    within "tr[id='admin_user_#{AdminUser.first.id}'] td[class='col col-actions']" do
-      click_link 'View'
-    end
-
-    click_link 'Grant Restricted access'
-    expect(restricted_user.reload.is_restricted?).to be_truthy
-
-    click_link 'Grant Admin access'
-    expect(restricted_user.reload.is_restricted?).to be_falsey
-  end
 
   it 'creates a new natural person and its issue via admin' do
-    AdminUser.current_admin_user = admin_user
+    AdminUser.current_admin_user = compliance_admin_user
     observation_reason = create(:human_world_check_reason)
-   
-    login_as admin_user
+
+    login_as compliance_admin_user
 
     click_link 'People'
     click_link 'New Person'
@@ -56,7 +38,7 @@ describe 'an admin user' do
 
     click_link 'Add Person Information'
     click_button 'Create new issue'
-    
+
     fulfil_new_issue_form
     add_observation(observation_reason, 'Please check this guy on world check')
 
@@ -182,7 +164,7 @@ describe 'an admin user' do
   #   AdminUser.current_admin_user = admin_user
   #   observation_reason = create(:human_world_check_reason)
    
-  #   login_as admin_user
+  #   login_as compliance_admin_user
 
   #   click_link 'People'
   #   click_link 'New Person'
@@ -345,7 +327,7 @@ describe 'an admin user' do
     assert_logging(issue, :update_entity, 1)
 
     # Admin does not see it as pending
-    login_as admin_user
+    login_as compliance_admin_user
 
     expect(page).to have_content 'Signed in successfully.'
     click_on 'Observed'
@@ -474,7 +456,7 @@ describe 'an admin user' do
   it "Edits a customer by creating a new issue" do
     observation_reason = create(:human_world_check_reason)
     person = create(:full_natural_person)
-    login_as admin_user
+    login_as compliance_admin_user
 
     click_link 'People'
     click_link 'All'
@@ -665,7 +647,7 @@ describe 'an admin user' do
     issue.complete!
     assert_logging(issue, :create_entity, 1)
     assert_logging(issue, :update_entity, 1)
-    login_as admin_user
+    login_as compliance_admin_user
     click_on "Fresh"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Dismiss'
@@ -680,7 +662,7 @@ describe 'an admin user' do
     expect(person.state).to eq('enabled')
     issue = person.issues.reload.last
     issue.complete!
-    login_as admin_user
+    login_as compliance_admin_user
     click_on 'Answered'
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
     click_link 'Reject'
@@ -697,7 +679,7 @@ describe 'an admin user' do
     issue = create(:full_natural_person_issue, person: person)
     observation = create(:robot_observation, issue: issue)
 
-    login_as admin_user
+    login_as compliance_admin_user
     assert_logging(issue, :create_entity, 1)
 
     click_on 'Observed'
@@ -741,7 +723,7 @@ describe 'an admin user' do
       issue: issue)
 
     issue.reload.should be_observed  
-    login_as admin_user
+    login_as compliance_admin_user
 
     click_on 'Observed'
     within("#issue_#{issue.id} td.col.col-id") do
@@ -823,7 +805,7 @@ describe 'an admin user' do
     issue.reload.should be_observed
     assert_logging(issue.reload, :observe_issue, 1)
 
-    login_as admin_user
+    login_as compliance_admin_user
     
     # Admin clicks in the observation to see the issue detail
     click_on 'Observed'
@@ -857,7 +839,7 @@ describe 'an admin user' do
     assert_logging(issue, :create_entity, 1)
     assert_logging(issue, :update_entity, 1)
 
-    login_as admin_user
+    login_as compliance_admin_user
     click_on 'Answered'
     
     visit "/people/#{person.id}/issues/#{issue.id}"
@@ -877,7 +859,7 @@ describe 'an admin user' do
       person = create(:full_natural_person).reload
       issue = create(:full_natural_person_issue, person: person)
 
-      login_as admin_user
+      login_as compliance_admin_user
       click_on 'Draft'
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
@@ -931,7 +913,7 @@ describe 'an admin user' do
       person = create(:full_natural_person)
       issue = create(:basic_issue, person: person)
 
-      login_as admin_user
+      login_as compliance_admin_user
       click_on 'Draft'
       within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
         click_link(issue.id)
@@ -996,7 +978,7 @@ describe 'an admin user' do
       issue = person.issues.reload.first
 
       # Admin does not see it as pending
-      login_as admin_user
+      login_as compliance_admin_user
 
       expect(page).to have_content 'Signed in successfully.'
 
@@ -1069,7 +1051,7 @@ describe 'an admin user' do
     person = create(:full_natural_person).reload
     issue = create(:full_natural_person_issue, person: person)
 
-    login_as admin_user
+    login_as compliance_admin_user
 
     click_on 'Draft'
     within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
@@ -1125,7 +1107,7 @@ describe 'an admin user' do
   it 'manually enables/disables and sets risk for a person' do
     person = create(:full_natural_person)
 
-    login_as admin_user
+    login_as compliance_admin_user
 
     click_link 'People'
     click_link 'All'
@@ -1148,29 +1130,29 @@ describe 'an admin user' do
   end
 
   it "don't show api token for admin users in view page" do
-    login_as super_admin_user
+    login_as admin_user
 
     click_link 'Admin Users'
-    within("#admin_user_#{super_admin_user.id} td.col.col-actions") do
+    within("#admin_user_#{admin_user.id} td.col.col-actions") do
       click_link 'View'
     end
 
-    expect(page.current_path).to eq("/admin_users/#{super_admin_user.id}")
+    expect(page.current_path).to eq("/admin_users/#{admin_user.id}")
     expect(page).to_not have_text 'API TOKEN'
-    expect(page).to_not have_text super_admin_user.api_token
+    expect(page).to_not have_text admin_user.api_token
   end
 
   it "don't show sensible data for admin users in csv export" do
-    login_as super_admin_user
+    login_as admin_user
 
     click_link 'Admin Users'
     click_link 'CSV'
     DownloadHelpers::wait_for_download
     csv = File.read(DownloadHelpers::download)
     expect(csv).to_not include('API TOKEN')
-    expect(csv).to_not include(super_admin_user.api_token)
+    expect(csv).to_not include(admin_user.api_token)
     expect(csv).not_to include("Encrypted password")
-    expect(csv).to_not include(super_admin_user.encrypted_password)
+    expect(csv).to_not include(admin_user.encrypted_password)
     expect(csv).not_to include("Reset password token")
   end
 
