@@ -95,7 +95,7 @@ class Util::AffinityFulfilment
     issue = related_person_affinity.person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
     affinity = issue.affinity_seeds.build(
       related_person: related_person_affinity.related_person,
-      affinity_kind: AffinityKind.find_by_code(:same_person),
+      affinity_kind: AffinityKind.same_person,
       replaces: related_person_affinity,
       archived_at: Date.current
     )

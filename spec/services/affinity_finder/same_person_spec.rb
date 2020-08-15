@@ -190,7 +190,7 @@ describe AffinityFinder::SamePerson do
       end.to change{person_a.issues.count}.by(1)
 
       affinity_seed = person_a.issues.last.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_b.id,
@@ -278,7 +278,7 @@ describe AffinityFinder::SamePerson do
       end.to change{person_a.issues.count}.by(1)
 
       affinity_seed = person_a.issues.last.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_b.id,
@@ -346,7 +346,7 @@ describe AffinityFinder::SamePerson do
       issue = Issue.last
       expect(issue.person_id).to be(person_a.id)
       affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_b.id,
@@ -409,7 +409,7 @@ describe AffinityFinder::SamePerson do
       issue = Issue.last
       expect(issue.person_id).to be(person_b.id)
       affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_c.id,
@@ -467,7 +467,7 @@ describe AffinityFinder::SamePerson do
       issue = Issue.last
       expect(issue.person_id).to be(person_a.id)
       affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_d.id,
@@ -516,7 +516,7 @@ describe AffinityFinder::SamePerson do
       issue = Issue.last
       expect(issue.person_id).to be(person_b.id)
       affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_c.id,
@@ -585,7 +585,7 @@ describe AffinityFinder::SamePerson do
       issue = Issue.last
       expect(issue.person_id).to be(person_a.id)
       affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_d.id,
@@ -662,7 +662,7 @@ describe AffinityFinder::SamePerson do
       issue = Issue.last
       expect(issue.person_id).to be(person_a.id)
       affinity_seed = issue.affinity_seeds.first
-      affinity_kind = AffinityKind.find_by_code(:same_person)
+      affinity_kind = AffinityKind.same_person
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_f.id,

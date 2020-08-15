@@ -409,13 +409,13 @@ class Issue < ApplicationRecord
   end
 
   def fulfil_affinity_relationships
-    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.find_by_code(:same_person)
+    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person
 
     Util::AffinityFulfilment.call(affinity_seeds)
   end
 
   def fulfil_affinity_after_process
-    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.find_by_code(:same_person)
+    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person
 
     Util::AffinityFulfilment.after_process(affinity_seeds)
   end
