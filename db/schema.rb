@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_23_175323) do
+ActiveRecord::Schema.define(version: 2020_08_15_145954) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -67,6 +67,7 @@ ActiveRecord::Schema.define(version: 2020_07_23_175323) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.date "archived_at"
+    t.boolean "auto_created", default: false
     t.index ["affinity_seed_id"], name: "index_affinities_on_affinity_seed_id"
     t.index ["person_id"], name: "index_affinities_on_person_id"
     t.index ["related_person_id"], name: "index_affinities_on_related_person_id"
@@ -84,6 +85,7 @@ ActiveRecord::Schema.define(version: 2020_07_23_175323) do
     t.boolean "copy_attachments"
     t.date "expires_at"
     t.date "archived_at"
+    t.boolean "auto_created", default: false
     t.index ["fruit_id"], name: "index_affinity_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_affinity_seeds_on_issue_id"
     t.index ["related_person_id"], name: "index_affinity_seeds_on_related_person_id"
