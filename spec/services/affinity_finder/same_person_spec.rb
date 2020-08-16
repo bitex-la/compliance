@@ -84,6 +84,19 @@ describe AffinityFinder::SamePerson do
         []
       )
     end
+
+    it 'returns only persons in person_ids_filter' do
+      person_a = create_person_with_identification('abc123')
+      person_b = create_person_with_identification('abc123')
+      person_c = create_person_with_identification('abc123')
+      person_d = create_person_with_identification('def456')
+      person_e = create_person_with_identification('abc12345')
+
+      person_ids_filter = [person_c.id, person_d.id, person_e.id]
+      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_a, person_ids_filter)).to match_array(
+        [person_c.id, person_e.id]
+      )
+    end
   end
 
   describe '.with_matched_names' do
@@ -113,6 +126,32 @@ describe AffinityFinder::SamePerson do
       )
 
       expect(AffinityFinder::SamePerson.with_matched_names(legal_person_d)).to eq(
+        [legal_person_c.id]
+      )
+    end
+
+    it 'matches only persons in person_ids_filter' do
+      # matches
+      person_a = create_natural_person_with_docket('Juan', 'Perez')
+      person_b = create_natural_person_with_docket('Juan', 'Perez')
+      person_c = create_natural_person_with_docket('juan', 'perez')
+      person_d = create_natural_person_with_docket('juan', 'perez')
+
+      # no matches
+      person_e = create_natural_person_with_docket('Juana', 'Molina')
+      person_f = create_natural_person_with_docket('juan', 'pereza')
+
+
+      legal_person_a = create_legal_person_with_docket('ACME', nil)
+      legal_person_b = create_legal_person_with_docket('acme', nil)
+      legal_person_c = create_legal_person_with_docket('acme', nil)
+      legal_person_d = create_legal_person_with_docket('other company', nil)
+
+      expect(AffinityFinder::SamePerson.with_matched_names(person_a, [person_c.id, person_f.id])).to match_array(
+        [person_c.id]
+      )
+
+      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_a, [legal_person_c.id, legal_person_d.id])).to match_array(
         [legal_person_c.id]
       )
     end

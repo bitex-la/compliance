@@ -105,13 +105,11 @@ class Util::AffinityFulfilment
   end
 
   def self.same_person_match(person, related_person)
-    id1 = person.identifications.current&.first&.number
-    id2 = related_person.identifications.current&.first&.number
+    matched_names = AffinityFinder::SamePerson.with_matched_names(person, [related_person.id])
 
-    name1 = person.natural_docket&.name_body
-    name2 = related_person.natural_docket&.name_body
+    matched_id_numbers = AffinityFinder::SamePerson.with_matched_id_numbers(person, [related_person.id])
 
-    match_by_identification(id1, id2) || match_by_name(name1, name2)
+    matched_names.present? || matched_id_numbers.present?
   end
 
   def self.same_person_match_any_related_person(affinities, current_affinity, father)
@@ -124,26 +122,6 @@ class Util::AffinityFulfilment
       )
         return true
       end
-    end
-    return false
-  end
-
-  def self.match_by_identification(id1, id2)
-    if (id1 && id2)
-      return (
-        !!id1.downcase.match(id2.downcase) ||
-        !!id2.downcase.match(id1.downcase)
-      )
-    end
-    return false
-  end
-
-  def self.match_by_name(name1, name2)
-    if (name1 && name2)
-      return (
-        !!Regexp.union(name1.downcase.split(/\W+/)).match(name2.downcase) ||
-        !!Regexp.union(name2.downcase.split(/\W+/)).match(name1.downcase)
-      )
     end
     return false
   end

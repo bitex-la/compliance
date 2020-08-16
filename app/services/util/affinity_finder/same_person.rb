@@ -47,24 +47,32 @@ module AffinityFinder
     end
 
     # Returns Array[Int] (matched Person Ids)
-    def self.with_matched_id_numbers(person)
+    def self.with_matched_id_numbers(person, person_ids_filter = [])
       # This method matches person identification numbers
       # (exact match or one containg the other) on Identification collection.
       # The query use REGEXP operator in MySQL in order to get the result
       # in a single call (https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp)
       return [] if person.identifications.pluck(:number).empty?
 
-      Identification.current.where(
+      matched_ids = Identification.current.where(
         "identifications.person_id <> :person_id AND
         (LOWER(number) REGEXP LOWER(:numbers)
         OR LOWER(:numbers) REGEXP LOWER(number))",
         person_id: person.id,
         numbers: person.identifications.pluck(:number).join('|')
-      ).pluck(:person_id).uniq
+      )
+
+      if person_ids_filter.present?
+        matched_ids = matched_ids.where(
+          person_id: person_ids_filter
+        )
+      end
+
+      matched_ids.pluck(:person_id).uniq
     end
 
     # Returns Array[Int] (matched Person Ids)
-    def self.with_matched_names(person)
+    def self.with_matched_names(person, person_ids_filter = [])
       case person.person_type
         when :natural_person
           return [] if person.natural_dockets.count == 0
@@ -79,7 +87,7 @@ module AffinityFinder
             "
           end
 
-          match_names = NaturalDocket.current.where(
+          matched_names = NaturalDocket.current.where(
                           "natural_dockets.person_id <> :person_id AND
                           ((first_name IN (:words) AND last_name IN (:words)) OR
                           (#{conditions.join(' AND ')}))",
@@ -87,7 +95,13 @@ module AffinityFinder
                           words: full_name.split(/\W+/),
                         )
 
-          match_names.pluck(:person_id).uniq
+          if person_ids_filter.present?
+            matched_names = matched_names.where(
+              person_id: person_ids_filter
+            )
+          end
+
+          matched_names.pluck(:person_id).uniq
         when :legal_entity
           return [] if person.legal_entity_dockets.count == 0
 
@@ -101,15 +115,21 @@ module AffinityFinder
             'LOWER(legal_name) = :legal_name'
           ) if !docket.legal_name.blank?
 
-          legal_matches = LegalEntityDocket.current.where.not(person: person)
-
-          LegalEntityDocket.current.where(
+          legal_matches =LegalEntityDocket.current.where(
             "legal_entity_dockets.person_id <> :person_id AND
             (#{legal_match_conditions.join(' OR ')})",
             person_id: person.id,
             commercial_name: docket.commercial_name&.downcase,
             legal_name: docket.legal_name&.downcase
-          ).pluck(:person_id).uniq
+          )
+
+          if person_ids_filter.present?
+            legal_matches = legal_matches.where(
+              person_id: person_ids_filter
+            )
+          end
+
+          legal_matches.pluck(:person_id).uniq
         else
           return []
       end
