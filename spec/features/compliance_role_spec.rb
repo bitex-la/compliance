@@ -175,7 +175,7 @@ describe 'a compliance role admin user' do
       click_link 'Remove'
     end
 
-    Capybara.using_wait_time(10) do
+    Capybara.using_wait_time(15) do
       expect(page).to have_content('Domicile seed was successfully destroyed.')
     end
   end
