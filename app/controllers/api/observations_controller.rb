@@ -1,6 +1,6 @@
 class Api::ObservationsController < Api::EntityController
   def resource_class
-    Observation
+    Observation.current
   end
 
   protected
