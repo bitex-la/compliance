@@ -149,5 +149,9 @@ RSpec.describe Observation, type: :model do
 
     expect(Observation.current.count).to eq(1)
     expect(Observation.current.last).to eq(obs1)
+
+    Timecop.travel future_issue.defer_until
+    expect(Observation.current.count).to eq(2)
+    expect(Observation.current.last).to eq(obs2)
   end
 end
