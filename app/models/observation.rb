@@ -69,7 +69,7 @@ class Observation < ApplicationRecord
   }
 
   scope :current, -> { 
-    where("issue_id in (?)", Issue.current.select(:id))
+    merge(Issue.current)
   }
 
   aasm do
