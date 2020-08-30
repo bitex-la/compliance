@@ -409,7 +409,8 @@ class Issue < ApplicationRecord
   end
 
   def fulfil_affinity_relationships
-    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person
+    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person &&
+                  affinity_seeds&.first&.auto_created
 
     SamePersonAffinity::Fulfilment.call(affinity_seeds)
   end
