@@ -42,6 +42,52 @@ class Issue < ApplicationRecord
     errors.add(:reason, "change reason is not allowed!")
   end
 
+  validate :only_one_same_person_affinity,
+           :manual_same_person_affinities_with_no_relations,
+           :same_person_father_son_consistency
+
+  def only_one_same_person_affinity
+    # validates that only one same_personn affinity can exist in a issue
+    # and must be the only affinity seed.
+    # I decided to create this restriction because the fulfiment process of
+    # a same_person relationship could be intrincate
+    # (see cases in spec/services/same_person_affinity/finder_spec.rb)
+    return unless affinity_seeds.exists?(affinity_kind_id: AffinityKind.same_person.id) &&
+                  affinity_seeds.count > 1
+
+    errors.add(:reason, "there can be only one same_person affinity per issue. And only one")
+  end
+
+  def manual_same_person_affinities_with_no_relations
+    # validates that a manual same_person affinity relates
+    # persons that has no existing same_person relations.
+    # because fulfil process is not called in this cases
+    return unless affinity_seeds.exists?(
+                    affinity_kind_id: AffinityKind.same_person.id,
+                    auto_created: false
+                  ) &&
+                  affinity_seeds.count > 1
+
+    return unless person.affinities.exists?(affinity_kind_id: AffinityKind.same_person.id) ||
+                  affinity_seeds.first.related_person.affinities.exists?(affinity_kind_id: AffinityKind.same_person.id)
+
+    errors.add(:reason, "no previous relations could exist between persons in a new manual same_person relationship.")
+  end
+
+  def same_person_father_son_consistency
+    # in a same person affinity, the oldest (lower ID)
+    # must be the "father" issue's person
+    return unless affinity_seeds.exists?(
+      affinity_kind_id: AffinityKind.same_person.id,
+      auto_created: false
+    ) &&
+    affinity_seeds.count > 1 &&
+    person.id < affinity_seeds.first.related_person_id
+
+    # TODO: change the copy of the error. more clear to the end user
+    errors.add(:reason, "the oldest person in the system (lower id) must be the first person related")
+  end
+
   belongs_to :lock_admin_user, class_name: "AdminUser", foreign_key: "lock_admin_user_id", optional: true
   validate :locked_issue_cannot_changed
 
