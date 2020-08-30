@@ -8,8 +8,10 @@ describe SamePersonAffinity::Fulfilment do
       #            +------------------------+
       #   Before:  | Person_A (id number_a) |
       #            +------------------------+
+      person_a = create_person_with_identification('number_a')
 
       #   Action: a Person_B has set a new id to number_a
+      person_b = create_person_with_identification('number_a')
 
       #   After: Issue is created in Person_A with affinity same_person
       #         with realted_person: Person_B.
@@ -17,9 +19,6 @@ describe SamePersonAffinity::Fulfilment do
       #           +------------------------+    +-----------------------+
       #           | Person_A (id number_a) | -> | Person_B(id number_a) |
       #           +------------------------+    +-----------------------+
-      person_a = create_person_with_identification('number_a')
-      person_b = create_person_with_identification('number_a')
-
       SamePersonAffinity::Finder.call(person_b)
 
       expect do
@@ -37,8 +36,14 @@ describe SamePersonAffinity::Fulfilment do
       #            +----------------------+    +---------------------+
       #   Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
       #            +----------------------+    +---------------------+
+      person_a = create_person_with_identification('ABC123')
+      person_b = create_person_with_identification('ABC123')
+      SamePersonAffinity::Finder.call(person_b)
+      person_a.issues.last.approve!
 
       #   Action: a Person_C has set a new id to BC12
+      person_c = create_person_with_identification('BC12')
+
 
       #   After: Issue is created in Person_A with affinity same_person
       #         with realted_person: Person_C
@@ -49,14 +54,6 @@ describe SamePersonAffinity::Fulfilment do
       #                                    \   +--------------------+
       #                                     -> | Person_C (id BC12) |
       #                                        +--------------------+
-
-      person_a = create_person_with_identification('ABC123')
-      person_b = create_person_with_identification('ABC123')
-      SamePersonAffinity::Finder.call(person_b)
-      person_a.issues.last.approve!
-
-      person_c = create_person_with_identification('BC12')
-
       SamePersonAffinity::Finder.call(person_c)
 
       expect do
@@ -93,8 +90,13 @@ describe SamePersonAffinity::Fulfilment do
       #            +----------------------+    +---------------------+
       #   Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
       #            +----------------------+    +---------------------+
+      person_a = create_person_with_identification('ABC123')
+      person_b = create_person_with_identification('ABC123')
+      SamePersonAffinity::Finder.call(person_b)
+      person_a.issues.last.approve!
 
       #   Action: Person_A has a new id DEF456
+      change_person_identification(person_a, 'DEF456')
 
       #   After: Issue is created in Person_A to replace existing affinity with
       #          Person_B, setting archived_at attribute to issue created date
@@ -103,15 +105,6 @@ describe SamePersonAffinity::Fulfilment do
       #            +----------------------+    +---------------------+
       #            | Person_A (id DEF456) |    | Person_B(id ABC123) |
       #            +----------------------+    +---------------------+
-      person_a = create_person_with_identification('ABC123')
-      person_b = create_person_with_identification('ABC123')
-      SamePersonAffinity::Finder.call(person_b)
-      person_a.issues.last.approve!
-
-      current_same_person_affinity = person_a.affinities.last
-
-      change_person_identification(person_a, 'DEF456')
-
       SamePersonAffinity::Finder.call(person_a)
 
       expect do
@@ -135,9 +128,21 @@ describe SamePersonAffinity::Fulfilment do
       #                                      \   +-----------------------+
       #                                       -> | Person_E (id DEF456)  |
       #                                          +-----------------------+
+      person_a = create_person_with_identification('DEF456')
+      person_b = create_person_with_identification('ABC123')
+      person_c = create_person_with_identification('ABC123')
+      person_d = create_person_with_identification('DEF456')
+      person_e = create_person_with_identification('DEF456')
 
+      SamePersonAffinity::Finder.call(person_a)
+      person_a.issues[-1].approve!
+      person_a.issues[-2].approve!
+      SamePersonAffinity::Finder.call(person_b)
+      person_b.issues.last.approve!
 
       #     Action: Person_B has a new id DEF456
+      change_person_identification(person_b, 'DEF456')
+      person_b.reload
 
       #     After: Issue is created in Person_A with affinity same_person
       #           with realted_person: Person_B. On issue approval, Person_B relationship
@@ -155,22 +160,6 @@ describe SamePersonAffinity::Fulfilment do
       #                                      \   +-------------------------+
       #                                       -> | Person_B (id DEF456)    |
       #                                          +-------------------------+
-
-      person_a = create_person_with_identification('DEF456')
-      person_b = create_person_with_identification('ABC123')
-      person_c = create_person_with_identification('ABC123')
-      person_d = create_person_with_identification('DEF456')
-      person_e = create_person_with_identification('DEF456')
-
-      SamePersonAffinity::Finder.call(person_a)
-      person_a.issues[-1].approve!
-      person_a.issues[-2].approve!
-      SamePersonAffinity::Finder.call(person_b)
-      person_b.issues.last.approve!
-
-      change_person_identification(person_b, 'DEF456')
-      person_b.reload
-
       expect do
         SamePersonAffinity::Finder.call(person_b)
       end.to change{Issue.count}.by(1)
@@ -208,8 +197,20 @@ describe SamePersonAffinity::Fulfilment do
       #                                    \   +----------------------+
       #                                     -> | Person_E (id DEF456) |
       #                                        +----------------------+
+      person_a = create_person_with_identification('ABC123')
+      person_b = create_person_with_identification('ABC123')
+      person_c = create_person_with_identification('DEF456')
+      person_d = create_person_with_identification('DEF456')
+      person_e = create_person_with_identification('DEF456')
+
+      SamePersonAffinity::Finder.call(person_a)
+      person_a.issues.last.approve!
+      SamePersonAffinity::Finder.call(person_c)
+      person_c.issues[-1].approve!
+      person_c.issues[-2].approve!
 
       #   Action: Person_B has a new id DEF456
+      change_person_identification(person_b, 'DEF456')
 
       #   After: Issue is created in Person_B with affinity same_person
       #         with Person_C. When this issue is approved, the existing relationship
@@ -227,20 +228,6 @@ describe SamePersonAffinity::Fulfilment do
       #                                    \   +-------------------------+
       #                                     -> | Person_E (id DEF456)    |
       #                                         +-------------------------+
-      person_a = create_person_with_identification('ABC123')
-      person_b = create_person_with_identification('ABC123')
-      person_c = create_person_with_identification('DEF456')
-      person_d = create_person_with_identification('DEF456')
-      person_e = create_person_with_identification('DEF456')
-
-      SamePersonAffinity::Finder.call(person_a)
-      person_a.issues.last.approve!
-      SamePersonAffinity::Finder.call(person_c)
-      person_c.issues[-1].approve!
-      person_c.issues[-2].approve!
-
-      change_person_identification(person_b, 'DEF456')
-
       SamePersonAffinity::Finder.call(person_b)
 
       person_b.reload
@@ -276,19 +263,6 @@ describe SamePersonAffinity::Fulfilment do
       #           +----------------------+
       #           | Person_D (id DEF456) |
       #           +----------------------+
-
-      #   Action: Person_A has a new id DEF456
-
-      #   After: Issue is created in Person_A with affinity same_person to Person_D
-
-      #         If issue is approved:
-
-      #           Person_B -> Person_C
-
-      #           +----------------------+      +---------------------+
-      #           | Person_A (id DEF456) |  ->  | Person_D(id DEF456) |
-      #           +----------------------+      +---------------------+
-
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
       person_c = create_person_with_identification('ABC123')
@@ -300,9 +274,19 @@ describe SamePersonAffinity::Fulfilment do
       person_a.issues[-1].approve!
       person_a.issues[-2].approve!
 
+      #   Action: Person_A has a new id DEF456
       change_person_identification(person_a, 'DEF456')
       person_a.reload
 
+      #   After: Issue is created in Person_A with affinity same_person to Person_D
+
+      #         If issue is approved:
+
+      #           Person_B -> Person_C
+
+      #           +----------------------+      +---------------------+
+      #           | Person_A (id DEF456) |  ->  | Person_D(id DEF456) |
+      #           +----------------------+      +---------------------+
       SamePersonAffinity::Finder.call(person_a)
       person_a.reload
 
@@ -329,8 +313,17 @@ describe SamePersonAffinity::Fulfilment do
       #  Before:  | Person_A (id ABC123) | -> | Person_B(id ABC123) |
       #           |  (name John P.)      |    |  (name: Juan Perez) |
       #           +----------------------+    +---------------------+
+      person_a = create_person_with_identification('ABC123')
+      person_b = create_person_with_identification('ABC123')
+
+      SamePersonAffinity::Finder.call(person_a)
+      person_a.issues.last.approve!
+
+      change_person_name(person_a, 'John', 'P.')
+      change_person_name(person_b, 'Juan', 'Perez')
 
       #   Action: Person_C is created with id DEF456 and name Juan Perez
+      person_c = create_natural_person_with_docket('Juan', 'Perez')
 
       #   After: Issue is created in Person_B with affinity same_person (name) to Person_C
 
@@ -344,18 +337,6 @@ describe SamePersonAffinity::Fulfilment do
       #                                    -> | Person_C (id DEF456) |
       #                                       |  (name: Juan Perez)  |
       #                                       +----------------------+
-
-      person_a = create_person_with_identification('ABC123')
-      person_b = create_person_with_identification('ABC123')
-
-      SamePersonAffinity::Finder.call(person_a)
-      person_a.issues.last.approve!
-
-      change_person_name(person_a, 'John', 'P.')
-      change_person_name(person_b, 'Juan', 'Perez')
-
-      person_c = create_natural_person_with_docket('Juan', 'Perez')
-
       SamePersonAffinity::Finder.call(person_c)
       person_b.reload
 
@@ -384,8 +365,25 @@ describe SamePersonAffinity::Fulfilment do
       #             +----------------------+
       #             | Person_D (name jona) |
       #             +----------------------+
+      person_a = create_person_with_identification('ABC123')
+      person_b = create_person_with_identification('ABC123')
+      SamePersonAffinity::Finder.call(person_a)
+      person_a.issues.last.approve!
+      person_c = create_natural_person_with_docket('John', 'Doe')
+
+      change_person_name(person_a, 'John', 'Doe')
+      person_a.reload
+
+      SamePersonAffinity::Finder.call(person_c)
+
+      person_a.issues.last.approve!
+
+      person_d = create_natural_person_with_docket('Jona', 'Brother')
+
 
       #     Action: Person_A has a new name Jona
+      change_person_name(person_a, 'Jona', 'Brother')
+      person_a.reload
 
       #     After: Issue is created in Person_A with affinity same_person to Person_D
 
@@ -403,27 +401,6 @@ describe SamePersonAffinity::Fulfilment do
       #             +----------------------+
       #             | Person_C (name john) |
       #             +----------------------+
-
-      person_a = create_person_with_identification('ABC123')
-      person_b = create_person_with_identification('ABC123')
-      SamePersonAffinity::Finder.call(person_a)
-      person_a.issues.last.approve!
-
-      person_c = create_natural_person_with_docket('John', 'Doe')
-
-      change_person_name(person_a, 'John', 'Doe')
-      person_a.reload
-
-      SamePersonAffinity::Finder.call(person_c)
-
-      person_a.issues.last.approve!
-
-      person_d = create_natural_person_with_docket('Jona', 'Brother')
-
-      change_person_name(person_a, 'Jona', 'Brother')
-
-      person_a.reload
-
       SamePersonAffinity::Finder.call(person_a)
 
       person_a.reload
@@ -453,27 +430,6 @@ describe SamePersonAffinity::Fulfilment do
       #                                     \   +---------------------------------+
       #                                      -> | Person_F (name john, id GHI789) |
       #                                         +---------------------------------+
-
-
-      #   Action: Person_F has a new id ABC123
-
-      #   After: Issue is created in Person_A with affinity same_person to Person_F?
-
-      #         If issue is approved:
-      #           +----------------------+       +----------------------+
-      #           | Person_A (id ABC123) |  ->   | Person_B (id ABC123) |
-      #           +----------------------+       +----------------------+
-      #                             \   \        +---------------------------------+
-      #                              \    -----> | Person_D (id DEF456, name John) |
-      #                               \          +---------------------------------+
-      #                                \
-      #                                 \         +---------------------+
-      #                                  \ -----> | Person_E(id DEF456) |
-      #                                   \       +---------------------+
-      #                                    \   +---------------------------------+
-      #                                     -> | Person_F (name john, id ABC123) |
-      #                                        +---------------------------------+
-
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
       SamePersonAffinity::Finder.call(person_a)
@@ -497,9 +453,26 @@ describe SamePersonAffinity::Fulfilment do
 
       person_d.issues.last.approve!
 
+      #   Action: Person_F has a new id ABC123
       change_person_identification(person_f, 'ABC123')
-
       person_f.reload
+
+      #   After: Issue is created in Person_A with affinity same_person to Person_F?
+
+      #         If issue is approved:
+      #           +----------------------+       +----------------------+
+      #           | Person_A (id ABC123) |  ->   | Person_B (id ABC123) |
+      #           +----------------------+       +----------------------+
+      #                             \   \        +---------------------------------+
+      #                              \    -----> | Person_D (id DEF456, name John) |
+      #                               \          +---------------------------------+
+      #                                \
+      #                                 \         +---------------------+
+      #                                  \ -----> | Person_E(id DEF456) |
+      #                                   \       +---------------------+
+      #                                    \   +---------------------------------+
+      #                                     -> | Person_F (name john, id ABC123) |
+      #                                        +---------------------------------+
       SamePersonAffinity::Finder.call(person_f)
 
       person_a.reload
