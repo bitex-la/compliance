@@ -161,7 +161,8 @@ module SamePersonAffinity
           related_person: Person.find(orphan_id),
           affinity_kind: affinity_kind,
           replaces: current_affinity,
-          archived_at: Date.current
+          archived_at: Date.current,
+          auto_created: true
         )
 
         issue.save!

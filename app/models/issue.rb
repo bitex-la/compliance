@@ -416,7 +416,8 @@ class Issue < ApplicationRecord
   end
 
   def fulfil_affinity_after_process
-    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person
+    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person &&
+                  affinity_seeds&.first&.auto_created
 
     SamePersonAffinity::Fulfilment.after_process(affinity_seeds)
   end

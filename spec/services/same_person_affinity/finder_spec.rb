@@ -316,7 +316,8 @@ describe SamePersonAffinity::Finder do
       expect(affinity_seed).to have_attributes({
         related_person_id: person_b.id,
         affinity_kind_id: affinity_kind.id,
-        replaces: current_same_person_affinity
+        replaces: current_same_person_affinity,
+        auto_created: true
       })
     end
 

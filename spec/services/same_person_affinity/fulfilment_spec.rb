@@ -452,9 +452,7 @@ describe SamePersonAffinity::Fulfilment do
       person_d.reload
       person_f.reload
 
-
       SamePersonAffinity::Finder.call(person_d)
-
       person_d.issues.last.approve!
 
       #   Action: Person_F has a new id ABC123
@@ -477,7 +475,9 @@ describe SamePersonAffinity::Fulfilment do
       #                                    \   +---------------------------------+
       #                                     -> | Person_F (name john, id ABC123) |
       #                                        +---------------------------------+
-      SamePersonAffinity::Finder.call(person_f)
+      expect do
+        SamePersonAffinity::Finder.call(person_f)
+      end.to change{person_a.issues.count}.by(1)
 
       person_a.reload
       expect do
