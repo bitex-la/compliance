@@ -1,5 +1,5 @@
-module AffinityFinder
-  class SamePerson
+module SamePersonAffinity
+  class Finder
     # Returns Array[Int] (person_ids of orphans if any) DEPRECATED
     # Returns VOID (all arrengements on children are going to happen
     # in issue approval process)

@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-describe AffinityFinder::SamePerson do
+describe SamePersonAffinity::Finder do
   describe '.with_matched_id_numbers' do
     it 'matches exact numbers' do
       person_a = create_person_with_identification('abc123')
       person_b = create_person_with_identification('abc123')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to eq(
         [person_a.id]
       )
 
@@ -14,7 +14,7 @@ describe AffinityFinder::SamePerson do
       person_c = create_person_with_identification('def456')
       person_d = create_person_with_identification('DEF456')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_c)).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_c)).to match_array(
         [person_b.id, person_d.id]
       )
     end
@@ -23,7 +23,7 @@ describe AffinityFinder::SamePerson do
       person_a = create_person_with_identification('abc123')
       person_b = create_person_with_identification('zabc1234')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to eq(
         [person_a.id]
       )
 
@@ -31,7 +31,7 @@ describe AffinityFinder::SamePerson do
       person_c = create_person_with_identification('adef4567')
       person_d = create_person_with_identification('zdef4568')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to match_array(
         [person_a.id, person_c.id, person_d.id]
       )
     end
@@ -41,7 +41,7 @@ describe AffinityFinder::SamePerson do
       person_b = create_person_with_identification('abc123')
       person_c = create_person_with_identification('def456')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to eq(
         [person_a.id]
       )
     end
@@ -51,7 +51,7 @@ describe AffinityFinder::SamePerson do
       person_b = create_person_with_identification('abc1234')
       person_c = create_person_with_identification('def456')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to eq(
         [person_a.id]
       )
     end
@@ -61,7 +61,7 @@ describe AffinityFinder::SamePerson do
       person_b = create_person_with_identification('abc123')
       person_c = create_person_with_identification('def456')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to eq(
         [person_a.id]
       )
     end
@@ -71,7 +71,7 @@ describe AffinityFinder::SamePerson do
       person_b = create_person_with_identification('zabc123')
       person_c = create_person_with_identification('def456')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to eq(
         [person_a.id]
       )
     end
@@ -80,7 +80,7 @@ describe AffinityFinder::SamePerson do
       person_a = create_person_with_identification('abc123')
       person_b = create_person_with_identification('def456')
 
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_b)).to eq(
         []
       )
     end
@@ -93,7 +93,7 @@ describe AffinityFinder::SamePerson do
       person_e = create_person_with_identification('abc12345')
 
       person_ids_filter = [person_c.id, person_d.id, person_e.id]
-      expect(AffinityFinder::SamePerson.with_matched_id_numbers(person_a, person_ids_filter)).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_id_numbers(person_a, person_ids_filter)).to match_array(
         [person_c.id, person_e.id]
       )
     end
@@ -117,15 +117,15 @@ describe AffinityFinder::SamePerson do
       legal_person_c = create_legal_person_with_docket(nil, 'Apple Inc.')
       legal_person_d = create_legal_person_with_docket(nil, 'APPLE INC.')
 
-      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_names(person_b)).to match_array(
         [person_a.id, person_c.id]
       )
 
-      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_names(legal_person_b)).to eq(
         [legal_person_a.id]
       )
 
-      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_d)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_names(legal_person_d)).to eq(
         [legal_person_c.id]
       )
     end
@@ -147,11 +147,11 @@ describe AffinityFinder::SamePerson do
       legal_person_c = create_legal_person_with_docket('acme', nil)
       legal_person_d = create_legal_person_with_docket('other company', nil)
 
-      expect(AffinityFinder::SamePerson.with_matched_names(person_a, [person_c.id, person_f.id])).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_names(person_a, [person_c.id, person_f.id])).to match_array(
         [person_c.id]
       )
 
-      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_a, [legal_person_c.id, legal_person_d.id])).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_names(legal_person_a, [legal_person_c.id, legal_person_d.id])).to match_array(
         [legal_person_c.id]
       )
     end
@@ -163,7 +163,7 @@ describe AffinityFinder::SamePerson do
       person_d = create_natural_person_with_docket('Pedro Juan', 'García Perez')
       person_e = create_natural_person_with_docket('Not the Droid', 'U are looking for')
 
-      expect(AffinityFinder::SamePerson.with_matched_names(person_a)).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_names(person_a)).to match_array(
         [person_b.id, person_c.id, person_d.id]
       )
     end
@@ -173,7 +173,7 @@ describe AffinityFinder::SamePerson do
       person_b = create_natural_person_with_docket('Juan Antonio', 'Perez')
       person_c = create_natural_person_with_docket('antonio', 'juan Perez')
 
-      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to match_array(
+      expect(SamePersonAffinity::Finder.with_matched_names(person_b)).to match_array(
         [person_a.id, person_c.id]
       )
     end
@@ -190,15 +190,15 @@ describe AffinityFinder::SamePerson do
       legal_person_c = create_legal_person_with_docket(nil, 'ACME Inc.')
       legal_person_d = create_legal_person_with_docket(nil, 'ACME S.A.')
 
-      expect(AffinityFinder::SamePerson.with_matched_names(person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_names(person_b)).to eq(
         []
       )
 
-      expect(AffinityFinder::SamePerson.with_matched_names(person_c)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_names(person_c)).to eq(
         []
       )
 
-      expect(AffinityFinder::SamePerson.with_matched_names(legal_person_b)).to eq(
+      expect(SamePersonAffinity::Finder.with_matched_names(legal_person_b)).to eq(
         []
       )
 
@@ -225,7 +225,7 @@ describe AffinityFinder::SamePerson do
       person_b = create_person_with_identification('number_a')
 
       expect do
-        AffinityFinder::SamePerson.call(person_b)
+        SamePersonAffinity::Finder.call(person_b)
       end.to change{person_a.issues.count}.by(1)
 
       affinity_seed = person_a.issues.last.affinity_seeds.first
@@ -239,7 +239,7 @@ describe AffinityFinder::SamePerson do
       # check that no issue is created if another one is pending
       expect do
         # explain why this edge case (ie. create person_b)
-        AffinityFinder::SamePerson.call(person_b)
+        SamePersonAffinity::Finder.call(person_b)
       end.to change{person_a.issues.count}.by(0)
     end
 
@@ -264,13 +264,13 @@ describe AffinityFinder::SamePerson do
 
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
       person_a.issues.last.approve!
 
       person_c = create_person_with_identification('BC12')
 
       expect do
-        AffinityFinder::SamePerson.call(person_c)
+        SamePersonAffinity::Finder.call(person_c)
       end.to change{person_a.issues.count}.by(1)
 
       # C. Inverse partial match with existing relation
@@ -283,7 +283,7 @@ describe AffinityFinder::SamePerson do
       person_d = create_person_with_identification('XABC1234Z')
 
       expect do
-        AffinityFinder::SamePerson.call(person_d)
+        SamePersonAffinity::Finder.call(person_d)
       end.to change{person_a.issues.count}.by(1)
     end
 
@@ -305,7 +305,7 @@ describe AffinityFinder::SamePerson do
       #            +----------------------+    +---------------------+
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
       person_a.issues.last.approve!
 
       current_same_person_affinity = person_a.affinities.last
@@ -313,7 +313,7 @@ describe AffinityFinder::SamePerson do
       change_person_identification(person_a, 'DEF456')
 
       expect do
-        AffinityFinder::SamePerson.call(person_a)
+        SamePersonAffinity::Finder.call(person_a)
       end.to change{person_a.issues.count}.by(1)
 
       affinity_seed = person_a.issues.last.affinity_seeds.first
@@ -369,17 +369,17 @@ describe AffinityFinder::SamePerson do
       person_d = create_person_with_identification('DEF456')
       person_e = create_person_with_identification('DEF456')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues[-1].approve!
       person_a.issues[-2].approve!
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
       person_b.issues.last.approve!
 
       change_person_identification(person_b, 'DEF456')
       person_b.reload
 
       expect do
-        AffinityFinder::SamePerson.call(person_b)
+        SamePersonAffinity::Finder.call(person_b)
       end.to change{Issue.count}.by(1)
 
       issue = Issue.last
@@ -433,16 +433,16 @@ describe AffinityFinder::SamePerson do
       person_d = create_person_with_identification('DEF456')
       person_e = create_person_with_identification('DEF456')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
-      AffinityFinder::SamePerson.call(person_c)
+      SamePersonAffinity::Finder.call(person_c)
       person_c.issues[-1].approve!
       person_c.issues[-2].approve!
 
       change_person_identification(person_b, 'DEF456')
 
       expect do
-        AffinityFinder::SamePerson.call(person_b)
+        SamePersonAffinity::Finder.call(person_b)
       end.to change{Issue.count}.by(1)
 
       issue = Issue.last
@@ -492,7 +492,7 @@ describe AffinityFinder::SamePerson do
       person_c = create_person_with_identification('ABC123')
       person_d = create_person_with_identification('DEF456')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues[-1].approve!
       person_a.issues[-2].approve!
 
@@ -500,7 +500,7 @@ describe AffinityFinder::SamePerson do
       person_a.reload
 
       expect do
-        AffinityFinder::SamePerson.call(person_a)
+        SamePersonAffinity::Finder.call(person_a)
       end.to change{Issue.count}.by(1)
 
       issue = Issue.last
@@ -540,7 +540,7 @@ describe AffinityFinder::SamePerson do
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
 
       change_person_name(person_a, 'John', 'P.')
@@ -549,7 +549,7 @@ describe AffinityFinder::SamePerson do
       person_c = create_natural_person_with_docket('Juan', 'Perez')
 
       expect do
-        AffinityFinder::SamePerson.call(person_c)
+        SamePersonAffinity::Finder.call(person_c)
       end.to change{Issue.count}.by(1)
 
       issue = Issue.last
@@ -599,7 +599,7 @@ describe AffinityFinder::SamePerson do
 
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
 
       person_c = create_natural_person_with_docket('John', 'Doe')
@@ -607,7 +607,7 @@ describe AffinityFinder::SamePerson do
       change_person_name(person_a, 'John', 'Doe')
       person_a.reload
 
-      AffinityFinder::SamePerson.call(person_c)
+      SamePersonAffinity::Finder.call(person_c)
 
       person_a.issues.last.approve!
 
@@ -618,7 +618,7 @@ describe AffinityFinder::SamePerson do
       person_a.reload
 
       expect do
-        AffinityFinder::SamePerson.call(person_a)
+        SamePersonAffinity::Finder.call(person_a)
       end.to change{Issue.count}.by(1)
 
       issue = Issue.last
@@ -670,12 +670,12 @@ describe AffinityFinder::SamePerson do
 
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
 
       person_d = create_person_with_identification('DEF456')
       person_e = create_person_with_identification('DEF456')
-      AffinityFinder::SamePerson.call(person_d)
+      SamePersonAffinity::Finder.call(person_d)
       person_d.issues.last.approve!
 
       person_f = create_person_with_identification('GHI789')
@@ -687,7 +687,7 @@ describe AffinityFinder::SamePerson do
       person_f.reload
 
       expect do
-        AffinityFinder::SamePerson.call(person_d)
+        SamePersonAffinity::Finder.call(person_d)
       end.to change{person_d.issues.count}.by(1)
 
       person_d.issues.last.approve!
@@ -695,7 +695,7 @@ describe AffinityFinder::SamePerson do
       change_person_identification(person_f, 'ABC123')
 
       expect do
-        AffinityFinder::SamePerson.call(person_f)
+        SamePersonAffinity::Finder.call(person_f)
       end.to change{Issue.count}.by(1)
 
       issue = Issue.last

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Util::AffinityFulfilment do
+describe SamePersonAffinity::Fulfilment do
   describe '.call' do
 
     it 'fulfil a same_person AffinitySeed issue when found exact matches' do
@@ -20,7 +20,7 @@ describe Util::AffinityFulfilment do
       person_a = create_person_with_identification('number_a')
       person_b = create_person_with_identification('number_a')
 
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
 
       expect do
         person_a.issues.last.approve!
@@ -48,12 +48,12 @@ describe Util::AffinityFulfilment do
 
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
       person_a.issues.last.approve!
 
       person_c = create_person_with_identification('BC12')
 
-      AffinityFinder::SamePerson.call(person_c)
+      SamePersonAffinity::Finder.call(person_c)
 
       expect do
         person_a.issues.last.approve!
@@ -72,7 +72,7 @@ describe Util::AffinityFulfilment do
 
       person_d = create_person_with_identification('XABC1234Z')
 
-      AffinityFinder::SamePerson.call(person_d)
+      SamePersonAffinity::Finder.call(person_d)
 
       expect do
         person_a.issues.last.approve!
@@ -101,14 +101,14 @@ describe Util::AffinityFulfilment do
       #            +----------------------+    +---------------------+
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
       person_a.issues.last.approve!
 
       current_same_person_affinity = person_a.affinities.last
 
       change_person_identification(person_a, 'DEF456')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
 
       expect do
         person_a.issues.last.approve!
@@ -158,17 +158,17 @@ describe Util::AffinityFulfilment do
       person_d = create_person_with_identification('DEF456')
       person_e = create_person_with_identification('DEF456')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues[-1].approve!
       person_a.issues[-2].approve!
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
       person_b.issues.last.approve!
 
       change_person_identification(person_b, 'DEF456')
       person_b.reload
 
       expect do
-        AffinityFinder::SamePerson.call(person_b)
+        SamePersonAffinity::Finder.call(person_b)
       end.to change{Issue.count}.by(1)
       person_a.reload
 
@@ -229,15 +229,15 @@ describe Util::AffinityFulfilment do
       person_d = create_person_with_identification('DEF456')
       person_e = create_person_with_identification('DEF456')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
-      AffinityFinder::SamePerson.call(person_c)
+      SamePersonAffinity::Finder.call(person_c)
       person_c.issues[-1].approve!
       person_c.issues[-2].approve!
 
       change_person_identification(person_b, 'DEF456')
 
-      AffinityFinder::SamePerson.call(person_b)
+      SamePersonAffinity::Finder.call(person_b)
 
       person_b.reload
       expect do
@@ -290,7 +290,7 @@ describe Util::AffinityFulfilment do
       person_c = create_person_with_identification('ABC123')
       person_d = create_person_with_identification('DEF456')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
 
       person_a.reload
       person_a.issues[-1].approve!
@@ -299,7 +299,7 @@ describe Util::AffinityFulfilment do
       change_person_identification(person_a, 'DEF456')
       person_a.reload
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.reload
 
       expect do
@@ -344,7 +344,7 @@ describe Util::AffinityFulfilment do
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
 
       change_person_name(person_a, 'John', 'P.')
@@ -352,7 +352,7 @@ describe Util::AffinityFulfilment do
 
       person_c = create_natural_person_with_docket('Juan', 'Perez')
 
-      AffinityFinder::SamePerson.call(person_c)
+      SamePersonAffinity::Finder.call(person_c)
       person_b.reload
 
       expect do
@@ -402,7 +402,7 @@ describe Util::AffinityFulfilment do
 
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
 
       person_c = create_natural_person_with_docket('John', 'Doe')
@@ -410,7 +410,7 @@ describe Util::AffinityFulfilment do
       change_person_name(person_a, 'John', 'Doe')
       person_a.reload
 
-      AffinityFinder::SamePerson.call(person_c)
+      SamePersonAffinity::Finder.call(person_c)
 
       person_a.issues.last.approve!
 
@@ -420,7 +420,7 @@ describe Util::AffinityFulfilment do
 
       person_a.reload
 
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
 
       person_a.reload
       expect do
@@ -472,12 +472,12 @@ describe Util::AffinityFulfilment do
 
       person_a = create_person_with_identification('ABC123')
       person_b = create_person_with_identification('ABC123')
-      AffinityFinder::SamePerson.call(person_a)
+      SamePersonAffinity::Finder.call(person_a)
       person_a.issues.last.approve!
 
       person_d = create_person_with_identification('DEF456')
       person_e = create_person_with_identification('DEF456')
-      AffinityFinder::SamePerson.call(person_d)
+      SamePersonAffinity::Finder.call(person_d)
       person_d.issues.last.approve!
 
       person_f = create_person_with_identification('GHI789')
@@ -489,14 +489,14 @@ describe Util::AffinityFulfilment do
       person_f.reload
 
 
-      AffinityFinder::SamePerson.call(person_d)
+      SamePersonAffinity::Finder.call(person_d)
 
       person_d.issues.last.approve!
 
       change_person_identification(person_f, 'ABC123')
 
       person_f.reload
-      AffinityFinder::SamePerson.call(person_f)
+      SamePersonAffinity::Finder.call(person_f)
 
       person_a.reload
       expect do
