@@ -141,7 +141,8 @@ module SamePersonAffinity
       issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
       issue.affinity_seeds.build(
         related_person: related_person,
-        affinity_kind: AffinityKind.same_person
+        affinity_kind: AffinityKind.same_person,
+        auto_created: true
       )
 
       issue.save

@@ -233,7 +233,8 @@ describe SamePersonAffinity::Finder do
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_b.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: affinity_kind.id,
+        auto_created: true
       })
 
       # check that no issue is created if another one is pending
@@ -293,6 +294,7 @@ describe SamePersonAffinity::Finder do
       person_b = create_person_with_identification('ABC123')
       SamePersonAffinity::Finder.call(person_b)
       person_a.issues.last.approve!
+      current_same_person_affinity = person_a.affinities.last
 
       #   Action: Person_A has a new id DEF456
       change_person_identification(person_a, 'DEF456')
@@ -375,7 +377,8 @@ describe SamePersonAffinity::Finder do
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_b.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: affinity_kind.id,
+        auto_created: true
       })
     end
 
@@ -436,7 +439,8 @@ describe SamePersonAffinity::Finder do
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_c.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: affinity_kind.id,
+        auto_created: true
       })
     end
 
@@ -491,7 +495,8 @@ describe SamePersonAffinity::Finder do
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_d.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: affinity_kind.id,
+        auto_created: true
       })
     end
 
@@ -537,7 +542,8 @@ describe SamePersonAffinity::Finder do
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_c.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: affinity_kind.id,
+        auto_created: true
       })
     end
 
@@ -601,7 +607,8 @@ describe SamePersonAffinity::Finder do
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_d.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: affinity_kind.id,
+        auto_created: true
       })
     end
 
@@ -636,6 +643,8 @@ describe SamePersonAffinity::Finder do
       person_d.reload
       person_f.reload
 
+      SamePersonAffinity::Finder.call(person_d)
+
       person_d.issues.last.approve!
 
       #   Action: Person_F has a new id ABC123
@@ -668,7 +677,8 @@ describe SamePersonAffinity::Finder do
 
       expect(affinity_seed).to have_attributes({
         related_person_id: person_f.id,
-        affinity_kind_id: affinity_kind.id
+        affinity_kind_id: affinity_kind.id,
+        auto_created: true
       })
     end
   end

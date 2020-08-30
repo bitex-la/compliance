@@ -64,6 +64,10 @@ describe SamePersonAffinity::Fulfilment do
         person_b.id, person_c.id
       ])
 
+      expect(person_a.affinities.pluck(:auto_created)).to match_array([
+        true, true
+      ])
+
       # C. Inverse partial match with existing relation
 
       #   Action: a Person_D has set a new id to XABC1234Z
