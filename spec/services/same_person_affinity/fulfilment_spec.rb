@@ -25,6 +25,10 @@ describe SamePersonAffinity::Fulfilment do
       expect do
         person_a.issues.last.approve!
       end.to change{person_a.affinities.count}.by(1)
+
+      expect(person_a.affinities.pluck(:related_person_id)).to match_array([
+        person_b.id
+      ])
     end
 
     it 'fulfil a new same_person AffinitySeed on a person with existing affinity relation' do

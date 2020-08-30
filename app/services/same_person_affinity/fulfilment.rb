@@ -8,62 +8,60 @@ module SamePersonAffinity
       # only creates one affinity_seed per issue
       affinity_seed = affinity_seeds.first
 
-      unless affinity_seed.archived_at
-        # keep current affinities of the
-        # affinity_seed person if there still valid
-        person = affinity_seed.person
-        related_person = affinity_seed.related_person
+      return if affinity_seed.archived_at
 
-        current_affinities = person.affinities.by_kind(:same_person)
-        orphans = []
+      # keep current affinities of the
+      # affinity_seed person if there still valid
+      person = affinity_seed.person
+      related_person = affinity_seed.related_person
 
-        # revalidate relationship between father and current childrens
-        current_affinities.each do |current_affinity|
-          unless same_person_match(person, current_affinity.related_person)
-            # there is an edge case that a father is not related to a children
-            # directly but through an existing sibling (se result in edge case J.)
-            unless same_person_match_any_related_person(current_affinities, current_affinity, person)
-              archive_affinity!(current_affinity)
-              orphans.push(current_affinity.related_person)
-            end
-          end
-        end
+      current_affinities = person.affinities.by_kind(:same_person)
+      orphans = []
 
-        # if the result is more than one orphan,
-        # build same_person affinity between them
-        if orphans.count > 1
-          sorted_orphans = orphans.sort_by {|p| p.id}
-          father = sorted_orphans.shift
-          sorted_orphans.each do |orphan|
-            build_same_person_affinity!(father, orphan)
-          end
-        end
-
-        # if related_person has another same_person father,
-        # and still matches, move as sibling
-        # if not, archive the affinity
-        related_person_related_affinities = related_person.related_affinities.by_kind(:same_person)
-        related_person_related_affinities.each do |old_father_affinity|
-          archive_affinity!(old_father_affinity)
-          if (same_person_match(related_person, old_father_affinity.person))
-            old_father = old_father_affinity.person
-            build_same_person_affinity!(person, old_father)
-          end
-        end
-
-        # if children has childrens (of previous relationship),
-        # and still matches, move as sibling
-        # if not, archive the affinity
-        related_person_affinities = related_person.affinities.by_kind(:same_person)
-        related_person_affinities.each do |related_person_affinity|
-          archive_affinity!(related_person_affinity)
-          if (same_person_match_any_related_person(related_person_affinities, related_person_affinity, person))
-            build_same_person_affinity!(person, related_person_affinity.related_person)
+      # revalidate relationship between father and current childrens
+      current_affinities.each do |current_affinity|
+        unless same_person_match(person, current_affinity.related_person)
+          # there is an edge case that a father is not related to a children
+          # directly but through an existing sibling (se result in edge case J.)
+          unless same_person_match_any_related_person(current_affinities, current_affinity, person)
+            archive_affinity!(current_affinity)
+            orphans.push(current_affinity.related_person)
           end
         end
       end
 
-      return
+      # if the result is more than one orphan,
+      # build same_person affinity between them
+      if orphans.count > 1
+        sorted_orphans = orphans.sort_by {|p| p.id}
+        father = sorted_orphans.shift
+        sorted_orphans.each do |orphan|
+          build_same_person_affinity!(father, orphan)
+        end
+      end
+
+      # if related_person has another same_person father,
+      # and still matches, move as sibling
+      # if not, archive the affinity
+      related_person_related_affinities = related_person.related_affinities.by_kind(:same_person)
+      related_person_related_affinities.each do |old_father_affinity|
+        archive_affinity!(old_father_affinity)
+        if (same_person_match(related_person, old_father_affinity.person))
+          old_father = old_father_affinity.person
+          build_same_person_affinity!(person, old_father)
+        end
+      end
+
+      # if children has childrens (of previous relationship),
+      # and still matches, move as sibling
+      # if not, archive the affinity
+      related_person_affinities = related_person.affinities.by_kind(:same_person)
+      related_person_affinities.each do |related_person_affinity|
+        archive_affinity!(related_person_affinity)
+        if (same_person_match_any_related_person(related_person_affinities, related_person_affinity, person))
+          build_same_person_affinity!(person, related_person_affinity.related_person)
+        end
+      end
     end
 
     def self.after_process(affinity_seeds)
