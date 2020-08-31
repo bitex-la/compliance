@@ -37,8 +37,8 @@ jobs:
           paths:
             - vendor/bundle
       - run:
-        name: Wait for DB
-        command: dockerize -wait tcp://localhost:3306 -timeout 1m      
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m      
       - run:
           name: Wait for Redis
           command: dockerize -wait tcp://localhost:6379 -timeout 1m
@@ -49,9 +49,9 @@ jobs:
       - run: mkdir -p /tmp/artifacts
 
       - run:
-        name: Monitor memory usage
-        command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
-        background: true
+          name: Monitor memory usage
+          command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
+          background: true
 
       - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split)
       - store_test_results:
