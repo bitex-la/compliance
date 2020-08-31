@@ -33,8 +33,8 @@ ENV RAILS_FOLDER=/usr/local/compliance
 RUN mkdir /usr/local/rbenv/plugins \
     && git clone https://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build \
     && /usr/local/rbenv/plugins/ruby-build/install.sh \
-    && rbenv install 2.4.1 \
-    && rbenv global 2.4.1 \
+    && rbenv install 2.5.7 \
+    && rbenv global 2.5.7 \
     && gem install bundler \
     && rbenv rehash
 

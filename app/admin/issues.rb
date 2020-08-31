@@ -527,8 +527,12 @@ ActiveAdmin.register Issue do
             "Tasks"
           end
           table_for workflow.tasks, {class: 'tasks'} do
-            column :id {|t| link_to t.id, [workflow, t]}
-            column :task_type {|t| link_to t.try(:task_type), [workflow, t]}
+            column :id do |t|
+              link_to t.id, [workflow, t]
+            end
+            column :task_type do |t|
+              link_to t.try(:task_type), [workflow, t]
+            end
             column :state
             column :current_retries
             column :max_retries
