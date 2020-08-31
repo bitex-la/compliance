@@ -44,8 +44,7 @@ jobs:
           command: dockerize -wait tcp://localhost:6379 -timeout 1m
       
       - run: bundle exec rails db:create db:schema:load db:migrate --trace
-      - run: mkdir -p $CIRCLE_TEST_REPORTS/rspec
-
+      
       - run: mkdir -p /tmp/artifacts
 
       - run:
@@ -53,15 +52,21 @@ jobs:
           command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
           background: true
 
-      - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split)
+      - run:
+          name: Run rspec in parallel
+          command: |
+            bundle exec rspec --profile 10 \
+                              --format RspecJunitFormatter \
+                              --out test_results/rspec.xml \
+                              --format documentation \
+                              $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      # Save test results for timing analysis
       - store_test_results:
           path: /tmp/circleci-test-results
       - store_artifacts:
-          path: /tmp/circleci-artifacts
-      - store_artifacts:
-          path: /tmp/circleci-test-results
-      - store_artifacts:
           path: /tmp/artifacts
+      - store_test_results:
+          path: test_results
       - deploy:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
