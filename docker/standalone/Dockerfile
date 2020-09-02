@@ -44,9 +44,8 @@ RUN rm -rf /usr/local/bin/rbenv-install
 RUN sed -i "s|bind-address.*|skip-networking|g" /etc/mysql/mysql.conf.d/mysqld.cnf
 
 RUN git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
-    && cd /usr/local/compliance && git checkout remove-docker-compliance \
     && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
-    && bundle install 
+    && cd /usr/local/compliance && bundle install 
 
 RUN service mysql start \
     && redis-server --daemonize yes --port 0 --unixsocket /tmp/redis.sock --unixsocketperm 775 \
