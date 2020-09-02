@@ -35,7 +35,7 @@ RUN mkdir /usr/local/rbenv/plugins \
     && /usr/local/rbenv/plugins/ruby-build/install.sh \
     && rbenv install 2.5.7 \
     && rbenv global 2.5.7 \
-    && gem install bundler:1.16.2 \
+    && gem install bundler:1.17.3 \
     && rbenv rehash
 
 # RUN service mysql start && mysql -u root -e "SET Password FOR 'root'@'localhost' = 'example';"
