@@ -129,4 +129,29 @@ RSpec.describe Observation, type: :model do
     issue2.save!
     expect(Observation.history(issue)).to_not include obs2
   end
+
+  it "current scope only include non future issues" do
+    create(:human_world_check_reason)
+    issue = create(:basic_issue)
+    obs1 = issue.observations.build
+    obs1.observation_reason = ObservationReason.first
+    obs1.scope = :admin
+    issue.save!
+
+    expect(Observation.current.count).to eq(1)
+    expect(Observation.current.last).to eq(obs1)
+
+    future_issue = create(:future_issue)
+    obs2 = future_issue.observations.build
+    obs2.observation_reason = ObservationReason.first
+    obs2.scope = :admin
+    future_issue.save!
+
+    expect(Observation.current.count).to eq(1)
+    expect(Observation.current.last).to eq(obs1)
+
+    Timecop.travel future_issue.defer_until
+    expect(Observation.current.count).to eq(2)
+    expect(Observation.current.last).to eq(obs2)
+  end
 end
