@@ -38,39 +38,40 @@ class Observation < ApplicationRecord
     %i(by_issue_reason)
   end
 
-  scope :admin_pending, -> { 
-    joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
-    .where(scope: 'admin', aasm_state: 'new')
+  scope :by_scope, -> (scope) {
+    current
+      .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
+      .where(scope: scope, aasm_state: 'new')
       .includes(:issue, :observation_reason)
+  }
+
+  scope :admin_pending, -> { 
+    by_scope('admin')
   } 
 
   scope :robot_pending, -> { 
-    joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
-    .where(scope: 'robot', aasm_state: 'new')
-      .includes(:issue, :observation_reason)
+    by_scope('robot')
   } 
 
   scope :client_pending, -> { 
-    joins(:issue)
-    .where.not(issues: {aasm_state: ['abandoned', 'dismissed', 'rejected']})
-    .where(scope: 'client', aasm_state: 'new')
-      .includes(:issue, :observation_reason)
+    by_scope('client')
   } 
 
   scope :by_issue_reason, -> (reason) {   
-    joins(:issue) 
-      .where(issues: {reason_id: reason})
+    current.where(issues: {reason_id: reason})
   }
 
   scope :history, -> (issue) { 
-    joins(:issue)
+    current
       .where("issues.id != ?", issue.id)
       .where("issues.person_id = ?", issue.person.id)
       .order('created_at DESC')
   }
-  
+
+  scope :current, -> { 
+    merge(Issue.current)
+  }
+
   aasm do
     state :new, initial: true     
     state :answered
