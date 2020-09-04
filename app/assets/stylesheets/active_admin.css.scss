@@ -914,11 +914,18 @@ span.icon-text-fa {
   text-shadow: none;
 }
 
-
 .dropdown_other_actions {
   float: right;
   margin-bottom: 20px;
   li a {
     text-align: left !important;
   }
+}
+
+.top-priority {
+  background-color: #ffeded;
+}
+
+.zero-priority {
+  background-color: #f3f3f3;
 }
