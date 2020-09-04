@@ -145,6 +145,22 @@ describe Issue do
       expect(Date.parse(api_response.data.attributes.defer_until)).to eq(defer_until)
     end
 
+    it 'creates a new issue with default priority' do
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
+      end.to change{Issue.count}.by(1)
+
+      issue = Issue.find(api_response.data.id)
+      expect(issue.priority).to eq(0)
+
+      api_get("/issues/#{issue.id}")
+      
+      expect(api_response.data.attributes.priority).to eq(0)
+    end
+
     it 'creates a new issue with custom reason' do  
       expect do
         api_create('/issues', {
