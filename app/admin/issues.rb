@@ -162,6 +162,7 @@ ActiveAdmin.register Issue do
           column do
             attributes_table_for resource do
               row :id
+              row :priority
               row :state
               row :person
               row :reason if f.object.persisted?

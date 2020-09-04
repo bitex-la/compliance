@@ -1,5 +1,5 @@
 #encoding: utf-8
-ActiveAdmin.register Issue, as: "Dashboard" do
+ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   menu priority: 1
 
   actions :index
@@ -32,7 +32,12 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :created_at
   filter :updated_at
 
+  order_by(:priority) do
+    'priority desc, id asc'
+  end
+
   index title: '案 Issues Dashboard' do
+    column(:priority)
     column(:id)  do |o|
       link_to o.id, [o.person, o]
     end
