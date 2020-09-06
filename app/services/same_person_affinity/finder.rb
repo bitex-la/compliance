@@ -145,6 +145,11 @@ module SamePersonAffinity
         auto_created: true
       )
 
+      issue.note_seeds.build(
+        title:'auto created',
+        body: 'same_person affinity was detected automatically by the system'
+      )
+
       issue.save
     end
 

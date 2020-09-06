@@ -68,6 +68,8 @@ describe SamePersonAffinity::Fulfilment do
         true, true
       ])
 
+      expect(person_a.affinities.first.issue.note_seeds.first.title).to eq('auto created')
+
       # C. Inverse partial match with existing relation
 
       #   Action: a Person_D has set a new id to XABC1234Z
