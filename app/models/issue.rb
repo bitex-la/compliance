@@ -459,15 +459,13 @@ class Issue < ApplicationRecord
   end
 
   def fulfil_affinity_relationships
-    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person &&
-                  affinity_seeds&.first&.auto_created
+    return unless has_affinity_same_person_auto_created?
 
     SamePersonAffinity::Fulfilment.call(affinity_seeds)
   end
 
   def fulfil_affinity_after_process
-    return unless affinity_seeds&.first&.affinity_kind == AffinityKind.same_person &&
-                  affinity_seeds&.first&.auto_created
+    return unless has_affinity_same_person_auto_created?
 
     SamePersonAffinity::Fulfilment.after_process(affinity_seeds)
   end
@@ -477,6 +475,11 @@ class Issue < ApplicationRecord
   def lock_expired?
     return false if lock_expiration.nil?
     DateTime.now >= lock_expiration
+  end
+
+  def has_affinity_same_person_auto_created?
+    affinity_seeds&.first&.affinity_kind == AffinityKind.same_person &&
+    affinity_seeds&.first&.auto_created
   end
 
   def log_state_change(verb)
