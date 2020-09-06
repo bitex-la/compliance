@@ -15,7 +15,7 @@ module SamePersonAffinity
       person = affinity_seed.person
       related_person = affinity_seed.related_person
 
-      current_affinities = person.affinities.by_kind(:same_person)
+      current_affinities = person.affinities.by_kind(AffinityKind.same_person)
       orphans = []
 
       # revalidate relationship between father and current childrens
@@ -43,7 +43,7 @@ module SamePersonAffinity
       # if related_person has another same_person father,
       # and still matches, move as sibling (see case F in specs)
       # if not, archive the affinity
-      related_person_related_affinities = related_person.related_affinities.by_kind(:same_person)
+      related_person_related_affinities = related_person.related_affinities.by_kind(AffinityKind.same_person)
       related_person_related_affinities.each do |old_father_affinity|
         archive_affinity!(old_father_affinity)
         if (same_person_match(related_person, old_father_affinity.person))
@@ -55,7 +55,7 @@ module SamePersonAffinity
       # if children has childrens (of previous relationship),
       # and still matches, move as sibling (see case J in specs)
       # if not, archive the affinity
-      related_person_affinities = related_person.affinities.by_kind(:same_person)
+      related_person_affinities = related_person.affinities.by_kind(AffinityKind.same_person)
       related_person_affinities.each do |related_person_affinity|
         archive_affinity!(related_person_affinity)
         if (same_person_match_any_related_person(related_person_affinities, related_person_affinity, person))
@@ -76,9 +76,9 @@ module SamePersonAffinity
 
       # if person has a same_person father, and still matches, move his children/s
       # if not, archive the affinity (see case J in specs)
-      person.related_affinities.by_kind(:same_person).each do |father_affinity|
+      person.related_affinities.by_kind(AffinityKind.same_person).each do |father_affinity|
         if (same_person_match(father_affinity.person, person))
-          person.affinities.by_kind(:same_person).each do |children_affinity|
+          person.affinities.by_kind(AffinityKind.same_person).each do |children_affinity|
             archive_affinity!(children_affinity)
             build_same_person_affinity!(father_affinity.person, children_affinity.related_person)
           end
