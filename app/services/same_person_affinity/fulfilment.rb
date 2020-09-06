@@ -99,6 +99,11 @@ module SamePersonAffinity
         archived_at: Date.current
       )
 
+      issue.note_seeds.build(
+        title:'auto created',
+        body: 'same_person affinity was detected automatically by the system'
+      )
+
       issue.save!
       issue.approve!
     end
@@ -106,9 +111,11 @@ module SamePersonAffinity
     def self.same_person_match(person, related_person)
       matched_names = SamePersonAffinity::Finder.with_matched_names(person, [related_person.id])
 
+      return true if matched_names.present?
+
       matched_id_numbers = SamePersonAffinity::Finder.with_matched_id_numbers(person, [related_person.id])
 
-      matched_names.present? || matched_id_numbers.present?
+      matched_id_numbers.present?
     end
 
     def self.same_person_match_any_related_person(affinities, current_affinity, father)
