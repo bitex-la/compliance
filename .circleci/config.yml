@@ -46,7 +46,6 @@ jobs:
       - run: bundle exec rails db:create db:schema:load db:migrate --trace
       
       - run: mkdir -p /tmp/artifacts
-      - run: mkdir -p /tmp/rspec
 
       - run:
           name: Monitor memory usage
@@ -58,12 +57,12 @@ jobs:
           command: |
             bundle exec rspec --profile 10 \
                               --format RspecJunitFormatter \
-                              --out /tmp/rspec/rspec.xml \
+                              --out /tmp/artifacts/rspec.xml \
                               --format documentation \
                               $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
       # Save test results for timing analysis
       - store_test_results:
-          path: /tmp/rspec
+          path: /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
       - deploy:
