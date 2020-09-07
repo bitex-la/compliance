@@ -213,9 +213,7 @@ ActiveAdmin.register Person do
           panel "Observations" do
             Appsignal.instrument('render_observations') do
               table_for observations do
-                column :issue do |o|
-                  link_to "##{o.issue.id}", [resource, o.issue]
-                end
+                column(:issue) { |o| link_to "##{o.issue.id}", [resource, o.issue] }
                 column :observation_reason
                 column :scope
                 column "" do |o|
