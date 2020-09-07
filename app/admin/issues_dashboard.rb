@@ -32,7 +32,28 @@ ActiveAdmin.register Issue, as: "Dashboard" do
   filter :created_at
   filter :updated_at
 
+  batch_action :approve do |ids, inputs|
+    errors = []
+    Issue.find(ids).each do |issue|
+      unless issue.all_workflows_performed?
+        errors << "Not all workflows has been performed for Issue #{issue.id}"
+      end
+      unless authorized?(:approve, issue) && issue.may_approve? && issue.state != 'approve'
+        errors << "You might have not permission to approve Issue #{issue.id} or issue can't be approved"
+      end
+      begin
+        issue.approve!
+      rescue ActiveRecord::RecordInvalid => invalid
+        errors << invalid.record.errors.full_messages.join('-') unless invalid.record.errors.full_messages.empty?
+      rescue AASM::InvalidTransition => e
+        errors << e.message
+      end
+    end
+    redirect_to :back
+  end
+
   index title: '案 Issues Dashboard' do
+    selectable_column
     column(:id)  do |o|
       link_to o.id, [o.person, o]
     end
