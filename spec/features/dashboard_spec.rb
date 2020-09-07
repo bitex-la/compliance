@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-describe 'Dashboard', js: true do
-  it 'differenciates rows with priority bigger than zero' do
+describe 'Dashboard' do
+  it 'differentiates issues with priority bigger than zero' do
     login_as create(:admin_user)
 
     5.times do |n|
