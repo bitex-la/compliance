@@ -469,6 +469,12 @@ body.active_admin{
     tr.even td{
       background: #f9f9f9;
     }
+    tr.top-priority td{
+      background-color: #ffeded;
+    }
+    tr.zero-priority td{
+      background-color: #f0f0f0;
+    }
   }
   table.origins_and_destinations td.main{
     width: 30%;
@@ -920,8 +926,4 @@ span.icon-text-fa {
   li a {
     text-align: left !important;
   }
-}
-
-.top-priority {
-  background-color: #ffeded;
 }

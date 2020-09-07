@@ -36,7 +36,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
     'priority desc, id asc'
   end
 
-  index(title: '案 Issues Dashboard', row_class: -> record { record.priority.zero? ? 'even' : 'top-priority' }) do
+  index(title: '案 Issues Dashboard', row_class: -> record { record.priority.zero? ? 'zero-priority' : 'top-priority' }) do
     column(:priority)
     column(:id)  do |o|
       link_to o.id, [o.person, o]
