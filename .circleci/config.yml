@@ -60,7 +60,7 @@ jobs:
                               --format progress \
                               --format RspecJunitFormatter \
                               --format documentation \
-                              --o /tmp/rspec/rspec.xml \
+                              --out /tmp/rspec/rspec.xml \
                               $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
       # Save test results for timing analysis
       - store_test_results:
