@@ -178,6 +178,22 @@ describe Issue do
       expect(api_response.data.attributes.priority).to eq(1)
     end
 
+    it 'change priority from an existing issue' do
+      issue = create(:basic_issue)
+      expect(issue.priority).to eq(0)
+
+      api_update("/issues/#{issue.id}", {
+        type: 'issues',
+        id: issue.id,
+        attributes: {
+          priority: 1
+        }
+      })
+
+      api_get("/issues/#{issue.id}")
+      expect(api_response.data.attributes.priority).to eq(1)
+    end
+
     it 'creates a new issue with custom reason' do  
       expect do
         api_create('/issues', {
