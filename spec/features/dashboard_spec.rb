@@ -16,7 +16,6 @@ describe 'Dashboard' do
     click_link 'All'
 
     expect(page).to have_selector(:css, '.top-priority', count: 3)
-    expect(page).to have_selector(:css, '.zero-priority', count: 4)
 
     indexes = Array.new(7) do |i|
       page.body.index("id=\"issue_#{i + 1}\"")
