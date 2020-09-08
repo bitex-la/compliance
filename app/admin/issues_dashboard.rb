@@ -37,9 +37,19 @@ ActiveAdmin.register Issue, as: "Dashboard" do
     Issue.find(ids).each do |issue|
       unless issue.all_workflows_performed?
         errors << "Not all workflows has been performed for Issue #{issue.id}"
+        next
       end
-      unless authorized?(:approve, issue) && issue.may_approve? && issue.state != 'approve'
-        errors << "You might have not permission to approve Issue #{issue.id} or issue can't be approved"
+      unless authorized?(:approve, issue)
+        errors << "You might have not permission to approve Issue #{issue.id}"
+        next
+      end
+      unless issue.may_approve?
+        errors << "Issue #{issue.id} can't be approved"
+        next
+      end
+      unless issue.state != 'approve'
+        errors << "Issue #{issue.id} previously approved"
+        next
       end
       begin
         issue.approve!
@@ -49,6 +59,7 @@ ActiveAdmin.register Issue, as: "Dashboard" do
         errors << e.message
       end
     end
+    flash[:error] = errors.joins(', ')
     redirect_to :back
   end
 
