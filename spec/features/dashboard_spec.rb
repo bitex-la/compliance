@@ -18,19 +18,16 @@ describe 'Dashboard' do
     expect(page).to have_selector(:css, '.top-priority', count: 3)
     expect(page).to have_selector(:css, '.zero-priority', count: 4)
 
-    id1 = page.body.index('id="issue_1"')
-    id2 = page.body.index('id="issue_2"')
-    id3 = page.body.index('id="issue_3"')
-    id4 = page.body.index('id="issue_4"')
-    id5 = page.body.index('id="issue_5"')
-    id6 = page.body.index('id="issue_6"')
-    id7 = page.body.index('id="issue_7"')
+    indexes = Array.new(7) do |i|
+      page.body.index("id=\"issue_#{i + 1}\"")
+    end
 
-    expect(id3).to be < id2
-    expect(id2).to be < id1
-    expect(id1).to be < id4
-    expect(id4).to be < id5
-    expect(id5).to be < id6
-    expect(id6).to be < id7
+    expect(indexes.sort).to eq([indexes[2],
+      indexes[1],
+      indexes[0],
+      indexes[6],
+      indexes[5],
+      indexes[4],
+      indexes[3]])
   end
 end

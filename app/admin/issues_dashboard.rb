@@ -33,7 +33,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   filter :updated_at
 
   order_by(:priority) do
-    'priority desc, id asc'
+    'priority desc, id desc'
   end
 
   index(title: '案 Issues Dashboard', row_class: -> record { record.priority.zero? ? 'zero-priority' : 'top-priority' }) do
