@@ -39,6 +39,7 @@ install_plugin Capistrano::Puma
 # require "capistrano/rails/migrations"
 # require "capistrano/passenger"
 
+require 'settingslogic'
 require 'appsignal/capistrano'
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined
