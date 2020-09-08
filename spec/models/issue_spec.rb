@@ -18,10 +18,12 @@ RSpec.describe Issue, type: :model do
 
   it 'is valid with a person' do
     expect(basic_issue).to be_valid
+    expect(basic_issue).to_not be_future
   end
 
   it 'is valid future issue' do
     expect(future_issue).to be_valid
+    expect(future_issue).to be_future
   end
 
   it 'is not valid future issue when defer until is less than creation date' do

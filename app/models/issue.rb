@@ -200,6 +200,10 @@ class Issue < ApplicationRecord
     where('defer_until <= ?', Date.current)
   }
 
+  def future?
+    defer_until && defer_until > Date.current
+  end
+
   def self.ransackable_scopes(auth_object = nil)
     %i(active by_person_type by_person_tag)
   end

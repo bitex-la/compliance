@@ -85,5 +85,17 @@ describe Observation do
     api_get "/issues/#{issue.id}"
     api_response.data.attributes.state.should == 'answered'
   end
-end
 
+  it 'only include observations from non future issues' do
+    issue = create(:basic_issue)
+    observation = create(:robot_observation, issue: issue)
+
+    future_issue = create(:future_issue)
+    create(:robot_observation, issue: future_issue)
+
+    api_get "/observations"
+
+    expect(api_response.meta.total_items).to eq(1)
+    expect(api_response.data.first.id).to eq(observation.id.to_s)
+  end
+end
