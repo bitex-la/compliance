@@ -8,7 +8,7 @@ then
     --header 'Content-Type: application/json' \
     --header 'Accept: application/json' \
     --header "Circle-Token: $CIRCLE_TOKEN" \
-    -d "{ 'branch': "$CIRCLE_BRANCH" }")
+    -d "{ 'branch': "master" }")
 
   printf "\n\nBuild triggered\n\n"
   printf "Follow the progress of the build on \nhttps://app.circleci.com/pipelines/github/$ORGANIZATION/$PROJECT_TO_BUILD?branch=$CIRCLE_BRANCH"
