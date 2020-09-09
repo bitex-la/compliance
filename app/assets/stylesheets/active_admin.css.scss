@@ -469,6 +469,9 @@ body.active_admin{
     tr.even td{
       background: #f9f9f9;
     }
+    tr.top-priority td{
+      background-color: #ffeded;
+    }
   }
   table.origins_and_destinations td.main{
     width: 30%;
@@ -913,7 +916,6 @@ span.icon-text-fa {
   position: absolute;
   text-shadow: none;
 }
-
 
 .dropdown_other_actions {
   float: right;
