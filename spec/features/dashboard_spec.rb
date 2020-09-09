@@ -5,16 +5,42 @@ describe 'Dashboard' do
 
   describe 'group approval' do
     describe 'errors' do
-      it 'not all workflows has been performed' do
-        login_as admin_user
+      it 'unauthorized user' do
+        login_as create(:commercial_admin_user)
         issue = create(:basic_issue)
         issue.complete!
         visit '/'
+        
+        find(:css, '#collection_selection_toggle_all').set(true)
+        click_link 'Batch Action'
+        click_link 'Approve Selected'
+        expect(page).to have_content('You are not authorized to perform this action.')
+      end
+
+      it 'not all workflows has been performed, not allowed transition and not approve more than once' do
+        login_as admin_user
+
+        workflow_issue = create(:basic_issue)
+        create(:basic_workflow, issue: workflow_issue)
+        workflow_issue.complete!
+
+        rejected_issue = create(:basic_issue)
+        rejected_issue.reject!
+
+        person = create(:new_natural_person, :with_new_client_reason) 
+        approved_issue = person.issues.reload.last
+        approved_issue.approve!
+
+        visit '/'
+
+        click_link 'All'
 
         find(:css, '#collection_selection_toggle_all').set(true)
         click_link 'Batch Action'
         click_link 'Approve Selected'
-        expect(page).to have_content('Error')
+        expect(page).to have_content("Issue #{workflow_issue.id}: Event 'approve' cannot transition from 'new'. Failed callback(s): [:all_workflows_performed?]")
+        expect(page).to have_content("Issue #{rejected_issue.id}: Event 'approve' cannot transition from 'rejected'.")
+        expect(page).to have_content("Issue #{approved_issue.id}: no_more_updates_allowed")
       end
     end
   end
