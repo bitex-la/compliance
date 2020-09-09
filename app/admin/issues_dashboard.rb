@@ -59,8 +59,8 @@ ActiveAdmin.register Issue, as: "Dashboard" do
         errors << e.message
       end
     end
-    flash[:error] = errors.joins(', ')
-    redirect_to :back
+    flash[:error] = errors.join(', ')
+    redirect_to dashboards_url
   end
 
   index title: '案 Issues Dashboard' do
