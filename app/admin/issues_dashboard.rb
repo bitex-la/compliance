@@ -33,30 +33,16 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   filter :updated_at
 
   batch_action :approve do |ids, inputs|
+    authorize!(:approve, Issue)
+
     errors = []
     Issue.find(ids).each do |issue|
-      unless issue.all_workflows_performed?
-        errors << "Not all workflows has been performed for Issue #{issue.id}"
-        next
-      end
-      unless authorized?(:approve, issue)
-        errors << "You might have not permission to approve Issue #{issue.id}"
-        next
-      end
-      unless issue.may_approve?
-        errors << "Issue #{issue.id} can't be approved"
-        next
-      end
-      unless issue.state != 'approve'
-        errors << "Issue #{issue.id} previously approved"
-        next
-      end
       begin
         issue.approve!
       rescue ActiveRecord::RecordInvalid => invalid
-        errors << invalid.record.errors.full_messages.join('-') unless invalid.record.errors.full_messages.empty?
+        errors << "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" unless invalid.record.errors.full_messages.empty?
       rescue AASM::InvalidTransition => e
-        errors << e.message
+        errors << "Issue #{issue.id}: #{e.message}"
       end
     end
     flash[:error] = errors.join(', ') unless errors.empty?
