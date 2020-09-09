@@ -120,11 +120,20 @@ ActiveAdmin.register Issue do
     end
   end
 
-  form do |f|
-    if f.object.locked? && !f.object.locked_by_me?
-      remaining = f.object.lock_remaining_minutes
+  form do |f|    
+    issue = f.object
+
+    if issue.persisted? && issue.future? && !issue.observations.empty?
+      div class: 'flash flash_danger' do
+        "The observations will not be shown until the issue is visible"
+      end
+      br
+    end
+
+    if issue.locked? && !issue.locked_by_me?
+      remaining = issue.lock_remaining_minutes
       
-      msg = "Issue is locked by #{f.object.lock_admin_user.email}"
+      msg = "Issue is locked by #{issue.lock_admin_user.email}"
       if remaining != -1
         msg += " and expires in #{remaining} minutes."
       else
@@ -137,9 +146,9 @@ ActiveAdmin.register Issue do
       br
     end
   
-    unless f.object.errors.full_messages.empty?
+    unless issue.errors.full_messages.empty?
       ul class: 'validation_errors' do
-        f.object.errors.full_messages.each do |e|
+        issue.errors.full_messages.each do |e|
           li e
         end
       end
@@ -162,6 +171,7 @@ ActiveAdmin.register Issue do
           column do
             attributes_table_for resource do
               row :id
+              row :priority
               row :state
               row :person
               row :reason if f.object.persisted?
@@ -463,6 +473,14 @@ ActiveAdmin.register Issue do
   end
 
   show do
+    
+    if resource.persisted? && resource.future? && !resource.observations.empty?
+      div class: 'flash flash_danger' do
+        "The observations will not be shown until the issue is visible"
+      end
+      br
+    end
+    
     tabs do
       ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
