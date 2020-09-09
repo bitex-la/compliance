@@ -32,21 +32,31 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   filter :created_at
   filter :updated_at
 
-  batch_action :approve do |ids, inputs|
-    authorize!(:approve, Issue)
+  { approve:  'approved',
+    complete: 'completed',
+    dismiss:  'dismissed',
+    reject:   'rejected',
+    abandon:  'abandoned'
+  }.each do |action, state|
+    batch_action action do |ids, inputs|
+      authorize!(action, Issue)
 
-    errors = []
-    Issue.find(ids).each do |issue|
-      begin
-        issue.approve!
-      rescue ActiveRecord::RecordInvalid => invalid
-        errors << "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" unless invalid.record.errors.full_messages.empty?
-      rescue AASM::InvalidTransition => e
-        errors << "Issue #{issue.id}: #{e.message}"
+      errors = []
+      notices = []
+      Issue.find(ids).each do |issue|
+        begin
+          issue.send("#{action}!")
+          notices << "Issue #{issue.id} #{state}"
+        rescue ActiveRecord::RecordInvalid => invalid
+          errors << "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" unless invalid.record.errors.full_messages.empty?
+        rescue AASM::InvalidTransition => e
+          errors << "Issue #{issue.id}: #{e.message}"
+        end
       end
+      flash[:error] = errors.join(', ') unless errors.empty?
+      flash[:notice] = notices.join(', ') unless notices.empty?
+      redirect_to dashboards_url
     end
-    flash[:error] = errors.join(', ') unless errors.empty?
-    redirect_to dashboards_url
   end
 
   order_by(:priority) do
