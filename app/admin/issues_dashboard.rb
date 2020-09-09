@@ -1,5 +1,5 @@
 #encoding: utf-8
-ActiveAdmin.register Issue, as: "Dashboard" do
+ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   menu priority: 1
 
   actions :index
@@ -59,12 +59,17 @@ ActiveAdmin.register Issue, as: "Dashboard" do
         errors << e.message
       end
     end
-    flash[:error] = errors.join(', ')
+    flash[:error] = errors.join(', ') unless errors.empty?
     redirect_to dashboards_url
   end
 
-  index title: '案 Issues Dashboard' do
+  order_by(:priority) do
+    'priority desc, id desc'
+  end
+
+  index(title: '案 Issues Dashboard', row_class: ->(record) { 'top-priority' unless record.priority.zero? }) do
     selectable_column
+    column(:priority)
     column(:id)  do |o|
       link_to o.id, [o.person, o]
     end
