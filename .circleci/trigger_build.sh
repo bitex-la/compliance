@@ -2,12 +2,14 @@
 
 printf "Triggering an $PROJECT_TO_BUILD build on the $CIRCLE_BRANCH branch\n\n"
 
-if [ "$CIRCLE_BRANCH" = "master" ] 
+if [ "$CIRCLE_BRANCH" = "fix-trigger-ci" ] 
 then
-  BUILD_INFO=$(curl -X POST -H -d \
-    "{}" \
-    "https://circleci.com/api/v1/project/$ORGANIZATION/$PROJECT_TO_BUILD/tree/$CIRCLE_BRANCH?circle-token=$CIRCLE_TOKEN")
+  BUILD_INFO=$(curl -X POST https://circleci.com/api/v2/project/$PROJECT_TO_BUILD/pipeline \
+    --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' \
+    --header "Circle-Token: $CIRCLE_TOKEN" \
+    -d "{ 'branch': "$CIRCLE_BRANCH" }")
 
   printf "\n\nBuild triggered\n\n"
-  printf "Follow the progress of the build on \nhttps://circleci.com/gh/$ORGANIZATION/$PROJECT_TO_BUILD/tree/$CIRCLE_BRANCH"
+  printf "Follow the progress of the build on \nhttps://app.circleci.com/pipelines/github/$ORGANIZATION/$PROJECT_TO_BUILD?branch=$CIRCLE_BRANCH"
 fi
