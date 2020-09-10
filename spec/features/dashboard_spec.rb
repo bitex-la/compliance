@@ -26,16 +26,18 @@ describe 'Dashboard' do
       end
     end
 
-    it 'unauthorized user' do
-      login_as create(:commercial_admin_user)
-      issue = create(:basic_issue)
-      issue.complete!
+    it 'operations user can only see the authorized action (Complete)' do
+      login_as create(:operations_admin_user)
+      basic_issue = create(:basic_issue)
       visit '/'
       
+      click_link 'All'
       find(:css, '#collection_selection_toggle_all').set(true)
       click_link 'Batch Action'
-      click_link 'Approve Selected'
-      expect(page).to have_content('You are not authorized to perform this action.')
+      expect(page).not_to have_content('Approve Selected')
+      expect(page).to have_content('Complete Selected')
+      click_link 'Complete Selected'
+      expect(page).to have_content("Issue #{basic_issue.id} completed")
     end
 
     it 'shows issues approved, not all workflows has been performed, not allowed transition and not approve more than once' do

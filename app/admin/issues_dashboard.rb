@@ -38,7 +38,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
     reject:   'rejected',
     abandon:  'abandoned'
   }.each do |action, state|
-    batch_action action do |ids, inputs|
+    batch_action action, if: proc { authorized?(action, Issue) } do |ids, inputs|
       authorize!(action, Issue)
 
       errors = []
