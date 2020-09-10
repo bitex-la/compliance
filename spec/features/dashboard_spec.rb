@@ -4,48 +4,68 @@ describe 'Dashboard' do
   let(:admin_user) { create(:admin_user) }
 
   describe 'group approval' do
-    describe 'messages' do
-      it 'unauthorized user' do
-        login_as create(:commercial_admin_user)
-        issue = create(:basic_issue)
-        issue.complete!
-        visit '/'
-        
-        find(:css, '#collection_selection_toggle_all').set(true)
-        click_link 'Batch Action'
-        click_link 'Approve Selected'
-        expect(page).to have_content('You are not authorized to perform this action.')
-      end
-
-      it 'shows issues approved, not all workflows has been performed, not allowed transition and not approve more than once' do
-        login_as admin_user
+    it 'shows success for every state' do
+      login_as admin_user
+      {
+        approve:  'approved',
+        complete: 'completed',
+        dismiss:  'dismissed',
+        reject:   'rejected',
+        abandon:  'abandoned'
+      }.each do |action, state|
 
         basic_issue = create(:basic_issue)
         basic_issue.complete!
 
-        workflow_issue = create(:basic_issue)
-        create(:basic_workflow, issue: workflow_issue)
-        workflow_issue.complete!
-
-        rejected_issue = create(:basic_issue)
-        rejected_issue.reject!
-
-        person = create(:new_natural_person, :with_new_client_reason) 
-        approved_issue = person.issues.reload.last
-        approved_issue.approve!
-
         visit '/'
-
-        click_link 'All'
-
         find(:css, '#collection_selection_toggle_all').set(true)
         click_link 'Batch Action'
-        click_link 'Approve Selected'
-        expect(page).to have_content("Issue #{basic_issue.id} approved")
-        expect(page).to have_content("Issue #{workflow_issue.id}: Event 'approve' cannot transition from 'new'. Failed callback(s): [:all_workflows_performed?]")
-        expect(page).to have_content("Issue #{rejected_issue.id}: Event 'approve' cannot transition from 'rejected'.")
-        expect(page).to have_content("Issue #{approved_issue.id}: no_more_updates_allowed")
+        click_link "#{action.capitalize} Selected"
+        expect(page).to have_content("Issue #{basic_issue.id} #{state}")
+        basic_issue.destroy
       end
+    end
+
+    it 'unauthorized user' do
+      login_as create(:commercial_admin_user)
+      issue = create(:basic_issue)
+      issue.complete!
+      visit '/'
+      
+      find(:css, '#collection_selection_toggle_all').set(true)
+      click_link 'Batch Action'
+      click_link 'Approve Selected'
+      expect(page).to have_content('You are not authorized to perform this action.')
+    end
+
+    it 'shows issues approved, not all workflows has been performed, not allowed transition and not approve more than once' do
+      login_as admin_user
+
+      basic_issue = create(:basic_issue)
+      basic_issue.complete!
+
+      workflow_issue = create(:basic_issue)
+      create(:basic_workflow, issue: workflow_issue)
+      workflow_issue.complete!
+
+      rejected_issue = create(:basic_issue)
+      rejected_issue.reject!
+
+      person = create(:new_natural_person, :with_new_client_reason) 
+      approved_issue = person.issues.reload.last
+      approved_issue.approve!
+
+      visit '/'
+
+      click_link 'All'
+
+      find(:css, '#collection_selection_toggle_all').set(true)
+      click_link 'Batch Action'
+      click_link 'Approve Selected'
+      expect(page).to have_content("Issue #{basic_issue.id} approved")
+      expect(page).to have_content("Issue #{workflow_issue.id}: Event 'approve' cannot transition from 'new'. Failed callback(s): [:all_workflows_performed?]")
+      expect(page).to have_content("Issue #{rejected_issue.id}: Event 'approve' cannot transition from 'rejected'.")
+      expect(page).to have_content("Issue #{approved_issue.id}: no_more_updates_allowed")
     end
   end
 
