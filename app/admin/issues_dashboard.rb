@@ -51,6 +51,8 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
           errors << "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" unless invalid.record.errors.full_messages.empty?
         rescue AASM::InvalidTransition => e
           errors << "Issue #{issue.id}: #{e.message}"
+        rescue StandardError => e
+          errors << "Issue #{issue.id}: #{e.message}"
         end
       end
       flash[:error] = errors.join(', ') unless errors.empty?
