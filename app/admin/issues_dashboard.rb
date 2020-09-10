@@ -43,7 +43,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
 
       errors = []
       notices = []
-      Issue.find(ids).each do |issue|
+      Issue.where(id: ids).find_each do |issue|
         begin
           issue.send("#{action}!")
           notices << "Issue #{issue.id} #{state}"
