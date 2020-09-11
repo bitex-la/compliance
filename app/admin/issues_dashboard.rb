@@ -52,7 +52,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
             if invalid.record.errors.full_messages.present?
               "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" 
             else
-              "Issue #{issue.id}: Invalid Issue"
+              "Issue #{issue.id}: #{invalid.message}"
             end
         rescue AASM::InvalidTransition, StandardError => e
           errors << "Issue #{issue.id}: #{e.message}"
