@@ -48,7 +48,12 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
           issue.send("#{action}!")
           notices << "Issue #{issue.id} #{state}"
         rescue ActiveRecord::RecordInvalid => invalid
-          errors << "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" unless invalid.record.errors.full_messages.empty?
+          errors <<
+            if invalid.record.errors.full_messages.present?
+              "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" 
+            else
+              "Issue #{issue.id}: Invalid Issue"
+            end
         rescue AASM::InvalidTransition, StandardError => e
           errors << "Issue #{issue.id}: #{e.message}"
         end
