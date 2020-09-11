@@ -1,5 +1,18 @@
 require 'rails_helper'
 
+ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
+  batch_action :testing_with_authorize do |ids, inputs|
+    authorize!(:approve, Issue)
+    Issue.find(ids).first.approve!
+  end
+
+  batch_action :testing_without_authorize do |ids, inputs|
+    flash[:notice] = 'Does not enforce authorization'
+    Issue.find(ids).first.approve!
+    redirect_to dashboards_url
+  end
+end
+
 describe 'Dashboard' do
   let(:admin_user) { create(:admin_user) }
 
@@ -38,6 +51,26 @@ describe 'Dashboard' do
       expect(page).to have_content('Complete Selected')
       click_link 'Complete Selected'
       expect(page).to have_content("Issue #{basic_issue.id} completed")
+    end
+
+    it 'unauthorized user can not approve issue' do
+      login_as create(:operations_admin_user)
+
+      basic_issue = create(:basic_issue)
+      basic_issue.complete!
+
+      visit '/'
+      find(:css, '#collection_selection_toggle_all').set(true)
+      click_link 'Batch Action'
+      click_link 'Testing With Authorize Selected'
+      expect(page).to have_content('You are not authorized to perform this action.')
+      expect(basic_issue.reload.approved?).to be_falsy
+
+      find(:css, '#collection_selection_toggle_all').set(true)
+      click_link 'Batch Action'
+      click_link 'Testing Without Authorize Selected'
+      expect(page).to have_content('Does not enforce authorization')
+      expect(basic_issue.reload.approved?).to be_truthy
     end
 
     it 'shows issues approved, not all workflows has been performed, not allowed transition and not approve more than once' do
