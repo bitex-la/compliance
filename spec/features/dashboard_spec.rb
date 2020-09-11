@@ -27,15 +27,20 @@ describe 'Dashboard' do
         abandon:  'abandoned'
       }.each do |action, state|
 
-        basic_issue = create(:basic_issue)
-        basic_issue.complete!
+        issues = 10.times.map do
+          issue = create(:basic_issue)
+          issue.complete!
+          issue
+        end
 
         visit '/'
         find(:css, '#collection_selection_toggle_all').set(true)
         click_link 'Batch Action'
         click_link "#{action.capitalize} Selected"
-        expect(page).to have_content("Issue #{basic_issue.id} #{state}")
-        basic_issue.destroy
+        issues.each do |issue|
+          expect(page).to have_content("Issue #{issue.id} #{state}")
+        end
+        issues.map(&:destroy)
       end
     end
 
