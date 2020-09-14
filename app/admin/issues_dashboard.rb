@@ -32,11 +32,44 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   filter :created_at
   filter :updated_at
 
+  { approve:  'approved',
+    complete: 'completed',
+    dismiss:  'dismissed',
+    reject:   'rejected',
+    abandon:  'abandoned'
+  }.each do |action, state|
+    batch_action action, if: proc { authorized?(action, Issue) } do |ids, inputs|
+      authorize!(action, Issue)
+
+      errors = []
+      notices = []
+      Issue.where(id: ids).find_each do |issue|
+        begin
+          issue.send("#{action}!")
+          notices << "Issue #{issue.id} #{state}"
+        rescue ActiveRecord::RecordInvalid => invalid
+          errors <<
+            if invalid.record.errors.full_messages.present?
+              "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" 
+            else
+              "Issue #{issue.id}: #{invalid.message}"
+            end
+        rescue AASM::InvalidTransition, StandardError => e
+          errors << "Issue #{issue.id}: #{e.message}"
+        end
+      end
+      flash[:error] = errors.join(', ') unless errors.empty?
+      flash[:notice] = notices.join(', ') unless notices.empty?
+      redirect_to dashboards_url
+    end
+  end
+
   order_by(:priority) do
     'priority desc, id desc'
   end
 
   index(title: '案 Issues Dashboard', row_class: ->(record) { 'top-priority' unless record.priority.zero? }) do
+    selectable_column
     column(:priority)
     column(:id)  do |o|
       link_to o.id, [o.person, o]
