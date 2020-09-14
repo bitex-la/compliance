@@ -8,6 +8,7 @@ then
     "{}" \
     "https://circleci.com/api/v1/project/$ORGANIZATION/$PROJECT_TO_BUILD/tree/$CIRCLE_BRANCH?circle-token=$CIRCLE_TOKEN")
 
+  printf "$BUILD_INFO"
   printf "\n\nBuild triggered\n\n"
   printf "Follow the progress of the build on \nhttps://circleci.com/gh/$ORGANIZATION/$PROJECT_TO_BUILD/tree/$CIRCLE_BRANCH"
 fi
