@@ -140,4 +140,23 @@ describe 'Dashboard' do
     end
   end
 
+  describe 'Tags by Affinities' do
+    it 'shows payee tag with the issue tag' do
+      login_as admin_user
+
+      basic_issue_with_tags = create(:basic_issue_with_tags, person: create(:full_natural_person))
+      person = basic_issue_with_tags.reload.person
+      create(:full_affinity, person: person)
+      basic_issue_with_tags
+        .person
+        .affinities
+        .last
+        .update_column(:affinity_kind_id, AffinityKind.find_by_code(:payee).id)
+      basic_issue_with_tags.complete!
+      
+      visit '/'
+      expect(page).to have_content('(this-is-a-issue-tag-1) payee')
+    end
+  end
+
 end

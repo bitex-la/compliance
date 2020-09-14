@@ -104,7 +104,11 @@ RSpec.describe Issue, type: :model do
       basic_issue_with_tags = create(:basic_issue_with_tags, person: create(:full_natural_person))
       person = basic_issue_with_tags.reload.person
       create(:full_affinity, person: person)
-      basic_issue_with_tags.person.affinities.last.update_column(:affinity_kind_id, AffinityKind.find_by_code(:payee).id)
+      basic_issue_with_tags
+        .person
+        .affinities
+        .last
+        .update_column(:affinity_kind_id, AffinityKind.find_by_code(:payee).id)
       expect(basic_issue_with_tags.tags_by_affinities).to eq([:payee])
     end
 
