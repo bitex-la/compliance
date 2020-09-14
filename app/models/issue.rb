@@ -406,6 +406,15 @@ class Issue < ApplicationRecord
     end
   end
 
+  def tags_by_affinities
+    return [] if tags.empty?
+
+    person.affinities.reduce([]) do |acc, affinity|
+      acc.push(affinity.affinity_kind.associated_tag) if affinity.affinity_kind.associated_tag
+      acc
+    end
+  end
+
   private
 
   def lock_expired?

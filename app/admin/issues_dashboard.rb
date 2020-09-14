@@ -82,7 +82,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
     end
     column(:reason) do |o|
       tags = o.tags.any? ? "(#{o.tags.pluck(:name).join(' - ')})" : ''
-      "#{o.reason} #{tags}"
+      "#{o.reason} #{tags} #{o.tags_by_affinities.join('-')}"
     end
     column(:person_tags) do |o|
       o.person.tags.pluck(:name).join(' - ')

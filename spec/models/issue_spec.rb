@@ -99,6 +99,31 @@ RSpec.describe Issue, type: :model do
     expect(Issue.last.defer_until).to eq Date.current
   end
 
+  describe 'associated tag' do
+    it 'returns payee if tags is present and associated tag is defined' do
+      basic_issue_with_tags = create(:basic_issue_with_tags, person: create(:full_natural_person))
+      person = basic_issue_with_tags.reload.person
+      create(:full_affinity, person: person)
+      basic_issue_with_tags.person.affinities.last.update_column(:affinity_kind_id, 65)
+      expect(basic_issue_with_tags.tags_by_affinities).to eq([:payee])
+    end
+
+    it 'returns empty if no tags' do
+      basic_issue = create(:basic_issue, person: create(:full_natural_person))
+      person = basic_issue.reload.person
+      create(:full_affinity, person: person)
+      basic_issue.person.affinities.last.update_column(:affinity_kind_id, 65)
+      expect(basic_issue.tags_by_affinities).to eq([])
+    end
+
+    it 'returns empty if affinity kind has no associated tag' do
+      basic_issue = create(:basic_issue, person: create(:full_natural_person))
+      person = basic_issue.reload.person
+      create(:full_affinity, person: person)
+      expect(basic_issue.tags_by_affinities).to eq([])
+    end
+  end
+
   describe 'when transitioning' do
     it 'defaults to draft' do
       expect(empty_issue).to have_state(:draft)
