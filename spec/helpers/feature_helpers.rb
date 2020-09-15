@@ -82,7 +82,9 @@ module FeatureHelpers
       find_all('.select2.select2-container.select2-container--default')
         .to_a.first.click
     end
-    find(".select2-search__field").set(value)
+    within '.select2-search--dropdown' do
+      find(".select2-search__field").set(value)
+    end
     within ".select2-results" do
       find_all("li", text: value).first.click
     end

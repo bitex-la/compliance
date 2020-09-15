@@ -157,6 +157,42 @@ describe 'Dashboard' do
       visit '/'
       expect(page).to have_content('(this-is-a-issue-tag-1) payee')
     end
+
+    it 'searches by affinity tag' do
+      login_as admin_user
+
+      issues = 
+        10.times.map do
+          issue = create(:basic_issue)
+          issue.complete!
+          issue
+        end
+
+      basic_issue_with_tags = create(:basic_issue_with_tags, person: create(:full_natural_person))
+      person = basic_issue_with_tags.reload.person
+      create(:full_affinity, person: person)
+      basic_issue_with_tags
+        .person
+        .affinities
+        .last
+        .update_column(:affinity_kind_id, AffinityKind.find_by_code(:payee).id)
+      basic_issue_with_tags.complete!
+
+      visit '/'
+
+      [issues, basic_issue_with_tags].flatten.each do |issue|
+        expect(page).to have_selector("#issue_#{issue.id}")
+      end
+
+      select_with_search('#q_affinity_kinds_input', 'payee')
+
+      click_button 'Filter'
+
+      issues.each do |issue|
+        expect(page).not_to have_selector("#issue_#{issue.id}")
+      end
+      expect(page).to have_selector("#issue_#{basic_issue_with_tags.id}")
+    end
   end
 
 end

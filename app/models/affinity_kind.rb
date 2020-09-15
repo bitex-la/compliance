@@ -27,4 +27,8 @@ class AffinityKind
   def inverse
     inverse_of || "#{code}_of".to_sym
   end
+
+  def self.with_associated_tags
+    all.select { |affinity_kind| affinity_kind.associated_tag }
+  end
 end

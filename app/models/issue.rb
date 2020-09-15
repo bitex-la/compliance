@@ -9,6 +9,7 @@ class Issue < ApplicationRecord
 
   has_many :issue_taggings
   has_many :tags, through: :issue_taggings
+  has_many :affinities, through: :person
   accepts_nested_attributes_for :issue_taggings, allow_destroy: true
 
   ransack_alias :state, :aasm_state
@@ -200,12 +201,16 @@ class Issue < ApplicationRecord
     where('defer_until <= ?', Date.current)
   }
 
+  scope :affinity_kinds, ->(code) {
+    Issue.joins(:affinities).where(affinities: { affinity_kind_id: AffinityKind.find_by_code(code)&.id })
+  }
+
   def future?
     defer_until && defer_until > Date.current
   end
 
   def self.ransackable_scopes(auth_object = nil)
-    %i(active by_person_type by_person_tag)
+    %i(active by_person_type by_person_tag affinity_kinds)
   end
 
   def self.ransackable_scopes_skip_sanitize_args
@@ -409,7 +414,7 @@ class Issue < ApplicationRecord
   def tags_by_affinities
     return [] if tags.empty?
 
-    person.affinities.reduce([]) do |acc, affinity|
+    affinities.reduce([]) do |acc, affinity|
       acc.push(affinity.affinity_kind.associated_tag) if affinity.affinity_kind.associated_tag
       acc
     end

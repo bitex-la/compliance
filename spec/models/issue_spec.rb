@@ -102,8 +102,7 @@ RSpec.describe Issue, type: :model do
   describe 'associated tag' do
     it 'returns payee if tags is present and associated tag is defined' do
       basic_issue_with_tags = create(:basic_issue_with_tags, person: create(:full_natural_person))
-      person = basic_issue_with_tags.reload.person
-      create(:full_affinity, person: person)
+      create(:full_affinity, person: basic_issue_with_tags.reload.person)
       basic_issue_with_tags
         .person
         .affinities
@@ -114,16 +113,14 @@ RSpec.describe Issue, type: :model do
 
     it 'returns empty if no tags' do
       basic_issue = create(:basic_issue, person: create(:full_natural_person))
-      person = basic_issue.reload.person
-      create(:full_affinity, person: person)
+      create(:full_affinity, person: basic_issue.reload.person)
       basic_issue.person.affinities.last.update_column(:affinity_kind_id, AffinityKind.find_by_code(:payee).id)
       expect(basic_issue.tags_by_affinities).to eq([])
     end
 
     it 'returns empty if affinity kind has no associated tag' do
       basic_issue = create(:basic_issue, person: create(:full_natural_person))
-      person = basic_issue.reload.person
-      create(:full_affinity, person: person)
+      create(:full_affinity, person: basic_issue.reload.person)
       expect(basic_issue.tags_by_affinities).to eq([])
     end
   end

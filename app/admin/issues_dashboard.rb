@@ -28,6 +28,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   filter :natural_docket_seed_politically_exposed_eq, as: :select, label: "Is PEP"
   filter :reason
   filter :tags_id , as: :select, collection: proc { Tag.issues }, multiple: true
+  filter :affinity_kinds, as: :select, collection: proc { AffinityKind.with_associated_tags.map(&:code) }, label: 'Affinity Tags'
   filter :by_person_tag , as: :select, collection: proc { Tag.people }, multiple: true
   filter :created_at
   filter :updated_at
