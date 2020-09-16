@@ -45,7 +45,7 @@ RUN sed -i "s|bind-address.*|skip-networking|g" /etc/mysql/mysql.conf.d/mysqld.c
 
 RUN git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
     && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
-    && cd /usr/local/compliance && bundle install --deployment
+    && cd /usr/local/compliance && bundle install --deployment --without test
 
 RUN service mysql start \
     && redis-server --daemonize yes --port 0 --unixsocket /tmp/redis.sock --unixsocketperm 775 \
