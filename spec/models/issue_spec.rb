@@ -99,6 +99,23 @@ RSpec.describe Issue, type: :model do
     expect(Issue.last.defer_until).to eq Date.current
   end
 
+  it 'assigns tag to person when affinity_to_tag is defined' do
+    payee = AffinityKind.find_by_code(:payee)
+    basic_issue = create(:basic_issue, person: create(:full_natural_person))
+    person = basic_issue.reload.person
+    create(:full_affinity, person: person)
+    expect(person.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
+
+    basic_issue
+      .person
+      .affinities
+      .last
+      .update(affinity_kind_id: payee.id)
+    basic_issue.complete!
+
+    expect(person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+  end
+
   describe 'when transitioning' do
     it 'defaults to draft' do
       expect(empty_issue).to have_state(:draft)

@@ -25,6 +25,7 @@ class Issue < ApplicationRecord
   after_save :sync_observed_status
   after_save :log_if_needed
   after_save{ person.expire_action_cache }
+  after_save :assigns_tag_by_affinity
 
   validate :defer_until_cannot_be_in_the_past
 
@@ -120,6 +121,17 @@ class Issue < ApplicationRecord
         log_state_change(:observe_issue)
       end
     end
+  end
+
+  def assigns_tag_by_affinity
+    person
+      .affinities
+      .where(affinity_kind_id: AffinityKind.affinities_to_tags.map(&:id))
+      .map do |affinity|
+        kind = affinity.affinity_kind
+        affinity.person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.affinity_to_tag)
+        affinity.related_person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.inverse_of_tag)
+      end
   end
 
   HAS_ONE = %i{
