@@ -211,20 +211,18 @@ ActiveAdmin.register Person do
 
         if observations = resource.all_observations.sort_by(&:created_at).reverse
           panel "Observations" do
-            Appsignal.instrument('render_observations') do
-              table_for observations do
-                column :issue {|o| link_to "##{o.issue.id}", [resource, o.issue] }
-                column :observation_reason
-                column :scope
-                column "" do |o|
-                  span o.note
-                  br
-                  strong "Reply:"
-                  span o.reply
-                end
-                column :created_at
-                column :updated_at
+            table_for observations do
+              column :issue {|o| link_to "##{o.issue.id}", [resource, o.issue] }
+              column :observation_reason
+              column :scope
+              column "" do |o|
+                span o.note
+                br
+                strong "Reply:"
+                span o.reply
               end
+              column :created_at
+              column :updated_at
             end
           end
         end

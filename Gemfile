@@ -53,9 +53,6 @@ gem 'actionpack-action_caching'
 # exception notifier
 gem 'exception_notification'
 
-# monitoring
-gem 'appsignal'
-
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'yajl-ruby', require: 'yajl'
 
@@ -87,6 +84,7 @@ end
 
 group :development do
   gem 'bullet'
+  gem 'appsignal'
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-rails', '~> 1.3', require: false
   gem 'capistrano-bundler', '~> 1.1.2', require: false
