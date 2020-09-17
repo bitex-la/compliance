@@ -148,6 +148,27 @@ RSpec.describe Issue, type: :model do
       expect(person.reload.tags).to be_empty
       expect(affinity_seed.related_person.reload.tags).to be_empty
     end
+
+    it 'moves tags from one related person to another' do
+      related_person = create(:empty_person)
+      another_related_person = create(:empty_person)
+      affinity_seed =
+        create(:full_affinity_seed,
+              affinity_kind_id: payee.id,
+              person: issue.person,
+              related_person: related_person)
+
+      issue.affinity_seeds << affinity_seed
+      issue.complete!
+      issue.reload
+      expect(related_person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
+      expect(another_related_person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
+
+      affinity_seed.related_person = another_related_person
+      affinity_seed.save!
+      expect(related_person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
+      expect(another_related_person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
+    end
   end
 
   describe 'when transitioning' do

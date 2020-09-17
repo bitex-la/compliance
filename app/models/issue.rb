@@ -147,14 +147,12 @@ class Issue < ApplicationRecord
     phone_seeds
     email_seeds
     note_seeds
+    affinity_seeds
     risk_score_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
-
-  has_many :affinity_seeds, after_add: :add_affinity_tag, after_remove: :remove_affinity_tag
-  accepts_nested_attributes_for :affinity_seeds, allow_destroy: true
 
   has_many :workflows
   accepts_nested_attributes_for :workflows, allow_destroy: true
@@ -417,30 +415,6 @@ class Issue < ApplicationRecord
 
   def log_state_change(verb)
     EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))
-  end
-
-  def add_affinity_tag(affinity_seed)
-    kind = affinity_seed.affinity_kind
-    return unless kind.affinity_to_tag
-
-    affinity_seed.person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.affinity_to_tag)
-    affinity_seed.related_person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.inverse_of_tag)
-  end
-
-  def remove_affinity_tag(affinity_seed)
-    affinity_seed
-      .person
-      .person_taggings
-      .joins(:tag)
-      .where('tags.name': affinity_seed.affinity_kind.affinity_to_tag)
-      .delete_all
-
-    affinity_seed
-      .related_person
-      .person_taggings
-      .joins(:tag)
-      .where('tags.name': affinity_seed.affinity_kind.inverse_of_tag)
-      .delete_all
   end
 
   def self.eager_issue_entities

@@ -2,6 +2,9 @@ class AffinitySeed < AffinityBase
   include Garden::Seed
   validate :linked_once_in_issue
 
+  before_save :add_affinity_tag
+  after_destroy :remove_affinity_tag
+
   def not_linked_to_itself
     return if issue.nil?
     return unless related_person.try(:id) == issue.person.id
@@ -43,4 +46,40 @@ class AffinitySeed < AffinityBase
     return related_person if person == current_person
     return current_issue.person if related_person == current_issue.person
   end
+
+  private
+
+  def add_affinity_tag
+    return unless affinity_kind.affinity_to_tag
+
+    if related_person_id_changed? && related_person_id_was
+      Person
+        .find(related_person_id_was)
+        .person_taggings
+        .joins(:tag)
+        .where('tags.name': affinity_kind.inverse_of_tag)
+        .delete_all
+    end
+
+    tag = Tag.find_or_create_by(tag_type: :person, name: affinity_kind.affinity_to_tag)
+    PersonTagging.find_or_create_by(tag: tag, person: person)
+
+    related_tag = Tag.find_or_create_by(tag_type: :person, name: affinity_kind.inverse_of_tag)
+    PersonTagging.find_or_create_by(tag: related_tag, person: related_person)
+  end
+
+  def remove_affinity_tag
+    person
+      .person_taggings
+      .joins(:tag)
+      .where('tags.name': affinity_kind.affinity_to_tag)
+      .delete_all
+
+    related_person
+      .person_taggings
+      .joins(:tag)
+      .where('tags.name': affinity_kind.inverse_of_tag)
+      .delete_all
+  end
+
 end
