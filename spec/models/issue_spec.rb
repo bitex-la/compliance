@@ -118,6 +118,7 @@ RSpec.describe Issue, type: :model do
       issue.affinity_seeds << affinity_seed
       issue.save!
       expect(person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
     end
 
     it 'removes tag from person' do
@@ -126,10 +127,12 @@ RSpec.describe Issue, type: :model do
       issue.reload
       person = issue.person
       expect(person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
 
       issue.affinity_seeds.destroy(affinity_seed)
       issue.save!
       expect(person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
     end
 
     it 'do not assigns tag to person if affinity kind affinity_to_tag is nil' do
@@ -143,6 +146,7 @@ RSpec.describe Issue, type: :model do
       issue.reload
       person = issue.person
       expect(person.reload.tags).to be_empty
+      expect(affinity_seed.related_person.reload.tags).to be_empty
     end
   end
 
