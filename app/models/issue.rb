@@ -428,11 +428,18 @@ class Issue < ApplicationRecord
   end
 
   def remove_affinity_tag(affinity_seed)
-    person
+    affinity_seed
+      .person
       .person_taggings
       .joins(:tag)
-      .where('tags.name': [affinity_seed.affinity_kind.affinity_to_tag, 
-                           affinity_seed.affinity_kind.inverse_of_tag])
+      .where('tags.name': affinity_seed.affinity_kind.affinity_to_tag)
+      .delete_all
+
+    affinity_seed
+      .related_person
+      .person_taggings
+      .joins(:tag)
+      .where('tags.name': affinity_seed.affinity_kind.inverse_of_tag)
       .delete_all
   end
 
