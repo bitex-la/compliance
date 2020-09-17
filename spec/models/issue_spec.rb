@@ -99,21 +99,38 @@ RSpec.describe Issue, type: :model do
     expect(Issue.last.defer_until).to eq Date.current
   end
 
-  it 'assigns tag to person when affinity_to_tag is defined' do
-    payee = AffinityKind.find_by_code(:payee)
-    basic_issue = create(:basic_issue, person: create(:full_natural_person))
-    person = basic_issue.reload.person
-    create(:full_affinity, person: person)
-    expect(person.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
+  describe 'affinity_to_tag' do
+    let(:payee) { AffinityKind.find_by_code(:payee) } 
+    let(:issue) { create(:basic_issue, person: create(:empty_person)) } 
+    let(:affinity_seed) {
+      create(:full_affinity_seed,
+             affinity_kind_id: payee.id,
+             person: issue.person,
+             related_person: create(:empty_person))
+    }
 
-    basic_issue
-      .person
-      .affinities
-      .last
-      .update(affinity_kind_id: payee.id)
-    basic_issue.complete!
+    it 'assigns tag to person' do
+      issue.complete!
+      issue.reload
+      person = issue.person
+      expect(person.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
 
-    expect(person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+      issue.affinity_seeds << affinity_seed
+      issue.save!
+      expect(person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+    end
+
+    it 'removes tag from person' do
+      issue.affinity_seeds << affinity_seed
+      issue.complete!
+      issue.reload
+      person = issue.person
+      expect(person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+
+      issue.affinity_seeds.destroy(affinity_seed)
+      issue.save!
+      expect(person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
+    end
   end
 
   describe 'when transitioning' do

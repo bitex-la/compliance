@@ -25,7 +25,6 @@ class Issue < ApplicationRecord
   after_save :sync_observed_status
   after_save :log_if_needed
   after_save{ person.expire_action_cache }
-  after_save :assigns_tag_by_affinity
 
   validate :defer_until_cannot_be_in_the_past
 
@@ -123,17 +122,6 @@ class Issue < ApplicationRecord
     end
   end
 
-  def assigns_tag_by_affinity
-    person
-      .affinities
-      .where(affinity_kind_id: AffinityKind.affinities_to_tags.map(&:id))
-      .map do |affinity|
-        kind = affinity.affinity_kind
-        affinity.person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.affinity_to_tag)
-        affinity.related_person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.inverse_of_tag)
-      end
-  end
-
   HAS_ONE = %i{
     natural_docket_seed
     legal_entity_docket_seed
@@ -159,12 +147,14 @@ class Issue < ApplicationRecord
     phone_seeds
     email_seeds
     note_seeds
-    affinity_seeds
     risk_score_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
+
+  has_many :affinity_seeds, after_add: :add_affinity_tag, after_remove: :remove_affinity_tag
+  accepts_nested_attributes_for :affinity_seeds, allow_destroy: true
 
   has_many :workflows
   accepts_nested_attributes_for :workflows, allow_destroy: true
@@ -427,6 +417,21 @@ class Issue < ApplicationRecord
 
   def log_state_change(verb)
     EventLog.log_entity!(self, AdminUser.current_admin_user, EventLogKind.send(verb))
+  end
+
+  def add_affinity_tag(affinity_seed)
+    kind = affinity_seed.affinity_kind
+    affinity_seed.person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.affinity_to_tag)
+    affinity_seed.related_person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.inverse_of_tag)
+  end
+
+  def remove_affinity_tag(affinity_seed)
+    person
+      .person_taggings
+      .joins(:tag)
+      .where('tags.name': [affinity_seed.affinity_kind.affinity_to_tag, 
+                           affinity_seed.affinity_kind.inverse_of_tag])
+      .delete_all
   end
 
   def self.eager_issue_entities
