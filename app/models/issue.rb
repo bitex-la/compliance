@@ -421,6 +421,8 @@ class Issue < ApplicationRecord
 
   def add_affinity_tag(affinity_seed)
     kind = affinity_seed.affinity_kind
+    return unless kind.affinity_to_tag
+
     affinity_seed.person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.affinity_to_tag)
     affinity_seed.related_person.tags << Tag.find_or_create_by(tag_type: :person, name: kind.inverse_of_tag)
   end

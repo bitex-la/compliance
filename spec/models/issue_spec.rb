@@ -131,6 +131,19 @@ RSpec.describe Issue, type: :model do
       issue.save!
       expect(person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
     end
+
+    it 'do not assigns tag to person if affinity kind affinity_to_tag is nil' do
+      affinity_seed =
+        create(:full_affinity_seed,
+              person: issue.person,
+              related_person: create(:empty_person))
+
+      issue.affinity_seeds << affinity_seed
+      issue.complete!
+      issue.reload
+      person = issue.person
+      expect(person.reload.tags).to be_empty
+    end
   end
 
   describe 'when transitioning' do
