@@ -139,26 +139,4 @@ describe 'Dashboard' do
         indexes[3]])
     end
   end
-
-  describe 'affinity tags' do
-    it 'shows payee tag' do
-      login_as admin_user
-
-      basic_issue = create(:basic_issue, person: create(:full_natural_person))
-      create(:full_affinity, person: basic_issue.reload.person)
-      basic_issue
-        .person
-        .affinities
-        .last
-        .update_column(:affinity_kind_id, AffinityKind.find_by_code(:payee).id)
-      basic_issue.complete!
-
-      visit '/'
-      expect(page).to have_content('active-in-AR - payee')
-      click_link 'People'
-      click_link 'Natural Person'
-      expect(page).to have_content('active-in-AR - payee')
-      expect(page).to have_content('payer')
-    end
-  end
 end
