@@ -33,9 +33,9 @@ ENV RAILS_FOLDER=/usr/local/compliance
 RUN mkdir /usr/local/rbenv/plugins \
     && git clone https://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build \
     && /usr/local/rbenv/plugins/ruby-build/install.sh \
-    && rbenv install 2.4.1 \
-    && rbenv global 2.4.1 \
-    && gem install bundler \
+    && rbenv install 2.5.7 \
+    && rbenv global 2.5.7 \
+    && gem install bundler:1.17.3 \
     && rbenv rehash
 
 # RUN service mysql start && mysql -u root -e "SET Password FOR 'root'@'localhost' = 'example';"
@@ -45,7 +45,7 @@ RUN sed -i "s|bind-address.*|skip-networking|g" /etc/mysql/mysql.conf.d/mysqld.c
 
 RUN git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
     && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
-    && cd /usr/local/compliance && bundle install 
+    && cd /usr/local/compliance && bundle install --deployment --without test
 
 RUN service mysql start \
     && redis-server --daemonize yes --port 0 --unixsocket /tmp/redis.sock --unixsocketperm 775 \

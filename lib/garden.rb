@@ -30,7 +30,8 @@ module Garden
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :naming { Naming.new(name) }
+      cattr_accessor(:naming) { Naming.new(name) }
+
       belongs_to :issue
       has_one :person, through: :issue
       def person
