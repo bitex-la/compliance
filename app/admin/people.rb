@@ -212,7 +212,7 @@ ActiveAdmin.register Person do
         if observations = resource.all_observations.sort_by(&:created_at).reverse
           panel "Observations" do
             table_for observations do
-              column :issue {|o| link_to "##{o.issue.id}", [resource, o.issue] }
+              column(:issue) { |o| link_to "##{o.issue.id}", [resource, o.issue] }
               column :observation_reason
               column :scope
               column "" do |o|
@@ -224,6 +224,8 @@ ActiveAdmin.register Person do
               column :created_at
               column :updated_at
             end
+            column :created_at
+            column :updated_at
           end
         end
 
