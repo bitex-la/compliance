@@ -224,8 +224,6 @@ ActiveAdmin.register Person do
               column :created_at
               column :updated_at
             end
-            column :created_at
-            column :updated_at
           end
         end
 
