@@ -4,7 +4,7 @@ unless Rails.env.production?
     password: 'password',
     password_confirmation: 'password',
     api_token: 'my_secure_api_token',
-    role_type: 'super_admin'
+    admin_role: AdminRole.admin
   )
 
   ############# CREATE SUPPORT ENTITIES #################
