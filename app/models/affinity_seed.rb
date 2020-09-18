@@ -57,28 +57,25 @@ class AffinitySeed < AffinityBase
         .find(related_person_id_was)
         .person_taggings
         .joins(:tag)
-        .where('tags.name': affinity_kind.inverse_of_tag)
+        .where('tags.name': affinity_kind.affinity_to_tag)
         .delete_all
     end
 
-    tag = Tag.find_or_create_by(tag_type: :person, name: affinity_kind.affinity_to_tag)
-    PersonTagging.find_or_create_by(tag: tag, person: person)
-
-    related_tag = Tag.find_or_create_by(tag_type: :person, name: affinity_kind.inverse_of_tag)
-    PersonTagging.find_or_create_by(tag: related_tag, person: related_person)
+    person.add_tag(affinity_kind.inverse_of_tag)
+    related_person.add_tag(affinity_kind.affinity_to_tag)
   end
 
   def remove_affinity_tag
     person
       .person_taggings
       .joins(:tag)
-      .where('tags.name': affinity_kind.affinity_to_tag)
+      .where('tags.name': affinity_kind.inverse_of_tag)
       .delete_all
 
     related_person
       .person_taggings
       .joins(:tag)
-      .where('tags.name': affinity_kind.inverse_of_tag)
+      .where('tags.name': affinity_kind.affinity_to_tag)
       .delete_all
   end
 
