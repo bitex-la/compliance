@@ -331,6 +331,13 @@ class Person < ApplicationRecord
     PersonTagging.find_or_create_by(person: self, tag: tag)
   end
 
+  def remove_tag(tag_name)
+    person_taggings
+      .joins(:tag)
+      .where('tags.name': tag_name)
+      .delete_all
+  end
+
   aasm do
     state :new, initial: true
     state :enabled

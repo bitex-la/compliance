@@ -55,10 +55,7 @@ class AffinitySeed < AffinityBase
     if related_person_id_changed? && related_person_id_was
       Person
         .find(related_person_id_was)
-        .person_taggings
-        .joins(:tag)
-        .where('tags.name': affinity_kind.affinity_to_tag)
-        .delete_all
+        .remove_tag(affinity_kind.affinity_to_tag)
     end
 
     person.add_tag(affinity_kind.inverse_of_tag)
@@ -66,17 +63,8 @@ class AffinitySeed < AffinityBase
   end
 
   def remove_affinity_tag
-    person
-      .person_taggings
-      .joins(:tag)
-      .where('tags.name': affinity_kind.inverse_of_tag)
-      .delete_all
-
-    related_person
-      .person_taggings
-      .joins(:tag)
-      .where('tags.name': affinity_kind.affinity_to_tag)
-      .delete_all
+    person.remove_tag(affinity_kind.inverse_of_tag)
+    related_person.remove_tag(affinity_kind.affinity_to_tag)
   end
 
 end
