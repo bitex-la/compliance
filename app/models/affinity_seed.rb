@@ -50,7 +50,7 @@ class AffinitySeed < AffinityBase
   private
 
   def add_affinity_tag
-    return unless affinity_kind.affinity_to_tag
+    return unless affinity_kind.affinity_to_tag || affinity_kind.inverse_of_tag
 
     if related_person_id_changed? && related_person_id_was
       Person
@@ -66,5 +66,4 @@ class AffinitySeed < AffinityBase
     person.remove_tag(affinity_kind.inverse_of_tag)
     related_person.remove_tag(affinity_kind.affinity_to_tag)
   end
-
 end

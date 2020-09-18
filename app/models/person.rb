@@ -332,10 +332,7 @@ class Person < ApplicationRecord
   end
 
   def remove_tag(tag_name)
-    person_taggings
-      .joins(:tag)
-      .where('tags.name': tag_name)
-      .delete_all
+    tags.delete(Tag.find_by_name(tag_name))
   end
 
   aasm do
