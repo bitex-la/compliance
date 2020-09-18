@@ -29,6 +29,6 @@ class AffinityKind
   end
 
   def self.affinities_to_tags
-    all.select { |affinity| affinity.affinity_to_tag && affinity.inverse_of_tag }
+    all.select { |affinity| affinity.affinity_to_tag || affinity.inverse_of_tag }
   end
 end
