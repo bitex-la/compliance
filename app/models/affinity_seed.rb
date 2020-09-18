@@ -54,8 +54,9 @@ class AffinitySeed < AffinityBase
     related_person_changed = related_person_id_changed? && related_person_id_was
 
     if affinity_kind_changed
-      tag_name = AffinityKind.find(affinity_kind_id_was).affinity_to_tag
-      inverse_tag_name = AffinityKind.find(affinity_kind_id_was).inverse_of_tag
+      kind = AffinityKind.find(affinity_kind_id_was)
+      tag_name = kind.affinity_to_tag
+      inverse_tag_name = kind.inverse_of_tag
       if related_person_changed
         Person
           .find(related_person_id_was)
@@ -67,11 +68,7 @@ class AffinitySeed < AffinityBase
     end
 
     if related_person_changed
-      if affinity_kind_changed
-        Person
-          .find(related_person_id_was)
-          .remove_tag(AffinityKind.find(affinity_kind_id_was).affinity_to_tag)
-      else
+      unless affinity_kind_changed
         Person
           .find(related_person_id_was)
           .remove_tag(affinity_kind.affinity_to_tag)
