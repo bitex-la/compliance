@@ -2,7 +2,7 @@ class AffinitySeed < AffinityBase
   include Garden::Seed
   validate :linked_once_in_issue
 
-  before_save :add_affinity_tag
+  before_save :add_update_affinity_tag
   after_destroy :remove_affinity_tag
 
   def not_linked_to_itself
@@ -49,7 +49,7 @@ class AffinitySeed < AffinityBase
 
   private
 
-  def add_affinity_tag
+  def add_update_affinity_tag
     affinity_kind_changed = affinity_kind_id_changed? && affinity_kind_id_was
     related_person_changed = related_person_id_changed? && related_person_id_was
 
