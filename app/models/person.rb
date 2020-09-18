@@ -327,8 +327,11 @@ class Person < ApplicationRecord
   end
 
   def add_tag(tag_name)
+    return unless tag_name
+
     tag = Tag.find_or_create_by(tag_type: :person, name: tag_name)
     PersonTagging.find_or_create_by(person: self, tag: tag)
+    tags.reload
   end
 
   def remove_tag(tag_name)
