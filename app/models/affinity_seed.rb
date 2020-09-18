@@ -75,8 +75,6 @@ class AffinitySeed < AffinityBase
       end
     end
 
-    return unless affinity_kind.affinity_to_tag
-
     person.add_tag(affinity_kind.inverse_of_tag)
     related_person.add_tag(affinity_kind.affinity_to_tag)
   end
