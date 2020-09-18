@@ -123,15 +123,12 @@ RSpec.describe Issue, type: :model do
 
     it 'removes tag from person' do
       issue.affinity_seeds << affinity_seed
-      issue.complete!
-      issue.reload
-      person = issue.person
-      expect(person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
+      expect(issue.person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
 
       issue.affinity_seeds.destroy(affinity_seed)
       issue.save!
-      expect(person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
+      expect(issue.person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
     end
 
@@ -142,10 +139,7 @@ RSpec.describe Issue, type: :model do
               related_person: create(:empty_person))
 
       issue.affinity_seeds << affinity_seed
-      issue.complete!
-      issue.reload
-      person = issue.person
-      expect(person.reload.tags).to be_empty
+      expect(issue.person.reload.tags).to be_empty
       expect(affinity_seed.related_person.reload.tags).to be_empty
     end
 
@@ -159,8 +153,6 @@ RSpec.describe Issue, type: :model do
               related_person: related_person)
 
       issue.affinity_seeds << affinity_seed
-      issue.complete!
-      issue.reload
       expect(related_person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
       expect(another_related_person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
 
@@ -177,9 +169,6 @@ RSpec.describe Issue, type: :model do
               related_person: create(:empty_person))
 
       issue.affinity_seeds << affinity_seed
-      issue.complete!
-      issue.reload
-
       expect(issue.person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
 
@@ -191,9 +180,6 @@ RSpec.describe Issue, type: :model do
 
     it 'removes person tag when affinity kind changed' do
       issue.affinity_seeds << affinity_seed
-      issue.complete!
-      issue.reload
-
       expect(issue.person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
 
