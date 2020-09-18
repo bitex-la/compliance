@@ -169,6 +169,39 @@ RSpec.describe Issue, type: :model do
       expect(related_person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
       expect(another_related_person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
     end
+
+    it 'create person tag when affinity kind is assigned' do
+      affinity_seed =
+        create(:full_affinity_seed,
+              person: issue.person,
+              related_person: create(:empty_person))
+
+      issue.affinity_seeds << affinity_seed
+      issue.complete!
+      issue.reload
+
+      expect(issue.person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
+
+      affinity_seed.affinity_kind = payee
+      affinity_seed.save!
+      expect(issue.person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+    end
+
+    it 'removes person tag when affinity kind changed' do
+      issue.affinity_seeds << affinity_seed
+      issue.complete!
+      issue.reload
+
+      expect(issue.person.reload.tags.map(&:name)).to include(payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(payee.affinity_to_tag.to_s)
+
+      affinity_seed.affinity_kind = AffinityKind.find_by_code(:spouse)
+      affinity_seed.save!
+      expect(issue.person.reload.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(payee.affinity_to_tag.to_s)
+    end
   end
 
   describe 'when transitioning' do
