@@ -50,13 +50,35 @@ class AffinitySeed < AffinityBase
   private
 
   def add_affinity_tag
-    return unless affinity_kind.affinity_to_tag || affinity_kind.inverse_of_tag
+    affinity_kind_changed = affinity_kind_id_changed? && affinity_kind_id_was
+    related_person_changed = related_person_id_changed? && related_person_id_was
 
-    if related_person_id_changed? && related_person_id_was
-      Person
-        .find(related_person_id_was)
-        .remove_tag(affinity_kind.affinity_to_tag)
+    if affinity_kind_changed
+      tag_name = AffinityKind.find(affinity_kind_id_was).affinity_to_tag
+      inverse_tag_name = AffinityKind.find(affinity_kind_id_was).inverse_of_tag
+      if related_person_changed
+        Person
+          .find(related_person_id_was)
+          .remove_tag(tag_name)
+      else
+        related_person.remove_tag(tag_name)
+      end
+      person.remove_tag(inverse_tag_name)
     end
+
+    if related_person_changed
+      if affinity_kind_changed
+        Person
+          .find(related_person_id_was)
+          .remove_tag(AffinityKind.find(affinity_kind_id_was).affinity_to_tag)
+      else
+        Person
+          .find(related_person_id_was)
+          .remove_tag(affinity_kind.affinity_to_tag)
+      end
+    end
+
+    return unless affinity_kind.affinity_to_tag
 
     person.add_tag(affinity_kind.inverse_of_tag)
     related_person.add_tag(affinity_kind.affinity_to_tag)
