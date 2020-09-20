@@ -5,7 +5,7 @@ RSpec.describe Issue, type: :model do
     create: -> (person_id) { Issue.create!(person_id: person_id) },
     change_person: -> (obj, person_id){ obj.person_id = person_id }
 
-  let(:invalid_issue) { described_class.new } 
+  let(:invalid_issue) { described_class.new }
   let(:empty_issue) { create(:basic_issue) }
   let(:basic_issue) { create(:basic_issue) }
   let(:future_issue) { create(:future_issue) }
@@ -54,7 +54,7 @@ RSpec.describe Issue, type: :model do
     expect(Issue.fresh).to_not include future_issue
 
     Timecop.travel 3.months.from_now
-  
+
     expect(Issue.future).to_not include future_issue
     expect(Issue.current).to include future_issue
     expect(Issue.draft).to include future_issue
@@ -134,7 +134,7 @@ RSpec.describe Issue, type: :model do
 
     %i(new answered approved).each do |state|
       it "goes from #{state} to approved on approve" do
-        expect(empty_issue).to transition_from(state).to(:approved).on_event(:approve) 
+        expect(empty_issue).to transition_from(state).to(:approved).on_event(:approve)
       end
     end
 
@@ -147,7 +147,7 @@ RSpec.describe Issue, type: :model do
     it 'does nothing on reject' do
       person = create :full_natural_person
       issue = create(:basic_issue, person: person)
-      
+
       expect do
         issue.reject!
       end.not_to change{ person.enabled }
@@ -156,7 +156,7 @@ RSpec.describe Issue, type: :model do
     it 'does nothing on dismiss' do
       person = create :full_natural_person
       issue = create(:basic_issue, person: person)
-      
+
       expect do
         issue.dismiss!
       end.not_to change{ person.enabled }
@@ -164,7 +164,7 @@ RSpec.describe Issue, type: :model do
 
     it 'do not enable person on approve' do
       person = create :new_natural_person
-      
+
       person.issues.reload.last.approve!
       person.reload
       expect(person.enabled).to be_falsey
@@ -173,7 +173,7 @@ RSpec.describe Issue, type: :model do
 
     it 'enable person on approve if issue reason is new_client' do
       person = create(:new_natural_person, :with_new_client_reason)
-      
+
       person.issues.reload.last.approve!
       person.reload
       expect(person.enabled).to be_truthy
@@ -182,7 +182,7 @@ RSpec.describe Issue, type: :model do
 
     it 'validates error on approve twice' do
       person = create(:new_natural_person, :with_new_client_reason)
-      
+
       person.issues.reload.last.approve!
       person.reload
       expect(person.enabled).to be_truthy
@@ -198,15 +198,15 @@ RSpec.describe Issue, type: :model do
       expires_at = 1.month.from_now.to_date
       issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
       issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
-    
+
       issue.save!
 
       expect(person.issues.to_a).to eq([issue])
 
       expect do
         issue.approve!
-      end.to change{person.issues.count}.by(2)      
-      
+      end.to change{person.issues.count}.by(2)
+
       person.reload
 
       issue_notes = person.issues[-2]
@@ -241,9 +241,9 @@ RSpec.describe Issue, type: :model do
       issue = create(:full_natural_person_issue_with_fixed_email, person: person)
       issue2 = create(:full_natural_person_issue_with_fixed_email, person: person)
       issue3 = create(:full_natural_person_issue_with_fixed_email, person: person)
-      
+
       issue2.complete!
-      
+
       expect(NoteSeed.others_active_seeds(issue)).to include issue2.reload.note_seeds.first
       expect(NoteSeed.others_active_seeds(issue)).to_not include issue3.reload.note_seeds.first
 
@@ -296,7 +296,7 @@ RSpec.describe Issue, type: :model do
       %w(domicile allowance identification).each do |assoc|
         person.send(assoc.pluralize).first.seed.should ==
           issue.send("#{assoc}_seeds").first
-        issue.send("#{assoc}_seeds").first.fruit.should == 
+        issue.send("#{assoc}_seeds").first.fruit.should ==
           person.send(assoc.pluralize).first
       end
 
@@ -305,7 +305,7 @@ RSpec.describe Issue, type: :model do
 
       # Allowance
       fruit = person.allowances.first
-  
+
       %i(weight amount kind).each do |attr|
         fruit.send(attr).should == fruit.seed.send(attr)
       end
@@ -350,7 +350,7 @@ RSpec.describe Issue, type: :model do
       issue.add_seeds_replacing([other_person.domiciles.last])
       issue.reload.domicile_seeds.should be_empty
     end
-  end  
+  end
 
   describe "when snapping in and out of observed state" do
     it 'can snap into observed state' do
@@ -414,10 +414,10 @@ RSpec.describe Issue, type: :model do
 
     interval = Issue.lock_expiration_interval_minutes
 
-    before :each do 
-      AdminUser.current_admin_user = admin_user 
+    before :each do
+      AdminUser.current_admin_user = admin_user
     end
-    
+
     it 'can lock issue if not locked' do
       Timecop.freeze DateTime.new(2018,01,01,13,0,0)
       expect(basic_issue.lock_issue!).to be true
@@ -694,6 +694,26 @@ RSpec.describe Issue, type: :model do
 
       issue.person.reload
       expect(issue.person.tags.count).to eq(1)
+    end
+  end
+
+  describe "when issue contain same_person affinity seed" do
+    it 'execute fulfilment service on auto created affinity same_person issues' do
+      issue = create(:basic_issue)
+      create(:full_affinity_seed, issue: issue, affinity_kind: AffinityKind.same_person, auto_created: true)
+      issue.reload
+      expect(SamePersonAffinity::Fulfilment).to receive(:call).with(issue.affinity_seeds).once
+      expect(SamePersonAffinity::Fulfilment).to receive(:after_process).with(issue.affinity_seeds).once
+      issue.approve!
+    end
+
+    it 'not execute fulfilment service on manual affinity same_person issues' do
+      issue = create(:basic_issue)
+      create(:full_affinity_seed, issue: issue, affinity_kind: AffinityKind.same_person)
+      issue.reload
+      expect(SamePersonAffinity::Fulfilment).not_to receive(:call).with(issue.affinity_seeds)
+      expect(SamePersonAffinity::Fulfilment).not_to receive(:after_process).with(issue.affinity_seeds)
+      issue.approve!
     end
   end
 end
