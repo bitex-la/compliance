@@ -175,6 +175,20 @@ RSpec.describe Issue, type: :model do
       expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
     end
+    
+    it 'change related person and affinity kind' do
+      another_related_person = create(:empty_person)
+
+      issue.affinity_seeds << simple_affinity_seed
+      expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(simple_affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+
+      affinity_seed.related_person = another_related_person
+      simple_affinity_seed.affinity_kind = AffinityKind.payee
+      affinity_seed.save!
+      expect(related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+      expect(another_related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+    end
   end
 
   describe 'when transitioning' do
