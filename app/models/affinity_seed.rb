@@ -60,27 +60,27 @@ class AffinitySeed < AffinityBase
       if related_person_changed
         Person
           .find(related_person_id_was)
-          .remove_tag(tag_name)
+          .remove_tag(tag_name) if tag_name
       else
-        related_person.remove_tag(tag_name)
+        related_person.remove_tag(tag_name) if tag_name
       end
-      person.remove_tag(inverse_tag_name)
+      person.remove_tag(inverse_tag_name) if inverse_tag_name
     end
 
     if related_person_changed
       unless affinity_kind_changed
         Person
           .find(related_person_id_was)
-          .remove_tag(affinity_kind.affinity_to_tag)
+          .remove_tag(affinity_kind.affinity_to_tag) if affinity_kind.affinity_to_tag
       end
     end
 
-    person.add_tag(affinity_kind.inverse_of_tag)
-    related_person.add_tag(affinity_kind.affinity_to_tag)
+    person.add_tag(affinity_kind.inverse_of_tag) if affinity_kind.inverse_of_tag
+    related_person.add_tag(affinity_kind.affinity_to_tag) if affinity_kind.affinity_to_tag
   end
 
   def remove_affinity_tag
-    person.remove_tag(affinity_kind.inverse_of_tag)
-    related_person.remove_tag(affinity_kind.affinity_to_tag)
+    person.remove_tag(affinity_kind.inverse_of_tag) if affinity_kind.inverse_of_tag
+    related_person.remove_tag(affinity_kind.affinity_to_tag) if affinity_kind.affinity_to_tag
   end
 end
