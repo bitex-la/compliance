@@ -108,6 +108,11 @@ RSpec.describe Issue, type: :model do
              person: issue.person,
              related_person: related_person)
     }
+    let(:simple_affinity_seed) {
+      create(:full_affinity_seed,
+            person: issue.person,
+            related_person: create(:empty_person))
+    }
 
     it 'assigns tag to person' do
       person = issue.person
@@ -131,14 +136,9 @@ RSpec.describe Issue, type: :model do
     end
 
     it 'do not assigns tag to person if affinity kind affinity_to_tag is nil' do
-      affinity_seed =
-        create(:full_affinity_seed,
-              person: issue.person,
-              related_person: create(:empty_person))
-
-      issue.affinity_seeds << affinity_seed
+      issue.affinity_seeds << simple_affinity_seed
       expect(issue.person.reload.tags).to be_empty
-      expect(affinity_seed.related_person.reload.tags).to be_empty
+      expect(simple_affinity_seed.related_person.reload.tags).to be_empty
     end
 
     it 'moves tags from one related person to another' do
@@ -155,19 +155,14 @@ RSpec.describe Issue, type: :model do
     end
 
     it 'create person tag when affinity kind is assigned' do
-      affinity_seed =
-        create(:full_affinity_seed,
-              person: issue.person,
-              related_person: create(:empty_person))
-
-      issue.affinity_seeds << affinity_seed
+      issue.affinity_seeds << simple_affinity_seed
       expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
-      expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+      expect(simple_affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
 
-      affinity_seed.affinity_kind = AffinityKind.payee
-      affinity_seed.save!
+      simple_affinity_seed.affinity_kind = AffinityKind.payee
+      simple_affinity_seed.save!
       expect(issue.person.reload.tags.map(&:name)).to include(AffinityKind.payee.inverse_of_tag.to_s)
-      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+      expect(simple_affinity_seed.related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
     end
 
     it 'removes person tag when affinity kind changed' do
