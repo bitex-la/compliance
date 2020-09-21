@@ -170,7 +170,7 @@ RSpec.describe Issue, type: :model do
       expect(issue.person.reload.tags.map(&:name)).to include(AffinityKind.payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
 
-      affinity_seed.affinity_kind = AffinityKind.find_by_code(:spouse)
+      affinity_seed.affinity_kind = AffinityKind.spouse
       affinity_seed.save!
       expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
