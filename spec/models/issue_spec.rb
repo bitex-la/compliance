@@ -110,8 +110,6 @@ RSpec.describe Issue, type: :model do
     }
 
     it 'assigns tag to person' do
-      issue.complete!
-      issue.reload
       person = issue.person
       expect(person.tags.map(&:name)).not_to include(payee.inverse_of_tag.to_s)
 
