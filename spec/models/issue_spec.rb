@@ -101,11 +101,12 @@ RSpec.describe Issue, type: :model do
 
   describe 'affinity_to_tag' do
     let(:issue) { create(:basic_issue, person: create(:empty_person)) } 
+    let(:related_person) { create(:empty_person) } 
     let(:affinity_seed) {
       create(:full_affinity_seed,
              affinity_kind_id: AffinityKind.payee.id,
              person: issue.person,
-             related_person: create(:empty_person))
+             related_person: related_person)
     }
 
     it 'assigns tag to person' do
@@ -141,13 +142,7 @@ RSpec.describe Issue, type: :model do
     end
 
     it 'moves tags from one related person to another' do
-      related_person = create(:empty_person)
       another_related_person = create(:empty_person)
-      affinity_seed =
-        create(:full_affinity_seed,
-              affinity_kind_id: AffinityKind.payee.id,
-              person: issue.person,
-              related_person: related_person)
 
       issue.affinity_seeds << affinity_seed
       expect(related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
