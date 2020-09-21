@@ -75,7 +75,7 @@ class AffinitySeed < AffinityBase
       end
     end
 
-    person.add_tag(affinity_kind.inverse_of_tag)
+    person.add_tag(affinity_kind.inverse_of_tag) if affinity_kind.inverse_of_tag
     related_person.add_tag(affinity_kind.affinity_to_tag)
   end
 
