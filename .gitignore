@@ -61,4 +61,5 @@ build-iPhoneSimulator/
 *.swo
 
 config/settings.yml
+config/appsignal.yml
 .vscode/launch.json
