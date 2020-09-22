@@ -17,10 +17,6 @@ defaults: &defaults
 
   exception_recipients: "some@me.com,other@me.com"
 
-  app_signal:
-    key: some_appsignal_api_key
-    app: "Your company"
-
   regularities:
     low:
       funding_amount: 2500
