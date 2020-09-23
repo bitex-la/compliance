@@ -65,6 +65,15 @@ describe 'an admin user' do
     issue.allowance_seeds.first.attachments
       .first.document_file_name.should == 'an_simple_????.gif'
 
+    expect(issue.identification_seeds.first.attachments
+      .first.document_url).to include('an_simple_????.jpg'.to_query('')[1..-1])
+
+    expect(issue.domicile_seeds.first.attachments
+      .first.document_url).to include('an_simple_????.zip'.to_query('')[1..-1])
+
+    expect(issue.allowance_seeds.first.attachments
+      .first.document_url).to include('an_simple_????.gif'.to_query('')[1..-1])
+
     issue.natural_docket_seed.should == NaturalDocketSeed.last
     issue.should be_observed
     observation.should be_new

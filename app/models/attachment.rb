@@ -3,7 +3,6 @@ class Attachment < ApplicationRecord
   belongs_to :attached_to_fruit, polymorphic: true, optional: true
   belongs_to :attached_to_seed, polymorphic: true, optional: true
   has_attached_file :document, optional: true
-  before_validation :strip_accents
 
   before_validation :relate_to_person
   before_validation :classify_type
@@ -14,6 +13,7 @@ class Attachment < ApplicationRecord
 
   before_save :classify_type
   after_save{ person.expire_action_cache }
+  before_post_process :sanitize_file_name
 
   include PersonScopeable
 
@@ -120,7 +120,7 @@ class Attachment < ApplicationRecord
     end 
   end
 
-  def strip_accents
-    self.document_file_name = ActiveSupport::Inflector.transliterate(self.document_file_name) unless self.document_file_name.nil?
+  def sanitize_file_name
+    self.document.instance_write :file_name, ActiveSupport::Inflector.transliterate(self.document_file_name)
   end
 end
