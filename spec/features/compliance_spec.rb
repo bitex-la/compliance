@@ -56,14 +56,14 @@ describe 'an admin user' do
       issue.send(seed).first.attachments.count == 1
     end
 
-    issue.identification_seeds.first.attachments
-      .first.document_file_name.should == 'an_simple_????.jpg'
+    expect(issue.identification_seeds.first.attachments
+      .first.document_file_name).to eq('áñ_simple_微信图片.jpg')
 
-    issue.domicile_seeds.first.attachments
-      .first.document_file_name.should == 'an_simple_????.zip'
+    expect(issue.domicile_seeds.first.attachments
+      .first.document_file_name).to eq('áñ_simple_微信图片.zip')
 
-    issue.allowance_seeds.first.attachments
-      .first.document_file_name.should == 'an_simple_????.gif'
+    expect(issue.allowance_seeds.first.attachments
+      .first.document_file_name).to eq('áñ_simple_微信图片.gif')
 
     issue.natural_docket_seed.should == NaturalDocketSeed.last
     issue.should be_observed

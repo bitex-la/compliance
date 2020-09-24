@@ -99,6 +99,98 @@ RSpec.describe Issue, type: :model do
     expect(Issue.last.defer_until).to eq Date.current
   end
 
+  describe 'affinity_to_tag' do
+    let(:issue) { create(:basic_issue, person: create(:empty_person)) } 
+    let(:related_person) { create(:empty_person) } 
+    let(:affinity_seed) {
+      create(:full_affinity_seed,
+             affinity_kind_id: AffinityKind.payee.id,
+             person: issue.person,
+             related_person: related_person)
+    }
+    let(:simple_affinity_seed) {
+      create(:full_affinity_seed,
+            person: issue.person,
+            related_person: create(:empty_person))
+    }
+
+    it 'assigns tag to person' do
+      person = issue.person
+      expect(person.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
+
+      issue.affinity_seeds << affinity_seed
+      issue.save!
+      expect(person.reload.tags.map(&:name)).to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+    end
+
+    it 'removes tag from person' do
+      issue.affinity_seeds << affinity_seed
+      expect(issue.person.reload.tags.map(&:name)).to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+
+      issue.affinity_seeds.destroy(affinity_seed)
+      issue.save!
+      expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+    end
+
+    it 'do not assigns tag to person if affinity kind affinity_to_tag is nil' do
+      issue.affinity_seeds << simple_affinity_seed
+      expect(issue.person.reload.tags).to be_empty
+      expect(simple_affinity_seed.related_person.reload.tags).to be_empty
+    end
+
+    it 'moves tags from one related person to another' do
+      another_related_person = create(:empty_person)
+
+      issue.affinity_seeds << affinity_seed
+      expect(related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+      expect(another_related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+
+      affinity_seed.related_person = another_related_person
+      affinity_seed.save!
+      expect(related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+      expect(another_related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+    end
+
+    it 'create person tag when affinity kind is assigned' do
+      issue.affinity_seeds << simple_affinity_seed
+      expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(simple_affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+
+      simple_affinity_seed.affinity_kind = AffinityKind.payee
+      simple_affinity_seed.save!
+      expect(issue.person.reload.tags.map(&:name)).to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(simple_affinity_seed.related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+    end
+
+    it 'removes person tag when affinity kind changed' do
+      issue.affinity_seeds << affinity_seed
+      expect(issue.person.reload.tags.map(&:name)).to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+
+      affinity_seed.affinity_kind = AffinityKind.spouse
+      affinity_seed.save!
+      expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+    end
+    
+    it 'change related person and affinity kind' do
+      another_related_person = create(:empty_person)
+
+      issue.affinity_seeds << simple_affinity_seed
+      expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
+      expect(simple_affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+
+      affinity_seed.related_person = another_related_person
+      simple_affinity_seed.affinity_kind = AffinityKind.payee
+      affinity_seed.save!
+      expect(related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
+      expect(another_related_person.reload.tags.map(&:name)).to include(AffinityKind.payee.affinity_to_tag.to_s)
+    end
+  end
+
   describe 'when transitioning' do
     it 'defaults to draft' do
       expect(empty_issue).to have_state(:draft)
