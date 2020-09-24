@@ -73,6 +73,8 @@ jobs:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
   notify:
+    docker:
+      - image: circleci/ruby:2.5.7-node-browsers
     steps:
       - slack/status:
           channel: devs-alerts
