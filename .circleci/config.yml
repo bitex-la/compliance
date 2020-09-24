@@ -5,7 +5,7 @@ orbs:
 
 jobs:
   build:
-    parallelism: 6
+    parallelism: 5
     docker:
       - image: circleci/ruby:2.5.7-node-browsers
         environment:
@@ -72,4 +72,13 @@ jobs:
       - deploy:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
-          
+  -notify:
+    - slack/status:
+      channel: devs-alerts
+
+workflows:
+  build:
+    jobs:             
+      - build
+      - notify
+  
