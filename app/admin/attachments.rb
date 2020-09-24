@@ -59,7 +59,7 @@ ActiveAdmin.register Attachment do
       row :document_file_size
       if IMAGEABLE_CONTENT_TYPES.include?(attachment.document_content_type)
         row "Preview (click to enlarge)" do
-          link_to image_tag(attachment.document_url), attachment.document.url, target: "_blank"
+          link_to image_tag(attachment.document_url), attachment.document_url, target: "_blank"
         end
       elsif DOWNLOADABLE_CONTENT_TYPES.include?(attachment.document_content_type)
         row "Preview (click to download)" do
