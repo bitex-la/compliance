@@ -83,7 +83,7 @@ workflows:
   build:
     jobs:             
       - build
-      - notify
+      - notify:
           requires:
             - build
   
