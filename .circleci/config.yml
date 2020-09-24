@@ -1,4 +1,8 @@
-version: 2
+version: 2.1
+
+orbs:
+  slack: circleci/slack@3.4.2
+
 jobs:
   build:
     parallelism: 4
@@ -68,3 +72,6 @@ jobs:
       - deploy:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
+      - slack/status:
+        channel: devs-alerts
+        
