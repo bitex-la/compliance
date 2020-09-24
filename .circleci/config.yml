@@ -84,4 +84,6 @@ workflows:
     jobs:             
       - build
       - notify
+        requires:
+          - build
   
