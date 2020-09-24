@@ -72,9 +72,10 @@ jobs:
       - deploy:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
-  -notify:
-    - slack/status:
-      channel: devs-alerts
+  notify:
+    steps:
+      - slack/status:
+          channel: devs-alerts
 
 workflows:
   build:
