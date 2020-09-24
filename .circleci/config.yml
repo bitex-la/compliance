@@ -5,7 +5,7 @@ orbs:
 
 jobs:
   build:
-    parallelism: 5
+    parallelism: 6
     docker:
       - image: circleci/ruby:2.5.7-node-browsers
         environment:
