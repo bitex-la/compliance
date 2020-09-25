@@ -1,37 +1,18 @@
 version: 2.1
 
 orbs:
+  ruby: circleci/ruby@1.0 
   slack: circleci/slack@3.4.2
 
 jobs:
   build:
     docker:
       - image: circleci/ruby:2.5.7-node-browsers
-        environment:
-          BUNDLE_JOBS: 4
-          BUNDLE_RETRY: 4
-          BUNDLE_PATH: vendor/bundle
-          IN_CIRCLE: true
     steps:
-      - run:
-          name: Install deps
-          command: |
-            sudo apt-get -qq update && sudo apt-get -qq install libssl-dev wget
-      
       - checkout
       
-      - run:
-          name: Which bundler?
-          command: bundle -v
-      - restore_cache:
-          keys:
-            - rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
-            - rails-compliance-bundle-v2-
-      - run: 'bundle check || bundle install'
-      - save_cache:
-          key: rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
+      - ruby/install-deps
+
       - slack/status:
           channel: devs-alerts
           fail_only: true
@@ -50,28 +31,12 @@ jobs:
       - image: circleci/mysql:5.7
       - image: circleci/redis:4.0.11
     steps:
-      - run:
-          name: Install deps
-          command: |
-            sudo apt-get -qq update && sudo apt-get -qq install libssl-dev wget
-      
       - checkout
       
       - run:
           name: Configuring settings
           command: cp .circleci/settings.yml config/settings.yml
-      - run:
-          name: Which bundler?
-          command: bundle -v
-      - restore_cache:
-          keys:
-            - rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
-            - rails-compliance-bundle-v2-
-      - run: 'bundle check || bundle install'
-      - save_cache:
-          key: rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
+      - ruby/install-deps
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:3306 -timeout 1m      
@@ -80,27 +45,14 @@ jobs:
           command: dockerize -wait tcp://localhost:6379 -timeout 1m
       
       - run: bundle exec rails db:create db:schema:load db:migrate --trace
-      
-      - run: mkdir -p /tmp/artifacts
 
       - run:
           name: Monitor memory usage
           command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
           background: true
 
-      - run:
-          name: Run rspec in parallel
-          command: |
-            bundle exec rspec --profile 10 \
-                              --format RspecJunitFormatter \
-                              --out /tmp/artifacts/rspec.xml \
-                              --format documentation \
-                              $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-      # Save test results for timing analysis
-      - store_test_results:
-          path: /tmp/artifacts
-      - store_artifacts:
-          path: /tmp/artifacts
+      - ruby/rspec-test
+
       - slack/status:
           channel: devs-alerts
           fail_only: true
