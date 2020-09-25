@@ -69,9 +69,10 @@ jobs:
           path: /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
-      - deploy:
-          name: Trigger Build
-          command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
+      - slack/status:
+          channel: devs-alerts
+          fail_only: true
+
   notify:
     docker:
       - image: circleci/ruby:2.5.7-node-browsers
@@ -79,11 +80,23 @@ jobs:
       - slack/status:
           channel: devs-alerts
 
+  trigger_build:
+    docker:
+      - image: circleci/ruby:2.5.7-node-browsers
+    steps:
+      - run:
+          name: Trigger Build
+          command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
+
 workflows:
+  version: 2
   build:
     jobs:             
       - build
       - notify:
+          requires:
+            - build
+      - trigger_build:
           requires:
             - build
   
