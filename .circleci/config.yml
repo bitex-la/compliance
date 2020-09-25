@@ -84,6 +84,7 @@ jobs:
     docker:
       - image: circleci/ruby:2.5.7-node-browsers
     steps:
+      - checkout
       - run:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
