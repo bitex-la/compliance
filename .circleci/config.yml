@@ -5,6 +5,49 @@ orbs:
 
 jobs:
   build:
+    docker:
+      - image: circleci/ruby:2.5.7-node-browsers
+        environment:
+          BUNDLE_JOBS: 4
+          BUNDLE_RETRY: 4
+          BUNDLE_PATH: vendor/bundle
+          RAILS_ENV: test
+          RACK_ENV: test
+          IN_CIRCLE: true
+    steps:
+      - run:
+          name: Install deps
+          command: |
+            sudo apt-get -qq update && sudo apt-get -qq install libssl-dev wget
+      
+      - checkout
+      
+      - run:
+          name: Configuring settings
+          command: cp .circleci/settings.yml config/settings.yml
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - restore_cache:
+          keys:
+            - rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
+            - rails-compliance-bundle-v2-
+      - run: 'bundle check || bundle install'
+      - save_cache:
+          key: rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      
+      - run:
+          name: Monitor memory usage
+          command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
+          background: true
+
+      - slack/status:
+          channel: devs-alerts
+          fail_only: true
+
+  test:
     parallelism: 5
     docker:
       - image: circleci/ruby:2.5.7-node-browsers
@@ -94,10 +137,13 @@ workflows:
   build:
     jobs:             
       - build
+      - test:
+          requires:
+            - build
       - notify:
           requires:
-            - build
+            - test
       - trigger_build:
           requires:
-            - build
+            - test
   
