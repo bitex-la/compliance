@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'an operations role admin user' do
+describe 'an commercial role admin user' do
   let(:commercial_admin_user) { create(:commercial_admin_user) }
 
   it 'gets redirected trying to access to forbidden paths' do
@@ -51,14 +51,15 @@ describe 'an operations role admin user' do
     expect(page).not_to have_content 'Reject'
 
     click_link 'View Person Issues'
-    expect(page).not_to have_content 'New'
+    expect(page).to have_content 'New'
 
     click_on 'Draft'
     within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
       click_link(issue.id)
     end
 
-    expect(page).not_to have_content 'Edit'
+    expect(page).to have_content 'Edit'
+    expect(page).not_to have_content 'Complete'
     expect(page).not_to have_content 'Approve'
     expect(page).not_to have_content 'Dismiss'
     expect(page).not_to have_content 'Abandon'
