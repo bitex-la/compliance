@@ -11,8 +11,6 @@ jobs:
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 4
           BUNDLE_PATH: vendor/bundle
-          RAILS_ENV: test
-          RACK_ENV: test
           IN_CIRCLE: true
     steps:
       - run:
@@ -22,9 +20,6 @@ jobs:
       
       - checkout
       
-      - run:
-          name: Configuring settings
-          command: cp .circleci/settings.yml config/settings.yml
       - run:
           name: Which bundler?
           command: bundle -v
@@ -37,12 +32,6 @@ jobs:
           key: rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-      
-      - run:
-          name: Monitor memory usage
-          command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
-          background: true
-
       - slack/status:
           channel: devs-alerts
           fail_only: true
