@@ -6,18 +6,6 @@ orbs:
 
 jobs:
   build:
-    docker:
-      - image: circleci/ruby:2.5.7-node-browsers
-    steps:
-      - checkout
-      
-      - ruby/install-deps
-
-      - slack/status:
-          channel: devs-alerts
-          fail_only: true
-
-  test:
     parallelism: 5
     docker:
       - image: circleci/ruby:2.5.7-node-browsers
@@ -83,13 +71,10 @@ workflows:
   build:
     jobs:             
       - build
-      - test:
-          requires:
-            - build
       - notify:
           requires:
-            - test
+            - build
       - trigger_build:
           requires:
-            - test
+            - build
   
