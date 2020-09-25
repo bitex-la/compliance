@@ -46,12 +46,17 @@ jobs:
       
       - run: bundle exec rails db:create db:schema:load db:migrate --trace
 
+      - run: mkdir -p /tmp/artifacts
+
       - run:
           name: Monitor memory usage
           command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
           background: true
 
       - ruby/rspec-test
+
+      - store_artifacts:
+          path: /tmp/artifacts
 
       - slack/status:
           channel: devs-alerts
