@@ -100,8 +100,8 @@ RSpec.describe Issue, type: :model do
   end
 
   describe 'affinity_to_tag' do
-    let(:issue) { create(:basic_issue, person: create(:empty_person)) } 
-    let(:related_person) { create(:empty_person) } 
+    let(:issue) { create(:basic_issue, person: create(:empty_person)) }
+    let(:related_person) { create(:empty_person) }
     let(:affinity_seed) {
       create(:full_affinity_seed,
              affinity_kind_id: AffinityKind.payee.id,
@@ -175,7 +175,7 @@ RSpec.describe Issue, type: :model do
       expect(issue.person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.inverse_of_tag.to_s)
       expect(affinity_seed.related_person.reload.tags.map(&:name)).not_to include(AffinityKind.payee.affinity_to_tag.to_s)
     end
-    
+
     it 'change related person and affinity kind' do
       another_related_person = create(:empty_person)
 
