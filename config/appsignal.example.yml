@@ -1,0 +1,34 @@
+default: &defaults
+  # Your push api key, it is possible to set this dynamically using ERB:
+  # push_api_key: "<%= ENV['APPSIGNAL_PUSH_API_KEY'] %>"
+  push_api_key: ""
+
+  # Your app's name
+  name: "Open Compliance"
+
+  ignore_errors:
+    - SystemExit
+
+  debug: false
+
+  # Will send <sample>/100 datapoints on average, picked randomly
+  sample: 50
+
+  active: true
+
+# Configuration per environment, leave out an environment or set active
+# to false to not push metrics for that environment.
+development:
+  <<: *defaults
+  name: "Open Compliance (dev)"
+  sample: 100
+  debug: true
+  active: false
+
+production:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+  active: false
+  name: "Open Compliance (staging)"

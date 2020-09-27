@@ -139,5 +139,4 @@ describe 'Dashboard' do
         indexes[3]])
     end
   end
-
 end
