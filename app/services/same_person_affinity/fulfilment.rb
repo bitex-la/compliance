@@ -8,7 +8,9 @@ module SamePersonAffinity
       # only creates one affinity_seed per issue (for now)
       affinity_seed = affinity_seeds.first
 
-      return if affinity_seed.archived_at
+      return if affinity_seed.archived_at ||
+                affinity_seed.affinity_kind != AffinityKind.same_person ||
+                !affinity_seed.auto_created
 
       # keep current affinities of the
       # affinity_seed person if there still valid (see case C in finder spec)
@@ -71,6 +73,10 @@ module SamePersonAffinity
       # I only evaluate the first one because the same_person affinity process
       # only creates one affinity_seed per issue (for now)
       affinity_seed = affinity_seeds.first
+
+      return unless affinity_seed.affinity_kind == AffinityKind.same_person &&
+                    affinity_seed.auto_created
+
       person = affinity_seed.person
       related_person = affinity_seed.related_person
 

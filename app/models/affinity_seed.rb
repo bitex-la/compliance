@@ -95,6 +95,18 @@ class AffinitySeed < AffinityBase
     return current_issue.person if related_person == current_issue.person
   end
 
+  def self.on_issue_approve(affinity_seeds)
+    return unless affinity_seeds.present?
+
+    SamePersonAffinity::Fulfilment.call(affinity_seeds)
+  end
+
+  def self.after_issue_approve(affinity_seeds)
+    return unless affinity_seeds.present?
+
+    SamePersonAffinity::Fulfilment.after_process(affinity_seeds)
+  end
+
   private
 
   def add_update_affinity_tag

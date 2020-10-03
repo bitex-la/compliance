@@ -799,7 +799,7 @@ RSpec.describe Issue, type: :model do
       issue.approve!
     end
 
-    it 'not execute fulfilment service on manual affinity same_person issues' do
+    xit 'not execute fulfilment service on manual affinity same_person issues' do
       issue = create(:basic_issue)
       create(:full_affinity_seed, issue: issue, affinity_kind: AffinityKind.same_person)
       issue.reload
