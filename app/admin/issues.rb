@@ -89,7 +89,11 @@ ActiveAdmin.register Issue do
       begin
         resource.send("#{action}!")
       rescue ActiveRecord::RecordInvalid => invalid
-        flash[:error] = invalid.record.errors.full_messages.join('-') unless invalid.record.errors.full_messages.empty?
+        if invalid.record.errors.full_messages.empty?
+          flash[:error] = invalid.message
+        else
+          flash[:error] = "#{invalid.record.class} #{invalid.record.errors.full_messages.join('-')}"
+        end
       rescue AASM::InvalidTransition => e
         flash[:error] = e.message
       end
