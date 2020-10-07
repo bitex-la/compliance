@@ -18,6 +18,8 @@ describe AffinitySeed do
 
   it_behaves_like 'archived_seed', :full_affinity
 
+  it_behaves_like 'model_validations', described_class
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

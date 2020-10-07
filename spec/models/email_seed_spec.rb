@@ -18,4 +18,6 @@ RSpec.describe EmailSeed, type: :model do
     }
 
   it_behaves_like 'archived_seed', :full_email
+
+  it_behaves_like 'model_validations', described_class
 end
