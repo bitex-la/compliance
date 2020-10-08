@@ -31,4 +31,6 @@ RSpec.describe NoteSeed, type: :model do
       issue = create(:basic_issue, person_id: person_id)
       create(:full_note_seed, issue: issue)
     }
+
+  it_behaves_like 'model_validations', described_class
 end
