@@ -32,6 +32,8 @@ describe IdentificationSeed do
       create(:full_natural_person_identification_seed, issue: issue)
     }
 
+  it_behaves_like 'model_validations', described_class
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

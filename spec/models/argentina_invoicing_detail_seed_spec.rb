@@ -22,4 +22,6 @@ describe ArgentinaInvoicingDetailSeed do
       issue = create(:basic_issue, person_id: person_id)
       create(:full_argentina_invoicing_detail_seed, issue: issue)
     }
+
+  it_behaves_like 'model_validations', described_class
 end
