@@ -47,6 +47,32 @@ describe Attachment do
     end
   end
 
+  it 'handles heic images' do
+    allow_any_instance_of(Paperclip::MediaTypeSpoofDetector).to(
+      receive(:type_from_file_command).and_return('image/heic')
+    )
+    issue = create(:basic_issue)
+    seed = create(:full_natural_docket_seed,
+      issue: issue, add_all_attachments: false)
+
+    api_create "/attachments",
+      {
+        type: "attachments",
+        relationships: {attached_to_seed: {data: {id: seed.id, type: 'natural_docket_seeds'}}},
+        attributes: {
+          document: "data:#{mime_for(:heic)};base64,#{bytes_for(:heic)}",
+          document_file_name: 'simple.heic',
+          document_content_type: mime_for(:heic)
+        }
+      }
+    file_attachment = api_response.data
+
+    api_get "/attachments/#{file_attachment.id}"
+    expect(api_response.data.relationships.attached_to_seed.data.to_h).to(
+      eq(type: 'natural_docket_seeds', id: seed.id.to_s)
+    )
+  end
+
   it "Can validate max people request limit on show" do
     one, two, three, four, five = 5.times.map do
       seed = create(:full_natural_docket_seed_with_person)

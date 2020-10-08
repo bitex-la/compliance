@@ -38,7 +38,7 @@ module RequestHelpers
 
   def mime_for(ext)
     case ext
-      when :bmp, :png, :jpg, :jpeg, :JPEG, :gif, :BMP, :JPG, :PNG, :GIF then "image/#{ext.downcase}"
+      when :bmp, :png, :jpg, :jpeg, :JPEG, :gif, :BMP, :JPG, :PNG, :GIF, :heic, :heif, :HEIC, :HEIF then "image/#{ext.downcase}"
       when :pdf, :zip, :PDF, :ZIP then "application/#{ext.downcase}"
       when :rar, :RAR then "application/x-rar-compressed"
       else raise "No fixture for #{ext.downcase} files"
