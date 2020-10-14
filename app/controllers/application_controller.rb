@@ -64,7 +64,7 @@ class ApplicationController < ActionController::Base
           # people set score and returns 404 error.
           counter.decrement
           rejected_set.increment person_id
-          render body: nil, status: 400
+          render body: 'You have reached the user-defined limits', status: 403
         end
       end
     end
