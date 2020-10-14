@@ -61,10 +61,10 @@ class ApplicationController < ActionController::Base
         else
           # If the limit reach the maximum, decrements the counter to
           # allow dynamic changes to the limit, increments the rejected
-          # people set score and returns 404 error.
+          # people set score and returns 403 error.
           counter.decrement
           rejected_set.increment person_id
-          render body: nil, status: 400
+          render body: 'You have reached the user-defined limits', status: 403
         end
       end
     end
