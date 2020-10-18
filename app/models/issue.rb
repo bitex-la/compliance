@@ -282,8 +282,6 @@ class Issue < ApplicationRecord
     event :approve do
       before do
         if aasm.from_state != :approved
-          AffinitySeed.on_issue_approve(self.affinity_seeds)
-          # fulfil_affinity_relationships
           harvest_all!
         end
       end
@@ -292,8 +290,6 @@ class Issue < ApplicationRecord
 
       after do
         if aasm.from_state != :approved
-          AffinitySeed.after_issue_approve(self.affinity_seeds)
-          # fulfil_affinity_after_process
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
           refresh_person_country_tagging!

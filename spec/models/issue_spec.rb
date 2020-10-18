@@ -794,17 +794,8 @@ RSpec.describe Issue, type: :model do
       issue = create(:basic_issue)
       create(:full_affinity_seed, issue: issue, affinity_kind: AffinityKind.same_person, auto_created: true)
       issue.reload
-      expect(SamePersonAffinity::Fulfilment).to receive(:call).with(issue.affinity_seeds).once
-      expect(SamePersonAffinity::Fulfilment).to receive(:after_process).with(issue.affinity_seeds).once
-      issue.approve!
-    end
-
-    xit 'not execute fulfilment service on manual affinity same_person issues' do
-      issue = create(:basic_issue)
-      create(:full_affinity_seed, issue: issue, affinity_kind: AffinityKind.same_person)
-      issue.reload
-      expect(SamePersonAffinity::Fulfilment).not_to receive(:call).with(issue.affinity_seeds)
-      expect(SamePersonAffinity::Fulfilment).not_to receive(:after_process).with(issue.affinity_seeds)
+      expect(SamePersonAffinity::Fulfilment).to receive(:call).with(issue.affinity_seeds.first).once
+      expect(SamePersonAffinity::Fulfilment).to receive(:after_process).with(issue.affinity_seeds.first).once
       issue.approve!
     end
   end

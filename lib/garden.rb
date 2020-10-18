@@ -17,7 +17,7 @@ module Garden
   module SelfHarvestable
     extend ActiveSupport::Concern
 
-    included do 
+    included do
       after_save -> { self_harvest! }
     end
 
@@ -45,13 +45,13 @@ module Garden
 
       has_many :observations, as: :observable
 
-      before_validation do 
+      before_validation do
         attachments.each do |a|
           a.attached_to_seed = self if a.attached_to.nil?
         end
-        
+
         observations.each do |o|
-          o.observable = self unless o.observable 
+          o.observable = self unless o.observable
           o.issue = o.observable.issue unless o.issue
         end
       end
@@ -95,7 +95,7 @@ module Garden
         "#{self.class.name}: #{name_body}".truncate(40, omission:'…')
       end
 
-      scope :others_active_seeds, -> (issue) { 
+      scope :others_active_seeds, -> (issue) {
         joins(:issue)
           .where("issues.id != ?", issue.id)
           .where("issues.aasm_state IN (?)",%i{new observed answered})
@@ -104,6 +104,7 @@ module Garden
     end
 
     def harvest!
+      self.try(:before_harvest)
       fruit = self.class.naming.fruit.constantize.new(attributes.except(
         *%w(id created_at updated_at issue_id fruit_id replaces_id copy_attachments expires_at)
       ))
@@ -144,6 +145,7 @@ module Garden
       end
 
       create_deferred_issue(fruit) unless expires_at.nil?
+      self.try(:after_harvest)
 
       fruit
     end
@@ -171,17 +173,17 @@ module Garden
 
       after_save{ person.expire_action_cache }
 
-      scope :current, -> { 
+      scope :current, -> {
         where(replaced_by_id: nil)
         .where("archived_at is NULL OR archived_at > ?", Date.current)
         .includes(:attachments)
-        .order(updated_at: :desc) 
+        .order(updated_at: :desc)
       }
 
-      scope :archived, ->(person) { 
+      scope :archived, ->(person) {
         where("archived_at <= ?", Date.current)
         .where(person: person)
-        .order(archived_at: :desc) 
+        .order(archived_at: :desc)
       }
 
       def previous_versions

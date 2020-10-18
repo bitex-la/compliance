@@ -18,7 +18,6 @@ class AffinitySeed < AffinityBase
     return unless affinity_kind == AffinityKind.same_person &&
                   issue.affinity_seeds.count > 1
 
-
     errors.add(:reason, "there can be only one same_person affinity per issue. And only one")
   end
 
@@ -95,16 +94,12 @@ class AffinitySeed < AffinityBase
     return current_issue.person if related_person == current_issue.person
   end
 
-  def self.on_issue_approve(affinity_seeds)
-    return unless affinity_seeds.present?
-
-    SamePersonAffinity::Fulfilment.call(affinity_seeds)
+  def before_harvest
+    SamePersonAffinity::Fulfilment.call(self)
   end
 
-  def self.after_issue_approve(affinity_seeds)
-    return unless affinity_seeds.present?
-
-    SamePersonAffinity::Fulfilment.after_process(affinity_seeds)
+  def after_harvest
+    SamePersonAffinity::Fulfilment.after_process(self)
   end
 
   private

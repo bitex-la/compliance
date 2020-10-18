@@ -1,12 +1,8 @@
 module SamePersonAffinity
   class Fulfilment
-    def self.call(affinity_seeds)
+    def self.call(affinity_seed)
       # Determine if this affinity_seed should be process as is
       # or must be changed. Also check if other affinities must be archived
-      #
-      # I only evaluate the first one because the same_person affinity process
-      # only creates one affinity_seed per issue (for now)
-      affinity_seed = affinity_seeds.first
 
       return if affinity_seed.archived_at ||
                 affinity_seed.affinity_kind != AffinityKind.same_person ||
@@ -66,13 +62,9 @@ module SamePersonAffinity
       end
     end
 
-    def self.after_process(affinity_seeds)
+    def self.after_process(affinity_seed)
       # This method evaluates the existing same_person relationship
       # of the new children
-
-      # I only evaluate the first one because the same_person affinity process
-      # only creates one affinity_seed per issue (for now)
-      affinity_seed = affinity_seeds.first
 
       return unless affinity_seed.affinity_kind == AffinityKind.same_person &&
                     affinity_seed.auto_created

@@ -37,4 +37,6 @@ describe Affinity do
       data: {id: create(:empty_person).id.to_s, type: 'people'}
     }}
   }, {affinity_kind_code: 'stakeholder'}
+
+  # TODO: add validation specs for same_person (seba)
 end
