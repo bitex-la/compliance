@@ -25,4 +25,6 @@ describe RiskScoreSeed do
       issue = create(:basic_issue, person_id: person_id)
       create(:full_risk_score_seed, issue: issue)
     }
+
+  it_behaves_like 'model_validations', described_class
 end
