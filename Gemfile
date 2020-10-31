@@ -41,6 +41,8 @@ gem 'active_model_serializers', '~> 0.10.0'
 gem 'jsonapi_mapper', github: 'bitex-la/jsonapi-mapper'
 gem 'static_models', github: 'bitex-la/static_models'
 
+gem 'rake'
+
 gem 'kaminari'
 gem 'timecop'
 
@@ -68,13 +70,15 @@ gem 'connection_pool'
 gem 'redis-objects'
 gem 'redis-store'
 
-group :development, :test do 
+gem 'therubyracer'
+
+group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rubocop'
   gem 'rubocop-rspec'
 end
 
-group :test do 
+group :test do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'selenium-webdriver'
