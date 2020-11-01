@@ -290,6 +290,7 @@ class Issue < ApplicationRecord
 
       after do
         if aasm.from_state != :approved
+          after_harvest_all!
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
           refresh_person_country_tagging!
@@ -346,6 +347,11 @@ class Issue < ApplicationRecord
     reload
     HAS_MANY.each{|assoc| send(assoc).map(&:harvest!) }
     HAS_ONE.each{|assoc| send(assoc).try(:harvest!) }
+  end
+
+  def after_harvest_all!
+    HAS_MANY.each{|assoc| send(assoc).map(&:after_harvest!) }
+    HAS_ONE.each{|assoc| send(assoc).try(:after_harvest!) }
   end
 
   def add_seeds_replacing(fruits)

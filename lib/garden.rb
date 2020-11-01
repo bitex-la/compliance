@@ -145,9 +145,12 @@ module Garden
       end
 
       create_deferred_issue(fruit) unless expires_at.nil?
-      self.try(:after_harvest)
 
       fruit
+    end
+
+    def after_harvest!
+      self.try(:after_harvest)
     end
 
     def create_deferred_issue(fruit)
