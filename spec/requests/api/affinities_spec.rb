@@ -84,17 +84,14 @@ describe Affinity do
       issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
 
       # expect a <422: Unprocessable Entity> response
-      api_request(
-        :post,
-        "/affinity_seeds",
+      api_create "/affinity_seeds",
         {
           data: {
             type: "affinity_seeds",
             attributes: initial_attrs,
             relationships: issue_relation.merge(initial_relations)
           }
-        },
-        422)
+        },422
     end
   end
 end

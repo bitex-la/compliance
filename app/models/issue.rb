@@ -345,13 +345,13 @@ class Issue < ApplicationRecord
     # We never want to risk losing fruits for harvesting an old issue instance.
     # Old instances shouldn't happen in prod, mostly in specs, but just in case.
     reload
-    HAS_MANY.each{|assoc| send(assoc).map(&:harvest!) }
-    HAS_ONE.each{|assoc| send(assoc).try(:harvest!) }
+    HAS_MANY.each { |assoc| send(assoc).map(&:harvest!) }
+    HAS_ONE.each { |assoc| send(assoc).try(:harvest!) }
   end
 
   def after_harvest_all!
-    HAS_MANY.each{|assoc| send(assoc).map(&:after_harvest!) }
-    HAS_ONE.each{|assoc| send(assoc).try(:after_harvest!) }
+    HAS_MANY.each { |assoc| send(assoc).map(&:after_harvest!) }
+    HAS_ONE.each { |assoc| send(assoc).try(:after_harvest!) }
   end
 
   def add_seeds_replacing(fruits)

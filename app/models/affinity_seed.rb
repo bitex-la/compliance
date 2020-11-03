@@ -94,11 +94,11 @@ class AffinitySeed < AffinityBase
     return current_issue.person if related_person == current_issue.person
   end
 
-  def before_harvest
+  def on_before_harvest
     SamePersonAffinity::Fulfilment.call(self)
   end
 
-  def after_harvest
+  def on_after_harvest
     SamePersonAffinity::Fulfilment.after_process(self)
   end
 

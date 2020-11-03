@@ -104,7 +104,8 @@ module Garden
     end
 
     def harvest!
-      self.try(:before_harvest)
+      try(:on_before_harvest)
+
       fruit = self.class.naming.fruit.constantize.new(attributes.except(
         *%w(id created_at updated_at issue_id fruit_id replaces_id copy_attachments expires_at)
       ))
@@ -150,7 +151,7 @@ module Garden
     end
 
     def after_harvest!
-      self.try(:after_harvest)
+      try(:on_after_harvest)
     end
 
     def create_deferred_issue(fruit)
