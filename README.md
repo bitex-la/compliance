@@ -57,12 +57,9 @@ Run:
 docker-compose -d
 ```
 
-However, in order to make it work properly, some changes must be done to the default database configuration under `settings.yml`:
+However, in order to make it work properly, you should change the configured mysql host in `settings.yml` to use `127.0.0.1`.
 
 ```
   mysql:
-    username: root
-    password: root
     host: 127.0.0.1
-    port: 3306
 ```
