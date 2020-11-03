@@ -78,7 +78,7 @@ group :test do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'selenium-webdriver'
-  gem 'geckodriver-helper'
+  gem 'webdrivers', '~> 4.0'
   gem 'factory_bot'
   gem 'faker'
   gem 'database_cleaner'
