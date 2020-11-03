@@ -6,9 +6,9 @@ if [ "$CIRCLE_BRANCH" = "master" ]
 then
   BUILD_INFO=$(curl --request POST \
   --url "https://circleci.com/api/v2/project/github/$ORGANIZATION/$PROJECT_TO_BUILD/pipeline" \
-  --header 'Circle-Token: aae23a3f48ce2b01bcf361f2820411aafb67a7c8' \
+  --header "Circle-Token: $CIRCLE_TOKEN" \
   --header 'content-type: application/json' \
-  --data '{"branch":"master"}')
+  --data "{"branch":"$CIRCLE_BRANCH"}")
 
   printf "$BUILD_INFO"
   printf "\n\nBuild triggered\n\n"
