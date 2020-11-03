@@ -47,7 +47,7 @@ describe Attachment do
     end
   end
 
-  it "Can validate max people request limit on show" do
+  it "can validate max people request limit on show" do
     one, two, three, four, five = 5.times.map do
       seed = create(:full_natural_docket_seed_with_person)
       api_create "/attachments",
@@ -61,8 +61,8 @@ describe Attachment do
     api_get "/attachments/#{two.id}"
     api_get "/attachments/#{three.id}"
 
-    api_get "/attachments/#{four.id}", {}, 400
-    api_get "/attachments/#{five.id}", {}, 400
+    api_get "/attachments/#{four.id}", {}, 403
+    api_get "/attachments/#{five.id}", {}, 403
 
     api_get "/attachments/#{one.id}"
     api_get "/attachments/#{two.id}"
