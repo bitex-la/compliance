@@ -27,7 +27,7 @@ module SamePersonAffinity
           matched_person = Person.find(matched_person_id)
         end
 
-        (father, children) = [person, matched_person].sort_by {|p| p.id}
+        (father, children) = [person, matched_person].sort_by(&:id)
 
         create_same_person_issue(father, children)
         issues_created = true
