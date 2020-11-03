@@ -8,7 +8,7 @@ then
   --url "https://circleci.com/api/v2/project/github/$ORGANIZATION/$PROJECT_TO_BUILD/pipeline" \
   --header "Circle-Token: $CIRCLE_TOKEN" \
   --header 'content-type: application/json' \
-  --data "{"branch":"$CIRCLE_BRANCH"}")
+  --data "{\"branch\":\"$CIRCLE_BRANCH\"}")
 
   printf "$BUILD_INFO"
   printf "\n\nBuild triggered\n\n"
