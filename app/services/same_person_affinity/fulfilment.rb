@@ -70,7 +70,6 @@ module SamePersonAffinity
                     affinity_seed.auto_created
 
       person = affinity_seed.person
-      related_person = affinity_seed.related_person
 
       # if person has a same_person father, and still matches, move his children/s
       # if not, archive the affinity (see case J in specs)
@@ -86,11 +85,9 @@ module SamePersonAffinity
       end
     end
 
-    private
-
     def self.archive_affinity!(related_person_affinity)
       issue = related_person_affinity.person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
-      affinity = issue.affinity_seeds.build(
+      issue.affinity_seeds.build(
         related_person: related_person_affinity.related_person,
         affinity_kind: AffinityKind.same_person,
         replaces: related_person_affinity,
@@ -112,21 +109,21 @@ module SamePersonAffinity
 
       return true if matched_names.present?
 
-      SamePersonAffinity::Finder.with_matched_id_numbers(person, [related_person.id]).present?
+      SamePersonAffinity::Finder.with_matched_id_numbers(person, [related_person.id])
+        .present?
     end
 
     def self.same_person_match_any_related_person(affinities, current_affinity, father)
       return true if same_person_match(current_affinity.person, current_affinity.related_person)
       affinities.each do |affinity|
         next if affinity == current_affinity
-        if (
-          same_person_match(father, affinity.related_person) &&
-          same_person_match(affinity.related_person, current_affinity.related_person)
-        )
+
+        if (same_person_match(father, affinity.related_person) &&
+          same_person_match(affinity.related_person, current_affinity.related_person))
           return true
         end
       end
-      return false
+      false
     end
 
     def self.build_same_person_affinity!(person, related_person)
@@ -138,7 +135,7 @@ module SamePersonAffinity
       )
 
       issue.note_seeds.build(
-        title:'auto created',
+        title: 'auto created',
         body: 'same_person affinity was detected automatically by the system'
       )
 

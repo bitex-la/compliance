@@ -8,9 +8,9 @@ module SamePersonAffinity
       matched_ids = with_matched_id_numbers(person).to_set
       matched_ids.merge(with_matched_names(person))
 
-      children_ids =  person.affinities.where(
-                        affinity_kind_id: AffinityKind.same_person.id
-                      ).pluck(:related_person_id)
+      children_ids = person.affinities
+        .where(affinity_kind_id: AffinityKind.same_person.id)
+        .pluck(:related_person_id)
 
       issues_created = false
       matched_ids.each do |matched_person_id|
@@ -21,11 +21,12 @@ module SamePersonAffinity
         # and is included in matched array
         affinity_father = same_person_affinity_father(matched_person_id)
 
-        if affinity_father && matched_ids.include?(affinity_father.id)
-          matched_person = affinity_father
-        else
-          matched_person = Person.find(matched_person_id)
-        end
+        matched_person =
+          if affinity_father && matched_ids.include?(affinity_father.id)
+            affinity_father
+          else
+            Person.find(matched_person_id)
+          end
 
         (father, children) = [person, matched_person].sort_by(&:id)
 
@@ -88,12 +89,12 @@ module SamePersonAffinity
           end
 
           matched_names = NaturalDocket.current.where(
-                          "natural_dockets.person_id <> :person_id AND
-                          ((first_name IN (:words) AND last_name IN (:words)) OR
-                          (#{conditions.join(' AND ')}))",
-                          person_id: person.id,
-                          words: full_name.split(/\W+/),
-                        )
+            "natural_dockets.person_id <> :person_id AND
+            ((first_name IN (:words) AND last_name IN (:words)) OR
+            (#{conditions.join(' AND ')}))",
+            person_id: person.id,
+            words: full_name.split(/\W+/)
+          )
 
           if person_ids_filter.present?
             matched_names = matched_names.where(
@@ -103,7 +104,7 @@ module SamePersonAffinity
 
           matched_names.pluck(:person_id).uniq
         when :legal_entity
-          return [] if person.legal_entity_dockets.count == 0
+          return [] if person.legal_entity_dockets.count.zero?
 
           docket = person.legal_entity_docket
 
@@ -131,7 +132,7 @@ module SamePersonAffinity
 
           legal_matches.pluck(:person_id).uniq
         else
-          return []
+          []
       end
     end
 
@@ -146,7 +147,7 @@ module SamePersonAffinity
       )
 
       issue.note_seeds.build(
-        title:'auto created',
+        title: 'auto created',
         body: 'same_person affinity was detected automatically by the system'
       )
 
@@ -162,7 +163,7 @@ module SamePersonAffinity
         )
 
         issue = person.issues.build(state: 'new', reason: IssueReason.new_risk_information)
-        affinity = issue.affinity_seeds.build(
+        issue.affinity_seeds.build(
           related_person: Person.find(orphan_id),
           affinity_kind: affinity_kind,
           replaces: current_affinity,
