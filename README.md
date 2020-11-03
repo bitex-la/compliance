@@ -41,3 +41,9 @@ bundle exec rails -s
 ```
 rspec
 ``` 
+
+In order to run the feature specs, the suite relies on `geckodriver`. You can run the following command to install it for the project:
+
+```
+RAILS_ENV=test rails webdrivers:geckodriver:update
+```
