@@ -42,6 +42,12 @@ bundle exec rails -s
 rspec
 ``` 
 
+In order to run the feature specs, the suite relies on `geckodriver`. You can run the following command to install it for the project:
+
+```
+RAILS_ENV=test rails webdrivers:geckodriver:update
+```
+
 ## Using Docker for Development
 
 The `docker-compose.yml` contains the required configuration to launch both the Redis and MySQL instance.
