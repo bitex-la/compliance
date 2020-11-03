@@ -41,3 +41,22 @@ bundle exec rails -s
 ```
 rspec
 ``` 
+
+## Using Docker for Development
+
+The `docker-compose.yml` contains the required configuration to launch both the Redis and MySQL instance.
+
+Run: 
+```
+docker-compose -d
+```
+
+However, in order to make it work properly, some changes must be done to the default database configuration under `settings.yml`:
+
+```
+  mysql:
+    username: root
+    password: root
+    host: 127.0.0.1
+    port: 3306
+```
