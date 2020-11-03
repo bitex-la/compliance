@@ -64,3 +64,6 @@ config/settings.yml
 config/appsignal.yml
 .vscode/launch.json
 .vscode/settings.json
+
+# Ignore IntelliJ IDEs config
+/.idea/
