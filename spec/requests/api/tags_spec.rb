@@ -74,7 +74,7 @@ describe Tag do
   end
 
   it 'restricted user is not allowed' do
-    restricted_admin = create(:restricted_admin_user)
+    restricted_admin = create(:compliance_admin_user)
     AdminUser.current_admin_user = restricted_admin
     
     one = create(:person_tag)

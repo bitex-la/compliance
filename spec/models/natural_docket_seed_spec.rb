@@ -32,6 +32,8 @@ describe NaturalDocketSeed do
     job_description: '  I use a lot of spaces '
   }
 
+  it_behaves_like 'model_validations', described_class
+
   it 'is not valid without an issue' do
     expect(invalid_seed).to_not be_valid
   end

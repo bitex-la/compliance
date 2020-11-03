@@ -607,13 +607,15 @@ shared_examples "max people allowed request limit" do |type, factory_one|
     api_get "/#{type}/#{@three.id}"
     expect(json_response[:data][:id]).to eq(@three.id.to_s)
 
-    api_get "/#{type}/#{@four.id}", {}, 400
-    #request to the same resource twice must fail
-    api_get "/#{type}/#{@four.id}", {}, 400
+    api_get "/#{type}/#{@four.id}", {}, 403
+    expect(response.body).to eq('You have reached the user-defined limits')
 
-    api_get "/#{type}/#{@five.id}", {}, 400
     #request to the same resource twice must fail
-    api_get "/#{type}/#{@five.id}", {}, 400
+    api_get "/#{type}/#{@four.id}", {}, 403
+
+    api_get "/#{type}/#{@five.id}", {}, 403
+    #request to the same resource twice must fail
+    api_get "/#{type}/#{@five.id}", {}, 403
 
     api_get "/#{type}/#{@one.id}"
     expect(json_response[:data][:id]).to eq(@one.id.to_s)
@@ -634,7 +636,7 @@ shared_examples "max people allowed request limit" do |type, factory_one|
     api_get "/#{type}/#{@four.id}"
     expect(json_response[:data][:id]).to eq(@four.id.to_s)
     
-    api_get "/#{type}/#{@five.id}", {}, 400
+    api_get "/#{type}/#{@five.id}", {}, 403
 
     expect(@admin.request_limit_set.length).to eq 4
     expect(@admin.request_limit_rejected_set.length).to eq 1
@@ -662,7 +664,8 @@ shared_examples "max people allowed request limit" do |type, factory_one|
     api_get "/#{type}/#{@three.id}"
     expect(json_response[:data][:id]).to eq(@three.id.to_s)
 
-    api_get "/#{type}/#{@four.id}", {}, 400
+    api_get "/#{type}/#{@four.id}", {}, 403
+    expect(response.body).to eq('You have reached the user-defined limits')
 
     Timecop.travel 1.day.from_now
 
@@ -675,6 +678,6 @@ shared_examples "max people allowed request limit" do |type, factory_one|
     api_get "/#{type}/#{@one.id}"
     expect(json_response[:data][:id]).to eq(@one.id.to_s)
 
-    api_get "/#{type}/#{@three.id}", {}, 400
+    api_get "/#{type}/#{@three.id}", {}, 403
   end
 end

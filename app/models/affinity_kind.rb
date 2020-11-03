@@ -2,7 +2,7 @@ class AffinityKind
   include StaticModels::Model
 
   static_models_dense [
-    [:id, :code, :inverse_of],
+    [:id, :code, :inverse_of, :affinity_to_tag, :inverse_of_tag],
     [10, :spouse],
     [15, :business_partner],
     [20, :couple],
@@ -14,8 +14,8 @@ class AffinityKind
     [50, :other],
     [55, :stakeholder, :shareholder_of],
     [60, :partner],
-    [65, :payee, :payer],
-    [70, :payer, :payee],
+    [65, :payee, :payer, :payee, :payer],
+    [70, :payer, :payee, :payer, :payee],
     [75, :provider, :customer],
     [80, :compliance_liaison, :compliance_liaison_for],
     [85, :same_person]

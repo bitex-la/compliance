@@ -326,6 +326,20 @@ class Person < ApplicationRecord
     tags.reload
   end
 
+  def add_tag(tag_name)
+    return unless tag_name
+
+    tag = Tag.find_or_create_by(tag_type: :person, name: tag_name)
+    PersonTagging.find_or_create_by(person: self, tag: tag)
+    tags.reload
+  end
+
+  def remove_tag(tag_name)
+    return unless tag_name
+
+    tags.delete(Tag.find_or_create_by(name: tag_name))
+  end
+
   aasm do
     state :new, initial: true
     state :enabled

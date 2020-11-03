@@ -12,15 +12,11 @@ defaults: &defaults
     
   mysql:
     username: root
-    password: example
+    password:
     host: 127.0.0.1
     port: 3306
 
   exception_recipients: "some@me.com,other@me.com"
-
-  app_signal:
-    key: some_appsignal_api_key
-    app: "Your company"
 
   regularities:
     low:

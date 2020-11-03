@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_09_160444) do
+ActiveRecord::Schema.define(version: 2020_09_03_204040) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -52,8 +52,8 @@ ActiveRecord::Schema.define(version: 2020_04_09_160444) do
     t.string "api_token"
     t.string "otp_secret_key"
     t.boolean "otp_enabled", default: false
-    t.integer "role_type", default: 0, null: false
     t.integer "max_people_allowed"
+    t.integer "admin_role_id", default: 7, null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -478,9 +478,11 @@ ActiveRecord::Schema.define(version: 2020_04_09_160444) do
     t.boolean "locked", default: false, null: false
     t.bigint "lock_admin_user_id"
     t.datetime "lock_expiration"
+    t.integer "priority", default: 0, null: false
     t.index ["aasm_state"], name: "index_issues_on_aasm_state"
     t.index ["lock_admin_user_id"], name: "index_issues_on_lock_admin_user_id"
     t.index ["person_id"], name: "index_issues_on_person_id"
+    t.index ["priority", "id"], name: "index_issues_on_priority_and_id"
   end
 
   create_table "legal_entity_docket_seeds", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|

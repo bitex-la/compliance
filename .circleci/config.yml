@@ -1,58 +1,80 @@
-version: 2
+version: 2.1
+
+orbs:
+  ruby: circleci/ruby@1.0 
+  slack: circleci/slack@3.4.2
+
 jobs:
   build:
-    working_directory: ~/home/compliance
-    parallelism: 4
-    environment:
-      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
-      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+    parallelism: 5
     docker:
-      - image: bitexla/compliance_web
+      - image: circleci/ruby:2.5.7-node-browsers
         environment:
+          BUNDLE_JOBS: 4
+          BUNDLE_RETRY: 4
+          BUNDLE_PATH: vendor/bundle
           RAILS_ENV: test
-          SELENIUM_HEADLESS: true
-      - image: mysql/mysql-server:5.7
-        environment:
-          - MYSQL_ROOT_PASSWORD=example
-          - MYSQL_ROOT_HOST=%
+          RACK_ENV: test
+          IN_CIRCLE: true
+      - image: circleci/mysql:5.7
       - image: circleci/redis:4.0.11
     steps:
       - checkout
+      
       - run:
           name: Configuring settings
           command: cp .circleci/settings.yml config/settings.yml
+      - ruby/install-deps
       - run:
-          name: Which bundler?
-          command: bundle -v
-      - restore_cache:
-          keys:
-            - rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
-            - rails-compliance-bundle-v2-
-      - run:
-          name: install dockerize
-          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-          environment:
-            DOCKERIZE_VERSION: v0.3.0
-      - run:
-          name: Wait for db
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
-      - run: 'bundle check || bundle install'
-      - save_cache:
-          key: rails-compliance-bundle-v2-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m      
       - run:
           name: Wait for Redis
           command: dockerize -wait tcp://localhost:6379 -timeout 1m
-      - run: bundle exec rails db:create db:schema:load db:migrate
-      - run: mkdir -p $CIRCLE_TEST_REPORTS/rspec
-      - run: bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml --format progress $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split)
-      - store_test_results:
-          path: /tmp/circleci-test-results
+      
+      - run: bundle exec rails db:create db:schema:load db:migrate --trace
+
+      - run: mkdir -p /tmp/artifacts
+
+      - run:
+          name: Monitor memory usage
+          command: while true; do ps -u $(whoami) --cols 80 eo rss,vsz,args --sort=-rss >> /tmp/artifacts/mem.txt; sleep 5; done
+          background: true
+
+      - ruby/rspec-test
+
       - store_artifacts:
-          path: /tmp/circleci-artifacts
-      - store_artifacts:
-          path: /tmp/circleci-test-results
-      - deploy:
+          path: /tmp/artifacts
+
+      - slack/status:
+          channel: devs-alerts
+          fail_only: true
+
+  notify:
+    docker:
+      - image: circleci/ruby:2.5.7-node-browsers
+    steps:
+      - slack/status:
+          channel: devs-alerts
+
+  trigger_build:
+    docker:
+      - image: circleci/ruby:2.5.7-node-browsers
+    steps:
+      - checkout
+      - run:
           name: Trigger Build
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
+
+workflows:
+  version: 2
+  build:
+    jobs:             
+      - build
+      - notify:
+          requires:
+            - build
+      - trigger_build:
+          requires:
+            - build
+  
