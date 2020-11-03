@@ -31,7 +31,7 @@ module SamePersonAffinity
       # if the result is more than one orphan,
       # build same_person affinity between them (see case D)
       if orphans.count > 1
-        sorted_orphans = orphans.sort_by {|p| p.id}
+        sorted_orphans = orphans.sort_by(&:id)
         father = sorted_orphans.shift
         sorted_orphans.each do |orphan|
           build_same_person_affinity!(father, orphan)
