@@ -63,3 +63,6 @@ build-iPhoneSimulator/
 config/settings.yml
 config/appsignal.yml
 .vscode/launch.json
+
+# Ignore IntelliJ IDEs config
+/.idea/
