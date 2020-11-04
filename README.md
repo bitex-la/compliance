@@ -46,3 +46,12 @@ In order to run the feature specs, the suite relies on `geckodriver`. You can ru
 ```
 RAILS_ENV=test rails webdrivers:geckodriver:update
 ```
+
+## Using Docker for Development
+
+The `docker-compose.yml` contains the required configuration to launch both the Redis and MySQL instance.
+
+Run: 
+```
+docker-compose -f ./docker/docker-compose.yml -p compliance up -d
+```

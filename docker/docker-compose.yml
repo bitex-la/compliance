@@ -1,0 +1,19 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./tmp/db:/var/lib/mysql
+  redis_cache:
+    image: redis:6
+    command: redis-server
+    volumes:
+      - ./tmp/redis:/var/lib/redis
+    ports:
+      - "6379:6379"
