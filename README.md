@@ -26,9 +26,8 @@ or
     - redis.cache_url: redis url 
     - redis.pool_size: connection pool size
 
-## Create database 
-- [ ] `rails db:create`
-- [ ] `rails db:schema:load`
+## Setup database
+- `rails db:setup`
 
 ## Start the application
 ```
