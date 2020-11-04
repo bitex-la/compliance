@@ -9,11 +9,11 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ../tmp/db:/var/lib/mysql
+      - ./tmp/db:/var/lib/mysql
   redis_cache:
     image: redis:6
     command: redis-server
     volumes:
-      - ../tmp/redis:/var/lib/redis
+      - ./tmp/redis:/var/lib/redis
     ports:
       - "6379:6379"
