@@ -54,7 +54,7 @@ The `docker-compose.yml` contains the required configuration to launch both the 
 
 Run: 
 ```
-docker-compose -f ./docker/docker-compose.yml up -d
+docker-compose -f ./docker/docker-compose.yml -p compliance up -d
 ```
 
 However, in order to make it work properly, you should change the configured mysql host in `settings.yml` to use `127.0.0.1`.
