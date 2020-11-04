@@ -1,7 +1,6 @@
 class Person < ApplicationRecord
   include AASM
   include Loggable
-  StaticModels::BelongsTo
 
   after_create :log_state_new
   after_save :log_if_enabled
