@@ -1,5 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'support/factory_bot'
+require 'support/webdrivers'
 require 'spec_helper'
 require 'capybara/rspec'
 require 'aasm/rspec'
