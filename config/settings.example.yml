@@ -7,14 +7,14 @@ defaults: &defaults
     attachments_bucket: production
 
   ses:
-    access_key: <%= ENV.fetch('SES_ACCESS_KEY', some_access_key) %>
-    secret: <%= ENV.fetch('SES_SECRET', some_secret) %>
+    access_key: <%= ENV.fetch('SES_ACCESS_KEY'){ 'some_access_key' } %>
+    secret: <%= ENV.fetch('SES_SECRET'){ 'some_secret' } %>
 
   mysql:
-    username: <%= ENV.fetch('MYSQL_USERNAME', 'root') %>
-    password: <%= ENV.fetch('MYSQL_PASSWORD', '') %>
-    host: <%= ENV.fetch('MYSQL_HOST', 'localhost') %>
-    port: <%= ENV.fetch('MYSQL_PORT', 3306) %>
+    username: <%= ENV.fetch('MYSQL_USERNAME'){ 'root' } %>
+    password: <%= ENV.fetch('MYSQL_PASSWORD'){ '' }  %>
+    host: <%= ENV.fetch('MYSQL_HOST'){ 'localhost' } %>
+    port: <%= ENV.fetch('MYSQL_PORT'){ 3306 } %>
 
   exception_recipients: "some@me.com,other@me.com"
 
@@ -30,7 +30,7 @@ defaults: &defaults
     expiration_interval_minutes: 15
 
   redis:
-    cache_url: <%= ENV.fetch('REDIS_CACHE_URL', 'redis://localhost:6379/0') %>
+    cache_url: <%= ENV.fetch('REDIS_CACHE_URL' ){ 'redis://localhost:6379/0' } %>
     namespace: 'compliance'
     pool_size: 8
 
