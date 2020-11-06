@@ -26,9 +26,8 @@ or
     - redis.cache_url: redis url 
     - redis.pool_size: connection pool size
 
-## Create database 
-- [ ] `rails db:create`
-- [ ] `rails db:schema:load`
+## Setup database
+- `rails db:setup`
 
 ## Start the application
 ```
@@ -41,3 +40,18 @@ bundle exec rails -s
 ```
 rspec
 ``` 
+
+In order to run the feature specs, the suite relies on `geckodriver`. You can run the following command to install it for the project:
+
+```
+RAILS_ENV=test rails webdrivers:geckodriver:update
+```
+
+## Using Docker for Development
+
+The `docker-compose.yml` contains the required configuration to launch both the Redis and MySQL instance.
+
+Run: 
+```
+docker-compose -f ./docker/docker-compose.yml -p compliance up -d
+```

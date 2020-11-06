@@ -13,7 +13,7 @@ defaults: &defaults
   mysql:
     username: <%= ENV.fetch('MYSQL_USERNAME'){ 'root' } %>
     password: <%= ENV.fetch('MYSQL_PASSWORD'){ '' }  %>
-    host: <%= ENV.fetch('MYSQL_HOST'){ 'localhost' } %>
+    host: <%= ENV.fetch('MYSQL_HOST'){ '127.0.0.1' } %>
     port: <%= ENV.fetch('MYSQL_PORT'){ 3306 } %>
 
   exception_recipients: "some@me.com,other@me.com"
