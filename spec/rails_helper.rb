@@ -9,6 +9,7 @@ ENV["TZ"] = "UTC"
 require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
+require 'support/webdrivers'
 require 'rspec/rails'
 require 'support/wait_for_ajax'
 Dir[Rails.root.join("spec/helpers/**/*.rb")].each {|f| require f} 

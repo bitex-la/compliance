@@ -67,3 +67,6 @@ config/appsignal.yml
 
 # Ignore IntelliJ IDEs config
 /.idea/
+
+# Ignore tmp folder for Docker-Compose volumes
+/docker/tmp/
