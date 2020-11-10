@@ -75,6 +75,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
+      - run:
+          name: Configuring settings
+          command: cp .circleci/settings.yml config/settings.yml
       - ruby/install-deps
       - run:
           name: Merge and check coverage
