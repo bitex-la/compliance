@@ -75,6 +75,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
+      - ruby/install-deps
       - run:
           name: Merge and check coverage
           command: |
