@@ -17,4 +17,11 @@ SimpleCov.start 'rails' do
 
   track_files "**/*.rb"
   enable_coverage :branch
+
+  {
+    "Admin" => "app/admin",
+    "Serializers" => "app/serializers",
+    "Services" => "app/services"
+  }.each { |k, v| add_group k, v }
+
 end
