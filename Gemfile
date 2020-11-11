@@ -41,8 +41,6 @@ gem 'active_model_serializers', '~> 0.10.0'
 gem 'jsonapi_mapper', github: 'bitex-la/jsonapi-mapper'
 gem 'static_models', github: 'bitex-la/static_models'
 
-gem 'rake'
-
 gem 'kaminari'
 gem 'timecop'
 

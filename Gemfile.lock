@@ -536,7 +536,6 @@ DEPENDENCIES
   puma (~> 3.12)
   rails (~> 5.2.3)
   rails-jquery-autocomplete
-  rake
   redis-objects
   redis-store
   rspec-rails
