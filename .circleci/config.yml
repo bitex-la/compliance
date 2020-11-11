@@ -46,6 +46,17 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts
 
+      - run:
+          name: Stash Coverage Results
+          command: |
+            mkdir coverage_results
+            cp -R coverage/.resultset.json coverage_results/.resultset-${CIRCLE_NODE_INDEX}.json
+      
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage_results
+
       - slack/status:
           channel: devs-alerts
           fail_only: true
@@ -56,6 +67,24 @@ jobs:
     steps:
       - slack/status:
           channel: devs-alerts
+
+  coverage:
+    docker:
+      - image: circleci/ruby:2.5.7-node-browsers
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Configuring settings
+          command: cp .circleci/settings.yml config/settings.yml
+      - ruby/install-deps
+      - run:
+          name: Merge and check coverage
+          command: |
+            bundle exec rake coverage:report
+      - store_artifacts:
+          path: coverage
 
   trigger_build:
     docker:
@@ -71,6 +100,9 @@ workflows:
   build:
     jobs:             
       - build
+      - coverage:
+          requires:
+            - build
       - notify:
           requires:
             - build

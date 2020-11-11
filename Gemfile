@@ -69,13 +69,15 @@ gem 'redis-objects'
 gem 'redis-store'
 gem 'sidekiq', '~> 5.2'
 
-group :development, :test do 
+gem 'therubyracer'
+
+group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rubocop'
   gem 'rubocop-rspec'
 end
 
-group :test do 
+group :test do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'selenium-webdriver'
@@ -84,6 +86,7 @@ group :test do
   gem 'faker'
   gem 'database_cleaner'
   gem 'rspec_junit_formatter', '0.2.2'
+  gem 'simplecov', require: false
 end
 
 group :development do
