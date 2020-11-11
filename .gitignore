@@ -69,3 +69,5 @@ config/appsignal.yml
 
 # Ignore tmp folder for Docker-Compose volumes
 /docker/tmp/
+
+coverage
