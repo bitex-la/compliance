@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 describe 'an admin restricted role' do
-  let(:admin_restricted_user) { create(:admin_restricted_user) }
+  let(:business_admin_user) { create(:business_admin_user) }
 
   it 'successfully access' do
-    login_as admin_restricted_user
+    login_as business_admin_user
 
     %w[
       dashboards
@@ -25,7 +25,7 @@ describe 'an admin restricted role' do
   end
 
   it 'cannot see event logs' do
-    login_as admin_restricted_user
+    login_as business_admin_user
 
     visit '/event_logs'
 

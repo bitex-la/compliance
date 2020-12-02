@@ -1,12 +1,10 @@
 # frozen_string_literal: true
-
 module Abilities
-  class AdminRestricted
+  class SuperAdmin
     include CanCan::Ability
 
-    def initialize(_user)
+    def initialize(user)
       can :manage, :all
-      cannot :manage, [EventLog]
     end
   end
 end
