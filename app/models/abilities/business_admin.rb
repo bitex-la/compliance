@@ -1,10 +1,12 @@
 # frozen_string_literal: true
+
 module Abilities
-  class Admin
+  class BusinessRestricted
     include CanCan::Ability
 
-    def initialize(user)
+    def initialize(_user)
       can :manage, :all
+      cannot :manage, [EventLog]
     end
   end
 end
