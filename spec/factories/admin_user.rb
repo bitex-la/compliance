@@ -30,5 +30,9 @@ FactoryBot.define do
       api_token { 'my_super_admin_secure_token_for_testing' }
       max_people_allowed { 3 }
     end
+
+    factory :admin_restricted_user do
+      admin_role { AdminRole.admin_restricted }
+    end
   end
 end
