@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Abilities
-  class BusinessRestricted
+  class BusinessAdmin
     include CanCan::Ability
 
     def initialize(_user)
