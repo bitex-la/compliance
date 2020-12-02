@@ -161,6 +161,12 @@ describe 'AdminUser', js: true do
     expect(page).not_to have_content 'inactive@user.com'
   end
 
+  it 'inactive user does not allow login' do
+    login_admin(active: false)
+
+    expect(page).to have_content('Este usuario ha sido deshabilitado.')
+  end
+
   describe 'restricted role' do
     it 'redirect to login' do
       login_admin(admin_role: AdminRole.restricted)

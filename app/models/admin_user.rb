@@ -18,6 +18,14 @@ class AdminUser < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
+  def active_for_authentication?
+    super && active?
+  end
+
+  def inactive_message
+    active? ? super : 'Este usuario ha sido deshabilitado.'
+  end
+
   def request_limit_set
     now = Time.now
     now_string = now.strftime('%Y%m%d')
