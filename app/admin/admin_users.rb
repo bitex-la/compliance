@@ -155,7 +155,7 @@ ActiveAdmin.register AdminUser do
     skip_before_action :authenticate_active_admin_user, raise: false, only: :omg_wtf_omg
 
     def scoped_collection
-      AdminUser.active
+      super.active
     end
 
     def toogle_otp
