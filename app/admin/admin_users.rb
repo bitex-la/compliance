@@ -156,7 +156,7 @@ ActiveAdmin.register AdminUser do
   member_action :disable_user, method: :post do
     authorize!(:disable_user, resource)
 
-    resource.update(active: false)
+    resource.update!(active: false)
   end
 
   collection_action :omg_wtf_omg do
