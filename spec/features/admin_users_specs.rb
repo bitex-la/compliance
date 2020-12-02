@@ -180,6 +180,14 @@ describe 'AdminUser', js: true do
     expect(page).not_to have_content 'active1@user.com'
   end
 
+  it "can't disable itself" do
+    user = create(:admin_user, admin_role: AdminRole.commercial)
+    login_as user
+
+    visit "/admin_users/#{user.id}"
+    expect(page).not_to have_content 'Disable'
+  end
+
   describe 'restricted role' do
     it 'redirect to login' do
       login_admin(admin_role: AdminRole.restricted)
