@@ -154,6 +154,10 @@ ActiveAdmin.register AdminUser do
   controller do
     skip_before_action :authenticate_active_admin_user, raise: false, only: :omg_wtf_omg
 
+    def scoped_collection
+      AdminUser.active
+    end
+
     def toogle_otp
       resource.update!(otp_enabled: !resource.otp_enabled)
       redirect_back notice: "OTP #{resource.otp_enabled? ? 'enabled' : 'disabled'}", fallback_location: root_path

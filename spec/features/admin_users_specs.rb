@@ -149,6 +149,18 @@ describe 'AdminUser', js: true do
     end
   end
 
+  it 'only active users are shown' do
+    create(:admin_user, email: 'active1@user.com')
+    create(:admin_user, email: 'active2@user.com')
+    create(:admin_user, email: 'inactive@user.com', active: false)
+    login_admin
+    visit '/admin_users'
+
+    expect(page).to have_content 'active1@user.com'
+    expect(page).to have_content 'active2@user.com'
+    expect(page).not_to have_content 'inactive@user.com'
+  end
+
   describe 'restricted role' do
     it 'redirect to login' do
       login_admin(admin_role: AdminRole.restricted)
