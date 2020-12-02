@@ -139,7 +139,7 @@ ActiveAdmin.register AdminUser do
   end
 
   action_item :disable, only: :show,
-                        if: proc { authorized?(:disable_user, AdminUser) } do
+                        if: proc { authorized?(:disable_user, resource) } do
     next unless authorized? :disable_user, resource
 
     link_to('Disable', disable_user_admin_user_path(resource), method: :post)
