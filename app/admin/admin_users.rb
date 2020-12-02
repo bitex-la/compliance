@@ -152,8 +152,6 @@ ActiveAdmin.register AdminUser do
   end
 
   member_action :disable_user, method: :post do
-    authorize!(:disable_user, resource)
-
     resource.update!(active: false)
   end
 

@@ -180,12 +180,25 @@ describe 'AdminUser', js: true do
     expect(page).not_to have_content 'active1@user.com'
   end
 
-  it "can't disable itself" do
+  it 'Disable button is not shown for itself' do
     user = create(:admin_user, admin_role: AdminRole.commercial)
     login_as user
 
     visit "/admin_users/#{user.id}"
     expect(page).not_to have_content 'Disable'
+  end
+
+  it "can't disable itself" do
+    user = create(:admin_user, admin_role: AdminRole.commercial)
+    login_as user
+
+    visit "/admin_users/#{user.id}"
+
+    page.execute_script %{
+      $('body').append('<a rel="nofollow" data-method="post" href="/admin_users/#{user.id}/disable_user">Disable</a>')
+    }
+    click_link 'Disable'
+    expect(page).to have_content 'You are not authorized to perform this action.'
   end
 
   describe 'restricted role' do
