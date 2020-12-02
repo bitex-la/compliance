@@ -167,6 +167,19 @@ describe 'AdminUser', js: true do
     expect(page).to have_content('Este usuario ha sido deshabilitado.')
   end
 
+  it 'security user can disable another user' do
+    admin_user = create(:admin_user, email: 'active1@user.com')
+
+    login_admin(admin_role: AdminRole.security)
+    visit '/admin_users'
+
+    expect(page).to have_content 'active1@user.com'
+    find(:xpath, "//a[@href='/admin_users/#{admin_user.id}']").click
+    click_link 'Disable'
+    visit '/admin_users'
+    expect(page).not_to have_content 'active1@user.com'
+  end
+
   describe 'restricted role' do
     it 'redirect to login' do
       login_admin(admin_role: AdminRole.restricted)

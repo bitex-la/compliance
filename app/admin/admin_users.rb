@@ -138,12 +138,24 @@ ActiveAdmin.register AdminUser do
     link_to('Disable OTP', disable_otp_admin_user_path(resource), method: :post)
   end
 
+  action_item :disable, only: :show, if: proc{ authorized?(:disable_user, AdminUser) } do
+    next unless authorized? :disable_user, resource
+
+    link_to('Disable', disable_user_admin_user_path(resource), method: :post)
+  end
+
   member_action :enable_otp, method: :post do
     toogle_otp
   end
 
   member_action :disable_otp, method: :post do
     toogle_otp
+  end
+
+  member_action :disable_user, method: :post do
+    authorize!(:disable_user, resource)
+
+    resource.update(active: false)
   end
 
   collection_action :omg_wtf_omg do
