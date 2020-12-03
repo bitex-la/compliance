@@ -30,4 +30,18 @@ describe AdminUser do
     expect(admin_user.can_manage_tag?(admin_user.tags.first)).to be_truthy
     expect(admin_user.can_manage_tag?(person_tag)).to be_truthy
   end
+
+  it 'disable user' do
+    admin = create(:admin_user, admin_role: AdminRole.security)
+    expect(admin.active).to eq(true)
+    admin.disable!
+    expect(admin.active).to eq(false)
+  end
+
+  it 'not authorized to disable user' do
+    admin = create(:admin_user, admin_role: AdminRole.marketing)
+    expect(admin.active).to eq(true)
+    expect { admin.disable! }
+      .to raise_error(DisableNotAuthorized)
+  end
 end

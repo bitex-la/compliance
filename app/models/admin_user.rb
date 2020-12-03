@@ -26,6 +26,16 @@ class AdminUser < ApplicationRecord
     active? ? super : 'Este usuario ha sido deshabilitado.'
   end
 
+  def disable!
+    raise DisableNotAuthorized, 'Not allowed to disable user' unless authorized_to_disable?
+
+    update!(active: false)
+  end
+
+  def authorized_to_disable?
+    admin_role.code == :admin || admin_role.code == :security
+  end
+
   def request_limit_set
     now = Time.now
     now_string = now.strftime('%Y%m%d')
@@ -97,3 +107,5 @@ Warden::Manager.after_authentication scope: :admin_user do |user, warden, option
     throw :warden, scope: :admin_user, message: 'Invalid OTP'
   end
 end
+
+class DisableNotAuthorized < StandardError; end
