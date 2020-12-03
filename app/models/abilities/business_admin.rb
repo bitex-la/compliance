@@ -4,7 +4,7 @@ module Abilities
   class BusinessAdmin
     include CanCan::Ability
 
-    def initialize(_user)
+    def initialize(user)
       can :manage, :all
       cannot :manage, [EventLog]
       cannot :create, AdminUser
