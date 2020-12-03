@@ -164,7 +164,7 @@ describe 'AdminUser', js: true do
   it 'inactive user does not allow login' do
     login_admin(active: false)
 
-    expect(page).to have_content('Este usuario ha sido deshabilitado.')
+    expect(page).to have_content('This user has been disabled.')
   end
 
   it 'security user can disable another user' do
