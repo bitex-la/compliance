@@ -34,7 +34,7 @@ describe AdminUser do
   it 'disable user' do
     admin = create(:admin_user)
     expect(admin.active).to eq(true)
-    admin.disable
+    admin.disable!
     expect(admin.active).to eq(false)
   end
 end
