@@ -149,6 +149,58 @@ describe 'AdminUser', js: true do
     end
   end
 
+  it 'only active users are shown' do
+    create(:admin_user, email: 'active1@user.com')
+    create(:admin_user, email: 'active2@user.com')
+    create(:admin_user, email: 'inactive@user.com', active: false)
+    login_admin
+    visit '/admin_users'
+
+    expect(page).to have_content 'active1@user.com'
+    expect(page).to have_content 'active2@user.com'
+    expect(page).not_to have_content 'inactive@user.com'
+  end
+
+  it 'inactive user does not allow login' do
+    login_admin(active: false)
+
+    expect(page).to have_content('Este usuario ha sido deshabilitado.')
+  end
+
+  it 'security user can disable another user' do
+    admin_user = create(:admin_user, email: 'active1@user.com')
+
+    login_admin(admin_role: AdminRole.security)
+    visit '/admin_users'
+
+    expect(page).to have_content 'active1@user.com'
+    find(:xpath, "//a[@href='/admin_users/#{admin_user.id}']").click
+    click_link 'Disable'
+    visit '/admin_users'
+    expect(page).not_to have_content 'active1@user.com'
+  end
+
+  it 'Disable button is not shown for itself' do
+    user = create(:admin_user, admin_role: AdminRole.commercial)
+    login_as user
+
+    visit "/admin_users/#{user.id}"
+    expect(page).not_to have_content 'Disable'
+  end
+
+  it "can't disable itself" do
+    user = create(:admin_user, admin_role: AdminRole.commercial)
+    login_as user
+
+    visit "/admin_users/#{user.id}"
+
+    page.execute_script %{
+      $('body').append('<a rel="nofollow" data-method="post" href="/admin_users/#{user.id}/disable_user">Disable</a>')
+    }
+    click_link 'Disable'
+    expect(page).to have_content 'You are not authorized to perform this action.'
+  end
+
   describe 'restricted role' do
     it 'redirect to login' do
       login_admin(admin_role: AdminRole.restricted)
