@@ -3,7 +3,7 @@ FactoryBot.define do
     email     { Faker::Internet.email }
     password  { 'mysecurepassword' }
     api_token { 'my_super_secure_token_for_testing' }
-    admin_role { AdminRole.admin }
+    admin_role { AdminRole.super_admin }
     max_people_allowed { 1000 }
 
     factory :operations_admin_user do
@@ -29,6 +29,10 @@ FactoryBot.define do
     factory :limited_people_allowed_admin_user do
       api_token { 'my_super_admin_secure_token_for_testing' }
       max_people_allowed { 3 }
+    end
+
+    factory :business_admin_user do
+      admin_role { AdminRole.business_admin }
     end
   end
 end

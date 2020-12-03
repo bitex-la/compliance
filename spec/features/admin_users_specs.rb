@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe 'AdminUser', js: true do
   it "Allowed roles can view all admin users" do
-    roles = [AdminRole.security, AdminRole.admin]
+    roles = [AdminRole.security, AdminRole.super_admin]
 
     roles.each do |role|
       login_admin(admin_role: role)
@@ -33,7 +33,7 @@ describe 'AdminUser', js: true do
       AdminRole.operations,
       AdminRole.commercial,
       AdminRole.security,
-      AdminRole.admin]
+      AdminRole.super_admin]
 
     roles.each do |role|
       login_admin(admin_role: role)
@@ -65,7 +65,7 @@ describe 'AdminUser', js: true do
       AdminRole.operations,
       AdminRole.commercial,
       AdminRole.security,
-      AdminRole.admin]
+      AdminRole.super_admin]
 
     roles.each do |role|
       login_admin(admin_role: role)
@@ -79,7 +79,7 @@ describe 'AdminUser', js: true do
   end
 
   it "Allowed roles can disable OTP" do
-    roles = [AdminRole.security, AdminRole.admin]
+    roles = [AdminRole.security, AdminRole.super_admin]
 
     roles.each do |role|
       admin = create(:admin_user, admin_role: AdminRole.marketing, otp_enabled: true)
@@ -109,7 +109,7 @@ describe 'AdminUser', js: true do
   end
 
   it "Allowed roles can full update admin users" do
-    roles = [AdminRole.security, AdminRole.admin]
+    roles = [AdminRole.security, AdminRole.super_admin]
 
     roles.each do |role|
       admin = create(:admin_user, admin_role: AdminRole.marketing)
@@ -135,7 +135,7 @@ describe 'AdminUser', js: true do
       AdminRole.operations,
       AdminRole.commercial,
       AdminRole.security,
-      AdminRole.admin]
+      AdminRole.super_admin]
 
     roles.each do |role|
       login_admin(admin_role: role)
