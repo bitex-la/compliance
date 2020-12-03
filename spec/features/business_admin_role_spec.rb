@@ -10,7 +10,6 @@ describe 'an admin restricted role' do
 
     %w[
       dashboards
-      admin_users
       observation_reasons
       observations
       tags
@@ -28,6 +27,17 @@ describe 'an admin restricted role' do
     login_as business_admin_user
 
     visit '/event_logs'
+
+    expect(page.current_path).to eq('/dashboards')
+    expect(page).to(
+      have_content('You are not authorized to perform this action.')
+    )
+  end
+
+  it 'cannot see admin users' do
+    login_as business_admin_user
+
+    visit '/admin_users'
 
     expect(page.current_path).to eq('/dashboards')
     expect(page).to(
