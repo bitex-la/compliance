@@ -34,14 +34,7 @@ describe AdminUser do
   it 'disable user' do
     admin = create(:admin_user)
     expect(admin.active).to eq(true)
-    admin.disable!
+    admin.disable
     expect(admin.active).to eq(false)
-  end
-
-  it 'not authorized to disable user' do
-    admin = create(:admin_user, admin_role: AdminRole.marketing)
-    expect(admin.active).to eq(true)
-    expect { admin.disable! }
-      .to raise_error(DisableNotAuthorized)
   end
 end

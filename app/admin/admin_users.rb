@@ -152,7 +152,7 @@ ActiveAdmin.register AdminUser do
   end
 
   member_action :disable_user, method: :post do
-    resource.disable!
+    resource.disable
   end
 
   collection_action :omg_wtf_omg do
