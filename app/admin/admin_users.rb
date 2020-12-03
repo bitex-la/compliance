@@ -153,6 +153,8 @@ ActiveAdmin.register AdminUser do
 
   member_action :disable_user, method: :post do
     resource.disable!
+
+    redirect_to admin_users_url
   end
 
   collection_action :omg_wtf_omg do
