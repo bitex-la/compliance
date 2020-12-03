@@ -7,6 +7,8 @@ module Abilities
     def initialize(_user)
       can :manage, :all
       cannot :manage, [EventLog]
+      cannot :create, AdminUser
+      cannot :update, AdminUser
     end
   end
 end

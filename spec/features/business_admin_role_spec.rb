@@ -34,4 +34,23 @@ describe 'an admin restricted role' do
       have_content('You are not authorized to perform this action.')
     )
   end
+
+  it 'cannot create admin users' do
+    login_as business_admin_user
+
+    visit '/admin_users'
+    expect(page).to_not have_content('New Admin User')
+  end
+
+  it 'cannot update admin users' do
+    admin_user = create(:admin_user)
+    login_as business_admin_user
+
+    visit "/admin_users/#{admin_user.id}/edit"
+
+    expect(page).to(
+      have_content('You are not authorized to perform this action.')
+    )
+    expect(page.current_path).to eq('/dashboards')
+  end
 end
