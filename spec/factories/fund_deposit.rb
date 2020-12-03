@@ -36,4 +36,18 @@ FactoryBot.define do
       association :person, factory: :empty_person
     end
   end
+
+  factory :an_fund_deposit, class: FundDeposit do
+    amount { 45000 }
+    exchange_rate_adjusted_amount{ amount / 45.0 }
+    currency_code { 'usd' }
+    deposit_method_code { 'debin' }
+    external_id { "2" }
+    country { 'AN' }
+    deposit_date { DateTime.now.utc }
+
+    factory :an_fund_deposit_with_person do
+      association :person, factory: :empty_person
+    end
+  end
 end
