@@ -26,7 +26,7 @@ class AdminUser < ApplicationRecord
     active? ? super : 'Este usuario ha sido deshabilitado.'
   end
 
-  def disable
+  def disable!
     update!(active: false)
   end
 
