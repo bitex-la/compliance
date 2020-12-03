@@ -45,4 +45,10 @@ RSpec.describe DomicileSeed, type: :model do
   it 'is valid with an issue' do
     expect(valid_seed).to be_valid
   end
+
+  it 'is valid with AN country' do
+    domicile = create(:domicile_seed, issue: create(:basic_issue),
+      country: 'AN')
+    expect(domicile).to be_valid
+  end
 end
