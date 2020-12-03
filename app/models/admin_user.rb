@@ -33,7 +33,7 @@ class AdminUser < ApplicationRecord
   end
 
   def authorized_to_disable?
-    admin_role.code == :admin || admin_role.code == :security
+    admin_role.code == :super_admin || admin_role.code == :security
   end
 
   def request_limit_set
