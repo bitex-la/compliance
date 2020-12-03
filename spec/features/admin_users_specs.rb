@@ -164,7 +164,7 @@ describe 'AdminUser', js: true do
   it 'inactive user does not allow login' do
     login_admin(active: false)
 
-    expect(page).to have_content('Este usuario ha sido deshabilitado.')
+    expect(page).to have_content('This user has been disabled.')
   end
 
   it 'security user can disable another user' do
@@ -176,8 +176,8 @@ describe 'AdminUser', js: true do
     expect(page).to have_content 'active1@user.com'
     find(:xpath, "//a[@href='/admin_users/#{admin_user.id}']").click
     click_link 'Disable'
-    visit '/admin_users'
     expect(page).not_to have_content 'active1@user.com'
+    expect(current_path).to eq('/admin_users')
   end
 
   it 'Disable button is not shown for itself' do

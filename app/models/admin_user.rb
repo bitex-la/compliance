@@ -23,7 +23,7 @@ class AdminUser < ApplicationRecord
   end
 
   def inactive_message
-    active? ? super : 'Este usuario ha sido deshabilitado.'
+    active? ? super : 'This user has been disabled.'
   end
 
   def disable!
