@@ -10,7 +10,15 @@ module AllowancesUpdater
         person.allowances.all? { |a| a.amount.zero? }
 
       issue = person.issues.create
-      issue.allowances_seed.create(amount: 25_000.0, kind: Currency.ars)
+
+      if person.allowances.empty?
+        issue.allowance_seeds.create(amount: 25_000.0, kind: Currency.ars)
+      else
+        person.allowances.select { |a| a.amount.zero? }.each do |a|
+          issue.allowance_seeds.create(amount: 25_000.0, kind: Currency.ars, replaces: a)
+        end
+      end
+
       issue.save!
       issue.approve!
     end
