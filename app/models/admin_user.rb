@@ -16,6 +16,20 @@ class AdminUser < ApplicationRecord
 
   belongs_to :admin_role, required: true
 
+  scope :active, -> { where(active: true) }
+
+  def active_for_authentication?
+    super && active?
+  end
+
+  def inactive_message
+    active? ? super : 'This user has been disabled.'
+  end
+
+  def disable!
+    update!(active: false)
+  end
+
   def request_limit_set
     now = Time.now
     now_string = now.strftime('%Y%m%d')

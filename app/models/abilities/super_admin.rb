@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Abilities
-  class Admin
+  class SuperAdmin
     include CanCan::Ability
 
     def initialize(user)

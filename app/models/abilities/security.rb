@@ -15,6 +15,7 @@ module Abilities
       can :disable_otp, AdminUser
       can :full_update, AdminUser
       can :full_read, AdminUser
+      can :disable_user, AdminUser
     end
   end
 end

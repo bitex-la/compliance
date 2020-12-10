@@ -240,10 +240,6 @@ class Issue < ApplicationRecord
 
     event :complete do
       transitions from: [:draft, :new], to: :new
-
-      after do
-        refresh_person_country_tagging!
-      end
     end
 
     event :observe do
@@ -292,7 +288,6 @@ class Issue < ApplicationRecord
           after_harvest_all!
           person.enable! if reason == IssueReason.new_client
           log_state_change(:approve_issue)
-          refresh_person_country_tagging!
         end
       end
     end
@@ -402,16 +397,6 @@ class Issue < ApplicationRecord
       :natural_person
     elsif legal_entity_docket_seed_id
       :legal_entity
-    end
-  end
-
-  def refresh_person_country_tagging!
-    if argentina_invoicing_detail_seed
-      person.refresh_person_country_tagging!('AR')
-    end
-
-    if chile_invoicing_detail_seed
-      person.refresh_person_country_tagging!('CL')
     end
   end
 

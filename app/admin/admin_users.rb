@@ -138,12 +138,23 @@ ActiveAdmin.register AdminUser do
     link_to('Disable OTP', disable_otp_admin_user_path(resource), method: :post)
   end
 
+  action_item :disable, only: :show,
+                        if: proc { authorized?(:disable_user, resource) } do
+    link_to('Disable', disable_user_admin_user_path(resource), method: :post)
+  end
+
   member_action :enable_otp, method: :post do
     toogle_otp
   end
 
   member_action :disable_otp, method: :post do
     toogle_otp
+  end
+
+  member_action :disable_user, method: :post do
+    resource.disable!
+
+    redirect_to admin_users_url
   end
 
   collection_action :omg_wtf_omg do
@@ -153,6 +164,10 @@ ActiveAdmin.register AdminUser do
 
   controller do
     skip_before_action :authenticate_active_admin_user, raise: false, only: :omg_wtf_omg
+
+    def scoped_collection
+      super.active
+    end
 
     def toogle_otp
       resource.update!(otp_enabled: !resource.otp_enabled)
