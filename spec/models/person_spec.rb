@@ -125,7 +125,11 @@ RSpec.describe Person, type: :model do
     robot_observation = create(:robot_observation, issue: three)
 
     person.all_observations.count.should == 3
-    
+
+    worldcheck_observation.answer!
+    risk_observation.answer!
+    robot_observation.answer!
+
     one.dismiss!
     two.abandon!
 
