@@ -248,15 +248,19 @@ class Issue < ApplicationRecord
 
     event :answer do
       # Admins and migrations may create "already answered" observations.
-      transitions from: [:observed, :draft, :new, :answered], to: :answered
-    
+      transitions from: %i[observed draft new answered],
+                  to: :answered,
+                  guard: :observations_answered?
+
       after do 
         log_state_change(:answer_issue) if aasm.from_state != :answered
       end
     end
 
     event :dismiss do
-      transitions from: [:draft, :new, :answered, :observed, :dismissed], to: :dismissed
+      transitions from: %i[draft new answered observed dismissed],
+                  to: :dismissed,
+                  guard: :observations_answered?
 
       after do 
         log_state_change(:dismiss_issue) if aasm.from_state != :dismissed
@@ -264,7 +268,9 @@ class Issue < ApplicationRecord
     end
 
     event :reject do
-      transitions from: [:draft, :new, :observed, :answered, :rejected], to: :rejected
+      transitions from: %i[draft new observed answered rejected],
+                  to: :rejected,
+                  guard: :observations_answered?
 
       after do
         if aasm.from_state != :rejected
@@ -276,8 +282,10 @@ class Issue < ApplicationRecord
 
     event :approve do
       before{ harvest_all! if aasm.from_state != :approved }
-      
-      transitions from: [:draft, :new, :answered, :approved], to: :approved, guard: :all_workflows_performed?
+
+      transitions from: %i[draft new answered approved],
+                  to: :approved,
+                  guards: %i[all_workflows_performed? observations_answered?]
 
       after do 
         if aasm.from_state != :approved
@@ -288,8 +296,10 @@ class Issue < ApplicationRecord
     end
 
     event :abandon do
-      transitions from: [:draft, :new, :observed, :answered, :abandoned], to: :abandoned
-      
+      transitions from: %i[draft new observed answered abandoned],
+                  to: :abandoned,
+                  guard: :observations_answered?
+
       after do 
         log_state_change(:abandon_issue) if aasm.from_state != :abandoned
       end
@@ -411,6 +421,10 @@ class Issue < ApplicationRecord
 
   def self.eager_seed_entities
     [:person, :fruit , attachments:[:attached_to_fruit, :attached_to_seed]]
+  end
+
+  def observations_answered?
+    observations.all?(&:answered?)
   end
 
   def self.included_for
