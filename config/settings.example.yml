@@ -2,9 +2,9 @@ defaults: &defaults
   secret_key_base: secret_key_base_for_staging_tries_to_be_a_bit_longer_than_before_just_to_make_sure_its_useful
 
   s3:
-    aws_access_key_id: ____c
-    aws_secret_access_key: ____
-    attachments_bucket: production
+    aws_access_key_id: <%= ENV.fetch('S3_ACCESS_KEY'){ '____c' } %>
+    aws_secret_access_key: <%= ENV.fetch('S3_SECRET_KEY'){ '____' } %>
+    attachments_bucket: <%= ENV.fetch('S3_BUCKET'){ 'production' } %>
 
   ses:
     access_key: <%= ENV.fetch('SES_ACCESS_KEY'){ 'some_access_key' } %>
@@ -16,7 +16,7 @@ defaults: &defaults
     host: <%= ENV.fetch('MYSQL_HOST'){ '127.0.0.1' } %>
     port: <%= ENV.fetch('MYSQL_PORT'){ 3306 } %>
 
-  exception_recipients: "some@me.com,other@me.com"
+  exception_recipients: <%= ENV.fetch('EXCEPTION_RECIPIENTS'){ 'some@me.com,other@me.com' } %>
 
   regularities:
     low:
