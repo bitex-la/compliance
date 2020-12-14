@@ -1,5 +1,5 @@
 defaults: &defaults
-  secret_key_base: secret_key_base_for_staging_tries_to_be_a_bit_longer_than_before_just_to_make_sure_its_useful
+  secret_key_base: <%= ENV.fetch('SECRET_KEY_BASE'){ 'secret_key' } %>
 
   s3:
     aws_access_key_id: <%= ENV.fetch('S3_ACCESS_KEY'){ '____c' } %>
@@ -11,6 +11,7 @@ defaults: &defaults
     secret: <%= ENV.fetch('SES_SECRET'){ 'some_secret' } %>
 
   mysql:
+    pool: <%= ENV.fetch('MYSQL_POOL'){ 5 } %>
     username: <%= ENV.fetch('MYSQL_USERNAME'){ 'root' } %>
     password: <%= ENV.fetch('MYSQL_PASSWORD'){ '' }  %>
     host: <%= ENV.fetch('MYSQL_HOST'){ '127.0.0.1' } %>
@@ -29,10 +30,16 @@ defaults: &defaults
   lock_issues:
     expiration_interval_minutes: 15
 
+  app_signal:
+    key: <%= ENV.fetch('APP_SIGNAL_KEY' ){ 'fjkdjflkdjflkdjfdkl' } %> 
+    app: <%= ENV.fetch('APP_SIGNAL_APP' ){ 'Compliance' } %> 
+
   redis:
     cache_url: <%= ENV.fetch('REDIS_CACHE_URL' ){ 'redis://localhost:6379/0' } %>
-    namespace: 'compliance'
-    pool_size: 8
+    namespace: <%= ENV.fetch('REDIS_NAMESPACE' ){ 'compliance' } %> 
+    pool_size: <%= ENV.fetch('REDIS_POOL_SIZE' ){ 8 } %>
+
+  cache_store: <%= ENV.fetch('CACHE_STORE' ){ '/tmp/cache/compliance } %>
 
 production:
   <<: *defaults
