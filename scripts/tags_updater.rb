@@ -1,9 +1,9 @@
 module TagsUpdater
   def self.perform!
-    Person.find_each do |person|
-      from_date = Date.new(2020, 1, 1)
-      country_filter = ['AR', 'CL', 'UY', 'PY']
+    from_date = Date.new(2020, 1, 1)
+    country_filter = ['AR', 'CL', 'UY', 'PY']
 
+    Person.find_each do |person|
       Rails.logger.info "Processing person #{person.id}"
 
       countries = ['AN']
