@@ -39,7 +39,7 @@ defaults: &defaults
     namespace: <%= ENV.fetch('REDIS_NAMESPACE' ){ 'compliance' } %> 
     pool_size: <%= ENV.fetch('REDIS_POOL_SIZE' ){ 8 } %>
 
-  cache_store: <%= ENV.fetch('CACHE_STORE' ){ '/tmp/cache/compliance } %>
+  cache_store: <%= ENV.fetch('CACHE_STORE' ){ '/tmp/cache/compliance' } %>
 
 production:
   <<: *defaults
