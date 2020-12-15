@@ -248,9 +248,7 @@ class Issue < ApplicationRecord
 
     event :answer do
       # Admins and migrations may create "already answered" observations.
-      transitions from: %i[observed draft new answered],
-                  to: :answered,
-                  guard: :observations_answered?
+      transitions from: %i[observed draft new answered], to: :answered
 
       after do 
         log_state_change(:answer_issue) if aasm.from_state != :answered

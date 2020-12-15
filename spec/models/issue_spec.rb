@@ -237,7 +237,6 @@ RSpec.describe Issue, type: :model do
     end
 
     [
-      %i[answered answer],
       %i[dismissed dismiss],
       %i[rejected reject],
       %i[approved approve],
@@ -254,7 +253,6 @@ RSpec.describe Issue, type: :model do
     end
 
     [
-      %i[answered answer],
       %i[dismissed dismiss],
       %i[rejected reject],
       %i[approved approve],
