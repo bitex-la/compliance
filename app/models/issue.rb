@@ -250,7 +250,7 @@ class Issue < ApplicationRecord
       # Admins and migrations may create "already answered" observations.
       transitions from: %i[observed draft new answered], to: :answered
 
-      after do 
+      after do
         log_state_change(:answer_issue) if aasm.from_state != :answered
       end
     end
@@ -260,7 +260,7 @@ class Issue < ApplicationRecord
                   to: :dismissed,
                   guard: :observations_answered?
 
-      after do 
+      after do
         log_state_change(:dismiss_issue) if aasm.from_state != :dismissed
       end
     end
@@ -283,7 +283,7 @@ class Issue < ApplicationRecord
 
       transitions from: %i[draft new answered approved],
                   to: :approved,
-                  guards: %i[all_workflows_performed? observations_answered?]
+                  guard: :all_workflows_performed?
 
       after do 
         if aasm.from_state != :approved
