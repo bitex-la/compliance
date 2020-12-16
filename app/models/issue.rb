@@ -248,27 +248,24 @@ class Issue < ApplicationRecord
 
     event :answer do
       # Admins and migrations may create "already answered" observations.
-      transitions from: %i[observed draft new answered], to: :answered
-
-      after do
+      transitions from: [:observed, :draft, :new, :answered], to: :answered
+    
+      after do 
         log_state_change(:answer_issue) if aasm.from_state != :answered
       end
     end
 
     event :dismiss do
-      transitions from: %i[draft new answered observed dismissed],
-                  to: :dismissed,
-                  guard: :observations_answered?
+      transitions from: [:draft, :new, :answered, :observed, :dismissed], to: :dismissed, guard: :observations_answered?
 
-      after do
+
+      after do 
         log_state_change(:dismiss_issue) if aasm.from_state != :dismissed
       end
     end
 
     event :reject do
-      transitions from: %i[draft new observed answered rejected],
-                  to: :rejected,
-                  guard: :observations_answered?
+      transitions from: [:draft, :new, :observed, :answered, :rejected], to: :rejected, guard: :observations_answered?
 
       after do
         if aasm.from_state != :rejected
@@ -280,10 +277,8 @@ class Issue < ApplicationRecord
 
     event :approve do
       before{ harvest_all! if aasm.from_state != :approved }
-
-      transitions from: %i[draft new answered approved],
-                  to: :approved,
-                  guard: :all_workflows_performed?
+      
+      transitions from: [:draft, :new, :answered, :approved], to: :approved, guard: :all_workflows_performed?
 
       after do 
         if aasm.from_state != :approved
@@ -294,10 +289,8 @@ class Issue < ApplicationRecord
     end
 
     event :abandon do
-      transitions from: %i[draft new observed answered abandoned],
-                  to: :abandoned,
-                  guard: :observations_answered?
-
+      transitions from: [:draft, :new, :observed, :answered, :abandoned], to: :abandoned, guard: :observations_answered?
+      
       after do 
         log_state_change(:abandon_issue) if aasm.from_state != :abandoned
       end
