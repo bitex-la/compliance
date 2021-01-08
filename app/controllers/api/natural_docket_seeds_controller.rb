@@ -28,7 +28,8 @@ class Api::NaturalDocketSeedsController < Api::EntityController
         :copy_attachments,
         :issue,
         :expires_at,
-        :archived_at
+        :archived_at,
+        :expected_investment
       ]
   end
 end

@@ -92,6 +92,8 @@ shared_examples "seed" do |type, initial_factory, later_factory,
     api_get "/people/#{person.id}"
 
     initial_attrs = attributes_for(initial_seed)
+    initial_attrs_json = attributes_for(initial_seed).to_json(encode_big_decimal_as_string: true)
+    initial_attrs = JSON.parse(initial_attrs_json).deep_symbolize_keys
 
     initial_relations = instance_exec(&relations_proc)
     issue_relation = { issue: { data: { id: issue.id.to_s, type: 'issues' } } }
@@ -116,7 +118,8 @@ shared_examples "seed" do |type, initial_factory, later_factory,
         .merge(initial_relations)
         .merge(server_sent_relations)
 
-    later_attrs = attributes_for(later_seed)
+    later_attrs_json = attributes_for(later_seed).to_json(encode_big_decimal_as_string: true)
+    later_attrs = JSON.parse(later_attrs_json).deep_symbolize_keys
     later_relations = instance_exec(&relations_proc)
 
     api_update "/#{seed_type}/#{seed.id}", {
@@ -167,7 +170,8 @@ shared_examples "docket" do |type, initial_factory|
     # for the fruit that follows it can create it's original seed and add
     # it to the existing issue.
     create(:basic_issue, person: person, aasm_state: "approved")
-    old_attrs = attributes_for(initial_factory)
+    old_attrs_json = attributes_for(initial_factory).to_json(encode_big_decimal_as_string: true)
+    old_attrs = JSON.parse(old_attrs_json).deep_symbolize_keys
     old_fruit = create(initial_factory, person: person).reload
 
     issue = create(:basic_issue, person: person)

@@ -54,6 +54,7 @@ ActiveAdmin.register Person do
   filter :identifications_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
   filter :natural_dockets_first_name_cont, label: "First Name"
   filter :natural_dockets_last_name_cont,  label: "Last Name"
+  filter :natural_dockets_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
   filter :by_person_type, as: :select, collection: Person.person_types
   filter :notes_title_or_notes_body_cont, label: "Notes"
