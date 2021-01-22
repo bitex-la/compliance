@@ -294,6 +294,7 @@ ActiveAdmin.register Issue do
             sf.input :marital_status_id, as: :select, collection: MaritalStatusKind.all
             sf.input :job_title
             sf.input :job_description
+            sf.input :expected_investment
             sf.input :politically_exposed
             sf.input :politically_exposed_reason, input_html: {rows: 3}
             if resource.person.natural_docket
