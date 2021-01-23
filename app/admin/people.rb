@@ -150,10 +150,11 @@ ActiveAdmin.register Person do
 
   csv do
     column :id
-    column :person_info
-    column 'email' do |o|
-      o.email_for_export
-    end
+    column('email') { |o| o.email_for_export }
+    column('first_name') { |o| o.natural_docket&.first_name }
+    column('last_name') { |o| o.natural_docket&.last_name }
+    column('legal_entity_name') { |o| o.legal_entity_docket&.name_body }
+    column('phone') { |o| o.phones.last&.number }
     column :state
     column :risk
     column :regularity
