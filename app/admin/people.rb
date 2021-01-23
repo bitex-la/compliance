@@ -68,6 +68,7 @@ ActiveAdmin.register Person do
   filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
 
   scope :fresh, default: true
+  scope :pending
   scope :enabled
   scope :disabled
   scope :rejected
