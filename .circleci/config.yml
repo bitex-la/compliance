@@ -51,7 +51,7 @@ jobs:
           command: |
             mkdir coverage_results
             cp -R coverage/.resultset.json coverage_results/.resultset-${CIRCLE_NODE_INDEX}.json
-      
+
       - persist_to_workspace:
           root: .
           paths:
@@ -85,6 +85,21 @@ jobs:
             bundle exec rake coverage:report
       - store_artifacts:
           path: coverage
+  brakeman:
+    docker: 
+      - image: circleci/ruby:2.5.7-node-browsers
+    steps:
+      - checkout
+      - run:
+          name: Configuring settings
+          command: cp .circleci/settings.yml config/settings.yml
+      - ruby/install-deps
+      - run:
+          name: Brakeman
+          command: |
+            brakeman -o brakeman_report.html
+      - store_artifacts:
+          path: brakeman_report.html
 
   trigger_build:
     docker:
@@ -101,6 +116,9 @@ workflows:
     jobs:             
       - build
       - coverage:
+          requires:
+            - build
+      - brakeman:
           requires:
             - build
       - notify:
