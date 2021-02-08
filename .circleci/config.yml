@@ -98,8 +98,7 @@ jobs:
       - run:
           name: Brakeman
           command: |
-            bundle exec brakeman -o brakeman_report.html
-            exit 0
+            bundle exec brakeman -o brakeman_report.html --no-exit-on-warn --no-exit-on-error
       - store_artifacts:
           path: brakeman_report.html
 
