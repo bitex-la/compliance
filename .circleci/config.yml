@@ -85,6 +85,7 @@ jobs:
             bundle exec rake coverage:report
       - store_artifacts:
           path: coverage
+  
   brakeman:
     docker: 
       - image: circleci/ruby:2.5.7-node-browsers
@@ -98,6 +99,7 @@ jobs:
           name: Brakeman
           command: |
             bundle exec brakeman -o brakeman_report.html
+            exit 0
       - store_artifacts:
           path: brakeman_report.html
 
@@ -115,6 +117,9 @@ workflows:
   build:
     jobs:             
       - build
+      - trigger_build:
+          requires:
+            - build
       - coverage:
           requires:
             - build
@@ -124,7 +129,5 @@ workflows:
       - notify:
           requires:
             - build
-      - trigger_build:
-          requires:
-            - build
+      
   
