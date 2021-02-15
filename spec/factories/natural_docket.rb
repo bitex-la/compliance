@@ -9,6 +9,7 @@ FactoryBot.define_persons_item_and_seed(:natural_docket,
     job_title { 'Sr. Software developer' }
     job_description { 'Build cool open source software' }
     politically_exposed { false }
+    expected_investment { 500.to_d }
     transient{ add_all_attachments { true } }
   },
   alt_full_natural_docket: proc {
@@ -21,6 +22,7 @@ FactoryBot.define_persons_item_and_seed(:natural_docket,
     job_title { 'Super Sr. Software developer' }
     job_description { 'Build cool open source software software' }
     politically_exposed { true }
+    expected_investment { 5000.to_d }
   }
 )
 

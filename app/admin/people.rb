@@ -65,6 +65,7 @@ ActiveAdmin.register Person do
       (NaturalDocket.current.pluck(:nationality) +
        NaturalDocketSeed.where(fruit_id: nil).pluck(:nationality)).uniq.sort
     }
+  filter :natural_dockets_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
   filter :by_person_type, as: :select, collection: Person.person_types
   filter :notes_title_or_notes_body_cont, label: "Notes"
