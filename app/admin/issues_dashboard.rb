@@ -21,7 +21,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   filter :natural_docket_seed_last_name_cont,  label: "Last Name"
   filter :natural_docket_seed_nationality_eq,
     label: 'Nationality', as: :autocomplete,
-    url: 'people/search_country',
+    url: proc { search_country_people_path },
     required: false, wrapper_html: { style: "list-style: none" }
   filter :natural_docket_seed_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_docket_seed_legal_name_or_legal_entity_docket_seed_commercial_name_cont, label: "Company Name"

@@ -59,7 +59,7 @@ ActiveAdmin.register Person do
   filter :natural_dockets_last_name_cont,  label: "Last Name"
   filter :natural_dockets_nationality_or_natural_docket_seeds_nationality_eq,
     label: 'Nationality', as: :autocomplete,
-    url: 'people/search_country',
+    url: proc { search_country_people_path },
     required: false, wrapper_html: { style: "list-style: none" }
   filter :natural_dockets_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
