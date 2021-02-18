@@ -42,12 +42,9 @@ ActiveAdmin.register Person do
 
   collection_action :search_country, method: :get do 
     keyword = params[:term]
-    render json: ISO3166::Country.translations.invert
-      .select{|x| x.downcase.starts_with?(keyword)}
-      .map{|k, v| {
-        label: k,
-        value: v
-      }}
+    render json: ISO3166::Country.all_names_with_sym_codes(:es)
+      .select { |x| x.downcase.starts_with?(keyword) }
+      .map { |k, v| { label: k, value: v } }
   end
 
   filter :emails_address_cont, label: "Email"
