@@ -42,6 +42,23 @@ describe NaturalDocketSeed do
     expect(valid_seed).to be_valid
   end
 
+  it 'allow only valid countries' do
+    valid_seed.nationality = 'XX'
+    expect(valid_seed).not_to be_valid
+    expect(valid_seed.errors[:nationality]).to eq(['XX not found'])
+
+    valid_seed.nationality = ''
+    expect(valid_seed).not_to be_valid
+    expect(valid_seed.errors[:nationality]).to eq([' not found'])
+
+    valid_seed.nationality = nil
+    expect(valid_seed).not_to be_valid
+    expect(valid_seed.errors[:nationality]).to eq([' not found'])
+
+    valid_seed.nationality = 'AR'
+    expect(valid_seed).to be_valid
+  end
+
   it 'trims special characters at the beginning of a birthdate' do
     seed = described_class.new(
       first_name: 'Mr Joe',
