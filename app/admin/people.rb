@@ -42,7 +42,7 @@ ActiveAdmin.register Person do
 
   collection_action :search_country, method: :get do 
     keyword = params[:term]
-    render json: I18n.t('countries').invert
+    render json: ISO3166::Country.translations.invert
       .select{|x| x.downcase.starts_with?(keyword)}
       .map{|k, v| {
         label: k,
