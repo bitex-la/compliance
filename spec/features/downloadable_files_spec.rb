@@ -37,7 +37,7 @@ describe 'an admin user' do
     end
 
     after(:each) do
-      open_download_profile_actions_menu('Basic')
+      open_download_profile_actions_menu('Full')
       DownloadHelpers.wait_for_download
       expect(File.basename(DownloadHelpers.download)).to eq('person_1_kyc_files.zip')
 
@@ -51,6 +51,7 @@ describe 'an admin user' do
           expect(text).to include('Number: +5491125410470')
           expect(text).to include(/Address: \w*@\w*/)
           expect(text).to include('State: Buenos Aires')
+          expect(text).to include('Kind: business_partner')
         end
       end
     end
