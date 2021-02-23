@@ -37,13 +37,14 @@ class PersonProfile
     end
 
     def render_identifications(pdf, person)
-      if person.identifications.empty?
+      if person.identifications.empty? && person.issues.map(&:identification_seeds).empty? 
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      person.identifications.each do |i|
+      identifications = person.identifications.presence || person.issues.map(&:identification_seeds).flatten
+      identifications.each do |i|
         nice_table(pdf, [
           ["Kind: #{i.identification_kind}", "Number: #{i.number}", "Issuer: #{i.issuer}"],
           ["Public Registry Authority: #{i.public_registry_authority}", "Public Registry Book: #{i.public_registry_book}", "Public Registry Data: #{i.public_registry_extra_data}"]
@@ -53,9 +54,10 @@ class PersonProfile
     end
 
     def render_docket(pdf, person)
-      case person.person_type
+      person_type = person.person_type || person.rejected_person_type
+      case person_type
       when :natural_person
-        docket = person.natural_dockets.last
+        docket = person.natural_dockets.last || person.issues.map(&:natural_docket_seed).last
         nice_table(pdf, [
           ["First Name: #{docket.first_name}", "Last Name: #{docket.last_name}", "Birth Date: #{docket.birth_date}"],
           ["Nationality: #{docket.nationality}", "Gender: #{docket.gender}", "Marital Status: #{docket.marital_status}"],
@@ -64,7 +66,7 @@ class PersonProfile
           ]
         )
       when :legal_entity
-        docket = person.legal_entity_dockets.last
+        docket = person.legal_entity_dockets.last || person.issues.map(&:legal_entity_docket_seed).last
         nice_table(pdf, [
           ["Legal Name: #{docket.legal_name}", "Industry: #{docket.industry}", "Business: #{docket.business_description}"],
           ["Country: #{docket.country}", "Commercial Name: #{docket.commercial_name}"]
@@ -102,13 +104,14 @@ class PersonProfile
     end
 
     def render_phones(pdf, person)
-      if person.phones.empty?
+      if person.phones.empty? && person.issues.map(&:phone_seeds).empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      person.phones.each do |p|
+      phones = person.phones.presence || person.issues.map(&:phone_seeds).flatten
+      phones.each do |p|
         nice_table(pdf, [
           ["Number: #{p.number}", "Phone Kind: #{p.phone_kind}", "Country: #{p.country}"]
           ]
@@ -117,13 +120,14 @@ class PersonProfile
     end
 
     def render_mails(pdf, person)
-      if person.emails.empty?
+      if person.emails.empty? && person.issues.map(&:email_seeds).empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      person.emails.each do |e|
+      emails = person.emails.presence || person.issues.map(&:email_seeds).flatten
+      emails.each do |e|
         nice_table(pdf, [
           ["Address: #{e.address}", "Email Kind: #{e.email_kind}"]
           ]
@@ -132,13 +136,14 @@ class PersonProfile
     end
 
     def render_domiciles(pdf, person)
-      if person.domiciles.empty?
+      if person.domiciles.empty? && person.issues.map(&:domicile_seeds).empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      person.domiciles.each do |d|
+      domiciles = person.domiciles.presence || person.issues.map(&:domicile_seeds).flatten
+      domiciles.each do |d|
         nice_table(pdf, [
           ["Country: #{d.country}","State: #{d.state}","City: #{d.city}"],
           ["Adress: #{d.street_address}","Number: #{d.street_number}","Postal Code: #{d.postal_code}"],
@@ -164,13 +169,13 @@ class PersonProfile
     end
 
     def render_affinities(pdf, person)
-      if person.affinities.empty?
+      if person.affinities.empty? && person.issues.map(&:affinity_seeds).empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
-
-      person.affinities.each do |a|
+      affinities = person.affinities.presence || person.issues.map(&:affinity_seeds).flatten
+      affinities.each do |a|
         nice_table(pdf, [
           ["Kind: #{a.affinity_kind}"]
           ]

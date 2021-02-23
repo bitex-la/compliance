@@ -110,6 +110,14 @@ class Person < ApplicationRecord
     end
   end
 
+  def rejected_person_type
+    if issues.any?(&:natural_docket_seed)
+      :natural_person
+    elsif issues.any?(&:legal_entity_docket_seed)
+      :legal_entity
+    end
+  end
+
   def self.person_types
     %i(natural legal)
   end
