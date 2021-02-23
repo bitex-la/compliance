@@ -146,7 +146,7 @@ class PersonProfile
       domiciles.each do |d|
         nice_table(pdf, [
           ["Country: #{d.country}","State: #{d.state}","City: #{d.city}"],
-          ["Adress: #{d.street_address}","Number: #{d.street_number}","Postal Code: #{d.postal_code}"],
+          ["Address: #{d.street_address}","Number: #{d.street_number}","Postal Code: #{d.postal_code}"],
           ["Floor: #{d.floor}", "Apartment: #{d.apartment}"]
           ]
         )
