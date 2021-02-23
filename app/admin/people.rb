@@ -47,12 +47,12 @@ ActiveAdmin.register Person do
       .map { |k, v| { label: k, value: v } }
   end
 
-  filter :emails_address_cont, label: "Email"
-  filter :identifications_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
-  filter :natural_dockets_first_name_cont, label: "First Name"
-  filter :natural_dockets_last_name_cont,  label: "Last Name"
+  filter :emails_address_or_issues_email_seeds_address_cont, label: "Email"
+  filter :identifications_number_or_issues_identification_seeds_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
+  filter :natural_dockets_first_name_or_issues_natural_docket_seed_first_name_cont, label: "First Name"
+  filter :natural_dockets_last_name_or_issues_natural_docket_seed_last_name_cont,  label: "Last Name"
   filter :natural_dockets_expected_investment, label: "Expected Investment", as: :numeric
-  filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
+  filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_or_issues_legal_entity_docket_seed_legal_name_or_issues_legal_entity_docket_seed_commercial_name_cont, label: "Company Name"
   filter :by_person_type, as: :select, collection: Person.person_types
   filter :notes_title_or_notes_body_cont, label: "Notes"
   filter :domiciles_street_address_or_argentina_invoicing_details_address_cont, label: "Street Address"
