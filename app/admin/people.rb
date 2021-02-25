@@ -14,6 +14,12 @@ ActiveAdmin.register Person do
     def related_person
       params[:id]
     end
+
+    def apply_filtering(chain)
+      # We may get multiple hits for the same Person when using filters that query multiple
+      # tables because ransack uses a LEFT OUTER JOIN for this kind of queries.
+      super(chain).distinct
+    end
   end
 
   actions :all, except: [:destroy]
@@ -51,6 +57,10 @@ ActiveAdmin.register Person do
   filter :identifications_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
   filter :natural_dockets_first_name_cont, label: "First Name"
   filter :natural_dockets_last_name_cont,  label: "Last Name"
+  filter :natural_dockets_nationality_or_natural_docket_seeds_nationality_eq,
+    label: 'Nationality', as: :autocomplete,
+    url: proc { search_country_people_path },
+    required: false, wrapper_html: { style: "list-style: none" }
   filter :natural_dockets_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
   filter :by_person_type, as: :select, collection: Person.person_types
@@ -66,6 +76,7 @@ ActiveAdmin.register Person do
   filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
 
   scope :fresh, default: true
+  scope :pending
   scope :enabled
   scope :disabled
   scope :rejected
@@ -147,10 +158,11 @@ ActiveAdmin.register Person do
 
   csv do
     column :id
-    column :person_info
-    column 'email' do |o|
-      o.email_for_export
-    end
+    column('email') { |o| o.email_for_export }
+    column('first_name') { |o| o.natural_docket&.first_name }
+    column('last_name') { |o| o.natural_docket&.last_name }
+    column('legal_entity_name') { |o| o.legal_entity_docket&.name_body }
+    column('phone') { |o| o.phones.last&.number }
     column :state
     column :risk
     column :regularity
