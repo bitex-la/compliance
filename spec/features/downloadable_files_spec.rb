@@ -20,7 +20,7 @@ describe 'an admin user' do
     end
 
     it 'rejected person' do
-      person = create :new_natural_person
+      person = create :new_natural_person, :with_new_client_reason
 
       person.enable
       person.reload

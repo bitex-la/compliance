@@ -3,7 +3,7 @@
 class PersonProfile
   class PdfGenerator
     Prawn::Font::AFM.hide_m17n_warning = true
-    attr_accessor :person, :include_affinities, :include_risk_scores
+    attr_accessor :person, :include_affinities, :include_risk_scores, :issue
 
     def initialize(person, include_affinities, include_risk_scores)
       self.person = person
@@ -37,13 +37,13 @@ class PersonProfile
     end
 
     def render_identifications(pdf, person)
-      if person.identifications.empty? && person.issues.map(&:identification_seeds).empty? 
+      if person.identifications.empty? && issue&.identification_seeds&.empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      identifications = person.identifications.presence || person.issues.map(&:identification_seeds).flatten
+      identifications = issue&.identification_seeds || person.identifications
       identifications.each do |i|
         nice_table(pdf, [
           ["Kind: #{i.identification_kind}", "Number: #{i.number}", "Issuer: #{i.issuer}"],
@@ -57,7 +57,7 @@ class PersonProfile
       person_type = person.person_type || person.rejected_person_type
       case person_type
       when :natural_person
-        docket = person.natural_dockets.last || person.issues.map(&:natural_docket_seed).last
+        docket = person.natural_dockets.last || issue&.natural_docket_seed
         nice_table(pdf, [
           ["First Name: #{docket.first_name}", "Last Name: #{docket.last_name}", "Birth Date: #{docket.birth_date}"],
           ["Nationality: #{docket.nationality}", "Gender: #{docket.gender}", "Marital Status: #{docket.marital_status}"],
@@ -66,7 +66,7 @@ class PersonProfile
           ]
         )
       when :legal_entity
-        docket = person.legal_entity_dockets.last || person.issues.map(&:legal_entity_docket_seed).last
+        docket = person.legal_entity_dockets.last || issue&.legal_entity_docket_seed
         nice_table(pdf, [
           ["Legal Name: #{docket.legal_name}", "Industry: #{docket.industry}", "Business: #{docket.business_description}"],
           ["Country: #{docket.country}", "Commercial Name: #{docket.commercial_name}"]
@@ -104,13 +104,13 @@ class PersonProfile
     end
 
     def render_phones(pdf, person)
-      if person.phones.empty? && person.issues.map(&:phone_seeds).empty?
+      if person.phones.empty? && issue&.phone_seeds&.empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      phones = person.phones.presence || person.issues.map(&:phone_seeds).flatten
+      phones = issue&.phone_seeds || person.phones
       phones.each do |p|
         nice_table(pdf, [
           ["Number: #{p.number}", "Phone Kind: #{p.phone_kind}", "Country: #{p.country}"]
@@ -120,13 +120,13 @@ class PersonProfile
     end
 
     def render_mails(pdf, person)
-      if person.emails.empty? && person.issues.map(&:email_seeds).empty?
+      if person.emails.empty? && issue&.email_seeds&.empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      emails = person.emails.presence || person.issues.map(&:email_seeds).flatten
+      emails = issue&.email_seeds || person.emails
       emails.each do |e|
         nice_table(pdf, [
           ["Address: #{e.address}", "Email Kind: #{e.email_kind}"]
@@ -136,13 +136,13 @@ class PersonProfile
     end
 
     def render_domiciles(pdf, person)
-      if person.domiciles.empty? && person.issues.map(&:domicile_seeds).empty?
+      if person.domiciles.empty? && issue&.domicile_seeds&.empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
 
-      domiciles = person.domiciles.presence || person.issues.map(&:domicile_seeds).flatten
+      domiciles = issue&.domicile_seeds || person.domiciles
       domiciles.each do |d|
         nice_table(pdf, [
           ["Country: #{d.country}","State: #{d.state}","City: #{d.city}"],
@@ -169,12 +169,12 @@ class PersonProfile
     end
 
     def render_affinities(pdf, person)
-      if person.affinities.empty? && person.issues.map(&:affinity_seeds).empty?
+      if person.affinities.empty? && issue&.affinity_seeds&.empty?
         pdf.text("No data available", size: 12)
         pdf.move_down 10
         return
       end
-      affinities = person.affinities.presence || person.issues.map(&:affinity_seeds).flatten
+      affinities = issue&.affinity_seeds || person.affinities
       affinities.each do |a|
         nice_table(pdf, [
           ["Kind: #{a.affinity_kind}"]
@@ -224,40 +224,14 @@ class PersonProfile
 
         pdf.text("Profile", styles: [:bold], size: 24)
 
-        pdf.text("Basic Data", styles: [:bold], size: 18)
-
-        nice_table(pdf, [["Created At: #{person.created_at.strftime("%Y-%m-%d")}",
-          "Updated At: #{person.updated_at.strftime("%Y-%m-%d")}"]])
-
-        pdf.text("Docket", styles: [:bold], size: 18)
-        render_docket(pdf, person)
-
-        pdf.text("Identifications", styles: [:bold], size: 18)
-        render_identifications(pdf, person)
-
-        pdf.text("Domiciles", styles: [:bold], size: 18)
-        render_domiciles(pdf, person)
-
-        pdf.text("Invoicing", styles: [:bold], size: 18)
-        render_invoices(pdf, person)
-
-        pdf.text("EMails", styles: [:bold], size: 18)
-        render_mails(pdf, person)
-
-        pdf.text("Phones", styles: [:bold], size: 18)
-        render_phones(pdf, person)
-
-        pdf.text("Notes", styles: [:bold], size: 18)
-        render_notes(pdf, person)
-
-        if include_affinities
-          pdf.text("Affinities", styles: [:bold], size: 18)
-          render_affinities(pdf, person)
-        end
-
-        if include_risk_scores
-          pdf.text("Risk Scores", styles: [:bold], size: 18)
-          render_risk_scores(pdf, person)
+        if person.enabled?
+          inner_report(pdf)
+        elsif person.rejected?
+          pdf.text('Profile Rejected', styles: [:bold], size: 24)
+          person.issues.where(reason_id: IssueReason.new_client).each do |issue|
+            self.issue = issue
+            inner_report(pdf)
+          end
         end
 
         pdf.number_pages "<page>/<total>", {
@@ -267,6 +241,44 @@ class PersonProfile
           align: :right,
           start_count_at: 1
         }
+      end
+    end
+
+    def inner_report(pdf)
+      pdf.text("Basic Data", styles: [:bold], size: 18)
+
+      nice_table(pdf, [["Created At: #{person.created_at.strftime("%Y-%m-%d")}",
+        "Updated At: #{person.updated_at.strftime("%Y-%m-%d")}"]])
+
+      pdf.text("Docket", styles: [:bold], size: 18)
+      render_docket(pdf, person)
+
+      pdf.text("Identifications", styles: [:bold], size: 18)
+      render_identifications(pdf, person)
+
+      pdf.text("Domiciles", styles: [:bold], size: 18)
+      render_domiciles(pdf, person)
+
+      pdf.text("Invoicing", styles: [:bold], size: 18)
+      render_invoices(pdf, person)
+
+      pdf.text("EMails", styles: [:bold], size: 18)
+      render_mails(pdf, person)
+
+      pdf.text("Phones", styles: [:bold], size: 18)
+      render_phones(pdf, person)
+
+      pdf.text("Notes", styles: [:bold], size: 18)
+      render_notes(pdf, person)
+
+      if include_affinities
+        pdf.text("Affinities", styles: [:bold], size: 18)
+        render_affinities(pdf, person)
+      end
+
+      if include_risk_scores
+        pdf.text("Risk Scores", styles: [:bold], size: 18)
+        render_risk_scores(pdf, person)
       end
     end
   end
