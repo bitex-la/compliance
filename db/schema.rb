@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_06_164343) do
+ActiveRecord::Schema.define(version: 2021_03_02_130428) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -499,6 +499,8 @@ ActiveRecord::Schema.define(version: 2021_01_06_164343) do
     t.boolean "copy_attachments"
     t.date "expires_at"
     t.date "archived_at"
+    t.boolean "regulated_entity", default: false, null: false
+    t.boolean "operations_with_third_party_funds", default: false, null: false
     t.index ["commercial_name"], name: "index_legal_entity_docket_seeds_on_commercial_name"
     t.index ["country"], name: "index_legal_entity_docket_seeds_on_country"
     t.index ["fruit_id"], name: "index_legal_entity_docket_seeds_on_fruit_id"
@@ -518,6 +520,8 @@ ActiveRecord::Schema.define(version: 2021_01_06_164343) do
     t.datetime "updated_at", null: false
     t.bigint "replaced_by_id"
     t.date "archived_at"
+    t.boolean "regulated_entity", default: false, null: false
+    t.boolean "operations_with_third_party_funds", default: false, null: false
     t.index ["commercial_name"], name: "index_legal_entity_dockets_on_commercial_name"
     t.index ["country"], name: "index_legal_entity_dockets_on_country"
     t.index ["issue_id"], name: "index_legal_entity_dockets_on_issue_id"
