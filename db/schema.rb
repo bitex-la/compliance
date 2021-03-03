@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_02_124954) do
+ActiveRecord::Schema.define(version: 2021_01_06_164343) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -546,6 +546,7 @@ ActiveRecord::Schema.define(version: 2020_12_02_124954) do
     t.boolean "copy_attachments"
     t.date "expires_at"
     t.date "archived_at"
+    t.decimal "expected_investment", precision: 20, scale: 8
     t.index ["birth_date"], name: "index_natural_docket_seeds_on_birth_date"
     t.index ["first_name", "last_name"], name: "index_natural_docket_seeds_on_first_name_and_last_name"
     t.index ["first_name"], name: "index_natural_docket_seeds_on_first_name"
@@ -574,6 +575,7 @@ ActiveRecord::Schema.define(version: 2020_12_02_124954) do
     t.boolean "politically_exposed"
     t.text "politically_exposed_reason", limit: 4294967295
     t.date "archived_at"
+    t.decimal "expected_investment", precision: 20, scale: 8
     t.index ["birth_date"], name: "index_natural_dockets_on_birth_date"
     t.index ["first_name", "last_name"], name: "index_natural_dockets_on_first_name_and_last_name"
     t.index ["first_name"], name: "index_natural_dockets_on_first_name"

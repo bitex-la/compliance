@@ -139,4 +139,46 @@ describe 'Dashboard' do
         indexes[3]])
     end
   end
+
+  describe 'functionality' do
+    before(:each) do
+      login_as admin_user
+
+      9.times do |n|
+        issue = create(:basic_issue)
+        nationality =
+          if n < 4
+            'AR'
+          else
+            'ES'
+          end
+        create :full_natural_docket_seed, issue: issue, nationality: nationality
+      end
+
+      visit '/'
+      click_link 'All'
+    end
+
+    it 'argentina returns 4 results' do
+      fill_in :q_natural_docket_seed_nationality_eq, with: 'argentina'
+
+      within '.ui-menu-item' do
+        find('.ui-menu-item-wrapper').click
+      end
+      click_on 'Filter'
+
+      expect(page).to have_content('Displaying all 4 Dashboards')
+    end
+
+    it 'spain returns 5 results' do
+      fill_in :q_natural_docket_seed_nationality_eq, with: 'spain'
+
+      within '.ui-menu-item' do
+        find('.ui-menu-item-wrapper').click
+      end
+      click_on 'Filter'
+
+      expect(page).to have_content('Displaying all 5 Dashboards')
+    end
+  end
 end

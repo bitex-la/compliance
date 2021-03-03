@@ -14,6 +14,8 @@ module TagsUpdater
         .where('withdrawal_date >= ?', from_date)
         .pluck(:country)
 
+      Rails.logger.info "Countries to add #{countries}"
+
       countries.flatten.compact.uniq.each do |country|
         person.refresh_person_country_tagging!(country)
       end

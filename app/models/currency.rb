@@ -22,5 +22,6 @@ class Currency
     [17,  :aud,  'australian_dollar',  2         ],
     [18,  :gbp,  'pound_sterling',     2         ],
     [19,  :hkd,  'hong_kong_dollar',   2         ],
+    [20,  :bob,  'bolivian_peso',      2         ]
   ]
 end

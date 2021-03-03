@@ -13,9 +13,10 @@ RSpec.describe Observation, type: :model do
       issue = create(:basic_issue)
       another_issue = create(:basic_issue)
       worldcheck_observation = create(:admin_world_check_observation, issue: issue)
-      create(:chainalysis_observation, issue: another_issue)
+      chainalysis_observation = create(:chainalysis_observation, issue: another_issue)
 
       Observation.admin_pending.count.should == 2
+      chainalysis_observation.answer!
       another_issue.send("#{event}!")
       Observation.admin_pending.count.should == 1
       Observation.admin_pending.first.note.should == worldcheck_observation.note

@@ -1,34 +1,33 @@
 default: &defaults
   # Your push api key, it is possible to set this dynamically using ERB:
-  # push_api_key: "<%= ENV['APPSIGNAL_PUSH_API_KEY'] %>"
-  push_api_key: ""
+  push_api_key: <%= ENV.fetch('APPSIGNAL_PUSH_API_KEY' ){ '' } %>
 
   # Your app's name
-  name: "Open Compliance"
+  name: <%= ENV.fetch('APPSIGNAL_APP_NAME' ){ 'Open Compliance' } %> 
 
   ignore_errors:
     - SystemExit
 
-  debug: false
+  debug: <%= ENV.fetch('APPSIGNAL_DEBUG' ){ false } %> 
 
   # Will send <sample>/100 datapoints on average, picked randomly
-  sample: 50
+  sample: <%= ENV.fetch('APPSIGNAL_SAMPLE' ){ 50 } %> 
 
-  active: true
+  active: <%= ENV.fetch('APPSIGNAL_ACTIVE' ){ true } %> 
 
 # Configuration per environment, leave out an environment or set active
 # to false to not push metrics for that environment.
 development:
   <<: *defaults
-  name: "Open Compliance (dev)"
-  sample: 100
-  debug: true
-  active: false
+  name: <%= ENV.fetch('APPSIGNAL_APP_NAME' ){ 'Open Compliance (dev)' } %>  
+  sample: <%= ENV.fetch('APPSIGNAL_SAMPLE' ){ 100 } %> 
+  debug: <%= ENV.fetch('APPSIGNAL_DEBUG' ){ true } %>
+  active: <%= ENV.fetch('APPSIGNAL_ACTIVE' ){ false } %>
 
 production:
   <<: *defaults
 
 staging:
   <<: *defaults
-  active: false
-  name: "Open Compliance (staging)"
+  active: <%= ENV.fetch('APPSIGNAL_ACTIVE' ){ true } %>
+  name: <%= ENV.fetch('APPSIGNAL_APP_NAME' ){ 'Open Compliance (staging)' } %> 
