@@ -56,6 +56,11 @@ module Garden
         end
       end
 
+      before_create do
+        self.country = country.upcase if respond_to?(:country)
+        self.nationality = nationality.upcase if respond_to?(:nationality)
+      end
+
       validate do
         next if issue.nil?
         state = issue.changes[:aasm_state].try(:first) || issue.state
