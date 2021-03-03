@@ -9,8 +9,10 @@ class NaturalDocketBase < ApplicationRecord
   ransackable_static_belongs_to :gender, class_name: 'GenderKind',
     required: false
 
-  validates :first_name, :last_name, :job_title, :nationality,
+  validates :first_name, :last_name, :job_title,
     length: { maximum: 255 }
+
+  validates :nationality, country: true, length: { maximum: 255 }
 
   def name_body
     [first_name, last_name].join(' ')

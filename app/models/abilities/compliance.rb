@@ -22,7 +22,8 @@ module Abilities
         Phone,
         Email,
         Note,
-        Tag]
+        Tag,
+        ObservationReason]
 
       can :manage, [Person,
         Issue,

@@ -236,6 +236,40 @@ RSpec.describe Issue, type: :model do
       end
     end
 
+    [
+      %i[dismissed dismiss],
+      %i[rejected reject],
+      %i[approved approve],
+      %i[abandoned abandon]
+    ].each do |state, event|
+      it "does not goes from observed to #{state} because of not answered observations" do
+        issue = create(:full_natural_person_issue, person: create(:empty_person))
+        create(:observation, issue: issue)
+
+        expect do
+          issue.send("#{event}!")
+        end.to raise_error AASM::InvalidTransition
+      end
+    end
+
+    [
+      %i[dismissed dismiss],
+      %i[rejected reject],
+      %i[approved approve],
+      %i[abandoned abandon]
+    ].each do |state, event|
+      it "goes from answered observed issue to #{state}" do
+        issue = create(:full_natural_person_issue,
+                       person: create(:empty_person))
+        observation = create(:observation, issue: issue)
+        observation.answer!
+
+        expect(issue).to(
+          transition_from(:observed).to(state).on_event(event)
+        )
+      end
+    end
+
     it 'does nothing on reject' do
       person = create :full_natural_person
       issue = create(:basic_issue, person: person)

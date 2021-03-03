@@ -256,7 +256,8 @@ class Issue < ApplicationRecord
     end
 
     event :dismiss do
-      transitions from: [:draft, :new, :answered, :observed, :dismissed], to: :dismissed
+      transitions from: [:draft, :new, :answered, :observed, :dismissed], to: :dismissed, guard: :observations_answered?
+
 
       after do 
         log_state_change(:dismiss_issue) if aasm.from_state != :dismissed
@@ -264,7 +265,7 @@ class Issue < ApplicationRecord
     end
 
     event :reject do
-      transitions from: [:draft, :new, :observed, :answered, :rejected], to: :rejected
+      transitions from: [:draft, :new, :observed, :answered, :rejected], to: :rejected, guard: :observations_answered?
 
       after do
         if aasm.from_state != :rejected
@@ -288,7 +289,7 @@ class Issue < ApplicationRecord
     end
 
     event :abandon do
-      transitions from: [:draft, :new, :observed, :answered, :abandoned], to: :abandoned
+      transitions from: [:draft, :new, :observed, :answered, :abandoned], to: :abandoned, guard: :observations_answered?
       
       after do 
         log_state_change(:abandon_issue) if aasm.from_state != :abandoned
@@ -411,6 +412,10 @@ class Issue < ApplicationRecord
 
   def self.eager_seed_entities
     [:person, :fruit , attachments:[:attached_to_fruit, :attached_to_seed]]
+  end
+
+  def observations_answered?
+    observations.all?(&:answered?)
   end
 
   def self.included_for

@@ -11,6 +11,15 @@ class Person < ApplicationRecord
 
   ransack_alias :state, :aasm_state
 
+  HAS_MANY_PLAIN = %i{
+    issues
+    fund_deposits
+    fund_withdrawals
+    attachments
+  }.each do |relationship|
+    has_many relationship
+  end
+
   HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
@@ -25,21 +34,14 @@ class Person < ApplicationRecord
     affinities
     risk_scores
   }.each do |relationship|
+    rel_name = Garden::Naming.new(relationship)
     has_many relationship, -> {
-      where("#{relationship}.replaced_by_id is NULL")
-      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.current)
+      where("#{rel_name.plural}.replaced_by_id is NULL")
+      .where("#{rel_name.plural}.archived_at is NULL OR #{rel_name.plural}.archived_at > ?", Date.current)
     }
 
-    has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
-  end
-
-  HAS_MANY_PLAIN = %i{
-    issues
-    fund_deposits
-    fund_withdrawals
-    attachments
-  }.each do |relationship|
-    has_many relationship
+    has_many "#{rel_name.plural}_history".to_sym, class_name: rel_name.fruit
+    has_many rel_name.seed_plural.to_sym, through: :issues, class_name: rel_name.seed
   end
 
   HAS_MANY = HAS_MANY_REPLACEABLE + HAS_MANY_PLAIN
@@ -141,6 +143,12 @@ class Person < ApplicationRecord
   }.each do |k, v|
     scope k, -> { with_relations.where('people.aasm_state=?', v) }
   end
+
+  scope :pending, -> {
+    fresh
+      .includes(:issues)
+      .where(issues: { aasm_state: 'answered', reason_id: IssueReason.new_client })
+  }
 
   def self.ransackable_scopes(auth_object = nil)
     %i(by_person_type)

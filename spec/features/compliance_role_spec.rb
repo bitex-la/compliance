@@ -8,7 +8,6 @@ describe 'a compliance role admin user' do
 
     %w(
       admin_users
-      observation_reasons
     ).each do |path|
       visit "/#{path}"
       page.current_path.should == '/dashboards'
@@ -20,9 +19,9 @@ describe 'a compliance role admin user' do
     login_as compliance_admin_user
 
     within '.header' do
-      expect(page).to_not have_content 'Observation Reasons'
       expect(page).to_not have_content 'Admin Users'
 
+      expect(page).to have_content 'Observation Reasons'
       expect(page).to have_content 'Dashboard'
       expect(page).to have_content 'Observations'
       expect(page).to have_content 'People'

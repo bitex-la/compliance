@@ -262,7 +262,8 @@ describe Person do
             archived_at: nil,
             birth_date: person.natural_dockets.first.birth_date.to_formatted_s,
             created_at: '2018-01-01T00:00:00.000Z',
-            updated_at: '2018-01-01T00:00:00.000Z'
+            updated_at: '2018-01-01T00:00:00.000Z',
+            expected_investment: '500.0'
           },
           relationships: {
             person: {data: {id: person.id.to_s, type: "people"}},
