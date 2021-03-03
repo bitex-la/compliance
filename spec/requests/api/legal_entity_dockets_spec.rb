@@ -47,7 +47,7 @@ describe LegalEntityDocket do
       api_get "/legal_entity_dockets/#{LegalEntityDocket.last.id}"
       expect(api_response.data.attributes.to_h).to(
         include(regulated_entity: true,
-                operations_with_third_party_funds: false)
+                operations_with_third_party_funds: true)
       )
     end
   end
