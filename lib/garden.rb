@@ -56,16 +56,6 @@ module Garden
         end
       end
 
-      before_create do
-        if is_a? NaturalDocketSeed
-          self.nationality = nationality.upcase
-        elsif is_a? IdentificationSeed
-          self.issuer = issuer.upcase
-        elsif respond_to?(:country)
-          self.country = country.upcase
-        end
-      end
-
       validate do
         next if issue.nil?
         state = issue.changes[:aasm_state].try(:first) || issue.state

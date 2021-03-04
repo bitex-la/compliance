@@ -95,4 +95,19 @@ describe NaturalDocketSeed do
     issue = Issue.new(person: person)
     create(:strange_natural_docket_seed, issue: issue)
   end
+
+  it 'sets nationality to upper case' do
+    seed = NaturalDocketSeed.new(
+      first_name: 'Mr Joe',
+      last_name: 'Black',
+      nationality: 'ar',
+      job_title: ' Developer',
+      job_description: 'code for food',
+      issue: create(:basic_issue)
+    )
+
+    seed.save
+
+    expect(seed.nationality).to eq('AR')
+  end
 end

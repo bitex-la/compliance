@@ -39,4 +39,19 @@ describe LegalEntityDocketSeed do
   it 'is valid with an issue' do
     expect(valid_seed).to be_valid
   end
+
+  it 'sets country to upper case' do
+    seed = LegalEntityDocketSeed.new(
+      industry: 'Fabrics',
+      business_description: 'To make clothes',
+      country: 'es',
+      commercial_name: 'The Fabrics',
+      legal_name: 'The Fabrics',
+      issue: create(:basic_issue)
+    )
+
+    seed.save
+
+    expect(seed.country).to eq('ES')
+  end
 end
