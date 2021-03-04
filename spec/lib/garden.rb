@@ -30,4 +30,17 @@ describe Garden do
 
     expect(seed.nationality).to eq('AR')
   end
+
+  it 'sets issuer to upper case' do
+    seed = IdentificationSeed.new(
+      number: '2545566',
+      identification_kind_code: 'national_id',
+      issuer: 'mx',
+      issue: create(:basic_issue)
+    )
+
+    seed.save
+
+    expect(seed.issuer).to eq('MX')
+  end
 end

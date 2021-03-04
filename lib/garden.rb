@@ -57,8 +57,13 @@ module Garden
       end
 
       before_create do
-        self.country = country.upcase if respond_to?(:country)
-        self.nationality = nationality.upcase if respond_to?(:nationality)
+        if is_a? NaturalDocketSeed
+          self.nationality = nationality.upcase
+        elsif is_a? IdentificationSeed
+          self.issuer = issuer.upcase
+        elsif respond_to?(:country)
+          self.country = country.upcase
+        end
       end
 
       validate do
