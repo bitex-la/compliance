@@ -24,4 +24,21 @@ describe ArgentinaInvoicingDetailSeed do
     }
 
   it_behaves_like 'model_validations', described_class
+
+  it 'sets country to upper case' do
+    seed = ArgentinaInvoicingDetailSeed.new(
+      vat_status_code: 'monotributo',
+      tax_id: '20955754290',
+      tax_id_kind_code: 'cuit',
+      receipt_kind_code: 'a',
+      full_name: 'Julio Iglesias',
+      address: 'Jujuy 3421',
+      country: 'ar',
+      issue: create(:basic_issue)
+    )
+
+    seed.save
+
+    expect(seed.country).to eq('AR')
+  end
 end

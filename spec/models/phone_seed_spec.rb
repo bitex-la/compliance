@@ -23,4 +23,20 @@ describe PhoneSeed do
     }
 
   it_behaves_like 'model_validations', described_class
+
+  it 'sets country to upper case' do
+    seed = PhoneSeed.new(
+      number: '+5491125410470',
+      phone_kind_code: 'main',
+      country: 'ar',
+      has_whatsapp: true,
+      has_telegram: false,
+      note: 'please do not call on Sundays',
+      issue: create(:basic_issue)
+    )
+
+    seed.save
+
+    expect(seed.country).to eq('AR')
+  end
 end

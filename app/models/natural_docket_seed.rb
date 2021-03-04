@@ -1,6 +1,10 @@
 class NaturalDocketSeed < NaturalDocketBase
   include Garden::Seed
 
+  before_create do
+    self.nationality = nationality.upcase
+  end
+
   validate do
     next unless issue
     next unless issue.natural_docket_seed

@@ -1,4 +1,7 @@
 class ArgentinaInvoicingDetailSeed < ArgentinaInvoicingDetailBase
   include Garden::Seed
-end
 
+  before_create do
+    self.country = country.upcase
+  end
+end
