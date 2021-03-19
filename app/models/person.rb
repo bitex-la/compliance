@@ -144,11 +144,12 @@ class Person < ApplicationRecord
     scope k, -> { with_relations.where('people.aasm_state=?', v) }
   end
 
-  scope :pending, -> {
+  scope :pending, (lambda do
     fresh
       .includes(:issues)
-      .where(issues: { aasm_state: 'answered', reason_id: IssueReason.new_client })
-  }
+      .where(issues: { aasm_state: %w[new answered observed],
+                       reason_id: IssueReason.new_client })
+  end)
 
   def self.ransackable_scopes(auth_object = nil)
     %i(by_person_type)
