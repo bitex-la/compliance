@@ -44,6 +44,7 @@ module Abilities
         IssueTagging]
 
       can :full_read, Person
+      can :download_pending_csv, Person
       can :create, Tag
 
       can :read, user

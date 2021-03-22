@@ -154,6 +154,46 @@ class Person < ApplicationRecord
     %i(by_person_type)
   end
 
+  def self.to_csv
+    CSV.generate do |csv|
+      csv << [
+        'issue id',
+        'peson id',
+        'email',
+        'first name',
+        'last name',
+        'legal entity name',
+        'phones',
+        'person state',
+        'issue state',
+        'risk',
+        'regularity',
+        'person type',
+        'created at',
+        'updated at'
+      ]
+      all.each do |person|
+        person.issues.each do |issue|
+          csv << [
+            issue.id,
+            person.id,
+            issue.email_seeds.map { |email| "#{email.email_kind.code}: #{email.address}" }.join(','),
+            issue.natural_docket_seed&.first_name,
+            issue.natural_docket_seed&.last_name,
+            issue.legal_entity_docket_seed&.legal_name,
+            issue.phone_seeds.map { |phone| "#{phone.phone_kind.code}: #{phone.number}" }.join(','),
+            person.state,
+            issue.state,
+            person.risk,
+            person.person_type,
+            person.created_at,
+            person.updated_at
+          ]
+        end
+      end
+    end
+  end
+
   def name
     "(#{id}) #{person_info_name || person_info_email}"
   end

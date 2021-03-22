@@ -171,6 +171,28 @@ ActiveAdmin.register Person do
     column :updated_at
   end
 
+  collection_action :download_pending_csv, method: :get do
+    authorize!(:download_pending_csv, Person)
+
+    collection =
+      Person
+      .pending
+      .joins(:email_seeds)
+      .page(params[:page])
+      .ransack(params[:q])
+      .result
+
+    send_data collection.to_csv,
+              type: 'text/csv; charset=utf-8; header=present',
+              disposition: 'attachment; filename=people.csv'
+  end
+
+  action_item :pending_csv, only: :index, if: proc { authorized?(:download_pending_csv, Person) } do
+    next unless params[:scope] == 'pending'
+
+    link_to('Csv Pending Report', download_pending_csv_people_path(params.slice(:page, :scope, :q)))
+  end
+
   show as: :grid, columns: 2 do      
     if resource.issues.empty?
       div class: 'flash flash_danger' do
