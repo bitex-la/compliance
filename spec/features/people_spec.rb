@@ -22,6 +22,6 @@ describe 'people' do
     click_link 'Csv Pending Report'
 
     content = DownloadHelpers.download_content
-    expect(content).to match(/jhon\@doe\.com.*\n.*mike\@test\.com.*\n.*frank\@test\.com/)
+    expect(content).to match(/jhon\@doe\.com.*\n.*mike\@test\.com.*\n.*frank\@test\.com.*\n.*pete\@test\.com.*\n.*mary\@doe\.com/)
   end
 end
