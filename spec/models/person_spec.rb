@@ -47,7 +47,7 @@ RSpec.describe Person, type: :model do
   it 'is in pending scope' do
     person = create :new_natural_person, :with_new_client_reason
     observation = create :robot_observation, issue: person.reload.issues.last
-    expect(Person.pending).not_to include person
+    expect(Person.pending).to include person
     observation.update!(reply: 'done')
     expect(Person.pending).to include person
   end
