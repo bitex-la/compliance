@@ -159,7 +159,7 @@ class Person < ApplicationRecord
       csv << [
         'issue id',
         'peson id',
-        'email',
+        'emails',
         'first name',
         'last name',
         'legal entity name',
