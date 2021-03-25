@@ -165,7 +165,7 @@ RSpec.describe Person, type: :model do
 
   it 'return correct nil address' do
     person = create(:empty_person)
-    expect(person.emails_for_export).to be_nil
+    expect(person.emails_for_export).to be_blank
     expect(person.emails.count).to eq(0)
   end
 
