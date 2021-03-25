@@ -20,6 +20,10 @@ ActiveAdmin.register Person do
       # tables because ransack uses a LEFT OUTER JOIN for this kind of queries.
       super(chain).distinct
     end
+
+    def scoped_collection
+      super.includes(:issues)
+    end
   end
 
   actions :all, except: [:destroy]
@@ -158,39 +162,19 @@ ActiveAdmin.register Person do
 
   csv do
     column :id
-    column('email') { |o| o.email_for_export }
-    column('first_name') { |o| o.natural_docket&.first_name }
-    column('last_name') { |o| o.natural_docket&.last_name }
-    column('legal_entity_name') { |o| o.legal_entity_docket&.name_body }
-    column('phone') { |o| o.phones.last&.number }
+    column('email', &:emails_for_export)
+    column('first_name') { |o| o.natural_docket&.first_name || o.natural_docket_seeds.last&.first_name }
+    column('last_name') { |o| o.natural_docket&.last_name || o.natural_docket_seeds.last&.last_name }
+    column('legal_entity_name') do |o|
+      o.legal_entity_docket&.name_body || o.legal_entity_docket_seeds.last&.name_body
+    end
+    column('phone') { |o| o.phone_seeds.last&.number }
     column :state
     column :risk
     column :regularity
     column :person_type
     column :created_at
     column :updated_at
-  end
-
-  collection_action :download_pending_csv, method: :get do
-    authorize!(:download_pending_csv, Person)
-
-    collection =
-      Person
-      .pending
-      .joins(:email_seeds)
-      .page(params[:page])
-      .ransack(params[:q])
-      .result
-
-    send_data collection.to_csv,
-              type: 'text/csv; charset=utf-8; header=present',
-              disposition: 'attachment; filename=people.csv'
-  end
-
-  action_item :pending_csv, only: :index, if: proc { authorized?(:download_pending_csv, Person) } do
-    next unless params[:scope] == 'pending'
-
-    link_to('Csv Pending Report', download_pending_csv_people_path(params.slice(:page, :scope, :q)))
   end
 
   show as: :grid, columns: 2 do      
