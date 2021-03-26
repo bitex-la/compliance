@@ -162,6 +162,7 @@ ActiveAdmin.register Person do
 
   csv do
     column :id
+    column('pending') { |o| '*' if o.pending? }
     column('email', &:emails_for_export)
     column('first_name') { |o| o.natural_docket&.first_name || o.natural_docket_seeds.last&.first_name }
     column('last_name') { |o| o.natural_docket&.last_name || o.natural_docket_seeds.last&.last_name }
