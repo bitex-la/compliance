@@ -168,7 +168,7 @@ ActiveAdmin.register Person do
     column('legal_entity_name') do |o|
       o.legal_entity_docket&.name_body || o.legal_entity_docket_seeds.last&.name_body
     end
-    column('phone') { |o| o.phone_seeds.last&.number }
+    column('phone') { |o| o.phones.last&.number || o.phone_seeds.last&.number }
     column :state
     column :risk
     column :regularity
