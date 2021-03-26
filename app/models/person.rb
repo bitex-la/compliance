@@ -265,10 +265,11 @@ class Person < ApplicationRecord
 
   def emails_for_export
     email = emails.find { |e| e.email_kind == EmailKind.authentication } ||
-            emails.last
-    return email.address if email
+            emails.last ||
+            email_seeds.find { |email_seed| email_seed.email_kind == EmailKind.authentication } ||
+            email_seeds.last
 
-    email_seeds.map { |email_seed| "#{email_seed.email_kind.code}: #{email_seed.address}" }.join(',')
+    email&.address
   end
 
   def self.suggest(keyword, page = 1, per_page = 20)
