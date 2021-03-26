@@ -263,9 +263,12 @@ class Person < ApplicationRecord
     Note.current.where(person: self, public: true)
   end
 
-  def email_for_export
+  def emails_for_export
     email = emails.find { |e| e.email_kind == EmailKind.authentication } ||
-            emails.last
+            emails.last ||
+            email_seeds.find { |email_seed| email_seed.email_kind == EmailKind.authentication } ||
+            email_seeds.last
+
     email&.address
   end
 
