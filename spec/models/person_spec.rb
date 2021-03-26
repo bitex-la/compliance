@@ -44,12 +44,21 @@ RSpec.describe Person, type: :model do
     expect(Person.by_person_type("legal")).to include person
   end
 
-  it 'is in pending scope' do
+  it 'person with issues observed and then answered is in pending scope' do
     person = create :new_natural_person, :with_new_client_reason
     observation = create :robot_observation, issue: person.reload.issues.last
     expect(Person.pending).to include person
     observation.update!(reply: 'done')
     expect(Person.pending).to include person
+  end
+
+  it 'person with issues approved is not in pending scope' do
+    person = create :new_natural_person, :with_new_client_reason
+    observation = create :robot_observation, issue: person.reload.issues.last
+    expect(Person.pending).to include person
+    observation.update!(reply: 'done')
+    observation.issue.approve!
+    expect(Person.pending).not_to include person
   end
 
   it 'returns N/A person info' do
