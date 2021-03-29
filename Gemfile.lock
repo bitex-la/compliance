@@ -563,7 +563,6 @@ DEPENDENCIES
   jsonapi_mapper!
   kaminari
   listen (>= 3.0.5, < 3.2)
-  mimemagic (~> 0.3.7)
   mysql2
   omniauth (~> 1.9)
   omniauth-google-oauth2
