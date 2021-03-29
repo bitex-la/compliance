@@ -538,7 +538,6 @@ DEPENDENCIES
   jsonapi_mapper!
   kaminari
   listen (>= 3.0.5, < 3.2)
-  mimemagic (~> 0.3.7)
   mysql2
   paperclip (~> 6.1.0)
   prawn
