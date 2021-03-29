@@ -1,9 +1,7 @@
 module FeatureHelpers
   def login_as_admin(admin_user)
-    visit admin_user_session_path
-    fill_in 'admin_user[email]', with: admin_user.email
-    fill_in 'admin_user[password]', with: admin_user.password
-    click_button 'Login'
+    login_as(admin_user)
+    visit '/'
   end
 
   def logout
