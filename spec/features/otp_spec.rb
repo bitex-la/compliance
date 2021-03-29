@@ -4,15 +4,6 @@ describe 'an admin user' do
   let(:compliance_user) { create(:compliance_admin_user, otp_enabled: true) }
   let(:admin_user) { create(:admin_user, otp_enabled: true) }
 
-  it 'cannot login without otp if otp is enabled' do
-    visit admin_user_session_path
-    fill_in 'admin_user[email]', with: compliance_user.email
-    fill_in 'admin_user[password]', with: compliance_user.password
-    click_button 'Login'
-
-    expect(page).to have_content 'Invalid OTP'
-  end
-
   it 'can enable OTP and login with 2FA' do
     admin_user.update_column('otp_enabled', false)
 
@@ -42,14 +33,7 @@ describe 'an admin user' do
 
     click_link 'Logout'
 
-    fill_in 'admin_user[email]', with: admin_user.email
-    fill_in 'admin_user[password]', with: admin_user.password
-    fill_in 'admin_user[otp]', with: admin_user.otp_code
-    click_button 'Login'
-
-    within '.flash_notice' do
-      expect(page).to have_content 'Signed in successfully.'
-    end
+    login_as(admin_user)
 
     click_link 'Admin Users'
 
