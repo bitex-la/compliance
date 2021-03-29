@@ -33,7 +33,7 @@ describe 'an admin user' do
 
     click_link 'Logout'
 
-    login_as(admin_user)
+    login_as_admin(admin_user)
 
     click_link 'Admin Users'
 
