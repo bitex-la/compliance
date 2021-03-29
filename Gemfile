@@ -69,6 +69,7 @@ gem 'redis-objects'
 gem 'redis-store'
 
 gem 'therubyracer'
+gem 'mimemagic', '~> 0.3.7'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
