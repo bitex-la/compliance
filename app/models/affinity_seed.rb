@@ -2,6 +2,53 @@ class AffinitySeed < AffinityBase
   include Garden::Seed
   validate :linked_once_in_issue
 
+    # same_person affinity validation
+  validate :only_one_same_person_affinity,
+           :manual_same_person_affinities_with_no_relations,
+           :same_person_father_son_consistency
+
+  def only_one_same_person_affinity
+    # validates that only one same_personn affinity can exist in a issue
+    # and must be the only affinity seed.
+    # I decided to create this restriction because the fulfiment process of
+    # a same_person relationship could be intrincate
+    # (see cases in spec/services/same_person_affinity/finder_spec.rb)
+    return if issue.nil?
+
+    return unless affinity_kind == AffinityKind.same_person &&
+                  issue.affinity_seeds.count > 1
+
+    errors.add(:reason, "there can be only one same_person affinity per issue. And only one")
+  end
+
+  def manual_same_person_affinities_with_no_relations
+    # validates that a manual same_person affinity relates
+    # persons that has no existing same_person relations.
+    # because fulfil process is not called in this cases
+    return if issue.nil?
+
+    return unless affinity_kind == AffinityKind.same_person && !auto_created
+
+    return unless issue.person.affinities.exists?(affinity_kind_id: AffinityKind.same_person.id) ||
+                  related_person.affinities.exists?(affinity_kind_id: AffinityKind.same_person.id)
+
+    errors.add(:reason, "no previous relations could exist between persons in a new manual same_person relationship.")
+  end
+
+  def same_person_father_son_consistency
+    # in a same person affinity, the oldest (lower ID)
+    # must be the "father" issue's person
+    # In case of a manual creation, we need to make sure of this.
+    return if issue.nil?
+
+    return unless (affinity_kind == AffinityKind.same_person && !auto_created) &&
+                  issue.affinity_seeds.count > 1 &&
+                  issue.person.id < related_person_id
+
+    # TODO: change the copy of the error. more clear to the end user
+    errors.add(:reason, "the oldest person in the system (lower id) must be the first person related")
+  end
+
   before_save :add_update_affinity_tag
   after_destroy :remove_affinity_tag
 
@@ -32,7 +79,7 @@ class AffinitySeed < AffinityBase
       .where(aasm_state: %w(draft new observed answered))
       .pluck(:id)
 
-    AffinitySeed.where(issue_id: active_issues, related_person: related_one, 
+    AffinitySeed.where(issue_id: active_issues, related_person: related_one,
       affinity_kind_id: kind.try(:id))
       .where.not(id: id).count > 0
   end
@@ -45,6 +92,14 @@ class AffinitySeed < AffinityBase
   def related_one(current_issue)
     return related_person if person == current_person
     return current_issue.person if related_person == current_issue.person
+  end
+
+  def on_before_harvest
+    SamePersonAffinity::Fulfilment.call(self)
+  end
+
+  def on_after_harvest
+    SamePersonAffinity::Fulfilment.after_process(self)
   end
 
   private

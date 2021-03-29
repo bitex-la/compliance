@@ -84,7 +84,7 @@ describe Affinity do
     expect(repeated_one.errors[:base]).to eq ['affinity_already_exists']
   end
 
-  it 'validate that cannot link to itself' do 
+  it 'validate that cannot link to itself' do
     person = create(:empty_person)
     related_person = create(:empty_person)
     fruit = described_class.new(
@@ -115,7 +115,7 @@ describe Affinity do
   end
 
   describe 'when calculate inverse of relationships' do
-    it 'returns the inverse kind of a person that is the related on' do 
+    it 'returns the inverse kind of a person that is the related on' do
       person = create(:basic_issue).reload.person
       create(:full_affinity, person: person)
 
@@ -126,8 +126,8 @@ describe Affinity do
       ).to eq :business_partner_of
     end
 
-    %i(spouse business_partner couple manager immediate_family 
-      extended_family other partner 
+    %i(spouse business_partner couple manager immediate_family
+      extended_family other partner same_person
     ).each do |kind|
       it "get symmetrical affinity for #{kind} with _of suffix" do
         person = create(:basic_issue).reload.person

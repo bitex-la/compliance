@@ -29,13 +29,13 @@ describe Issue do
         .group_by{|i| i.type }
         .map{|a,b| [a, b.count ] }.to_h
         .should == {
-          "attachments"=>66, 
-          "email_seeds"=>2, 
-          "emails"=>2, 
-          "identification_seeds"=>2, 
-          "identifications"=>2, 
-          "natural_docket_seeds"=>2, 
-          "natural_dockets"=>2, 
+          "attachments"=>66,
+          "email_seeds"=>2,
+          "emails"=>2,
+          "identification_seeds"=>2,
+          "identifications"=>2,
+          "natural_docket_seeds"=>2,
+          "natural_dockets"=>2,
           "people"=>3
         }
     end
@@ -96,7 +96,7 @@ describe Issue do
         })
       end.to change{ Issue.count }.by(1)
 
-      issue = Issue.find(api_response.data.id) 
+      issue = Issue.find(api_response.data.id)
 
       assert_logging(Issue.last, :create_entity, 1)
 
@@ -128,7 +128,7 @@ describe Issue do
 
     it 'creates a new issue with defer until' do
       defer_until = 1.month.from_now.to_date
-      
+
       expect do
         api_create('/issues', {
           type: 'issues',
@@ -141,7 +141,7 @@ describe Issue do
       expect(issue.defer_until).to eq(defer_until)
 
       api_get("/issues/#{issue.id}")
-      
+
       expect(Date.parse(api_response.data.attributes.defer_until)).to eq(defer_until)
     end
 
@@ -157,7 +157,7 @@ describe Issue do
       expect(issue.priority).to eq(0)
 
       api_get("/issues/#{issue.id}")
-      
+
       expect(api_response.data.attributes.priority).to eq(0)
     end
 
@@ -174,7 +174,7 @@ describe Issue do
       expect(issue.priority).to eq(1)
 
       api_get("/issues/#{issue.id}")
-      
+
       expect(api_response.data.attributes.priority).to eq(1)
     end
 
@@ -194,7 +194,7 @@ describe Issue do
       expect(api_response.data.attributes.priority).to eq(1)
     end
 
-    it 'creates a new issue with custom reason' do  
+    it 'creates a new issue with custom reason' do
       expect do
         api_create('/issues', {
           type: 'issues',
@@ -212,11 +212,11 @@ describe Issue do
 
     it 'creates a new issue with tags' do
       issue_tag = create(:issue_tag)
-      
+
       expect do
         api_create('/issues', {
           type: 'issues',
-          relationships: { 
+          relationships: {
             person: {data: {id: person.id, type: 'people'}},
             tags: {data: [{id: issue_tag.id, type: 'tags'}] },
           }
@@ -244,6 +244,16 @@ describe Issue do
 
       expect(issue.reload.defer_until).to eq defer_until
     end
+
+    it 'creates a new issue with same_person relationship' do
+      expect do
+        api_create('/issues', {
+          type: 'issues',
+          relationships: { person: {data: {id: person.id, type: 'people'}}}
+        })
+      end.to change{Issue.count}.by(1)
+
+    end
   end
 
   describe "when changing state" do
@@ -269,8 +279,8 @@ describe Issue do
       abandon: :new
     }.each do |action, initial_state|
       it "It can #{action} issue" do
-        issue = create(:basic_issue, 
-          state: initial_state, 
+        issue = create(:basic_issue,
+          state: initial_state,
           person: person,
           workflows: [create(:basic_workflow)])
 
@@ -285,19 +295,19 @@ describe Issue do
       end
     end
 
-    it 'cannot approve issue if workflows are pending' do 
+    it 'cannot approve issue if workflows are pending' do
       issue = create(:basic_issue, person: person)
 
-      2.times do 
+      2.times do
         w = create(:basic_workflow, issue: issue)
         w.start!
       end
 
       api_request :post, "/issues/#{issue.id}/approve", {}, 422
-      
+
       api_request :post, "/workflows/#{Workflow.first.id}/finish", {}, 200
       api_request :post, "/issues/#{issue.id}/approve", {}, 422
-      
+
       api_request :post, "/workflows/#{Workflow.last.id}/finish", {}, 200
       api_request :post, "/issues/#{issue.id}/approve", {}, 200
     end
@@ -306,7 +316,7 @@ describe Issue do
   describe 'when using filters' do
     it 'filters by name' do
       person = create(:empty_person)
-      one, two, three, four, five, six = 6.times.map do 
+      one, two, three, four, five, six = 6.times.map do
         create(:full_natural_person_issue, person: person)
       end
       [one, two, three].each{|i| i.approve! }
@@ -349,7 +359,7 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
 
       create(:admin_user)
-      
+
       api_request :post, "/issues/#{issue.id}/lock", {}, 422
       issue.reload
       expect(issue.locked).to be true
@@ -377,7 +387,7 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
 
       create(:admin_user)
-      
+
       api_request :post, "/issues/#{issue.id}/unlock", {}, 422
       issue.reload
       expect(issue.locked).to be true
@@ -404,7 +414,7 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
 
       create(:admin_user)
-      
+
       api_request :post, "/issues/#{issue.id}/renew_lock", {}, 422
       issue.reload
       expect(issue.locked).to be true
@@ -429,7 +439,7 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
 
       create(:admin_user)
-      
+
       api_request :post, "/issues/#{issue.id}/lock_for_ever", {}, 422
       issue.reload
       expect(issue.locked).to be true
@@ -457,13 +467,13 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
 
       other = create(:admin_user)
-      
+
       Timecop.travel 1.day.from_now
 
       api_request :post, "/issues/#{issue.id}/lock", {}, 200
       issue.reload
       expect(issue.locked).to be true
-      expect(issue.lock_admin_user).to eq other    
+      expect(issue.lock_admin_user).to eq other
     end
 
     it 'can lock issue with no expiration if it is locked by another user and expired' do
@@ -475,7 +485,7 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
 
       other = create(:admin_user)
-      
+
       Timecop.travel 1.day.from_now
 
       api_request :post, "/issues/#{issue.id}/lock_for_ever", {}, 200
@@ -494,7 +504,7 @@ describe Issue do
       expect(issue.lock_admin_user).to eq admin
 
       other = create(:admin_user)
-      
+
       api_request :post, "/issues/#{issue.id}/unlock", {}, 422
       issue.reload
       expect(issue.locked).to be true
@@ -517,7 +527,7 @@ describe Issue do
       api_request :post, "/issues/#{issue.id}/lock", {}, 200
 
       api_get("/issues/#{issue.id}")
-      
+
       interval = Issue.lock_expiration_interval_minutes
 
       expect(api_response.data.attributes.locked).to eq true
