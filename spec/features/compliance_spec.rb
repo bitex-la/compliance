@@ -979,8 +979,6 @@ describe 'an admin user' do
       # Admin does not see it as pending
       login_as_admin compliance_admin_user
 
-      expect(page).to have_content 'Signed in successfully.'
-
       # Admin sees issue in dashboard.
       click_on 'Draft'
       expect(page).to have_content issue.id
