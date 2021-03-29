@@ -4,7 +4,7 @@ describe 'an operations role admin user' do
   let(:operations_admin_user) { create(:operations_admin_user) }
 
   it 'gets redirected trying to access to forbidden paths' do
-    login_as operations_admin_user
+    login_as_admin operations_admin_user
 
     %w(
       admin_users
@@ -20,7 +20,7 @@ describe 'an operations role admin user' do
   end
 
   it 'cannot see restricted menu items' do
-    login_as operations_admin_user
+    login_as_admin operations_admin_user
 
     within '.header' do
       expect(page).to_not have_content 'Observation Reasons'
@@ -36,7 +36,7 @@ describe 'an operations role admin user' do
 
   it 'can create a natural person and it issue' do
     observation_reason = create(:human_world_check_reason)
-    login_as operations_admin_user
+    login_as_admin operations_admin_user
 
     click_link 'People'
     click_link 'New Person'
@@ -76,7 +76,7 @@ describe 'an operations role admin user' do
     person = create(:full_natural_person).reload
     issue = create(:full_natural_person_issue, person: person)
 
-    login_as operations_admin_user
+    login_as_admin operations_admin_user
 
     click_on 'Draft'
     within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do

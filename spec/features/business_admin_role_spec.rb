@@ -6,7 +6,7 @@ describe 'an admin restricted role' do
   let(:business_admin_user) { create(:business_admin_user) }
 
   it 'successfully access' do
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     %w[
       dashboards
@@ -24,7 +24,7 @@ describe 'an admin restricted role' do
   end
 
   it 'cannot see event logs' do
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit '/event_logs'
 
@@ -35,7 +35,7 @@ describe 'an admin restricted role' do
   end
 
   it 'cannot see admin users' do
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit '/admin_users'
 
@@ -46,21 +46,21 @@ describe 'an admin restricted role' do
   end
 
   it 'cannot create admin users' do
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit '/admin_users'
     expect(page).to_not have_content('New Admin User')
   end
 
   it 'can read itself' do
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit "/admin_users/#{business_admin_user.id}"
     expect(page).to have_content(business_admin_user.email)
   end
 
   it 'can update itself' do
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit "/admin_users/#{business_admin_user.id}/edit"
     click_button 'Update Admin user'
@@ -69,7 +69,7 @@ describe 'an admin restricted role' do
 
   it 'cannot update admin users' do
     admin_user = create(:admin_user)
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit "/admin_users/#{admin_user.id}/edit"
 
@@ -81,7 +81,7 @@ describe 'an admin restricted role' do
 
   it 'cannot disable admin users' do
     admin_user = create(:admin_user)
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit "/admin_users/#{admin_user.id}"
     expect(page).to_not have_content('Disable')
@@ -91,7 +91,7 @@ describe 'an admin restricted role' do
     admin_user = create(:admin_user)
     admin_user.update_column('otp_enabled', false)
 
-    login_as business_admin_user
+    login_as_admin business_admin_user
 
     visit "/admin_users/#{admin_user.id}"
 

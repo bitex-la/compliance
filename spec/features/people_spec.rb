@@ -44,7 +44,7 @@ describe 'people' do
       seed.issue.approve! if n == 4
     end
 
-    login_as compliance_admin_user
+    login_as_admin compliance_admin_user
     click_link 'People'
     click_link 'Pending'
     click_link 'CSV'
@@ -82,7 +82,7 @@ describe 'people' do
       create(:basic_issue, person: person)
     end
 
-    login_as compliance_admin_user
+    login_as_admin compliance_admin_user
     click_link 'People'
     click_link 'Pending'
     expect(page).to have_content('Peter')

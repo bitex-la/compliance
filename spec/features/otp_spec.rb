@@ -16,7 +16,7 @@ describe 'an admin user' do
   it 'can enable OTP and login with 2FA' do
     admin_user.update_column('otp_enabled', false)
 
-    login_as admin_user
+    login_as_admin admin_user
 
     click_link 'Admin Users'
 

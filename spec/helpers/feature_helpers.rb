@@ -1,11 +1,18 @@
 module FeatureHelpers
+  def login_as_admin(admin_user)
+    visit admin_user_session_path
+    fill_in 'admin_user[email]', with: admin_user.email
+    fill_in 'admin_user[password]', with: admin_user.password
+    click_button 'Login'
+  end
+
   def logout
     visit '/logout'
     expect(page.current_path).to eq('/login')
   end
 
   def login_admin(params = {})
-    login_as create(:admin_user, params)
+    login_as_admin create(:admin_user, params)
   end
 
   def fill_seed(kind, attributes, has_many = true, index = 0)
