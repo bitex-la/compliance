@@ -120,7 +120,14 @@ Rails.application.routes.draw do
     end
   end
 
-  devise_for :admin_users, ActiveAdmin::Devise.config
+  devise_for :admin_users,
+             path: ActiveAdmin.application.default_namespace || "/",
+             controllers: {
+               omniauth_callbacks: 'admin_users/omniauth_callbacks',
+               sessions: 'active_admin/devise/sessions'
+             },
+             path_names: { sign_in: 'login', sign_out: "logout" },
+             sign_out_via: [*::Devise.sign_out_via, ActiveAdmin.application.logout_link_method].uniq
   begin
     ActiveAdmin.routes(self)
   rescue ActiveAdmin::DatabaseHitDuringLoad

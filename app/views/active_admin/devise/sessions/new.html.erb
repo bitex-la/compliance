@@ -1,0 +1,7 @@
+<h2><%= title "#{render_or_call_method_or_proc_on(self, active_admin_application.site_title)} #{t('active_admin.devise.login.title')}" %></h2>
+
+<%- resource_class.omniauth_providers.each do |provider| %>
+  <%= link_to t('active_admin.devise.links.sign_in_with_omniauth_provider', provider: provider.to_s.titleize),
+              omniauth_authorize_path(resource_name, provider) %>
+  <br>
+<% end -%>

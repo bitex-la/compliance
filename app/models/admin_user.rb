@@ -1,8 +1,7 @@
 class AdminUser < ApplicationRecord
   # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :recoverable,
-    :rememberable, :trackable, :validatable
+  # :confirmable, :lockable, :timeoutable, :recoverable, :validatable, :rememberable
+  devise :database_authenticatable, :trackable, :omniauthable, omniauth_providers: [:google_oauth2]
 
   has_one_time_password
   attr_accessor :otp
@@ -17,6 +16,12 @@ class AdminUser < ApplicationRecord
   belongs_to :admin_role, required: true
 
   scope :active, -> { where(active: true) }
+
+  def self.from_omniauth(omniauth_hash)
+    email = omniauth_hash.info.email
+
+    find_by(email: email)
+  end
 
   def active_for_authentication?
     super && active?
