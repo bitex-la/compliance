@@ -1,11 +1,4 @@
 module FeatureHelpers
-  def login_as(admin_user)
-    visit admin_user_session_path
-    fill_in 'admin_user[email]', with: admin_user.email
-    fill_in 'admin_user[password]', with: admin_user.password
-    click_button 'Login'
-  end
-
   def logout
     visit '/logout'
     expect(page.current_path).to eq('/login')
