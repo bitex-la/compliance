@@ -30,7 +30,11 @@ defaults: &defaults
     cache_url: 'redis://localhost:6379/0'
     namespace: 'compliance'
     pool_size: 8
-  
+
+  google_sso: # These credentials belong to mgarcia@bitex.la
+    client_id: '930903541468-3ppvtelhu6lhj3al52sg524qs4t6mvnu.apps.googleusercontent.com'
+    client_secret: 'FILL_ME_IN'
+
 production:
   <<: *defaults
 
