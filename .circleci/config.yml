@@ -115,6 +115,9 @@ jobs:
     machine: true
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
       - run: |
           TAG=0.1.$CIRCLE_BUILD_NUM
           docker build --no-cache --build-arg GITHUB_PERSONAL_TOKEN=$GITHUB_PERSONAL_TOKEN -t bitex/compliance:$TAG docker/standalone
