@@ -2,8 +2,8 @@
 FROM ubuntu:18.04 as checkout-compliance
 RUN apt-get update && apt-get install -y git
 
-ARG SESSION_TOKEN
-RUN git clone https://$SESSION_TOKEN@github.com/bitex-la/compliance.git
+ARG GITHUB_PERSONAL_TOKEN
+RUN git clone https://$GITHUB_PERSONAL_TOKEN@github.com/bitex-la/compliance.git
 
 FROM ubuntu:18.04
 
