@@ -1,3 +1,10 @@
+# See https://vsupalov.com/build-docker-image-clone-private-repo-ssh-key/
+FROM ubuntu:18.04 as checkout-compliance
+RUN apt-get update && apt-get install -y git
+
+ARG SESSION_TOKEN
+RUN git clone https://$SESSION_TOKEN@github.com/bitex-la/compliance.git
+
 FROM ubuntu:18.04
 
 ENV RBENV_ROOT=/usr/local/rbenv
@@ -43,8 +50,8 @@ RUN rm -rf /usr/local/bin/rbenv-install
 
 RUN sed -i "s|bind-address.*|skip-networking|g" /etc/mysql/mysql.conf.d/mysqld.cnf
 
-RUN git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
-    && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
+COPY --from=checkout-compliance /compliance /usr/local/compliance
+RUN cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
     && cd /usr/local/compliance && bundle install --deployment --without test
 
 RUN service mysql start \
