@@ -112,7 +112,6 @@ jobs:
           command:  chmod +x .circleci/trigger_build.sh && .circleci/trigger_build.sh
 
   deploy_docker:
-    machine: true
     steps:
       - checkout
       - setup_remote_docker:
