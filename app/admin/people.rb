@@ -85,8 +85,8 @@ ActiveAdmin.register Person do
   scope :disabled
   scope :rejected
   scope :all
-  scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
-  scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
+  #scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
+  #scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
 
   action_item :add_person_information, only: %i(show edit) do
     next unless authorized? :create, Issue
