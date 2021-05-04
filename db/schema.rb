@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_22_142706) do
+ActiveRecord::Schema.define(version: 2021_05_03_184254) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -542,6 +542,7 @@ ActiveRecord::Schema.define(version: 2021_04_22_142706) do
     t.index ["country"], name: "index_legal_entity_dockets_on_country"
     t.index ["issue_id"], name: "index_legal_entity_dockets_on_issue_id"
     t.index ["legal_name"], name: "index_legal_entity_dockets_on_legal_name"
+    t.index ["person_id", "archived_at", "replaced_by_id"], name: "index_legal_entity_dockets_for_person_type_search"
     t.index ["person_id"], name: "index_legal_entity_dockets_on_person_id"
     t.index ["replaced_by_id"], name: "index_legal_entity_dockets_on_replaced_by_id"
   end
