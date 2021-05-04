@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_22_142706) do
+ActiveRecord::Schema.define(version: 2021_05_04_143326) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -364,6 +364,7 @@ ActiveRecord::Schema.define(version: 2021_04_22_142706) do
     t.index ["admin_user_id"], name: "index_event_logs_on_admin_user_id"
     t.index ["entity_id", "entity_type"], name: "index_event_logs_on_entity_id_and_entity_type"
     t.index ["entity_id"], name: "index_event_logs_on_entity_id"
+    t.index ["entity_type", "verb_id"], name: "index_event_logs_on_entity_type_and_verb_id"
     t.index ["entity_type"], name: "index_event_logs_on_entity_type"
     t.index ["verb_id"], name: "index_event_logs_on_verb_id"
   end
