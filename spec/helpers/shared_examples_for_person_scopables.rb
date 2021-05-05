@@ -2,6 +2,12 @@ shared_examples 'person_scopable' do |options|
   creator = options[:create]
   change_person = options[:change_person]
 
+  AdminUser.class_eval do
+    def active_tags
+      admin_user_taggings.pluck(:tag_id)
+    end
+  end
+
   let(:admin_user) { AdminUser.current_admin_user = create(:admin_user) }
 
   let(:allowed) do
