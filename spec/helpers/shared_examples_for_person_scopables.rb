@@ -12,12 +12,7 @@ shared_examples 'person_scopable' do |options|
 
   before :each do
     admin_user
-
-    admin_user.class_eval do
-      def active_tags
-        admin_user_taggings.pluck(:tag_id)
-      end
-    end
+    dememoize_admin_user_tags(admin_user)
   end
 
   it_behaves_like 'person_scopable_readonly', options
@@ -128,7 +123,10 @@ shared_examples 'person_scopable_readonly' do |options|
     end
   end
 
-  before(:each){ admin_user }
+  before(:each) do
+    admin_user
+    dememoize_admin_user_tags(admin_user)
+  end
 
   it "allow fetching only if admin can manage the associated person by tags" do
     # We create an admin tagging to ensure tagged access rules still apply
