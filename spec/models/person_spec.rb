@@ -430,6 +430,18 @@ RSpec.describe Person, type: :model do
       expect(persons[3].id).to eq(person4.id)
     end
 
+    it 'memoize active tags' do
+      _, _, person3, = setup_for_admin_tags_spec
+      expect(Person.default_scope).to include(person3)
+      create(:admin_user_tagging,
+             admin_user: AdminUser.current_admin_user,
+             tag: PersonTagging.first.tag)
+      expect(AdminUser.current_admin_user.reload.active_tags).not_to be_empty
+      AdminUserTagging.delete_all
+      expect(AdminUser.current_admin_user.active_tags).not_to be_empty
+      expect(Person.default_scope).not_to include(person3)
+    end
+
     it 'add country tag and create a new tag' do
       person = create(:empty_person)
 
