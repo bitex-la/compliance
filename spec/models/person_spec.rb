@@ -237,6 +237,7 @@ RSpec.describe Person, type: :model do
 
     before :each do
       admin_user
+      dememoize_admin_user_tags(admin_user)
     end
 
     it "allow person creation only with admin tags" do
@@ -431,6 +432,7 @@ RSpec.describe Person, type: :model do
     end
 
     it 'memoize active tags' do
+      AdminUser.current_admin_user = create(:admin_user)
       _, _, person3, = setup_for_admin_tags_spec
       expect(Person.default_scope).to include(person3)
       create(:admin_user_tagging,
