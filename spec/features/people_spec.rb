@@ -90,4 +90,27 @@ describe 'people' do
     expect(page).to have_content('Gabriel')
     expect(page).to have_content('Displaying all 3 People')
   end
+
+  it 'shows only active issues for person' do
+    person = create(:empty_person)
+    issue1 = create(:basic_issue, person: person)
+    create(:full_natural_docket_seed,
+           person: person,
+           issue: issue1,
+           first_name: 'Michael',
+           last_name: 'Jhonson')
+    issue2 = create(:basic_issue, person: person)
+    seed2 = create(:full_natural_docket_seed,
+                   person: person,
+                   issue: issue2,
+                   first_name: 'Jake',
+                   last_name: 'Jackson')
+    login_as compliance_admin_user
+    visit "people/#{person.id}"
+
+    expect(page).to have_content('Jake Jackson')
+    seed2.issue.reject!
+    visit "people/#{person.id}"
+    expect(page).to have_content('Michael Jhonson')
+  end
 end
