@@ -187,8 +187,7 @@ class Person < ApplicationRecord
 
     if found = emails.last.try(:address)
       template % [nil, found]
-    elsif (found = issues.active.map { |i| i.email_seeds.first&.address })
-          .compact.last
+    elsif (found = issues.active.map { |i| i.email_seeds.first&.address }.compact.last)
       template % ['*', found]
     end
   end
@@ -196,7 +195,7 @@ class Person < ApplicationRecord
   def person_info_phone
     phone, from_seed = if found = phones.last
       found
-    elsif found = issues.active.map { |i| i.phone_seeds.first }.compact.last
+    elsif (found = issues.active.map { |i| i.phone_seeds.first }.compact.last)
       [found, "*"]
     end
 
