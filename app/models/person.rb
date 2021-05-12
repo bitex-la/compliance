@@ -174,9 +174,9 @@ class Person < ApplicationRecord
       when :legal_entity
         "🏭: #{legal_entity_dockets.last.name_body}"
       else
-        if found = issues.map(&:natural_docket_seed).compact.last
+        if (found = issues.active.map(&:natural_docket_seed).compact.last)
           "*☺: #{found.name_body}"
-        elsif found = issues.map(&:legal_entity_docket_seed).compact.last
+        elsif (found = issues.active.map(&:legal_entity_docket_seed).compact.last)
           "*🏭: #{found.name_body}"
         end
     end
@@ -187,8 +187,8 @@ class Person < ApplicationRecord
 
     if found = emails.last.try(:address)
       template % [nil, found]
-    elsif found = issues.all.map{|i| i.email_seeds.first&.address }
-      .compact.last
+    elsif (found = issues.active.map { |i| i.email_seeds.first&.address })
+          .compact.last
       template % ['*', found]
     end
   end
@@ -196,7 +196,7 @@ class Person < ApplicationRecord
   def person_info_phone
     phone, from_seed = if found = phones.last
       found
-    elsif found = issues.all.map{|i| i.phone_seeds.first }.compact.last
+    elsif found = issues.active.map { |i| i.phone_seeds.first }.compact.last
       [found, "*"]
     end
 
