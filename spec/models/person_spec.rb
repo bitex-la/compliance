@@ -44,6 +44,23 @@ RSpec.describe Person, type: :model do
     expect(Person.by_person_type("legal")).to include person
   end
 
+  it 'person with issues observed and then answered is in pending scope' do
+    person = create :new_natural_person, :with_new_client_reason
+    observation = create :robot_observation, issue: person.reload.issues.last
+    expect(Person.pending).to include person
+    observation.update!(reply: 'done')
+    expect(Person.pending).to include person
+  end
+
+  it 'person with issues approved is not in pending scope' do
+    person = create :new_natural_person, :with_new_client_reason
+    observation = create :robot_observation, issue: person.reload.issues.last
+    expect(Person.pending).to include person
+    observation.update!(reply: 'done')
+    observation.issue.approve!
+    expect(Person.pending).not_to include person
+  end
+
   it 'returns N/A person info' do
     person = create(:empty_person)
     expect(person.reload.person_info).to eq("(1)")
@@ -142,7 +159,7 @@ RSpec.describe Person, type: :model do
     create(:alt_full_email_seed_with_issue, issue: issue)
     issue.reload.approve!
     person = seed.issue.person.reload
-    expect(person.email_for_export).to eq(seed.address)
+    expect(person.emails_for_export).to eq(seed.address)
     expect(person.emails.count).to eq(2)
   end
 
@@ -151,13 +168,13 @@ RSpec.describe Person, type: :model do
     issue = seed.issue
     issue.reload.approve!
     person = seed.issue.person.reload
-    expect(person.email_for_export).to eq(seed.address)
+    expect(person.emails_for_export).to eq(seed.address)
     expect(person.emails.count).to eq(1)
   end
 
   it 'return correct nil address' do
     person = create(:empty_person)
-    expect(person.email_for_export).to be_nil
+    expect(person.emails_for_export).to be_blank
     expect(person.emails.count).to eq(0)
   end
 

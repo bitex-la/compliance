@@ -51,4 +51,22 @@ RSpec.describe DomicileSeed, type: :model do
       country: 'AN')
     expect(domicile).to be_valid
   end
+
+  it 'sets country to upper case' do
+    seed = DomicileSeed.new(
+      country: 'ar',
+      state: 'Buenos Aires',
+      city: 'C.A.B.A',
+      street_address: 'Cullen',
+      street_number: '5229',
+      postal_code: '1432',
+      floor: '5',
+      apartment: 'A',
+      issue: create(:basic_issue)
+    )
+
+    seed.save
+
+    expect(seed.country).to eq('AR')
+  end
 end

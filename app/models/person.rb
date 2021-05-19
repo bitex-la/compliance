@@ -11,6 +11,15 @@ class Person < ApplicationRecord
 
   ransack_alias :state, :aasm_state
 
+  HAS_MANY_PLAIN = %i{
+    issues
+    fund_deposits
+    fund_withdrawals
+    attachments
+  }.each do |relationship|
+    has_many relationship
+  end
+
   HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
@@ -25,21 +34,14 @@ class Person < ApplicationRecord
     affinities
     risk_scores
   }.each do |relationship|
+    rel_name = Garden::Naming.new(relationship)
     has_many relationship, -> {
-      where("#{relationship}.replaced_by_id is NULL")
-      .where("#{relationship}.archived_at is NULL OR #{relationship}.archived_at > ?", Date.current)
+      where("#{rel_name.plural}.replaced_by_id is NULL")
+      .where("#{rel_name.plural}.archived_at is NULL OR #{rel_name.plural}.archived_at > ?", Date.current)
     }
 
-    has_many "#{relationship}_history".to_sym, class_name: relationship.to_s.classify
-  end
-
-  HAS_MANY_PLAIN = %i{
-    issues
-    fund_deposits
-    fund_withdrawals
-    attachments
-  }.each do |relationship|
-    has_many relationship
+    has_many "#{rel_name.plural}_history".to_sym, class_name: rel_name.fruit
+    has_many rel_name.seed_plural.to_sym, through: :issues, class_name: rel_name.seed
   end
 
   HAS_MANY = HAS_MANY_REPLACEABLE + HAS_MANY_PLAIN
@@ -150,6 +152,13 @@ class Person < ApplicationRecord
     scope k, -> { with_relations.where('people.aasm_state=?', v) }
   end
 
+  scope :pending, (lambda do
+    fresh
+      .includes(:issues)
+      .where(issues: { aasm_state: %w[new answered observed],
+                       reason_id: IssueReason.new_client })
+  end)
+
   def self.ransackable_scopes(auth_object = nil)
     %i(by_person_type)
   end
@@ -173,9 +182,9 @@ class Person < ApplicationRecord
       when :legal_entity
         "🏭: #{legal_entity_dockets.last.name_body}"
       else
-        if found = issues.map(&:natural_docket_seed).compact.last
+        if (found = issues.active.map(&:natural_docket_seed).compact.last)
           "*☺: #{found.name_body}"
-        elsif found = issues.map(&:legal_entity_docket_seed).compact.last
+        elsif (found = issues.active.map(&:legal_entity_docket_seed).compact.last)
           "*🏭: #{found.name_body}"
         end
     end
@@ -186,8 +195,7 @@ class Person < ApplicationRecord
 
     if found = emails.last.try(:address)
       template % [nil, found]
-    elsif found = issues.all.map{|i| i.email_seeds.first&.address }
-      .compact.last
+    elsif (found = issues.active.map { |i| i.email_seeds.first&.address }.compact.last)
       template % ['*', found]
     end
   end
@@ -195,7 +203,7 @@ class Person < ApplicationRecord
   def person_info_phone
     phone, from_seed = if found = phones.last
       found
-    elsif found = issues.all.map{|i| i.phone_seeds.first }.compact.last
+    elsif (found = issues.active.map { |i| i.phone_seeds.first }.compact.last)
       [found, "*"]
     end
 
@@ -262,9 +270,12 @@ class Person < ApplicationRecord
     Note.current.where(person: self, public: true)
   end
 
-  def email_for_export
+  def emails_for_export
     email = emails.find { |e| e.email_kind == EmailKind.authentication } ||
-            emails.last
+            emails.last ||
+            email_seeds.find { |email_seed| email_seed.email_kind == EmailKind.authentication } ||
+            email_seeds.last
+
     email&.address
   end
 

@@ -14,6 +14,16 @@ ActiveAdmin.register Person do
     def related_person
       params[:id]
     end
+
+    def apply_filtering(chain)
+      # We may get multiple hits for the same Person when using filters that query multiple
+      # tables because ransack uses a LEFT OUTER JOIN for this kind of queries.
+      super(chain).distinct
+    end
+
+    def scoped_collection
+      super.includes(:issues)
+    end
   end
 
   actions :all, except: [:destroy]
@@ -47,10 +57,15 @@ ActiveAdmin.register Person do
       .map { |k, v| { label: k, value: v } }
   end
 
-  filter :emails_address_or_issues_email_seeds_address_cont, label: "Email"
-  filter :identifications_number_or_issues_identification_seeds_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: "ID Number"
-  filter :natural_dockets_first_name_or_issues_natural_docket_seed_first_name_cont, label: "First Name"
-  filter :natural_dockets_last_name_or_issues_natural_docket_seed_last_name_cont,  label: "Last Name"
+  filter :emails_address_or_issues_email_seeds_address_cont, label: 'Email'
+  filter :identifications_number_or_issues_identification_seeds_number_or_argentina_invoicing_details_tax_id_or_chile_invoicing_details_tax_id_cont, label: 'ID Number'
+  filter :natural_dockets_first_name_or_issues_natural_docket_seed_first_name_cont, label: 'First Name'
+  filter :natural_dockets_last_name_or_issues_natural_docket_seed_last_name_cont,  label: 'Last Name'
+  filter :natural_dockets_nationality_or_natural_docket_seeds_nationality_eq,
+         label: 'Nationality', as: :autocomplete,
+         url: proc { search_country_people_path },
+         required: false, wrapper_html: { style: 'list-style: none' }
+
   filter :natural_dockets_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_or_issues_legal_entity_docket_seed_legal_name_or_issues_legal_entity_docket_seed_commercial_name_cont, label: "Company Name"
   filter :by_person_type, as: :select, collection: Person.person_types
@@ -66,12 +81,13 @@ ActiveAdmin.register Person do
   filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
 
   scope :fresh, default: true
+  scope :pending
   scope :enabled
   scope :disabled
   scope :rejected
   scope :all
-  scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
-  scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
+  #scope('Legal Entity') { |scope| scope.merge(Person.by_person_type("legal")) }
+  #scope('Natural Person') { |scope| scope.merge(Person.by_person_type("natural")) }
 
   action_item :add_person_information, only: %i(show edit) do
     next unless authorized? :create, Issue
@@ -147,10 +163,14 @@ ActiveAdmin.register Person do
 
   csv do
     column :id
-    column :person_info
-    column 'email' do |o|
-      o.email_for_export
+    column('seed') { |o| '*' if o.new? }
+    column('email', &:emails_for_export)
+    column('first_name') { |o| o.natural_docket&.first_name || o.natural_docket_seeds.last&.first_name }
+    column('last_name') { |o| o.natural_docket&.last_name || o.natural_docket_seeds.last&.last_name }
+    column('legal_entity_name') do |o|
+      o.legal_entity_docket&.name_body || o.legal_entity_docket_seeds.last&.name_body
     end
+    column('phone') { |o| o.phones.last&.number || o.phone_seeds.last&.number }
     column :state
     column :risk
     column :regularity

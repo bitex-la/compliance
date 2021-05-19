@@ -23,7 +23,9 @@ class Api::LegalEntityDocketSeedsController < Api::EntityController
         :copy_attachments,
         :issue,
         :expires_at,
-        :archived_at
+        :archived_at,
+        :regulated_entity,
+        :operations_with_third_party_funds
       ]
   end
 end

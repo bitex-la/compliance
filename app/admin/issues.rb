@@ -266,7 +266,9 @@ ActiveAdmin.register Issue do
             sf.input :industry
             sf.input :business_description, input_html: {rows: 3}
             sf.input :country, as: :autocomplete, url: search_country_people_path
-            
+            sf.input :regulated_entity
+            sf.input :operations_with_third_party_funds
+
             if resource.person.legal_entity_docket
               sf.input :copy_attachments,
                 label: "Move existing Legal Entity Docket attachments to the new one"
