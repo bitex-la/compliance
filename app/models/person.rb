@@ -178,6 +178,12 @@ class Person < ApplicationRecord
           "*☺: #{found.name_body}"
         elsif (found = issues.active.map(&:legal_entity_docket_seed).compact.last)
           "*🏭: #{found.name_body}"
+        else
+          if (found = issues.map(&:natural_docket_seed).compact.last)
+            "*☺: #{found.name_body}"
+          elsif (found = issues.map(&:legal_entity_docket_seed).compact.last)
+            "*🏭: #{found.name_body}"
+          end
         end
     end
   end

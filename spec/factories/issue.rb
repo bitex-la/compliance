@@ -83,8 +83,6 @@ FactoryBot.define do
         issue.approve!
       end
     end
-
-    
   end
 
   factory :full_legal_entity_issue, class: Issue do
