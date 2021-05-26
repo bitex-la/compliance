@@ -30,7 +30,6 @@ gem 'countries'
 gem 'haml'
 gem 'devise'
 gem 'cancancan'
-gem 'draper'
 gem 'aws-sdk-s3', '~> 1.30.0'
 gem "paperclip", "~>6.1.0"
 gem 'aasm'
