@@ -8,7 +8,7 @@ jobs:
   build:
     parallelism: 5
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.8-node-browsers
         environment:
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 4
@@ -63,14 +63,14 @@ jobs:
 
   notify:
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.8-node-browsers
     steps:
       - slack/status:
           channel: devs-alerts
 
   coverage:
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.8-node-browsers
     steps:
       - checkout
       - attach_workspace:
@@ -88,7 +88,7 @@ jobs:
   
   brakeman:
     docker: 
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.8-node-browsers
     steps:
       - checkout
       - run:
@@ -104,7 +104,7 @@ jobs:
 
   trigger_build:
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.8-node-browsers
     steps:
       - checkout
       - run:
