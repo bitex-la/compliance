@@ -22,6 +22,21 @@ class Currency
     [17,  :aud,  'australian_dollar',  2         ],
     [18,  :gbp,  'pound_sterling',     2         ],
     [19,  :hkd,  'hong_kong_dollar',   2         ],
-    [20,  :bob,  'bolivian_peso',      2         ]
+    [20,  :bob,  'bolivian_peso',      2         ],
+    [21,  :ada,  'ada',                8         ],
+    [22,  :bnb,  'binance_coin',       8         ],
+    [23,  :dai,  'dai',                8         ],
+    [24,  :eth,  'ethereum',           8         ],
+    [25,  :link, 'link',               8         ],
+    [26,  :sushi,'sushi',              8         ],
+    [27,  :uni,  'uni',                8         ],
+    [28,  :usdt, 'usd_tether',         8         ],
+    [29,  :ftt,  'ftt',                8         ],
+    [30,  :yfi,  'yfi',                8         ],
+    [31,  :dot,  'dot',                8         ],
+    [32,  :doge, 'doge',               8         ],
+    [33,  :soya, 'soya',               8         ],
+    [34,  :usdc, 'usdc',               2         ],
+    [35,  :sol,  'sol',                8         ],
   ]
 end
