@@ -244,6 +244,23 @@ describe Issue do
 
       expect(issue.reload.defer_until).to eq defer_until
     end
+
+    it 'add tag on issue update' do
+      issue_tag = create(:issue_tag)
+      issue = create(:basic_issue)
+
+      expect do
+        api_update("/issues/#{issue.id}", {
+          type: 'issues',
+          id: issue.id,
+          relationships: {
+            tags: { data: [{ id: issue_tag.id, type: 'tags' }] }
+          }
+        })
+      end.to change { issue.reload.tags.count }
+
+      expect(issue.tags.first.id).to eq(issue_tag.id)
+    end
   end
 
   describe "when changing state" do
