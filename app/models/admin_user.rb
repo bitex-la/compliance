@@ -59,7 +59,7 @@ class AdminUser < ApplicationRecord
   end
 
   def active_tags
-    admin_user_taggings.pluck(:tag_id)
+    @active_tags ||= admin_user_taggings.pluck(:tag_id).presence
   end
 
   def can_manage_tag?(tag)
