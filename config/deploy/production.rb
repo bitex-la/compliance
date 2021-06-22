@@ -1,8 +1,9 @@
 set :stage, :production
 set :rails_env, 'production'
+
 server ENV['compliance_host'], roles: [:web, :app, :db], primary: true
 
-set :pty,             true
+set :pty,             false
 set :use_sudo,        false
 
 # server-based syntax

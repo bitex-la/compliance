@@ -25,6 +25,8 @@ set :puma_init_active_record, true
 set :linked_files, %w{ config/settings.yml config/appsignal.yml }
 set :linked_dirs, %w{log tmp/cache tmp/pids}
 
+set :init_system, :systemd
+
 set(:ssh_options, fetch(:ssh_options, { }).merge!(
   forward_agent: true,
   user: fetch(:user),
@@ -87,6 +89,10 @@ namespace :deploy do
   after  :finishing,    :cleanup
   after  :finishing,    :restart
 end
+
+SSHKit.config.command_map[:sidekiq] = "bundle exec sidekiq"
+SSHKit.config.command_map[:sidekiqctl] = "bundle exec sidekiqctl"
+
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
@@ -120,3 +126,4 @@ end
 
 # Uncomment the following to require manually verifying the host key before first deploy.
 # set :ssh_options, verify_host_key: :secure
+
