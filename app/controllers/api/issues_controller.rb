@@ -42,9 +42,10 @@ class Api::IssuesController < Api::ApiController
 
   def update
     mapper = JsonapiMapper.doc_unsafe! params.permit!.to_h,
-      [],
-      issues: [:priority, :defer_until, id: params[:id]]
-      
+      [:tags],
+      issues: [:priority, :defer_until, :tags, id: params[:id]],
+      tags: []
+
     return jsonapi_422 unless mapper.data
 
     if mapper.save_all
