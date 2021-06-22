@@ -43,7 +43,7 @@ RUN rm -rf /usr/local/bin/rbenv-install
 
 RUN sed -i "s|bind-address.*|skip-networking|g" /etc/mysql/mysql.conf.d/mysqld.cnf
 
-RUN git clone https://github.com/bitex-la/compliance.git /usr/local/compliance \
+RUN git clone https://$GITHUB_PERSONAL_TOKEN@github.com/bitex-la/compliance.git /usr/local/compliance \
     && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
     && cd /usr/local/compliance && bundle install --deployment --without test
 
