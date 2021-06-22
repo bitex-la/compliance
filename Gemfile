@@ -87,6 +87,7 @@ group :test do
   gem 'database_cleaner'
   gem 'rspec_junit_formatter', '0.2.2'
   gem 'simplecov', require: false
+  gem 'pdf-inspector', require: 'pdf/inspector'
 end
 
 group :development do
