@@ -12,7 +12,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'support/webdrivers'
 require 'rspec/rails'
 require 'support/wait_for_ajax'
-Dir[Rails.root.join("spec/helpers/**/*.rb")].each {|f| require f} 
+require 'support/omniauth_helpers'
+Dir[Rails.root.join("spec/helpers/**/*.rb")].each {|f| require f}
 
 FactoryBot.definition_file_paths = [ Rails.root.join('spec', 'factories') ]
 FactoryBot.find_definitions
@@ -39,6 +40,7 @@ FactoryBot.find_definitions
 ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
+  config.include Warden::Test::Helpers
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 

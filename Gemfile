@@ -29,6 +29,10 @@ gem 'rails-jquery-autocomplete'
 gem 'countries'
 gem 'haml'
 gem 'devise'
+gem 'omniauth-google-oauth2'
+# Omniauth is forced to 1.9 because Devise seems to be incompatible with Omniauth 2.0 at the moment.
+# See issue https://github.com/heartcombo/devise/issues/5326
+gem 'omniauth', '~> 1.9'
 gem 'cancancan'
 gem 'draper'
 gem 'aws-sdk-s3', '~> 1.30.0'

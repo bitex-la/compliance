@@ -4,7 +4,7 @@ describe 'a compliance role admin user' do
   let(:compliance_admin_user) { create(:compliance_admin_user) }
 
   it 'gets redirected trying to access to forbidden paths' do
-    login_as compliance_admin_user
+    login_as_admin compliance_admin_user
 
     %w(
       admin_users
@@ -16,7 +16,7 @@ describe 'a compliance role admin user' do
   end
 
   it 'cannot see restricted menu items' do
-    login_as compliance_admin_user
+    login_as_admin compliance_admin_user
 
     within '.header' do
       expect(page).to_not have_content 'Admin Users'
@@ -32,7 +32,7 @@ describe 'a compliance role admin user' do
 
   it 'can create a natural person and it issue' do
     observation_reason = create(:human_world_check_reason)
-    login_as compliance_admin_user
+    login_as_admin compliance_admin_user
 
     click_link 'People'
     click_link 'New Person'
@@ -72,7 +72,7 @@ describe 'a compliance role admin user' do
   # TODO: Uncomment when workflow implementation are ready for production
   # it 'can create a natural person and it issue, but cannot approve, reject, dismiss or abandon it with workflows' do
   #   observation_reason = create(:human_world_check_reason)
-  #   login_as restricted_user
+  #   login_as_admin restricted_user
 
   #   click_link 'People'
   #   click_link 'New Person'
@@ -120,7 +120,7 @@ describe 'a compliance role admin user' do
     person = create(:full_natural_person).reload
     issue = create(:full_natural_person_issue, person: person)
 
-    login_as compliance_admin_user
+    login_as_admin compliance_admin_user
 
     click_on 'Draft'
     within("tr[id='issue_#{issue.id}'] td[class='col col-id']") do
@@ -180,7 +180,7 @@ describe 'a compliance role admin user' do
   end
 
   it 'cannot edit tag' do
-    login_as compliance_admin_user
+    login_as_admin compliance_admin_user
 
     click_link 'Tags'
     click_link 'New'

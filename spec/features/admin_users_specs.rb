@@ -182,7 +182,7 @@ describe 'AdminUser', js: true do
 
   it 'Disable button is not shown for itself' do
     user = create(:admin_user, admin_role: AdminRole.commercial)
-    login_as user
+    login_as_admin user
 
     visit "/admin_users/#{user.id}"
     expect(page).not_to have_content 'Disable'
@@ -190,7 +190,7 @@ describe 'AdminUser', js: true do
 
   it "can't disable itself" do
     user = create(:admin_user, admin_role: AdminRole.commercial)
-    login_as user
+    login_as_admin user
 
     visit "/admin_users/#{user.id}"
 

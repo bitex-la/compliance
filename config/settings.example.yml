@@ -40,6 +40,9 @@ defaults: &defaults
     pool_size: <%= ENV.fetch('REDIS_POOL_SIZE' ){ 8 } %>
 
   cache_store: <%= ENV.fetch('CACHE_STORE' ){ '/tmp/cache/compliance' } %>
+  google_sso:
+    client_id: <%= ENV.fetch('GOOGLE_SSO_CLIENT_ID', '930903541468-3ppvtelhu6lhj3al52sg524qs4t6mvnu.apps.googleusercontent.com') %>
+    client_secret: <%= ENV('GOOGLE_SSO_CLIENT_SECRET', '') %>
 
 production:
   <<: *defaults

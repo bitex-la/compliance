@@ -18,7 +18,7 @@ describe 'Dashboard' do
 
   describe 'group approval' do
     it 'shows success for every state' do
-      login_as admin_user
+      login_as_admin admin_user
       {
         approve:  'approved',
         complete: 'completed',
@@ -45,7 +45,7 @@ describe 'Dashboard' do
     end
 
     it 'operations user can only see the authorized action (Complete)' do
-      login_as create(:operations_admin_user)
+      login_as_admin create(:operations_admin_user)
       basic_issue = create(:basic_issue)
       visit '/'
       
@@ -59,7 +59,7 @@ describe 'Dashboard' do
     end
 
     it 'unauthorized user can not approve issue' do
-      login_as create(:operations_admin_user)
+      login_as_admin create(:operations_admin_user)
 
       basic_issue = create(:basic_issue)
       basic_issue.complete!
@@ -79,7 +79,7 @@ describe 'Dashboard' do
     end
 
     it 'shows issues approved, not all workflows has been performed, not allowed transition and not approve more than once' do
-      login_as admin_user
+      login_as_admin admin_user
 
       basic_issue = create(:basic_issue)
       basic_issue.complete!
@@ -111,7 +111,7 @@ describe 'Dashboard' do
 
   describe 'priority' do
     it 'differentiates issues with priority bigger than zero' do
-      login_as admin_user
+      login_as_admin admin_user
 
       3.times do |n|
         create(:basic_issue, priority: n + 1)
@@ -142,7 +142,7 @@ describe 'Dashboard' do
 
   describe 'functionality' do
     before(:each) do
-      login_as admin_user
+      login_as_admin admin_user
 
       9.times do |n|
         issue = create(:basic_issue)

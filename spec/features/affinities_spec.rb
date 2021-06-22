@@ -4,7 +4,7 @@ describe 'an admin handling affinities' do
   let(:admin_user) { create(:admin_user) }
 
   it 'creates a legal entity and set the related people' do
-    login_as admin_user
+    login_as_admin admin_user
 
     # We set the already approved people
     owner_one = create(:new_natural_person)
@@ -71,7 +71,7 @@ describe 'an admin handling affinities' do
 
     related_person = person.reload.affinities.first.related_person
     
-    login_as admin_user
+    login_as_admin admin_user
 
     click_link 'People'
     click_link 'All'
@@ -121,7 +121,7 @@ describe 'an admin handling affinities' do
     person = create(:full_natural_person)
 
     related_person = person.reload.affinities.first.related_person
-    login_as admin_user
+    login_as_admin admin_user
 
     click_link 'People'
     click_link 'All'

@@ -8,7 +8,7 @@ describe 'an admin user' do
 
     person.should be_enabled
 
-    login_as admin_user
+    login_as_admin admin_user
     click_link('People')
     click_link('All')
 

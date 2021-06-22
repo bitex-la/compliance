@@ -4,7 +4,7 @@ describe 'a marketing role admin user' do
   let(:marketing_admin_user) { create(:marketing_admin_user) }
 
   it 'gets redirected trying to access to forbidden paths' do
-    login_as marketing_admin_user
+    login_as_admin marketing_admin_user
 
     %w(
       admin_users
@@ -20,7 +20,7 @@ describe 'a marketing role admin user' do
   end
 
   it 'cannot see restricted menu items' do
-    login_as marketing_admin_user
+    login_as_admin marketing_admin_user
 
     within '.header' do
       expect(page).to_not have_content 'Observation Reasons'
@@ -37,7 +37,7 @@ describe 'a marketing role admin user' do
   it 'cannot create a person or view person' do
     person = create(:empty_person)
     issue = create(:basic_issue, person: person)
-    login_as marketing_admin_user
+    login_as_admin marketing_admin_user
 
     click_link 'People'
     expect(page).not_to have_content 'New Person'
