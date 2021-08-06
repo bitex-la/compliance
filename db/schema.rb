@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_04_192108) do
+ActiveRecord::Schema.define(version: 2021_08_06_141445) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -483,6 +483,13 @@ ActiveRecord::Schema.define(version: 2021_05_04_192108) do
     t.index ["tag_id"], name: "index_issue_taggings_on_tag_id"
   end
 
+  create_table "issue_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "token", null: false
+    t.bigint "issue_id", null: false
+    t.datetime "valid_until", null: false
+    t.index ["issue_id"], name: "index_issue_tokens_on_issue_id"
+  end
+
   create_table "issues", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "person_id"
     t.datetime "created_at", null: false
@@ -543,6 +550,7 @@ ActiveRecord::Schema.define(version: 2021_05_04_192108) do
     t.index ["country"], name: "index_legal_entity_dockets_on_country"
     t.index ["issue_id"], name: "index_legal_entity_dockets_on_issue_id"
     t.index ["legal_name"], name: "index_legal_entity_dockets_on_legal_name"
+    t.index ["person_id", "archived_at", "replaced_by_id"], name: "index_legal_entity_dockets_for_person_type_search"
     t.index ["person_id"], name: "index_legal_entity_dockets_on_person_id"
     t.index ["replaced_by_id"], name: "index_legal_entity_dockets_on_replaced_by_id"
   end

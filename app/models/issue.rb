@@ -391,6 +391,19 @@ class Issue < ApplicationRecord
     end
   end
 
+  def self.eager_issue_entities_observations
+    (HAS_ONE + HAS_MANY).map(&:to_s).reduce([]) do |acc, seed|
+      acc << [
+        seed => {
+          observations: [
+            :note,
+            observation_reason: %i[subject_en subject_es body_en body_es]
+          ]
+        }
+      ]
+    end
+  end
+
   private
 
   def lock_expired?
