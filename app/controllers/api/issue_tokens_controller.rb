@@ -10,13 +10,7 @@ class Api::IssueTokensController < ApplicationController
   end
 
   def update
-    mapper =
-      JsonapiMapper.doc_unsafe!(
-        params.permit!.to_h,
-        [:natural_docket_seeds],
-        issues: [id: params[:id]],
-        natural_docket_seeds: [observations: [:reply], attachments: []]
-      )
+    mapper = get_mapper
 
     return jsonapi_422 unless mapper.data
 
@@ -28,5 +22,16 @@ class Api::IssueTokensController < ApplicationController
     else
       json_response mapper.all_errors, 422
     end
+  end
+
+  protected
+
+  def get_mapper
+    JsonapiMapper.doc_unsafe!(
+      params.permit!.to_h,
+      [:natural_docket_seeds],
+      issues: [id: params[:id]],
+      natural_docket_seeds: [observations: [:reply], attachments: []]
+    )
   end
 end

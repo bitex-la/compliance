@@ -24,6 +24,7 @@ class Issue < ApplicationRecord
   after_save :sync_observed_status
   after_save :log_if_needed
   after_save{ person.expire_action_cache }
+  after_create :generate_token
 
   validate :defer_until_cannot_be_in_the_past
 
@@ -375,7 +376,27 @@ class Issue < ApplicationRecord
 
     all
   end
-  
+
+  def all_observations
+    all = []
+    HAS_MANY.each do |assoc|
+      send(assoc).each do |association|
+        next unless association
+
+        all << (association.fruit || association).observations
+      end
+    end
+
+    HAS_ONE.each do |assoc|
+      association = send(assoc)
+      next unless association
+
+      all << (association.fruit || association).observations
+    end
+
+    all
+  end
+
   def all_seeds
     HAS_MANY.map{|a| send(a).try(:to_a) }.compact.flatten +
       HAS_ONE.map{|a| send(a) }.compact
@@ -405,6 +426,10 @@ class Issue < ApplicationRecord
   end
 
   private
+
+  def generate_token
+    IssueToken.create!(issue: self) if all_observations.count.positive?
+  end
 
   def lock_expired?
     return false if lock_expiration.nil?
