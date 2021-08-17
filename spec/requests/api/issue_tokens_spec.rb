@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 describe IssueToken do
-  describe 'updates observations issues' do
-    it 'add reply for a natural docket seeds observations' do
-      seed = build(:full_natural_docket_seed, issue: build(:basic_issue))
-      seed.observations << build(:observation)
-      issue = seed.issue
+  it 'show all observations from issue' do
+    seed = build(:full_natural_docket_seed, issue: build(:basic_issue))
+    seed.observations << [build(:observation), build(:robot_observation)]
+    issue = seed.issue
+    issue.save!
+    issue_token = IssueToken.where(issue: issue).first
 
-      expect { issue.save! }.to change { IssueToken.count }.by 1
-      expect(issue.reload.observations.count).to eq(1)
-    end
+    api_get("/issue_tokens/#{issue_token.token}")
+    expect(api_response.included.first.relationships.observations.data.count).to eq(2)
   end
 end

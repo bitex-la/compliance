@@ -119,7 +119,7 @@ Rails.application.routes.draw do
       post :truncate
     end
 
-    resources :issue_tokens, only: %i[show update]
+    resources :issue_tokens, only: %i[show]
   end
 
   devise_for :admin_users, ActiveAdmin::Devise.config
