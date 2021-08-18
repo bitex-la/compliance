@@ -3,6 +3,19 @@ class Api::ObservationsController < Api::EntityController
     Observation.current
   end
 
+  def update
+    params[:data][:id] = resource.id
+    check_validity_token(params[:issue_token_id], params[:data][:id]) if params[:issue_token_id]
+
+    map_and_save(200)
+  rescue NoMethodError
+    jsonapi_422
+  rescue IssueTokenNotValidError
+    jsonapi_error(410, 'invalid token')
+  rescue ActiveRecord::RecordNotFound
+    jsonapi_error(404, 'can not find observation')
+  end
+
   protected
 
   def related_person
@@ -25,5 +38,11 @@ class Api::ObservationsController < Api::EntityController
           :issue,
           :observable
         ])
+  end
+
+  def check_validity_token(token, observation_id)
+    IssueToken
+      .includes(:observations)
+      .where(observations: { id: observation_id }).find_by_token!(token)
   end
 end

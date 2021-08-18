@@ -23,4 +23,59 @@ describe IssueToken do
 
     api_get("/issue_tokens/#{issue_token.token}", {}, 410)
   end
+
+  it 'replies to an observation' do
+    issue_token = IssueToken.where(issue: issue).first
+
+    issue_token.observations.each do |observation|
+      api_update(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      )
+    end
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    api_get "/issues/#{issue.id}"
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    api_get("/issue_tokens/#{issue_token.token}")
+    expect(
+      api_response.included
+        .select { |datum| datum.type == 'observations' }
+        .map(&:attributes).map(&:reply).uniq
+    ).to eq(['Some reply here'])
+  end
+
+  it 'can not replies to an observation when token is invalid' do
+    issue_token = IssueToken.where(issue: issue).first
+
+    issue_token.observations.each do |observation|
+      Timecop.travel 31.days.from_now
+      api_update(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        {
+          type: 'observations',
+          id: observation.id,
+          attributes: { reply: 'Some reply here' }
+        },
+        410
+      )
+    end
+  end
+
+  it 'can not replies to an observation not belonging to the issue token' do
+    issue_token = IssueToken.where(issue: issue).first
+    observation = create(:observation, issue: create(:basic_issue))
+    api_update(
+      "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+      {
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      },
+      404
+    )
+  end
 end
