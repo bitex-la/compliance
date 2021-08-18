@@ -25,7 +25,6 @@ class Issue < ApplicationRecord
   after_save :sync_observed_status
   after_save :log_if_needed
   after_save{ person.expire_action_cache }
-  after_create :generate_token
 
   validate :defer_until_cannot_be_in_the_past
 
@@ -246,6 +245,10 @@ class Issue < ApplicationRecord
 
     event :observe do
       transitions  from: [:draft, :new, :answered, :observed], to: :observed
+
+      after do
+        generate_token
+      end
     end
 
     event :answer do
