@@ -13,7 +13,7 @@ describe IssueToken do
   it 'show all observations from issue' do
     issue_token = IssueToken.where(issue: issue).first
 
-    api_get("/issue_tokens/#{issue_token.token}")
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
     expect(api_response.included.first.relationships.observations.data.count).to eq(2)
   end
 
@@ -21,7 +21,7 @@ describe IssueToken do
     issue_token = IssueToken.where(issue: issue).first
     Timecop.travel 31.days.from_now
 
-    api_get("/issue_tokens/#{issue_token.token}", {}, 410)
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 410)
   end
 
   it 'replies to an observation' do
@@ -40,7 +40,7 @@ describe IssueToken do
     api_get "/issues/#{issue.id}"
     expect(api_response.data.attributes.state).to eq('answered')
 
-    api_get("/issue_tokens/#{issue_token.token}")
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
     expect(
       api_response.included
         .select { |datum| datum.type == 'observations' }

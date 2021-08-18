@@ -119,7 +119,8 @@ Rails.application.routes.draw do
       post :truncate
     end
 
-    resources :issue_tokens, only: [:show] do
+    resources :issue_tokens, only: %i[show] do
+      get :show_by_token
       resources :observations, only: [:update]
     end
   end
