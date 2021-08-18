@@ -8,6 +8,7 @@ class Issue < ApplicationRecord
 
   has_many :issue_taggings
   has_many :tags, through: :issue_taggings
+  has_one :issue_token
   accepts_nested_attributes_for :issue_taggings, allow_destroy: true
 
   ransack_alias :state, :aasm_state
