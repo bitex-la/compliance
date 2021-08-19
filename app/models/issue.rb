@@ -416,16 +416,6 @@ class Issue < ApplicationRecord
     end
   end
 
-  def self.eager_issue_entities_observations
-    (HAS_ONE + HAS_MANY).map(&:to_s).reduce([]) do |acc, seed|
-      acc << [
-        seed => {
-          observations: [:observation_reason]
-        }
-      ]
-    end
-  end
-
   private
 
   def generate_token

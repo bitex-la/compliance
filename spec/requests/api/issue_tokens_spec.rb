@@ -14,7 +14,8 @@ describe IssueToken do
     issue_token = IssueToken.where(issue: issue).first
 
     api_get("/issue_tokens/#{issue_token.token}/show_by_token")
-    expect(api_response.included.first.relationships.observations.data.count).to eq(2)
+    expect(api_response.included.count).to eq(2)
+    expect(api_response.included.map(&:type).uniq).to eq(['observations'])
   end
 
   it 'responds with 410 error when token is invalid' do
