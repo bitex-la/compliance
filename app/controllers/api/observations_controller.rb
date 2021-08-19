@@ -1,11 +1,13 @@
 class Api::ObservationsController < Api::EntityController
+  skip_before_action :require_token, only: [:update], if: :issue_token
+
   def resource_class
     Observation.current
   end
 
   def update
     params[:data][:id] = resource.id
-    check_validity_token(params[:issue_token_id], params[:data][:id]) if params[:issue_token_id]
+    check_validity_token(params[:issue_token_id], params[:data][:id]) if issue_token
 
     map_and_save(200)
   rescue NoMethodError
@@ -44,5 +46,9 @@ class Api::ObservationsController < Api::EntityController
     IssueToken
       .includes(:observations)
       .where(observations: { id: observation_id }).find_by_token!(token)
+  end
+
+  def issue_token
+    params[:issue_token_id].present?
   end
 end

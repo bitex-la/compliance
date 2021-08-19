@@ -1,6 +1,15 @@
 require 'rails_helper'
 
 describe IssueToken do
+  def api_update_issue_token(path, data, expected_status = 200)
+    api_request_token(:patch, path, { data: data }, expected_status)
+  end
+
+  def api_request_issue_token(method, path, params = {}, expected_status = 200)
+    send(method, "/api#{path}", params: params)
+    assert_response expected_status
+  end
+
   let(:issue) { build(:basic_issue) }
   let(:seed) { build(:full_natural_docket_seed, issue: issue) }
 
@@ -29,7 +38,7 @@ describe IssueToken do
     issue_token = IssueToken.where(issue: issue).first
 
     issue_token.observations.each do |observation|
-      api_update(
+      api_update_issue_token(
         "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         type: 'observations',
         id: observation.id,
@@ -54,7 +63,7 @@ describe IssueToken do
 
     issue_token.observations.each do |observation|
       Timecop.travel 31.days.from_now
-      api_update(
+      api_update_issue_token(
         "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         {
           type: 'observations',
@@ -69,7 +78,7 @@ describe IssueToken do
   it 'can not replies to an observation not belonging to the issue token' do
     issue_token = IssueToken.where(issue: issue).first
     observation = create(:observation, issue: create(:basic_issue))
-    api_update(
+    api_update_issue_token(
       "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
       {
         type: 'observations',
