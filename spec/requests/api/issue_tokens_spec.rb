@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe IssueToken do
   def api_update_issue_token(path, data, expected_status = 200)
-    api_request_token(:patch, path, { data: data }, expected_status)
+    api_request_issue_token(:patch, path, { data: data }, expected_status)
   end
 
   def api_request_issue_token(method, path, params = {}, expected_status = 200)
