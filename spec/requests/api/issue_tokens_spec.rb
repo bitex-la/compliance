@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 describe IssueToken do
+  def api_create_issue_token(path, data, expected_status = 201)
+    api_request_issue_token(:post, path, { data: data }, expected_status)
+  end
+
   def api_update_issue_token(path, data, expected_status = 200)
     api_request_issue_token(:patch, path, { data: data }, expected_status)
   end
@@ -46,6 +50,42 @@ describe IssueToken do
       )
     end
     expect(api_response.data.attributes.state).to eq('answered')
+
+    api_get "/issues/#{issue.id}"
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
+    expect(
+      api_response.included
+        .select { |datum| datum.type == 'observations' }
+        .map(&:attributes).map(&:reply).uniq
+    ).to eq(['Some reply here'])
+  end
+
+  it 'replies to an observation with attachments' do
+    issue_token = IssueToken.where(issue: issue).first
+
+    issue_token.observations.each do |observation|
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      )
+      expect(api_response.data.attributes.state).to eq('answered')
+
+      seed = observation.observable
+      api_create_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/attachments",
+        type: 'attachments',
+        relationships: { attached_to_seed: { data: { id: seed.id, type: 'natural_docket_seeds' } } },
+        attributes: {
+          document: "data:#{mime_for(:jpg)};base64,#{bytes_for('jpg')}",
+          document_file_name: 'áñçfile微信图片.jpg',
+          document_content_type: mime_for(:jpg)
+        }
+      )
+    end
 
     api_get "/issues/#{issue.id}"
     expect(api_response.data.attributes.state).to eq('answered')

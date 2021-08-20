@@ -1,4 +1,6 @@
 class Api::ObservationsController < Api::EntityController
+  include VerifyIssueToken
+
   skip_before_action :require_token, only: [:update], if: :issue_token
 
   def resource_class
@@ -40,15 +42,5 @@ class Api::ObservationsController < Api::EntityController
           :issue,
           :observable
         ])
-  end
-
-  def check_validity_token(token, observation_id)
-    IssueToken
-      .includes(:observations)
-      .where(observations: { id: observation_id }).find_by_token!(token)
-  end
-
-  def issue_token
-    params[:issue_token_id].present?
   end
 end
