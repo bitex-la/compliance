@@ -40,8 +40,9 @@ describe IssueToken do
 
   it 'replies to an observation' do
     issue_token = IssueToken.where(issue: issue).first
+    observations = issue_token.observations
 
-    issue_token.observations.each do |observation|
+    observations.each do |observation|
       api_update_issue_token(
         "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         type: 'observations',
@@ -54,26 +55,19 @@ describe IssueToken do
     api_get "/issues/#{issue.id}"
     expect(api_response.data.attributes.state).to eq('answered')
 
-    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
-    expect(
-      api_response.included
-        .select { |datum| datum.type == 'observations' }
-        .map(&:attributes).map(&:reply).uniq
-    ).to eq(['Some reply here'])
+    observations.each do |observation|
+      api_get("/observations/#{observation.id}")
+      expect(
+        api_response.data.attributes.reply
+      ).to eq('Some reply here')
+    end
   end
 
   it 'replies to an observation with attachments' do
     issue_token = IssueToken.where(issue: issue).first
+    observations = issue_token.observations
 
-    issue_token.observations.each do |observation|
-      api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
-        type: 'observations',
-        id: observation.id,
-        attributes: { reply: 'Some reply here' }
-      )
-      expect(api_response.data.attributes.state).to eq('answered')
-
+    observations.each do |observation|
       seed = observation.observable
       api_create_issue_token(
         "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/attachments",
@@ -85,17 +79,25 @@ describe IssueToken do
           document_content_type: mime_for(:jpg)
         }
       )
+
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      )
+      expect(api_response.data.attributes.state).to eq('answered')
     end
 
     api_get "/issues/#{issue.id}"
     expect(api_response.data.attributes.state).to eq('answered')
 
-    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
-    expect(
-      api_response.included
-        .select { |datum| datum.type == 'observations' }
-        .map(&:attributes).map(&:reply).uniq
-    ).to eq(['Some reply here'])
+    observations.each do |observation|
+      api_get("/observations/#{observation.id}")
+      expect(
+        api_response.data.attributes.reply
+      ).to eq('Some reply here')
+    end
   end
 
   it 'can not replies to an observation when token is invalid' do
