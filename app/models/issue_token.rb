@@ -1,6 +1,6 @@
 class IssueToken < ApplicationRecord
   belongs_to :issue
-  has_many :observations, through: :issue
+  has_many :observations, -> { where(aasm_state: 'new') }, through: :issue
 
   before_create do
     self.token = Digest::SHA256.hexdigest SecureRandom.hex
