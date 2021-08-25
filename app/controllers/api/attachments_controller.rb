@@ -1,6 +1,4 @@
 class Api::AttachmentsController < Api::EntityController
-  include VerifyIssueToken
-
   skip_before_action :require_token, only: [:create], if: :issue_token
 
   def resource_class
@@ -12,7 +10,7 @@ class Api::AttachmentsController < Api::EntityController
   end
 
   def create
-    check_validity_token(params[:issue_token_id], params[:observation_id]) if issue_token
+    check_validity_token(params[:issue_token_id]) if issue_token
 
     map_and_save(201)
   rescue NoMethodError
@@ -45,5 +43,13 @@ class Api::AttachmentsController < Api::EntityController
           :person
         ]
       )
+  end
+
+  def check_validity_token(token)
+    IssueToken.find_by_token!(token)
+  end
+
+  def issue_token
+    params[:issue_token_id].present?
   end
 end
