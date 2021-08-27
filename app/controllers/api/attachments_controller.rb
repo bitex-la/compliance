@@ -10,7 +10,10 @@ class Api::AttachmentsController < Api::EntityController
   end
 
   def create
-    check_validity_token(params[:issue_token_id]) if issue_token
+    if issue_token
+      check_validity_token(params[:issue_token_id])
+      update_observations_if_empty(params[:observation_id])
+    end
 
     map_and_save(201)
   rescue NoMethodError
@@ -51,5 +54,10 @@ class Api::AttachmentsController < Api::EntityController
 
   def issue_token
     params[:issue_token_id].present?
+  end
+
+  def update_observations_if_empty(observation_id)
+    observation = Observation.find(observation_id)
+    observation.update(reply: 'Reply in Attachment') if observation.reply.blank?
   end
 end

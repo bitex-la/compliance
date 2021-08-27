@@ -78,7 +78,7 @@ describe IssueToken do
       expect(api_response.data.attributes.state).to eq('answered')
 
       api_create_issue_token(
-        "/issue_tokens/#{issue_token.token}/attachments",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/attachments",
         type: 'attachments',
         relationships: { attached_to_seed: { data: { id: seed.id, type: 'natural_docket_seeds' } } },
         attributes: {
@@ -97,6 +97,34 @@ describe IssueToken do
       expect(
         api_response.data.attributes.reply
       ).to eq('Some reply here')
+    end
+  end
+
+  it 'fill observations reply if sending an attachment and observation is empty' do
+    issue_token = IssueToken.where(issue: issue).first
+    observations = issue_token.observations
+
+    observations.each do |observation|
+      api_create_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/attachments",
+        type: 'attachments',
+        relationships: { attached_to_seed: { data: { id: seed.id, type: 'natural_docket_seeds' } } },
+        attributes: {
+          document: "data:#{mime_for(:jpg)};base64,#{bytes_for('jpg')}",
+          document_file_name: 'áñçfile微信图片.jpg',
+          document_content_type: mime_for(:jpg)
+        }
+      )
+    end
+
+    api_get "/issues/#{issue.id}"
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    observations.each do |observation|
+      api_get("/observations/#{observation.id}")
+      expect(
+        api_response.data.attributes.reply
+      ).to eq('Reply in Attachment')
     end
   end
 
@@ -129,5 +157,21 @@ describe IssueToken do
       },
       404
     )
+  end
+
+  it 'issue is only answered if all observations are replied' do
+    issue_token = IssueToken.where(issue: issue).first
+    observation = issue_token.observations.first
+
+    api_update_issue_token(
+      "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+      type: 'observations',
+      id: observation.id,
+      attributes: { reply: 'Some reply here' }
+    )
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    api_get "/issues/#{issue.id}"
+    expect(api_response.data.attributes.state).to eq('observed')
   end
 end

@@ -121,8 +121,9 @@ Rails.application.routes.draw do
 
     resources :issue_tokens, only: %i[show] do
       get :show_by_token
-      resources :attachments, only: [:create]
-      resources :observations, only: [:update]
+      resources :observations, only: [:update] do
+        resources :attachments, only: [:create]
+      end
     end
   end
 
