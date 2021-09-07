@@ -334,6 +334,8 @@ GEM
     puma (3.12.6)
     racc (1.5.2)
     rack (2.2.3)
+    rack-cors (1.0.6)
+      rack (>= 1.6.0)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.2.4.5)
@@ -543,6 +545,7 @@ DEPENDENCIES
   prawn
   prawn-table
   puma (~> 3.12)
+  rack-cors
   rails (~> 5.2.3)
   rails-jquery-autocomplete
   redis-objects
