@@ -30,6 +30,11 @@ defaults: &defaults
     cache_url: 'redis://localhost:6379/0'
     namespace: 'compliance'
     pool_size: 8
+
+  cors:
+    debug: true
+    allowed_origins:
+      - "*"
   
 production:
   <<: *defaults
