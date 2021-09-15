@@ -5,6 +5,17 @@ class EventLog < ApplicationRecord
 
   serialize :raw_data, JSON
 
+  after_commit :publish!, on: :create
+
+  def publish!
+    self.class.sqs_client.send_message(
+      queue_url: Settings.sqs.queue,
+      message_body: self.to_json,
+      message_group_id: entity_type,
+      message_deduplication_id: id.to_s
+    )
+  end
+
   def data
     Hashie::Mash.new(raw_data)
   end
@@ -20,5 +31,17 @@ class EventLog < ApplicationRecord
       raw_data: raw_data.as_json,
       admin_user: user,
       verb: verb)
+  end
+
+  def self.sqs_client
+    @sqs_client ||= Aws::SQS::Client.new(Settings.sqs.credentials.to_h.symbolize_keys)
+  end
+
+  def self.purge_sqs_queue
+    sqs_client.purge_queue(queue_url: Settings.sqs.queue)
+  end
+
+  def self.sqs_poller
+    @sqs_poller ||= Aws::SQS::QueuePoller.new(Settings.sqs.queue, client: sqs_client)
   end
 end
