@@ -610,7 +610,7 @@ describe 'an admin user' do
     click_link "Approve"
     
     issue.reload.should be_approved
-    assert_logging(person, :enable_person, 1)
+    assert_logging(person, :enable_person, 1, false)
 
     old_domicile = Domicile.first
     new_domicile = Domicile.last
