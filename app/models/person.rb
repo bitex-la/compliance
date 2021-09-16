@@ -89,16 +89,11 @@ class Person < ApplicationRecord
   end
 
   scope :by_admin_user_tags, -> {
-    return unless AdminUser.current_admin_user.present?
+    return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
 
-    admin_tags = AdminUser.current_admin_user.admin_user_taggings
-    person_tags = PersonTagging.unscoped.select(:person_id)
-
-    where
-      .not(admin_tags.arel.exists) # AdminUser has no tags
-      .or(where.not(id: person_tags)) # Person has no tags
-      .or(where(id: person_tags.where(tag_id: admin_tags.select(:tag_id)))) # AdminUser and Person have at least one tag in common
-      .distinct
+    where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
+      OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
+      }, tags).distinct
   }
 
   def natural_docket
