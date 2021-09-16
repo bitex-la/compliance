@@ -10,6 +10,7 @@ class System
     all = conn.tables - %w(admin_users ar_internal_metadata schema_migrations)
     all.each{|table| conn.execute("truncate table #{table}") }
     conn.execute "SET FOREIGN_KEY_CHECKS = 1"
+    EventLog.purge_sqs_queue
 
     return true
   end
