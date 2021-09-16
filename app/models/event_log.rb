@@ -10,7 +10,7 @@ class EventLog < ApplicationRecord
   def publish!
     self.class.sqs_client.send_message(
       queue_url: Settings.sqs.queue,
-      message_body: self.to_json,
+      message_body: %i[id entity_type entity_id verb_code].map { |k| [k, send(k)] }.to_h.to_json,
       message_group_id: entity_type,
       message_deduplication_id: id.to_s
     )

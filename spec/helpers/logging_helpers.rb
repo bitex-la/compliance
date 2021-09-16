@@ -11,8 +11,9 @@ module LoggingHelpers
         .poll(wait_time_seconds: 0, max_number_of_messages: 10, idle_timeout: 0) do |batch|
           batch.each { |m| msgs << JSON.parse(m.body, symbolize_names: true) }
         end
-      found_event_msg = msgs.find { |msg| msg[:id] == last_log.id }
-      expect(found_event_msg).not_to be_nil
+      expected_msg = %i[id entity_type entity_id].map { |k| [k, last_log.send(k)] }.to_h
+      expected_msg[:verb_code] = last_log.verb_code.to_s
+      expect(msgs).to include expected_msg
     end
 
     yield last_log if block_given?
