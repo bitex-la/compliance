@@ -58,6 +58,10 @@ class AdminUser < ApplicationRecord
     save!
   end
 
+  def active_tags
+    admin_user_taggings.pluck(:tag_id)
+  end
+
   def can_manage_tag?(tag)
     !admin_user_taggings.exists? ||
       admin_user_taggings.where(tag: tag).exists?
