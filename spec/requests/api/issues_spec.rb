@@ -115,7 +115,7 @@ describe Issue do
       observation_id = api_response.data.id
 
       assert_logging(issue.observations.last, :create_entity, 1)
-      assert_logging(issue.reload, :observe_issue, 1)
+      assert_logging(issue.reload, :observe_issue, 1, false)
 
       api_get("/issues/#{issue.id}")
 

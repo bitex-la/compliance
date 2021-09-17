@@ -524,7 +524,7 @@ RSpec.describe Issue, type: :model do
       obs.update(reply: 'check out the reply')
       issue.reload.should be_observed
       issue.save
-      assert_logging(issue.reload, :observe_issue, 2)
+      assert_logging(issue.reload, :observe_issue, 2, false)
 
       Timecop.travel 1.second.from_now
       issue.update_column(:aasm_state, 'answered')

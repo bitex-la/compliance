@@ -2,10 +2,10 @@ class Person < ApplicationRecord
   include AASM
   include Loggable
 
-  after_create :log_state_new
-  after_save :log_if_enabled
-  after_save :log_state_changes
-  after_save :expire_action_cache
+  after_commit :log_state_new, on: :create
+  after_commit :log_if_enabled
+  after_commit :log_state_changes
+  after_commit :expire_action_cache
 
   belongs_to :regularity, class_name: "PersonRegularity"
 

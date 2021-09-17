@@ -1,5 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe EventLog, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it 'works' do
+    EventLog.sqs_client.purge_queue(queue_url: Settings.sqs.queue)
+  end
 end
