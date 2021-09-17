@@ -10,6 +10,16 @@ defaults: &defaults
     access_key: <%= ENV.fetch('SES_ACCESS_KEY'){ 'some_access_key' } %>
     secret: <%= ENV.fetch('SES_SECRET'){ 'some_secret' } %>
 
+  sqs:
+    credentials:
+      access_key_id: <%= ENV.fetch('SQS_ACCESS_KEY'){ 'some_access_key' } %>
+      secret_access_key: <%= ENV.fetch('SQS_SECRET'){ 'some_secret' } %>
+      region: <%= ENV.fetch('SQS_REGION'){ 'us-east-1' } %>
+
+    port: 9324
+    queue: <%= ENV.fetch('SQS_QUEUE'){ 'queue_url' } %>
+    publish: true
+
   mysql:
     pool: <%= ENV.fetch('MYSQL_POOL'){ 5 } %>
     username: <%= ENV.fetch('MYSQL_USERNAME'){ 'root' } %>
