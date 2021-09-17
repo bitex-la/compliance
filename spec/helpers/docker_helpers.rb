@@ -32,7 +32,7 @@ class DockerHelpers
     result = `docker ps -f 'status=running' --format "{{.ID}} {{.Ports}}"`
     return nil if result.blank?
 
-    if result =~ /(.*?) 0.0.0.0:#{port}->9324.*$/
+    if result =~ /(.*?) 0.0.0.0:#{port}-.*$/
       return $1
     end
   end
