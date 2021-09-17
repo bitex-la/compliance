@@ -5,7 +5,7 @@ module LoggingHelpers
     logs.count.should == expected_count
     last_log = logs.last
 
-    if check_sqs && expected_count > 0
+    if Settings.sqs.publish && check_sqs && expected_count > 0
       msgs = []
       EventLog.sqs_poller
         .poll(wait_time_seconds: 0, max_number_of_messages: 10, idle_timeout: 0) do |batch|

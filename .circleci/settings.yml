@@ -18,7 +18,8 @@ defaults: &defaults
 
     port: 9324
     queue: http://localhost:9324/000000000000/event-log.fifo
-    
+    publish: true
+
   mysql:
     username: root
     password:
