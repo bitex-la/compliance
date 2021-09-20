@@ -63,6 +63,33 @@ describe IssueToken do
     end
   end
 
+  it 'fails if replies to an already answered observation' do
+    issue_token = IssueToken.where(issue: issue).first
+    observations = issue_token.observations
+
+    observations.each do |observation|
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      )
+    end
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    observations.each do |observation|
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        {
+          type: 'observations',
+          id: observation.id,
+          attributes: { reply: 'Some reply here' }
+        },
+        404
+      )
+    end
+  end
+
   it 'replies to an observation with attachments' do
     issue_token = IssueToken.where(issue: issue).first
     observations = issue_token.observations
