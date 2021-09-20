@@ -16,8 +16,6 @@ class Api::AttachmentsController < Api::EntityController
     end
 
     map_and_save(201)
-  rescue NoMethodError
-    jsonapi_422
   rescue IssueTokenNotValidError
     jsonapi_error(410, 'invalid token')
   rescue ActiveRecord::RecordNotFound
