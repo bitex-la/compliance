@@ -52,6 +52,11 @@ production:
 staging:
   <<: *defaults
 
+  cors:
+    debug: false
+    allowed_origins:
+      - 'staging-compliance-observations.s3-website-us-east-1.amazonaws.com'
+
 development:
   <<: *defaults
 
