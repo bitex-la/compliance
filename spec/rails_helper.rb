@@ -90,8 +90,12 @@ RSpec.configure do |config|
   config.include StripAttributes::Matchers
 
   config.before(:suite) do
+    unless ENV['IN_CIRCLE']
+      DockerHelpers.ensure_elastic_mq_test_is_running
+    end
     DatabaseCleaner.clean_with(:truncation)
     Redis::Objects.redis.flushdb
+    EventLog.purge_sqs_queue
   end
 
   config.before(:each) do
@@ -105,5 +109,6 @@ RSpec.configure do |config|
     Timecop.return
     DatabaseCleaner.clean
     Redis::Objects.redis.flushdb
+    EventLog.purge_sqs_queue
   end
 end

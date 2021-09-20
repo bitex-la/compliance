@@ -23,8 +23,8 @@ class Issue < ApplicationRecord
   end
 
   after_save :sync_observed_status
-  after_save :log_if_needed
-  after_save{ person.expire_action_cache }
+  after_commit :log_if_needed
+  after_commit { person.expire_action_cache }
 
   validate :defer_until_cannot_be_in_the_past
 

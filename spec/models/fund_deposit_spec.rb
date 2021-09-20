@@ -179,7 +179,7 @@ RSpec.describe FundDeposit do
       create(:full_fund_deposit, person: person, amount:50000)
       expect(person.regularity).to eq PersonRegularity.high
 
-      assert_logging(person, :update_person_regularity, 1)
+      assert_logging(person, :update_person_regularity, 1, false)
 
       expect(person.issues.size).to eq 1
     end

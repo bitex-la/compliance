@@ -48,8 +48,8 @@ describe 'an admin user' do
     issue = Issue.last
     observation = Observation.last
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 4)
-    assert_logging(issue.reload, :observe_issue, 1)
+    assert_logging(issue, :update_entity, 4, false)
+    assert_logging(issue.reload, :observe_issue, 1, false)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -140,8 +140,8 @@ describe 'an admin user' do
     
     click_link 'Edit Person'
     click_link 'Disable'
-    assert_logging(issue.person, :enable_person, 1)
-    assert_logging(issue.person, :disable_person, 1)
+    assert_logging(issue.person, :enable_person, 1, false)
+    assert_logging(issue.person, :disable_person, 1, false)
     expect(issue.person.reload.enabled).to be_falsey
     expect(issue.person.state).to eq('disabled')
 
@@ -378,7 +378,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     assert_logging(issue, :update_entity, 6)
-    assert_logging(issue.reload, :observe_issue, 2)
+    assert_logging(issue.reload, :observe_issue, 2, false)
 
     Observation.where(issue: issue).count.should == 2
     issue.reload.should be_observed
@@ -402,7 +402,7 @@ describe 'an admin user' do
     }
 
     assert_logging(issue, :update_entity, 7)
-    assert_logging(issue.reload, :observe_issue, 2)
+    assert_logging(issue.reload, :observe_issue, 2, false)
 
     assert_response 200
 
@@ -572,7 +572,7 @@ describe 'an admin user' do
 
     issue = Issue.last
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue.reload, :observe_issue, 1)
+    assert_logging(issue.reload, :observe_issue, 1, false)
     observation = Observation.last
     issue.should be_observed
     observation.should be_new
@@ -610,7 +610,7 @@ describe 'an admin user' do
     click_link "Approve"
     
     issue.reload.should be_approved
-    assert_logging(person, :enable_person, 1)
+    assert_logging(person, :enable_person, 1, false)
 
     old_domicile = Domicile.first
     new_domicile = Domicile.last
@@ -646,7 +646,7 @@ describe 'an admin user' do
     issue = person.issues.reload.last
     issue.complete!
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 1)
+    assert_logging(issue, :update_entity, 1, false)
     login_as compliance_admin_user
     click_on "Fresh"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
@@ -824,7 +824,7 @@ describe 'an admin user' do
 
     issue.reload.should be_answered
     assert_logging(Issue.last, :update_entity, 4)
-    assert_logging(issue.reload, :observe_issue, 1)
+    assert_logging(issue.reload, :observe_issue, 1, false)
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should be_enabled
@@ -837,7 +837,7 @@ describe 'an admin user' do
     issue.complete!
 
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 1)
+    assert_logging(issue, :update_entity, 1, false)
 
     login_as compliance_admin_user
     click_on 'Answered'
@@ -895,7 +895,7 @@ describe 'an admin user' do
       issue.should be_draft
 
       assert_logging(issue, :create_entity, 1)
-      assert_logging(issue, :update_entity, 3)
+      assert_logging(issue, :update_entity, 3, false)
 
       click_link "Approve"
       issue.reload.should be_approved
@@ -962,7 +962,7 @@ describe 'an admin user' do
       issue.should be_draft
 
       assert_logging(Issue.last, :create_entity, 1)
-      assert_logging(Issue.last, :update_entity, 3)
+      assert_logging(Issue.last, :update_entity, 3, false)
 
       click_link "Approve"
       issue.reload.should be_approved
@@ -1032,7 +1032,7 @@ describe 'an admin user' do
 
       click_button 'Update Issue'
       assert_logging(issue, :create_entity, 1)
-      assert_logging(issue, :update_entity, 5) 
+      assert_logging(issue, :update_entity, 5, false)
 
 
       visit "/people/#{person.id}/issues/#{issue.id}"

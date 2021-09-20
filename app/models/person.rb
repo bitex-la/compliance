@@ -2,10 +2,10 @@ class Person < ApplicationRecord
   include AASM
   include Loggable
 
-  after_create :log_state_new
-  after_save :log_if_enabled
-  after_save :log_state_changes
-  after_save :expire_action_cache
+  after_commit :log_state_new, on: :create
+  after_commit :log_if_enabled
+  after_commit :log_state_changes
+  after_commit :expire_action_cache
 
   belongs_to :regularity, class_name: "PersonRegularity"
 
@@ -89,16 +89,11 @@ class Person < ApplicationRecord
   end
 
   scope :by_admin_user_tags, -> {
-    return unless AdminUser.current_admin_user.present?
+    return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
 
-    admin_tags = AdminUser.current_admin_user.admin_user_taggings
-    person_tags = PersonTagging.unscoped.select(:person_id)
-
-    where
-      .not(admin_tags.arel.exists) # AdminUser has no tags
-      .or(where.not(id: person_tags)) # Person has no tags
-      .or(where(id: person_tags.where(tag_id: admin_tags.select(:tag_id)))) # AdminUser and Person have at least one tag in common
-      .distinct
+    where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
+      OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
+      }, tags).distinct
   }
 
   def natural_docket
