@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe IssueToken, type: :model do
+describe IssueToken do
   it 'creates new issue token when there are obsevations' do
     seed = build(:full_natural_docket_seed, issue: build(:basic_issue))
     seed.observations << build(:observation)
