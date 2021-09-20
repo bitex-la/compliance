@@ -56,6 +56,6 @@ class Api::AttachmentsController < Api::EntityController
 
   def update_observations_if_empty(observation_id)
     observation = Observation.find(observation_id)
-    observation.update(reply: 'Reply in Attachment') if observation.reply.blank?
+    observation.update!(reply: 'Reply in Attachment') if observation.reply.blank?
   end
 end
