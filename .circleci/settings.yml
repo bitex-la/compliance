@@ -41,13 +41,13 @@ defaults: &defaults
     namespace: 'compliance'
     pool_size: 8
 
-  cors:
-    debug: true
-    allowed_origins:
-      - "*"
-  
 production:
   <<: *defaults
+
+  cors:
+    debug: false
+    allowed_origins:
+      - 'requerimientos.remitex.online'
 
 staging:
   <<: *defaults
@@ -60,5 +60,15 @@ staging:
 development:
   <<: *defaults
 
+  cors:
+    debug: true
+    allowed_origins:
+      - '*'
+
 test:
   <<: *defaults
+
+  cors:
+    debug: true
+    allowed_origins:
+      - '*'
