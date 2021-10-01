@@ -18,7 +18,7 @@ describe IssueToken do
   let(:seed) { build(:full_natural_docket_seed, issue: issue) }
 
   before(:each) do
-    seed.observations << [build(:observation), build(:robot_observation)]
+    seed.observations << [build(:observation), build(:observation)]
     issue = seed.issue
     issue.save!
   end
