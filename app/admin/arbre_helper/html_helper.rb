@@ -149,7 +149,7 @@ module ArbreHelpers
       end
     end
 
-    def self.strip_and_truncate(length = 40, text)
+    def self.strip_and_truncate(length = 200, text)
       ArbreHelpers::HtmlHelper.strip_html_tags(text).truncate(length, omission:'...')
     end
 

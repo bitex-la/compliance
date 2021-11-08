@@ -87,8 +87,8 @@ describe 'an admin user' do
 
     within '.extra_info' do
       expect(page)
-        .to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
+        .to have_content "link: https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n"
+      expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
     end
 
     assert_logging(issue, :update_entity, 7)
@@ -128,8 +128,8 @@ describe 'an admin user' do
     end
 
     within '.extra_info' do
-      expect(page).to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
+      expect(page).to have_content "link: https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n"
+      expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
     end
 
     click_link 'Enable'
