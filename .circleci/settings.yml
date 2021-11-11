@@ -47,7 +47,7 @@ production:
   cors:
     debug: false
     allowed_origins:
-      - 'requerimientos.remitex.online'
+      - 'https://requerimientos.remitex.online'
 
 staging:
   <<: *defaults
@@ -55,7 +55,7 @@ staging:
   cors:
     debug: false
     allowed_origins:
-      - 'staging-compliance-observations.s3-website-us-east-1.amazonaws.com'
+      - 'https://requerimientos.bitex-staging.la/'
 
 development:
   <<: *defaults

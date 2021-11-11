@@ -38,6 +38,25 @@ describe IssueToken do
     api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 410)
   end
 
+  it 'does not return observations when they are answered' do
+    issue_token = IssueToken.where(issue: issue).first
+    observations = issue_token.observations
+
+    observations.each do |observation|
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      )
+    end
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
+    expect(api_response.included.count).to eq(0)
+    expect(api_response.included.map(&:type).uniq).to eq([])
+  end
+
   it 'replies to an observation' do
     issue_token = IssueToken.where(issue: issue).first
     observations = issue_token.observations
