@@ -1,5 +1,5 @@
-class Api::IssueTokensController < ApplicationController
-  skip_before_action :verify_authenticity_token
+class Api::IssueTokensController < Api::ApiController
+  before_action :require_token, only: [:show]
   include ApiResponse
 
   def show
