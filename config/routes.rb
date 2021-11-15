@@ -118,6 +118,13 @@ Rails.application.routes.draw do
     resource :system do
       post :truncate
     end
+
+    resources :issue_tokens do
+      get :show_by_token
+      resources :observations, only: [:update] do
+        resources :attachments, only: [:create]
+      end
+    end
   end
 
   devise_for :admin_users, ActiveAdmin::Devise.config

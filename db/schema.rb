@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_04_192108) do
+ActiveRecord::Schema.define(version: 2021_08_06_141445) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -481,6 +481,13 @@ ActiveRecord::Schema.define(version: 2021_05_04_192108) do
     t.index ["issue_id", "tag_id"], name: "index_issue_taggings_on_issue_id_and_tag_id", unique: true
     t.index ["issue_id"], name: "index_issue_taggings_on_issue_id"
     t.index ["tag_id"], name: "index_issue_taggings_on_tag_id"
+  end
+
+  create_table "issue_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "token", null: false
+    t.bigint "issue_id", null: false
+    t.datetime "valid_until", null: false
+    t.index ["issue_id"], name: "index_issue_tokens_on_issue_id"
   end
 
   create_table "issues", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|

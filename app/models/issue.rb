@@ -8,6 +8,7 @@ class Issue < ApplicationRecord
 
   has_many :issue_taggings
   has_many :tags, through: :issue_taggings
+  has_one :issue_token
   accepts_nested_attributes_for :issue_taggings, allow_destroy: true
 
   ransack_alias :state, :aasm_state
@@ -244,6 +245,10 @@ class Issue < ApplicationRecord
 
     event :observe do
       transitions  from: [:draft, :new, :answered, :observed], to: :observed
+
+      after do
+        generate_token
+      end
     end
 
     event :answer do
@@ -375,7 +380,27 @@ class Issue < ApplicationRecord
 
     all
   end
-  
+
+  def all_observations
+    all = []
+    HAS_MANY.each do |assoc|
+      send(assoc).each do |association|
+        next unless association
+
+        all << (association.fruit || association).observations
+      end
+    end
+
+    HAS_ONE.each do |assoc|
+      association = send(assoc)
+      next unless association
+
+      all << (association.fruit || association).observations
+    end
+
+    all
+  end
+
   def all_seeds
     HAS_MANY.map{|a| send(a).try(:to_a) }.compact.flatten +
       HAS_ONE.map{|a| send(a) }.compact
@@ -392,6 +417,10 @@ class Issue < ApplicationRecord
   end
 
   private
+
+  def generate_token
+    IssueToken.create!(issue: self) if all_observations.count.positive?
+  end
 
   def lock_expired?
     return false if lock_expiration.nil?

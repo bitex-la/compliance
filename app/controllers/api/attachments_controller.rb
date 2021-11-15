@@ -1,10 +1,25 @@
 class Api::AttachmentsController < Api::EntityController
+  skip_before_action :require_token, only: [:create], if: :issue_token
+
   def resource_class
     Attachment
   end
 
   def options_for_response
     { include: [] }
+  end
+
+  def create
+    if issue_token
+      check_validity_token(params[:issue_token_id])
+      update_observations_if_empty(params[:observation_id])
+    end
+
+    map_and_save(201)
+  rescue IssueTokenNotValidError
+    jsonapi_error(410, 'invalid token')
+  rescue ActiveRecord::RecordNotFound
+    jsonapi_error(404, 'can not find attachment')
   end
 
   protected
@@ -29,5 +44,18 @@ class Api::AttachmentsController < Api::EntityController
           :person
         ]
       )
+  end
+
+  def check_validity_token(token)
+    IssueToken.find_by_token!(token)
+  end
+
+  def issue_token
+    params[:issue_token_id].present?
+  end
+
+  def update_observations_if_empty(observation_id)
+    observation = Observation.find(observation_id)
+    observation.update!(reply: 'Reply in Attachment') if observation.reply.blank?
   end
 end
