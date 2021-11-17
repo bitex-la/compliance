@@ -383,6 +383,7 @@ class Issue < ApplicationRecord
 
   def all_observations
     all = []
+    all << observations.to_a.select { |obs| obs.observable.nil? }
     HAS_MANY.each do |assoc|
       send(assoc).each do |association|
         next unless association
@@ -398,7 +399,7 @@ class Issue < ApplicationRecord
       all << (association.fruit || association).observations
     end
 
-    all
+    all.flatten.select { |obs| obs.client? && obs.new? }
   end
 
   def all_seeds
