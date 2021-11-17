@@ -760,14 +760,14 @@ RSpec.describe Issue, type: :model do
       let(:issue) { create(:basic_issue, person: create(:empty_person)) }
 
       it 'only returns observations for client scope' do
-        observation = create(:observation, issue: issue)
-        robot_observation = create(:robot_observation, issue: issue)
+        observation = create(:observation, issue: issue, observable: nil)
+        robot_observation = create(:robot_observation, issue: issue, observable: nil)
         expect(issue.all_observations).to eq([observation])
       end
 
       it 'only returns observations in new state' do
-        observation = create(:observation, issue: issue)
-        answered_observation = create(:observation, issue: issue, reply: 'A reply')
+        observation = create(:observation, issue: issue, observable: nil)
+        answered_observation = create(:observation, issue: issue, reply: 'A reply', observable: nil)
         expect(issue.all_observations).to eq([observation])
       end
     end
