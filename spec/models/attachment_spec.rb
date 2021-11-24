@@ -61,4 +61,12 @@ describe Attachment do
     issue.save
     assert_logging(issue, :create_entity, 1)
   end
+
+  it 'is not valid when attached to something' do
+    phone = create(:full_natural_person).reload.phones.first
+    a = build(:exceeding_size_attachment, thing: phone)
+    a.attached_to_fruit.should == phone
+    a.should_not be_valid
+    a.errors[:document].should == ['must be less than 10 MB']
+  end
 end

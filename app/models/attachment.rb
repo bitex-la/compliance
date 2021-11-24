@@ -31,7 +31,7 @@ class Attachment < ApplicationRecord
     end
     all + %w[fund_deposits fund_withdrawals fund_transfers]
   end
- 
+
   validates_attachment :document,
     content_type: {
       content_type: [
@@ -41,8 +41,11 @@ class Attachment < ApplicationRecord
         'image/gif',
         'image/png',
         'application/pdf',
-        'application/zip',
-        'application/x-rar-compressed'
+        'application/doc',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ]}
 
   validates_attachment_file_name :document, matches: [
@@ -52,9 +55,13 @@ class Attachment < ApplicationRecord
     /jpeg|JPEG\z/,
     /pdf|PDF\z/,
     /gif|GIF\z/,
-    /zip|ZIP\z/,
-    /rar|RAR\z/,
+    /doc|DOC\z/,
+    /docx|DOCX\z/,
+    /xls|XLS\z/,
+    /xlsx|XLSX\z/
   ]
+
+  validates_attachment_size :document, less_than: 10.megabyte
 
   def attached_to_something
     return unless attached_to.nil?
