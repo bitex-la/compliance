@@ -158,7 +158,7 @@ module FeatureHelpers
     })
     within(".has_many_container.domicile_seeds") do
       click_link "Add New Attachment"
-      fill_attachment('domicile_seeds', 'zip', true, 0, 0, true)
+      fill_attachment('domicile_seeds', 'jpg', true, 0, 0, true)
     end
 
     find('li[title="Allowances"] a').click 
