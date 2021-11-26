@@ -51,7 +51,7 @@ describe Attachment do
     a.errors[:base].should == ['must_be_attached_to_something']
   end
 
-  it 'can creat a new seed with an attachments' do
+  it 'can create a new seed with an attachments' do
     person = create(:empty_person)
     issue = Issue.new(person: person)
     domicile_seed = issue.domicile_seeds.build(country: "AR")
@@ -62,11 +62,11 @@ describe Attachment do
     assert_logging(issue, :create_entity, 1)
   end
 
-  it 'is not valid when attached to something' do
+  it 'is invalid when attachment is bigger than 10 MB' do
     phone = create(:full_natural_person).reload.phones.first
     a = build(:exceeding_size_attachment, thing: phone)
-    a.attached_to_fruit.should == phone
+    expect(a.attached_to_fruit).to eq phone
     a.should_not be_valid
-    a.errors[:document].should == ['must be less than 10 MB']
+    expect(a.errors[:document]).to eq ['must be less than 10 MB']
   end
 end
