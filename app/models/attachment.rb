@@ -32,36 +32,40 @@ class Attachment < ApplicationRecord
     all + %w[fund_deposits fund_withdrawals fund_transfers]
   end
 
-  validates_attachment :document,
-    content_type: {
-      content_type: [
-        'image/bmp',
-        'image/jpeg',
-        'image/jpg',
-        'image/gif',
-        'image/png',
-        'application/pdf',
-        'application/doc',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ]}
+  validates_attachment_content_type :document,
+                                    content_type: %w[
+                                      image/bmp
+                                      image/jpeg
+                                      image/jpg
+                                      image/gif
+                                      image/png
+                                      application/pdf
+                                      application/doc
+                                      application/msword
+                                      application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                                      application/vnd.ms-excel
+                                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                    ],
+                                    message: 'File uploaded has an invalid content type.'
 
-  validates_attachment_file_name :document, matches: [
-    /bmp|BMP\z/,
-    /png|PNG\z/,
-    /jpg|JPG\z/,
-    /jpeg|JPEG\z/,
-    /pdf|PDF\z/,
-    /gif|GIF\z/,
-    /doc|DOC\z/,
-    /docx|DOCX\z/,
-    /xls|XLS\z/,
-    /xlsx|XLSX\z/
-  ]
+  validates_attachment_file_name :document,
+                                 matches: [
+                                   /bmp|BMP\z/,
+                                   /png|PNG\z/,
+                                   /jpg|JPG\z/,
+                                   /jpeg|JPEG\z/,
+                                   /pdf|PDF\z/,
+                                   /gif|GIF\z/,
+                                   /doc|DOC\z/,
+                                   /docx|DOCX\z/,
+                                   /xls|XLS\z/,
+                                   /xlsx|XLSX\z/
+                                 ],
+                                 message: 'File uploaded contains an invalid file name.'
 
-  validates_attachment_size :document, less_than: 10.megabyte
+  validates_attachment_size :document,
+                            less_than: 10.megabytes,
+                            message: 'File size must be lower than 10MB.'
 
   def attached_to_something
     return unless attached_to.nil?
