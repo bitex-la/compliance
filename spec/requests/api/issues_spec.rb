@@ -29,7 +29,7 @@ describe Issue do
         .group_by{|i| i.type }
         .map{|a,b| [a, b.count ] }.to_h
         .should == {
-          "attachments"=>66, 
+          "attachments"=>108,
           "email_seeds"=>2, 
           "emails"=>2, 
           "identification_seeds"=>2, 
