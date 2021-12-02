@@ -146,34 +146,6 @@ describe IssueToken do
     end
   end
 
-  it 'fill observations reply if sending an attachment and observation is empty' do
-    issue_token = IssueToken.where(issue: issue).first
-    observations = issue_token.observations
-
-    observations.each do |observation|
-      api_create_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/attachments",
-        type: 'attachments',
-        relationships: { attached_to_seed: { data: { id: seed.id, type: 'natural_docket_seeds' } } },
-        attributes: {
-          document: "data:#{mime_for(:jpg)};base64,#{bytes_for('jpg')}",
-          document_file_name: 'áñçfile微信图片.jpg',
-          document_content_type: mime_for(:jpg)
-        }
-      )
-    end
-
-    api_get "/issues/#{issue.id}"
-    expect(api_response.data.attributes.state).to eq('answered')
-
-    observations.each do |observation|
-      api_get("/observations/#{observation.id}")
-      expect(
-        api_response.data.attributes.reply
-      ).to eq('Reply in Attachment')
-    end
-  end
-
   it 'can not replies to an observation when token is invalid' do
     issue_token = IssueToken.where(issue: issue).first
 
