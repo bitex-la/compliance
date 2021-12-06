@@ -99,6 +99,13 @@ RSpec.describe Issue, type: :model do
     expect(Issue.last.defer_until).to eq Date.current
   end
 
+  it 'returns latest issue_token' do
+    first_token = IssueToken.create!(issue: basic_issue)
+    second_token = IssueToken.create!(issue: basic_issue)
+    expect(basic_issue.reload.issue_token).not_to eq first_token
+    expect(basic_issue.reload.issue_token).to eq second_token
+  end
+
   describe 'affinity_to_tag' do
     let(:issue) { create(:basic_issue, person: create(:empty_person)) } 
     let(:related_person) { create(:empty_person) } 
