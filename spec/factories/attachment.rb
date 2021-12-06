@@ -19,13 +19,13 @@ FactoryBot.define do
       thing.class.name.include?('Seed') ? thing.issue.person_id : thing.person_id
     end
 
-    %i(bmp jpg png gif pdf doc docx xls xlsx).each do |type|
+    %i(bmp jpg png gif pdf doc docx xls xlsx zip).each do |type|
       factory "#{type}_attachment", class: Attachment do
         document { File.new("#{Rails.root}/spec/fixtures/files/simple.#{type}") }
       end
     end
 
-    %i(BMP JPG PNG GIF PDF DOC DOCX XLS XLSX).each do |type|
+    %i(BMP JPG PNG GIF PDF DOC DOCX XLS XLSX ZIP).each do |type|
       factory "#{type}_attachment", class: Attachment do
         document { File.new("#{Rails.root}/spec/fixtures/files/simple_upper.#{type}") }
       end

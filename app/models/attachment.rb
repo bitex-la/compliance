@@ -45,6 +45,8 @@ class Attachment < ApplicationRecord
                                       application/vnd.openxmlformats-officedocument.wordprocessingml.document
                                       application/vnd.ms-excel
                                       application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                      application/zip
+                                      application/x-rar-compressed
                                     ],
                                     message: 'File uploaded has an invalid content type.'
 
@@ -59,7 +61,9 @@ class Attachment < ApplicationRecord
                                    /doc|DOC\z/,
                                    /docx|DOCX\z/,
                                    /xls|XLS\z/,
-                                   /xlsx|XLSX\z/
+                                   /xlsx|XLSX\z/,
+                                   /zip|ZIP\z/,
+                                   /rar|RAR\z/
                                  ],
                                  message: 'File uploaded contains an invalid file name.'
 

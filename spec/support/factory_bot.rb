@@ -20,7 +20,7 @@ module FactoryBot
 
             after(:create) do |thing, evaluator|
               next unless evaluator.try(:add_all_attachments)
-              %i(bmp jpg png gif pdf doc docx xls xlsx BMP JPG PNG GIF PDF DOC DOCX XLS XLSX).each do |name|
+              %i(bmp jpg png gif pdf doc docx xls xlsx zip BMP JPG PNG GIF PDF DOC DOCX XLS XLSX).each do |name|
                 create "#{name}_attachment", thing: thing
               end
             end
