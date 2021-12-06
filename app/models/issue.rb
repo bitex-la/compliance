@@ -112,7 +112,8 @@ class Issue < ApplicationRecord
       .where(entity: self, verb_id: EventLogKind.send(:observe_issue).id)
       .last
 
-    if has_open_observations? 
+    if has_open_observations?
+      generate_token
       last_obv = observations.where(aasm_state: 'new').last
       if !last_logged
         log_state_change(:observe_issue)
@@ -245,10 +246,6 @@ class Issue < ApplicationRecord
 
     event :observe do
       transitions  from: [:draft, :new, :answered, :observed], to: :observed
-
-      after do
-        generate_token
-      end
     end
 
     event :answer do
