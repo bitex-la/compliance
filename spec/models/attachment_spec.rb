@@ -61,12 +61,4 @@ describe Attachment do
     issue.save
     assert_logging(issue, :create_entity, 1)
   end
-
-  it 'is invalid when attachment is bigger than 10 MB' do
-    phone = create(:full_natural_person).reload.phones.first
-    a = build(:exceeding_size_attachment, thing: phone)
-    expect(a.attached_to_fruit).to eq phone
-    a.should_not be_valid
-    expect(a.errors[:document]).to eq ['File size must be lower than 10MB.']
-  end
 end

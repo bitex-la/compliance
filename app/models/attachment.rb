@@ -68,8 +68,8 @@ class Attachment < ApplicationRecord
                                  message: 'File uploaded contains an invalid file name.'
 
   validates_attachment_size :document,
-                            less_than: 10.megabytes,
-                            message: 'File size must be lower than 10MB.'
+                            less_than: 20.megabytes,
+                            message: 'File size must be lower than 20MB.'
 
   def attached_to_something
     return unless attached_to.nil?
