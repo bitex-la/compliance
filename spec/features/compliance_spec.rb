@@ -634,7 +634,7 @@ describe 'an admin user' do
     new_allowance.replaced_by_id.should be_nil
 
     # Here we validate that attachments are copy to the new fruit (when applies)
-    new_identification.attachments.count.should == 19
+    new_identification.attachments.count.should == 20
     new_natural_docket.attachments.count.should == 1
 
     person.should be_enabled
@@ -887,7 +887,7 @@ describe 'an admin user' do
 
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
         click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'gif', true, 0, 18)
+        fill_attachment('domicile_seeds', 'gif', true, 0, 19)
       end
 
       click_button "Update Issue"
@@ -906,7 +906,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 18
+      new_domicile.attachments.count.should == 19
     end
 
     it 'can add new seeds' do
@@ -1026,7 +1026,7 @@ describe 'an admin user' do
       within(".has_many_container.identification_seeds") do
         within first(".has_many_container.attachments") do
           click_link "Add New Attachment"
-          fill_attachment('identification_seeds', 'jpg', true, 0, 18)
+          fill_attachment('identification_seeds', 'jpg', true, 0, 19)
         end
       end
 
