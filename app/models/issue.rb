@@ -24,6 +24,7 @@ class Issue < ApplicationRecord
 
   after_save :sync_observed_status
   after_commit :log_if_needed
+  after_commit :generate_token
   after_commit { person.expire_action_cache }
 
   validate :defer_until_cannot_be_in_the_past
@@ -113,7 +114,6 @@ class Issue < ApplicationRecord
       .last
 
     if has_open_observations?
-      generate_token
       last_obv = observations.where(aasm_state: 'new').last
       if !last_logged
         log_state_change(:observe_issue)
@@ -252,7 +252,8 @@ class Issue < ApplicationRecord
       # Admins and migrations may create "already answered" observations.
       transitions from: [:observed, :draft, :new, :answered], to: :answered
     
-      after do 
+      after do
+        invalidate_token
         log_state_change(:answer_issue) if aasm.from_state != :answered
       end
     end
@@ -414,10 +415,18 @@ class Issue < ApplicationRecord
     end
   end
 
+  def valid_token?
+    issue_token && (Time.now < issue_token.valid_until)
+  end
+
   private
 
   def generate_token
-    IssueToken.create!(issue: self) if all_observations.count.positive?
+    IssueToken.create!(issue: self) if all_observations.count.positive? && !valid_token?
+  end
+
+  def invalidate_token
+    issue_token.destroy!
   end
 
   def lock_expired?
