@@ -23,8 +23,8 @@ class Issue < ApplicationRecord
   end
 
   after_save :sync_observed_status
-  after_commit :log_if_needed
   after_commit :generate_token
+  after_commit :log_if_needed
   after_commit { person.expire_action_cache }
 
   validate :defer_until_cannot_be_in_the_past
@@ -253,8 +253,8 @@ class Issue < ApplicationRecord
       transitions from: [:observed, :draft, :new, :answered], to: :answered
     
       after do
-        invalidate_token
         log_state_change(:answer_issue) if aasm.from_state != :answered
+        invalidate_token
       end
     end
 
@@ -386,7 +386,7 @@ class Issue < ApplicationRecord
       send(assoc).each do |association|
         next unless association
 
-        all << (association.fruit || association).observations
+        all << association.observations
       end
     end
 
@@ -394,7 +394,7 @@ class Issue < ApplicationRecord
       association = send(assoc)
       next unless association
 
-      all << (association.fruit || association).observations
+      all << association.observations
     end
 
     all.flatten.select { |obs| obs.client? && obs.new? }
@@ -426,7 +426,7 @@ class Issue < ApplicationRecord
   end
 
   def invalidate_token
-    issue_token.destroy!
+    issue_token.destroy! if issue_token
   end
 
   def lock_expired?
