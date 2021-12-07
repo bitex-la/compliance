@@ -8,6 +8,7 @@ describe IssueToken do
 
     expect { issue.save! }.to change { IssueToken.count }.by 1
     expect(issue.issue_token.observations.count).to eq(1)
+    assert_logging(issue, :observe_issue, 1, false)
   end
 
   it 'only shows issue token observations when are not answered' do
@@ -18,6 +19,7 @@ describe IssueToken do
     issue.reload.observations.first.answer!
 
     expect(issue.issue_token.observations.count).to eq(0)
+    assert_logging(issue, :observe_issue, 1, false)
   end
 
   it 'creates new issue token for client observations on observed issue' do
@@ -31,5 +33,23 @@ describe IssueToken do
     issue.observations << build(:observation)
     expect { issue.save! }.to change { IssueToken.count }.by 1
     expect(issue.reload.issue_token.observations.count).to eq(1)
+    assert_logging(issue, :observe_issue, 1, false)
+  end
+
+  it 'it generates token for every client observation' do
+    seed = build(:full_natural_docket_seed, issue: build(:basic_issue))
+    seed.observations << build(:observation)
+    issue = seed.issue
+
+    expect { issue.save! }.to change { IssueToken.count }.by 1
+    expect(issue.reload.issue_token).not_to be nil
+
+    first_token = issue.reload.issue_token
+
+    issue.observations << build(:observation)
+    expect { issue.save! }.to change { IssueToken.count }.by 1
+    expect(issue.reload.issue_token.observations.count).to eq(2)
+    expect(issue.reload.issue_token).not_to eq first_token
+    assert_logging(issue, :observe_issue, 1, false)
   end
 end
