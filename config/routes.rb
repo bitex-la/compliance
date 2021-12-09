@@ -121,7 +121,9 @@ Rails.application.routes.draw do
 
     resources :issue_tokens do
       get :show_by_token
-      patch :reply_observation
+      resources :observations, only: [:update] do
+        resources :attachments, only: [:create]
+      end
     end
   end
 
