@@ -13,6 +13,15 @@ class IssueToken < ApplicationRecord
 
     issue_token
   end
+
+  def valid_token?
+    Time.now < self.valid_until
+  end
+
+  def invalidate!
+    self.valid_until = 31.days.ago
+    save!
+  end
 end
 
 class IssueTokenNotValidError < StandardError; end

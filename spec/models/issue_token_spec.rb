@@ -17,12 +17,12 @@ describe IssueToken do
     issue = seed.issue
     issue.save!
 
-    expect(issue.reload.issue_token).not_to be nil
+    expect(issue.reload.issue_token.valid_token?).to be true
     expect(issue.issue_token.observations.count).to eq(1)
 
     issue.reload.observations.first.answer!
 
-    expect(issue.reload.issue_token).to be nil
+    expect(issue.reload.issue_token.valid_token?).to be false
     assert_logging(issue, :observe_issue, 1, false)
   end
 
@@ -37,7 +37,6 @@ describe IssueToken do
     issue.observations << build(:observation)
     expect { issue.save! }.to change { IssueToken.count }.by 1
     expect(issue.reload.issue_token.observations.count).to eq(1)
-    assert_logging(issue, :observe_issue, 1, false)
   end
 
   it 'does not generate token when issue has valid token' do
@@ -49,7 +48,7 @@ describe IssueToken do
     expect(issue.reload.issue_token).not_to be nil
 
     issue.observations << build(:observation)
-    expect { issue.save! }.to change { IssueToken.count }.by 0
+    expect { issue.save! }.not_to change { IssueToken.count }
     expect(issue.reload.issue_token.observations.count).to eq(2)
     assert_logging(issue, :observe_issue, 1, false)
   end

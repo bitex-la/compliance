@@ -52,7 +52,7 @@ describe IssueToken do
     end
     expect(api_response.data.attributes.state).to eq('answered')
 
-    api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 404)
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 410)
     expect(api_response.included).to be nil
   end
 

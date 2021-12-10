@@ -415,18 +415,14 @@ class Issue < ApplicationRecord
     end
   end
 
-  def valid_token?
-    issue_token && (Time.now < issue_token.valid_until)
-  end
-
   private
 
   def generate_token
-    IssueToken.create!(issue: self) if all_observations.count.positive? && !valid_token?
+    IssueToken.create!(issue: self) if all_observations.count.positive? && !issue_token&.valid_token?
   end
 
   def invalidate_token
-    issue_token.destroy! if issue_token
+    issue_token.invalidate! if issue_token
   end
 
   def lock_expired?
