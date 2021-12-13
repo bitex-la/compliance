@@ -19,7 +19,7 @@ class IssueToken < ApplicationRecord
   end
 
   def invalidate!
-    self.valid_until = 31.days.ago
+    self.valid_until = Time.zone.parse('Thursday, 1 January 1970')
     save!
   end
 end
