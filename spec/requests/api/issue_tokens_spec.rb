@@ -52,9 +52,8 @@ describe IssueToken do
     end
     expect(api_response.data.attributes.state).to eq('answered')
 
-    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
-    expect(api_response.included.count).to eq(0)
-    expect(api_response.included.map(&:type).uniq).to eq([])
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 410)
+    expect(api_response.included).to be nil
   end
 
   it 'replies to an observation' do
@@ -115,14 +114,6 @@ describe IssueToken do
 
     observations.each do |observation|
       seed = observation.observable
-      api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
-        type: 'observations',
-        id: observation.id,
-        attributes: { reply: 'Some reply here' }
-      )
-      expect(api_response.data.attributes.state).to eq('answered')
-
       api_create_issue_token(
         "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/attachments",
         type: 'attachments',
@@ -133,6 +124,14 @@ describe IssueToken do
           document_content_type: mime_for(:jpg)
         }
       )
+
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      )
+      expect(api_response.data.attributes.state).to eq('answered')
     end
 
     api_get "/issues/#{issue.id}"

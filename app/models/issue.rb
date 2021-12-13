@@ -23,6 +23,7 @@ class Issue < ApplicationRecord
   end
 
   after_save :sync_observed_status
+  after_commit :generate_token
   after_commit :log_if_needed
   after_commit { person.expire_action_cache }
 
@@ -112,7 +113,7 @@ class Issue < ApplicationRecord
       .where(entity: self, verb_id: EventLogKind.send(:observe_issue).id)
       .last
 
-    if has_open_observations? 
+    if has_open_observations?
       last_obv = observations.where(aasm_state: 'new').last
       if !last_logged
         log_state_change(:observe_issue)
@@ -245,18 +246,15 @@ class Issue < ApplicationRecord
 
     event :observe do
       transitions  from: [:draft, :new, :answered, :observed], to: :observed
-
-      after do
-        generate_token
-      end
     end
 
     event :answer do
       # Admins and migrations may create "already answered" observations.
       transitions from: [:observed, :draft, :new, :answered], to: :answered
     
-      after do 
+      after do
         log_state_change(:answer_issue) if aasm.from_state != :answered
+        invalidate_token
       end
     end
 
@@ -388,7 +386,7 @@ class Issue < ApplicationRecord
       send(assoc).each do |association|
         next unless association
 
-        all << (association.fruit || association).observations
+        all << association.observations
       end
     end
 
@@ -396,7 +394,7 @@ class Issue < ApplicationRecord
       association = send(assoc)
       next unless association
 
-      all << (association.fruit || association).observations
+      all << association.observations
     end
 
     all.flatten.select { |obs| obs.client? && obs.new? }
@@ -420,7 +418,11 @@ class Issue < ApplicationRecord
   private
 
   def generate_token
-    IssueToken.create!(issue: self) if all_observations.count.positive?
+    IssueToken.create!(issue: self) if all_observations.count.positive? && !issue_token&.valid_token?
+  end
+
+  def invalidate_token
+    issue_token.invalidate! if issue_token
   end
 
   def lock_expired?
