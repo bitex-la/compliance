@@ -154,6 +154,10 @@ module Garden
       new_issue.add_seeds_replacing([fruit])
       new_issue.save!
     end
+
+    def multiple_documents=(files = [])
+      files.each { |file| attachments.create(document: file) }
+    end
   end
 
   module Fruit
