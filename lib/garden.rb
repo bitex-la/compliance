@@ -156,7 +156,7 @@ module Garden
     end
 
     def multiple_documents=(files = [])
-      files.each { |file| attachments.create(document: file) }
+      files.each { |file| attachments.new(document: file) }
     end
   end
 

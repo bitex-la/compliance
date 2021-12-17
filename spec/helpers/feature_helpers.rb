@@ -57,6 +57,26 @@ module FeatureHelpers
         File.absolute_path(filename), wait: 10.seconds)
   end
 
+  def fill_multiple_attachments(kind, ext = 'jpg', has_many = true, index = 0, accented = false)
+    wait_for_ajax
+    path = if has_many
+             "issue[#{kind}_attributes][#{index}][multiple_documents][]"
+           else
+             "issue[#{kind}_attributes][multiple_documents][]"
+           end
+    filename = if accented
+                 "./spec/fixtures/files/áñ_simple_微信图片.#{ext}"
+               else
+                 if ext == ext.upcase
+                   "./spec/fixtures/files/simple_upper.#{ext}"
+                 else
+                   "./spec/fixtures/files/simple.#{ext}"
+                 end
+               end
+    attach_file(path,
+                File.absolute_path(filename), wait: 10.seconds)
+  end
+
   def add_affinities(related_ones, kind, start_index)
     related_ones.each_with_index do |related, index|
       click_link "Add New Affinity seed"

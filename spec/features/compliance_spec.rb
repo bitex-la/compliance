@@ -1192,4 +1192,194 @@ describe 'an admin user' do
     pending
     fail
   end
+
+  context 'multiple attachments input' do
+    it "Edits a customer by creating a new issue" do
+      observation_reason = create(:human_world_check_reason)
+      person = create(:full_natural_person)
+      login_as compliance_admin_user
+
+      click_link 'People'
+      click_link 'All'
+
+      within("tr[id='person_#{person.id}'] td[class='col col-actions']") do
+        click_link('View')
+      end
+
+      click_link "Add Person Information"
+      click_button "Create new issue"
+
+      find('li[title="Identifications"] a').click
+      click_link "Add New Identification seed"
+      fill_seed("identification",{
+        number: '123456789',
+        issuer: 'AR'
+      })
+
+      select_with_search(
+        '#issue_identification_seeds_attributes_0_identification_kind_id_input',
+        'national_id'
+      )
+
+      person.identifications.reload
+
+      select_with_search(
+        '#issue_identification_seeds_attributes_0_replaces_input',
+        person.identifications.first.name
+      )
+
+      within(".has_many_container.identification_seeds") do
+        click_link "Add New Attachment"
+        fill_multiple_attachments('identification_seeds', 'jpg')
+      end
+
+      find(:css, '#issue_identification_seeds_attributes_0_copy_attachments').set true
+
+      find('li[title="Domiciles"] a').click
+      click_link "Add New Domicile seed"
+
+      fill_seed('domicile', {
+        country: 'AR',
+        state: 'Buenos Aires',
+        city: 'C.A.B.A',
+        street_address: 'Monroe',
+        street_number: '4567',
+        postal_code: '1657',
+        floor: '1',
+        apartment: 'C'
+      })
+
+      person.domiciles.reload
+
+      select_with_search(
+        '#issue_domicile_seeds_attributes_0_replaces_input',
+        person.domiciles.first.name
+      )
+
+      within(".has_many_container.domicile_seeds") do
+        click_link "Add New Attachment"
+        fill_multiple_attachments('domicile_seeds', 'jpg')
+      end
+
+      find('li[title="Allowances"] a').click
+      click_link "Add New Allowance seed"
+
+      select_with_search(
+        '#issue_allowance_seeds_attributes_0_kind_id_input',
+        'us_dollar'
+      )
+      fill_seed("allowance", {
+        amount: "100"
+      })
+
+      person.allowances.reload
+      select_with_search(
+        '#issue_allowance_seeds_attributes_0_replaces_input',
+        person.allowances.first.name
+      )
+
+      within(".has_many_container.allowance_seeds") do
+        click_link "Add New Attachment"
+        fill_multiple_attachments('allowance_seeds', 'gif')
+      end
+
+      find('li[title="Natural dockets"] a').click
+
+      select_with_search(
+        '#issue_natural_docket_seed_attributes_marital_status_id_input',
+        'married'
+      )
+      select_with_search(
+        '#issue_natural_docket_seed_attributes_gender_id_input',
+        'male'
+      )
+
+      fill_seed("natural_docket", {
+        nationality: 'AR',
+        first_name: "Lionel",
+        last_name: "Higuain",
+        birth_date: "1985-01-01"
+      }, false)
+
+      within("#natural_docket_seed") do
+        click_link "Add New Attachment"
+        fill_multiple_attachments('natural_docket_seed', 'png', false)
+      end
+
+      add_observation(observation_reason, 'Please check this guy on world check')
+
+      click_button "Update Issue"
+      click_link "Edit"
+
+      issue = Issue.last
+      assert_logging(issue, :create_entity, 1)
+      assert_logging(issue.reload, :observe_issue, 1, false)
+      observation = Observation.last
+      issue.should be_observed
+      observation.should be_new
+
+      find('li[title="Observations"] a').click
+      fill_in 'issue[observations_attributes][0][reply]',
+              with: '0 hits go ahead!!!'
+      click_button "Update Issue"
+      click_link "Edit"
+
+      assert_logging(issue, :update_entity, 7)
+      issue.reload.should be_answered
+      observation.reload.should be_answered
+
+      Timecop.travel 2.days.from_now
+
+      add_observation(1, observation_reason, 'Please check this guy on FBI database')
+      add_observation(2, observation_reason, 'Please check this on SII')
+
+      click_button "Update Issue"
+      click_link "Edit"
+
+      assert_logging(issue.reload, :observe_issue, 2)
+
+      find('li[title="Observations"] a').click
+
+      fill_in 'issue[observations_attributes][1][reply]',
+              with: '0 hits go ahead!!!'
+
+      fill_in 'issue[observations_attributes][2][reply]',
+              with: 'He is OK on SII'
+
+      click_button "Update Issue"
+
+      click_link "Approve"
+
+      issue.reload.should be_approved
+      assert_logging(person, :enable_person, 1, false)
+
+      old_domicile = Domicile.first
+      new_domicile = Domicile.last
+      old_identification = Identification.first
+      new_identification = Identification.last
+      old_allowance = Allowance.first
+      new_allowance = Allowance.last
+      old_natural_docket = NaturalDocket.first
+      new_natural_docket = NaturalDocket.last
+
+      old_domicile.replaced_by_id.should == new_domicile.id
+      new_domicile.replaced_by_id.should be_nil
+
+      old_identification.replaced_by_id.should == new_identification.id
+      new_identification.replaced_by_id.should be_nil
+
+      old_natural_docket.replaced_by_id.should == new_natural_docket.id
+      new_natural_docket.replaced_by_id.should be_nil
+
+      old_allowance.replaced_by_id.should == new_allowance.id
+      new_allowance.replaced_by_id.should be_nil
+
+      # Here we validate that attachments are copy to the new fruit (when applies)
+      new_identification.attachments.count.should == 19
+      new_natural_docket.attachments.count.should == 1
+
+      person.should be_enabled
+      expect(person.state).to eq('enabled')
+    end
+  end
 end
