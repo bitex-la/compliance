@@ -25,6 +25,7 @@ class Observation < ApplicationRecord
 
   validate :validate_scope_integrity
   validate :validate_issue_correspondence
+  validates :reply, presence: true, on: :observation_reply
 
   # We add this default_scope to allow others default_scopes
   # to cascade and apply admin taggings rules to the current query
