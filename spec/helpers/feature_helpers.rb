@@ -37,24 +37,31 @@ module FeatureHelpers
       .set(0)
   end
 
-  def fill_multiple_attachments(kind, ext = 'jpg', has_many = true, index = 0, accented = false)
+  def fill_attachment(kind, ext = 'jpg', has_many = true, accented = false)
     wait_for_ajax
-    path = if has_many
-             "issue[#{kind}_attributes][#{index}][multiple_documents][]"
-           else
-             "issue[#{kind}_attributes][multiple_documents][]"
-           end
-    filename = if accented
-                 "./spec/fixtures/files/áñ_simple_微信图片.#{ext}"
-               else
-                 if ext == ext.upcase
-                   "./spec/fixtures/files/simple_upper.#{ext}"
-                 else
-                   "./spec/fixtures/files/simple.#{ext}"
-                 end
-               end
-    attach_file(path,
-                File.absolute_path(filename), wait: 10.seconds)
+    path = build_attachment_path(has_many, kind)
+    filename = build_attachment_filename(accented, ext)
+    attach_file(path, File.absolute_path(filename), wait: 10.seconds)
+  end
+
+  def build_attachment_path(has_many, kind, index = 0)
+    if has_many
+      "issue[#{kind}_attributes][#{index}][multiple_documents][]"
+    else
+      "issue[#{kind}_attributes][multiple_documents][]"
+    end
+  end
+
+  def build_attachment_filename(accented, ext)
+    if accented
+      "./spec/fixtures/files/áñ_simple_微信图片.#{ext}"
+    else
+      if ext == ext.upcase
+        "./spec/fixtures/files/simple_upper.#{ext}"
+      else
+        "./spec/fixtures/files/simple.#{ext}"
+      end
+    end
   end
 
   def add_affinities(related_ones, kind, start_index)
@@ -115,7 +122,7 @@ module FeatureHelpers
     )
 
     within(".has_many_container.identification_seeds") do
-      fill_multiple_attachments('identification_seeds', 'jpg', true, 0, true)
+      fill_attachment('identification_seeds', 'jpg', true, true)
     end
 
     find('li[title="Emails"] a').click
@@ -156,7 +163,7 @@ module FeatureHelpers
       apartment: 'C'
     })
     within(".has_many_container.domicile_seeds") do
-      fill_multiple_attachments('domicile_seeds', 'jpg', true, 0, true)
+      fill_attachment('domicile_seeds', 'jpg', true, true)
     end
 
     find('li[title="Allowances"] a').click 
@@ -172,7 +179,7 @@ module FeatureHelpers
     })
 
     within(".has_many_container.allowance_seeds") do
-      fill_multiple_attachments('allowance_seeds', 'gif', true, 0, true)
+      fill_attachment('allowance_seeds', 'gif', true, true)
     end
 
     find('li[title="Natural dockets"] a').click 
@@ -199,7 +206,7 @@ module FeatureHelpers
     }, false)
 
     within("#natural_docket_seed") do
-      fill_multiple_attachments('natural_docket_seed', 'png', false)
+      fill_attachment('natural_docket_seed', 'png', false)
     end
 
     find('li[title="Risk scores"] a').click  
@@ -213,7 +220,7 @@ module FeatureHelpers
     })
 
     within(".has_many_container.risk_score_seeds") do
-      fill_multiple_attachments('risk_score_seeds', 'gif', true, 0,true)
+      fill_attachment('risk_score_seeds', 'gif', true, true)
     end
   end
 

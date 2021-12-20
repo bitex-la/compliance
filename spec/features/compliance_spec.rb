@@ -488,7 +488,7 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.identification_seeds") do
-      fill_multiple_attachments('identification_seeds', 'jpg')
+      fill_attachment('identification_seeds', 'jpg')
     end
 
     find(:css, '#issue_identification_seeds_attributes_0_copy_attachments').set true
@@ -515,7 +515,7 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.domicile_seeds") do
-      fill_multiple_attachments('domicile_seeds', 'jpg')
+      fill_attachment('domicile_seeds', 'jpg')
     end
 
     find('li[title="Allowances"] a').click
@@ -536,7 +536,7 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.allowance_seeds") do
-      fill_multiple_attachments('allowance_seeds', 'gif')
+      fill_attachment('allowance_seeds', 'gif')
     end
 
     find('li[title="Natural dockets"] a').click
@@ -558,7 +558,7 @@ describe 'an admin user' do
     }, false)
 
     within("#natural_docket_seed") do
-      fill_multiple_attachments('natural_docket_seed', 'png', false)
+      fill_attachment('natural_docket_seed', 'png', false)
     end
 
     add_observation(observation_reason, 'Please check this guy on world check')
@@ -882,7 +882,7 @@ describe 'an admin user' do
         })
 
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
-        fill_multiple_attachments('domicile_seeds', 'gif', true, 0, 18)
+        fill_attachment('domicile_seeds', 'gif', true)
       end
 
       click_button "Update Issue"
@@ -930,7 +930,7 @@ describe 'an admin user' do
       )
 
       within(".has_many_container.identification_seeds") do
-        fill_multiple_attachments('identification_seeds', 'jpg')
+        fill_attachment('identification_seeds', 'jpg')
       end
 
       find('li[title="Domiciles"] a').click
@@ -948,7 +948,7 @@ describe 'an admin user' do
         apartment: 'C'
       })
       within(".has_many_container.domicile_seeds fieldset:nth-of-type(1)") do
-        fill_multiple_attachments('domicile_seeds', 'jpg')
+        fill_attachment('domicile_seeds', 'jpg')
       end
 
       click_button "Update Issue"
@@ -1017,7 +1017,7 @@ describe 'an admin user' do
       )
 
       within(".has_many_container.identification_seeds") do
-        fill_multiple_attachments('identification_seeds', 'jpg', true, 0, 18)
+        fill_attachment('identification_seeds', 'jpg', true)
       end
 
       click_button 'Update Issue'
