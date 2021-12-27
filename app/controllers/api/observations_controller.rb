@@ -49,7 +49,7 @@ class Api::ObservationsController < Api::EntityController
   end
 
   def context
-    :observation_reply if params[:data][:attributes].key?(:reply)
+    :observation_reply if params.dig(:data, :attributes, :reply)
   end
 
   def issue_token
