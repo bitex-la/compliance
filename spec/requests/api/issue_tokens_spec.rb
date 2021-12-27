@@ -44,7 +44,7 @@ describe IssueToken do
 
     observations.each do |observation|
       api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         type: 'observations',
         id: observation.id,
         attributes: { reply: 'Some reply here' }
@@ -62,7 +62,7 @@ describe IssueToken do
 
     observations.each do |observation|
       api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         type: 'observations',
         id: observation.id,
         attributes: { reply: 'Some reply here' }
@@ -87,7 +87,7 @@ describe IssueToken do
 
     observations.each do |observation|
       api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         {
           type: 'observations',
           id: observation.id,
@@ -104,7 +104,7 @@ describe IssueToken do
 
     observations.each do |observation|
       api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         type: 'observations',
         id: observation.id,
         attributes: { reply: 'Some reply here' }
@@ -114,7 +114,7 @@ describe IssueToken do
 
     observations.each do |observation|
       api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         {
           type: 'observations',
           id: observation.id,
@@ -143,7 +143,7 @@ describe IssueToken do
       )
 
       api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         type: 'observations',
         id: observation.id,
         attributes: { reply: 'Some reply here' }
@@ -168,7 +168,7 @@ describe IssueToken do
     issue_token.observations.each do |observation|
       Timecop.travel 31.days.from_now
       api_update_issue_token(
-        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         {
           type: 'observations',
           id: observation.id,
@@ -183,7 +183,7 @@ describe IssueToken do
     issue_token = IssueToken.where(issue: issue).first
     observation = create(:observation, issue: create(:basic_issue))
     api_update_issue_token(
-      "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+      "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
       {
         type: 'observations',
         id: observation.id,
@@ -198,7 +198,7 @@ describe IssueToken do
     observation = issue_token.observations.first
 
     api_update_issue_token(
-      "/issue_tokens/#{issue_token.token}/observations/#{observation.id}/reply",
+      "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
       type: 'observations',
       id: observation.id,
       attributes: { reply: 'Some reply here' }
