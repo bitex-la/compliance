@@ -21,11 +21,11 @@ class Api::EntityController < Api::ReadOnlyEntityController
 
   protected
 
-  def map_and_save(success_code)
+  def map_and_save(success_code, context = nil)
     mapper = get_mapper
     return jsonapi_422 unless mapper.data
 
-    if mapper.data.save
+   if mapper.data.save(context: context)
       jsonapi_response mapper.data, options_for_response, success_code
     else
       json_response mapper.all_errors, 422

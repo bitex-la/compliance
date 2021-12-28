@@ -81,6 +81,23 @@ describe IssueToken do
     end
   end
 
+  it 'returns an error if reply is empty' do
+    issue_token = IssueToken.where(issue: issue).first
+    observations = issue_token.observations
+
+    observations.each do |observation|
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        {
+          type: 'observations',
+          id: observation.id,
+          attributes: { reply: '   ' }
+        },
+        422
+      )
+    end
+  end
+
   it 'fails if replies to an already answered observation' do
     issue_token = IssueToken.where(issue: issue).first
     observations = issue_token.observations

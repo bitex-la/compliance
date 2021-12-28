@@ -9,7 +9,7 @@ class Api::ObservationsController < Api::EntityController
     params[:data][:id] = resource.id
     check_validity_token(params[:issue_token_id], params[:data][:id]) if issue_token
 
-    map_and_save(200)
+    map_and_save(200, context)
   rescue NoMethodError
     jsonapi_422
   rescue IssueTokenNotValidError
@@ -46,6 +46,10 @@ class Api::ObservationsController < Api::EntityController
     IssueToken
       .includes(:observations)
       .where(observations: { id: observation_id }).find_by_token!(token)
+  end
+
+  def context
+    :observation_reply if params.dig(:data, :attributes, :reply)
   end
 
   def issue_token

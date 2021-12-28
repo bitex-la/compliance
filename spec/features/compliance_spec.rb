@@ -788,7 +788,7 @@ describe 'an admin user' do
     api_update "/observations/#{wc_observation.id}", {
       type: 'observations',
       id: wc_observation.id,
-      attributes: {reply: nil}
+      attributes: {reply: 'Ok'}
     }
 
     click_button 'Update Issue'
