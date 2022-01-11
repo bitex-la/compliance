@@ -42,6 +42,8 @@ module ArbreHelpers
               ArbreHelpers::Attachment.preview(self, a)
             }.to_s
           )
+        else
+          af.input :document, as: :file, label: "Attachment"
         end
       end
       form.input :multiple_documents, as: :file, label: "Add Attachments", input_html: { multiple: true }
