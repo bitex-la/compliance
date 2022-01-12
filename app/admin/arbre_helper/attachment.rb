@@ -46,7 +46,7 @@ module ArbreHelpers
           af.input :document, as: :file, label: "Attachment"
         end
       end
-      form.input :multiple_documents, as: :file, label: "Add Attachments", input_html: { multiple: true }
+      form.input :multiple_documents, as: :file, label: "Add Attachments", input_html: { multiple: true }, hint: "Max. size per file 10MB"
     end
 
     def self.attachments_list(context, attachments)
