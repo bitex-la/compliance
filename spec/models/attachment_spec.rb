@@ -67,6 +67,6 @@ describe Attachment do
     a = build(:exceeding_size_attachment, thing: phone)
     expect(a.attached_to_fruit).to eq phone
     a.should_not be_valid
-    expect(a.errors[:document]).to eq ['File size must be lower than 10MB.']
+    expect(a.errors[:document_file_size]).to eq ['File exceeding_size.doc size must be lower than 10MB.']
   end
 end

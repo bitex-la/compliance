@@ -11,6 +11,8 @@ class Attachment < ApplicationRecord
   validates :person, presence: true
   validate :person_cannot_be_removed_once_set
 
+  after_validation :clean_paperclip_errors
+
   before_save :classify_type
   after_save{ person.expire_action_cache }
 
@@ -46,7 +48,7 @@ class Attachment < ApplicationRecord
                                       application/vnd.ms-excel
                                       application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
                                     ],
-                                    message: 'File uploaded has an invalid content type.'
+                                    message: lambda {|attachment, metadata| "File #{attachment.document_file_name} has an invalid content type." }
 
   validates_attachment_file_name :document,
                                  matches: [
@@ -61,11 +63,11 @@ class Attachment < ApplicationRecord
                                    /xls|XLS\z/,
                                    /xlsx|XLSX\z/
                                  ],
-                                 message: 'File uploaded contains an invalid file name.'
+                                 message: lambda {|attachment, metadata| "File #{attachment.document_file_name} contains an invalid file name." }
 
   validates_attachment_size :document,
                             less_than: 10.megabytes,
-                            message: 'File size must be lower than 10MB.'
+                            message: lambda {|attachment, metadata| "File #{attachment.document_file_name} size must be lower than 10MB." }
 
   def attached_to_something
     return unless attached_to.nil?
@@ -114,6 +116,10 @@ class Attachment < ApplicationRecord
 
   def issue
     attached_to_seed.try(:issue)
+  end
+
+  def clean_paperclip_errors
+    errors.delete(:document)
   end
 
   private

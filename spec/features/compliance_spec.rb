@@ -488,7 +488,6 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.identification_seeds") do
-      click_link "Add New Attachment"
       fill_attachment('identification_seeds', 'jpg')
     end
 
@@ -516,7 +515,6 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.domicile_seeds") do
-      click_link "Add New Attachment"
       fill_attachment('domicile_seeds', 'jpg')
     end
 
@@ -538,7 +536,6 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.allowance_seeds") do
-      click_link "Add New Attachment"
       fill_attachment('allowance_seeds', 'gif')
     end
 
@@ -561,7 +558,6 @@ describe 'an admin user' do
     }, false)
 
     within("#natural_docket_seed") do
-      click_link "Add New Attachment"
       fill_attachment('natural_docket_seed', 'png', false)
     end
 
@@ -886,8 +882,7 @@ describe 'an admin user' do
         })
 
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
-        click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'gif', true, 0, 18)
+        fill_attachment('domicile_seeds', 'gif', true)
       end
 
       click_button "Update Issue"
@@ -935,7 +930,6 @@ describe 'an admin user' do
       )
 
       within(".has_many_container.identification_seeds") do
-        click_link "Add New Attachment"
         fill_attachment('identification_seeds', 'jpg')
       end
 
@@ -954,7 +948,6 @@ describe 'an admin user' do
         apartment: 'C'
       })
       within(".has_many_container.domicile_seeds fieldset:nth-of-type(1)") do
-        click_link "Add New Attachment"
         fill_attachment('domicile_seeds', 'jpg')
       end
 
@@ -1024,10 +1017,7 @@ describe 'an admin user' do
       )
 
       within(".has_many_container.identification_seeds") do
-        within first(".has_many_container.attachments") do
-          click_link "Add New Attachment"
-          fill_attachment('identification_seeds', 'jpg', true, 0, 18)
-        end
+        fill_attachment('identification_seeds', 'jpg', true)
       end
 
       click_button 'Update Issue'
