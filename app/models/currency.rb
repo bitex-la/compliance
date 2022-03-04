@@ -38,5 +38,12 @@ class Currency
     [33,  :soya, 'soya',               8         ],
     [34,  :usdc, 'usdc',               2         ],
     [35,  :sol,  'sol',                8         ],
+    [36,  :cora, 'cora',                    8        ],
+    [37,  :brz,  'brazilian_digital_token', 8        ],
+    [38,  :shib, 'shiba_inu',               8        ],
+    [39,  :mana, 'mana',                    8        ],
+    [40,  :chz,  'chiliz',                  8        ],
+    [41,  :xlm,  'stellar',                 8        ],
+    [42,  :xrp,  'ripple',                  8        ],
   ]
 end
