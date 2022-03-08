@@ -69,4 +69,14 @@ describe Attachment do
     a.should_not be_valid
     expect(a.errors[:document_file_size]).to eq ['File exceeding_size.doc size must be lower than 10MB.']
   end
+
+  it 'allows old exceeding size attachments' do
+    expect(create(:exceeding_size_attachment)).not_to be_valid
+    expect(build(:exceeding_size_attachment)).not_to be_valid
+    expect(build(:exceeding_size_attachment, created_at: Date.new(2021, 12, 1), updated_at: Date.new(2021, 12, 16))).not_to be_valid
+    expect(build(:exceeding_size_attachment, created_at: Date.new(2021, 12, 15))).not_to be_valid
+    expect(build(:exceeding_size_attachment, created_at: Date.new(2021, 12, 16))).not_to be_valid
+
+    expect(build(:exceeding_size_attachment, created_at: Date.new(2021, 12, 1))).to be_valid
+  end
 end

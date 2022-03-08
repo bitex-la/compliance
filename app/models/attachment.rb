@@ -67,7 +67,8 @@ class Attachment < ApplicationRecord
 
   validates_attachment_size :document,
                             less_than: 10.megabytes,
-                            message: lambda {|attachment, metadata| "File #{attachment.document_file_name} size must be lower than 10MB." }
+                            message: lambda {|attachment, metadata| "File #{attachment.document_file_name} size must be lower than 10MB." },
+                            if: :validate_attachment_size?
 
   def attached_to_something
     return unless attached_to.nil?
@@ -123,6 +124,13 @@ class Attachment < ApplicationRecord
   end
 
   private
+
+  def validate_attachment_size?
+    return true if new_record?
+
+    date_new = Date.new(2021, 12, 15)
+    created_at >= date_new || updated_at >= date_new
+  end
 
   def relate_to_person
     self.person_id = attached_to&.person&.id
