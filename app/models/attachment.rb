@@ -67,7 +67,8 @@ class Attachment < ApplicationRecord
 
   validates_attachment_size :document,
                             less_than: 2.megabytes,
-                            message: lambda {|attachment, metadata| "File #{attachment.document_file_name} size must be lower than 10MB." }
+                            message: lambda {|attachment, metadata| "File #{attachment.document_file_name} size must be lower than 10MB." },
+                            if: :document_changed?
 
   def attached_to_something
     return unless attached_to.nil?
