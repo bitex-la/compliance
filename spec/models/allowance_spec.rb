@@ -16,4 +16,12 @@ describe Allowance do
   it 'is valid with a person' do
     expect(valid_allowance).to be_valid
   end
+
+  it 'update person ipt' do
+    expect(person.ipt).to eq 'usd_0'
+    create(:allowance, person: person, kind: Currency.find_by_code('ars'), ipt: 2)
+    expect(person.ipt).to eq 'usd_10000_to_20000'
+    create(:allowance, person: person, kind: Currency.find_by_code('ars'), ipt: 4)
+    expect(person.ipt).to eq 'usd_50000_to_100000'
+  end
 end
