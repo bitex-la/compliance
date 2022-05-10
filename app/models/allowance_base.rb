@@ -5,11 +5,9 @@ class AllowanceBase < ApplicationRecord
   def name_body
     "#{amount} #{kind}"
   end
-
-  enum tpi: %i(_
-               usd_5000_to_10000
-               usd_10000_to_20000
-               usd_20000_to_50000
-               usd_50000_to_100000
-               usd_100000)
+  enum tpi: { usd_5000_to_10000: 1,
+              usd_10000_to_20000: 2,
+              usd_20000_to_50000: 3,
+              usd_50000_to_100000: 4,
+              usd_100000: 5 }
 end
