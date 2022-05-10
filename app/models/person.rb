@@ -82,7 +82,7 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
-  enum ipt: %i(usd_0
+  enum tpi: %i(unknown
                usd_5000_to_10000
                usd_10000_to_20000
                usd_20000_to_50000

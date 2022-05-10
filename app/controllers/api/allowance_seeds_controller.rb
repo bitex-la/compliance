@@ -23,7 +23,7 @@ class Api::AllowanceSeedsController < Api::EntityController
         :issue,
         :expires_at,
         :archived_at,
-        :ipt
+        :tpi
       ]
   end
 end
