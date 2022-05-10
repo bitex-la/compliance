@@ -82,6 +82,13 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
+  enum ipt: %i(usd_0
+               usd_5000_to_10000
+               usd_10000_to_20000
+               usd_20000_to_50000
+               usd_50000_to_100000
+               usd_100000)
+
   # This default_scope allow filter person with allowed
   # admin tags
   def self.default_scope
