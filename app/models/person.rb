@@ -82,12 +82,13 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
-  enum tpi: %i(unknown
-               usd_5000_to_10000
-               usd_10000_to_20000
-               usd_20000_to_50000
-               usd_50000_to_100000
-               usd_100000)
+  TPI_VALUES = { usd_5000_to_10000: 1,
+                 usd_10000_to_20000: 2,
+                 usd_20000_to_50000: 3,
+                 usd_50000_to_100000: 4,
+                 usd_100000: 5 }.freeze
+  enum tpi: { unknown: 0 }.merge(TPI_VALUES)
+
 
   # This default_scope allow filter person with allowed
   # admin tags
