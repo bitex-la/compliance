@@ -22,7 +22,8 @@ class Api::AllowanceSeedsController < Api::EntityController
         :replaces,
         :issue,
         :expires_at,
-        :archived_at
+        :archived_at,
+        :tpi
       ]
   end
 end

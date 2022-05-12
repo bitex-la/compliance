@@ -349,6 +349,7 @@ ActiveAdmin.register Issue do
         ArbreHelpers::Form.has_many_form self, f, :allowance_seeds do |sf, context|
           sf.input :amount
           sf.input :kind_id, as: :select, collection: Currency.all.select{|x| ![1, 2, 3].include? x.id}
+          sf.input :tpi
           ArbreHelpers::Replacement.fields_for_replaces context, sf, :allowances
           sf.input :expires_at, as: :datepicker
           sf.input :archived_at, as: :datepicker

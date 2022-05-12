@@ -77,6 +77,7 @@ ActiveAdmin.register Person do
   filter :updated_at
   filter :risk
   filter :regularity
+  filter :tpi
   filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
 
   scope :fresh, default: true
@@ -128,7 +129,13 @@ ActiveAdmin.register Person do
     end
     
     f.inputs 'Basics' do
-      f.input :risk, as:  :select, collection: %w(low medium high)
+      f.input :risk, as: :select, collection: %w(low medium high)
+      f.input :tpi, as: :select, collection: %w(unknown
+                                                usd_5000_to_10000
+                                                usd_10000_to_20000
+                                                usd_20000_to_50000
+                                                usd_50000_to_100000
+                                                usd_100000)
     end
 
     ArbreHelpers::Form.has_many_form self, f, :comments do |cf, context|
@@ -151,6 +158,7 @@ ActiveAdmin.register Person do
     column :state
     column :risk
     column :regularity
+    column :tpi
     column :person_type
     column(:tags) do |o|
       o.tags.pluck(:name).join(' - ')
@@ -178,7 +186,7 @@ ActiveAdmin.register Person do
     column :updated_at
   end
 
-  show as: :grid, columns: 2 do      
+  show as: :grid, columns: 2 do
     if resource.issues.empty?
       div class: 'flash flash_danger' do
         "This person has no created issues. Please create a new issue to add information."
@@ -213,6 +221,7 @@ ActiveAdmin.register Person do
               row :state
               row :risk
               row :regularity
+              row :tpi
             end
           end
           column do

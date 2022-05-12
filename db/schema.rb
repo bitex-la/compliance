@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_06_141445) do
+ActiveRecord::Schema.define(version: 2022_05_10_194954) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(version: 2021_08_06_141445) do
     t.integer "kind_id"
     t.date "expires_at"
     t.date "archived_at"
+    t.integer "tpi"
     t.index ["archived_at"], name: "index_allowance_seeds_on_archived_at"
     t.index ["fruit_id"], name: "index_allowance_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_allowance_seeds_on_issue_id"
@@ -121,6 +122,7 @@ ActiveRecord::Schema.define(version: 2021_08_06_141445) do
     t.bigint "replaced_by_id"
     t.integer "kind_id"
     t.date "archived_at"
+    t.integer "tpi"
     t.index ["archived_at"], name: "index_allowances_on_archived_at"
     t.index ["issue_id"], name: "index_allowances_on_issue_id"
     t.index ["person_id"], name: "index_allowances_on_person_id"
@@ -693,6 +695,7 @@ ActiveRecord::Schema.define(version: 2021_08_06_141445) do
     t.integer "risk"
     t.integer "regularity_id", default: 1, null: false
     t.string "aasm_state", default: "new", null: false
+    t.integer "tpi", default: 0, null: false
     t.index ["aasm_state"], name: "index_people_on_aasm_state"
   end
 
