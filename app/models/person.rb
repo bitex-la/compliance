@@ -82,11 +82,12 @@ class Person < ApplicationRecord
 
   enum risk: %i(low medium high)
 
-  TPI_VALUES = { usd_5000_to_10000: 1,
-                 usd_10000_to_20000: 2,
-                 usd_20000_to_50000: 3,
-                 usd_50000_to_100000: 4,
-                 usd_100000: 5 }.freeze
+  TPI_VALUES = { usd_1_to_5000: 1,
+                 usd_5001_to_10000: 2,
+                 usd_10001_to_20000: 3,
+                 usd_20001_to_50000: 4,
+                 usd_50001_to_100000: 5,
+                 usd_100001: 6 }.freeze
   enum tpi: { unknown: 0 }.merge(TPI_VALUES)
 
 
