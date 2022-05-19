@@ -131,11 +131,12 @@ ActiveAdmin.register Person do
     f.inputs 'Basics' do
       f.input :risk, as: :select, collection: %w(low medium high)
       f.input :tpi, as: :select, collection: %w(unknown
-                                                usd_5000_to_10000
-                                                usd_10000_to_20000
-                                                usd_20000_to_50000
-                                                usd_50000_to_100000
-                                                usd_100000)
+                                                usd_1_to_5000
+                                                usd_5001_to_10000
+                                                usd_10001_to_20000
+                                                usd_20001_to_50000
+                                                usd_50001_to_100000
+                                                usd_100001)
     end
 
     ArbreHelpers::Form.has_many_form self, f, :comments do |cf, context|
