@@ -71,6 +71,7 @@ gem 'redis-store'
 
 gem 'therubyracer'
 gem 'rack-cors'
+gem 'rails-healthcheck'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
