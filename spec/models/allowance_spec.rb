@@ -16,18 +16,4 @@ describe Allowance do
   it 'is valid with a person' do
     expect(valid_allowance).to be_valid
   end
-
-  it 'update person tpi' do
-    expect(person.tpi).to eq 'unknown'
-    create(:allowance, person: person, kind: Currency.find_by_code('ars'), tpi: 2)
-    expect(person.tpi).to eq 'usd_5001_to_10000'
-    create(:allowance, person: person, kind: Currency.find_by_code('ars'), tpi: 4)
-    expect(person.tpi).to eq 'usd_20001_to_50000'
-  end
-
-  it 'does not update person tpi' do
-    expect(person.tpi).to eq 'unknown'
-    create(:allowance, person: person, kind: Currency.find_by_code('ars'), tpi: nil)
-    expect(person.tpi).to eq 'unknown'
-  end
 end
