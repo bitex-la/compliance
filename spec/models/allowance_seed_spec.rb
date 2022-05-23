@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe AllowanceSeed do
+
   let(:invalid_seed) { described_class.new }
   let(:valid_seed)   { create(:salary_allowance_seed, issue: create(:basic_issue)) }
 
@@ -22,5 +23,23 @@ describe AllowanceSeed do
 
   it 'is valid with an issue' do
     expect(valid_seed).to be_valid
+  end
+
+  describe '#update person tpi' do
+    let(:person) {create(:empty_person)}
+
+    it 'update person tpi' do
+      expect(person.tpi).to eq 'unknown'
+      create(:salary_allowance_seed, issue: create(:basic_issue), tpi: 2, person: person)
+      expect(person.tpi).to eq 'usd_5001_to_10000'
+      create(:salary_allowance_seed, issue: create(:basic_issue), tpi: 4, person: person)
+      expect(person.tpi).to eq 'usd_20001_to_50000'
+    end
+
+    it 'does not update person tpi' do
+      expect(person.tpi).to eq 'unknown'
+      create(:salary_allowance_seed, issue: create(:basic_issue), tpi: nil)
+      expect(person.tpi).to eq 'unknown'
+    end
   end
 end
