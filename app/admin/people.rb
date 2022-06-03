@@ -109,6 +109,10 @@ ActiveAdmin.register Person do
     process_download_profile resource, EventLogKind.download_profile_full
   end
 
+  member_action :download_profile_history, method: :post do
+    process_download_profile resource, EventLogKind.download_profile_history
+  end
+
   form do |f|
     if resource.new_record?
       AdminUser.current_admin_user.tags.each do |t|
@@ -201,13 +205,17 @@ ActiveAdmin.register Person do
     end
   
     if authorized?(:download_profile_basic, resource) || 
-      authorized?(:download_profile_full, resource)
+      authorized?(:download_profile_full, resource) ||
+      authorized?(:download_profile_history, resource)
       dropdown_menu 'Download Profile', class: 'dropdown_menu dropdown_other_actions' do
         if authorized?(:download_profile_basic, resource)
           item 'Basic', download_profile_basic_person_path, method: :post
         end
         if authorized?(:download_profile_full, resource)
           item 'Full', download_profile_full_person_path, method: :post
+        end
+        if authorized?(:download_profile_history, resource)
+          item 'History', download_profile_history_person_path, method: :post
         end
       end
       br  
