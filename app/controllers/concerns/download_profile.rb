@@ -13,6 +13,7 @@ module DownloadProfile
     files = resource.all_attachments.map { |a| [a.id, a.document, a.document_file_name] }
 
     begin
+      file_name_suffix = ''
       Zip::OutputStream.open(zip) { |zos| }
 
       Zip::File.open(zip.path, Zip::File::CREATE) do |zipfile|
