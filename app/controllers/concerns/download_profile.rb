@@ -43,7 +43,7 @@ module DownloadProfile
         end
       end
       send_data File.read(zip.path), type: 'application/zip',
-        filename: "person_#{resource.id}_#{suffix}.zip"
+        filename: "person_#{resource.id}_#{file_name_suffix}.zip"
     ensure
       zip.close
       zip.unlink
