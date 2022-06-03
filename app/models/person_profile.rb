@@ -269,4 +269,80 @@ class PersonProfile
   def self.generate_pdf(person, include_affinities, include_risk_scores)
     PdfGenerator.new(person, include_affinities, include_risk_scores).generate
   end
+
+  class CsvGenerator
+    HAS_MANY = Issue::HAS_MANY - [:note_seeds, :affinity_seeds, :risk_score_seeds]
+    HAS_MANY_SINGULARIZED = HAS_MANY.map(&:to_s).map(&:singularize).map(&:to_sym)
+    FAKE_ISSUE_ATTRS = Issue::HAS_ONE + HAS_MANY_SINGULARIZED
+    ATTRS_MAPPING = FAKE_ISSUE_ATTRS.map do |r|
+      serializer = Garden::Naming.new(r).serializer.constantize
+      attrs = serializer.attributes_to_serialize.keys - [:archived_at, :created_at, :updated_at]
+      [r, attrs]
+    end.to_h
+    FakeIssue = Struct.new(:raw_issue, :created_at, *FAKE_ISSUE_ATTRS, keyword_init: true)
+
+    def self.generate_profile_history_for(person)
+      fissues = []
+      person.issues.find_each do |issue|
+        singularized_attrs = singularize_attrs(issue, 0)
+        attrs = Issue::HAS_ONE.map { |r| [r, issue.send(r)] }.to_h.merge(singularized_attrs)
+        fissues << FakeIssue.new(raw_issue: issue, created_at: issue.created_at, **attrs)
+        extra_relations = HAS_MANY.map { |r| issue.send(r).count }.max - 1
+        extra_relations.times.map do |idx|
+          wanted_idx = idx + 1
+          fissues << FakeIssue.new(raw_issue: issue, created_at: issue.created_at, **singularize_attrs(issue, wanted_idx))
+        end
+      end
+
+      basic_headers = %i[person_id issue_id created_at reason issue_state person_state]
+      headers = [*basic_headers]
+      ATTRS_MAPPING.each do |r, attrs|
+        attrs.each { |a| headers << "#{Garden::Naming.new(r).base}-#{a}" }
+      end
+
+      rows = [headers]
+      event_kinds = [:person_enabled, :person_disabled, :person_rejected].map { |v| EventLogKind.send(v) }
+      events = person.event_logs.where(verb_id: event_kinds).to_a
+      things = (events + fissues).sort_by(&:created_at)
+      things.each do |thing|
+        row_kv = basic_headers.map { |k| [k, nil] }.to_h
+        row_data = []
+        if thing.is_a? FakeIssue
+          issue = thing
+          raw_issue = issue.raw_issue
+          row_kv.update(person_id: raw_issue.person_id, issue_id: raw_issue.id,
+                        reason: raw_issue.reason.to_s, created_at: raw_issue.created_at,
+                        issue_state: raw_issue.state)
+          ATTRS_MAPPING.map do |r, attrs|
+            seed = issue.send(r)
+            attrs.each { |a| row_data << seed.try(a) }
+          end
+
+          next if row_data.compact.empty?
+        else
+          event = thing
+          row_kv.update(person_id: event.entity_id, created_at: event.created_at, person_state: event.verb.code)
+        end
+
+        rows << [*row_kv.values, *row_data]
+      end
+
+      rows.map(&:to_csv).join
+    end
+
+    def self.generate_observations_history_for(person)
+      headers = %i[person_id issue_id created_at replied_on state reason body note reply]
+      rows = [headers]
+      Observation.client.eager_load(:observation_reason).where(issue: person.issues).each do |obs|
+        rows << [person.id, obs.issue_id, obs.created_at, obs.updated_at, obs.state,
+                 obs.observation_reason.subject_es, obs.observation_reason.body_es, obs.note,
+                 obs.reply]
+      end
+      rows.map(&:to_csv).join
+    end
+
+    def self.singularize_attrs(issue, idx)
+      [HAS_MANY_SINGULARIZED, HAS_MANY].transpose.map { |s, p| [s, issue.send(p)[idx]] }.to_h
+    end
+  end
 end

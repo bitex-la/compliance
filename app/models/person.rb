@@ -407,6 +407,14 @@ class Person < ApplicationRecord
     PersonProfile.generate_pdf(self, include_affinities, include_risk_scores)
   end
 
+  def generate_profile_history_csv
+    PersonProfile::CsvGenerator.generate_profile_history_for(self)
+  end
+
+  def generate_observations_history_csv
+    PersonProfile::CsvGenerator.generate_observations_history_for(self)
+  end
+
   def expire_action_cache
     Rails.cache.delete_matched "*/person/show/#{self.id}/*"
   end
