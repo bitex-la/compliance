@@ -33,7 +33,7 @@ describe IssueToken do
 
   it 'responds with 410 error when token is invalid' do
     issue_token = IssueToken.where(issue: issue).first
-    Timecop.travel 31.days.from_now
+    Timecop.travel 91.days.from_now
 
     api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 410)
   end
@@ -166,7 +166,7 @@ describe IssueToken do
     issue_token = IssueToken.where(issue: issue).first
 
     issue_token.observations.each do |observation|
-      Timecop.travel 31.days.from_now
+      Timecop.travel 91.days.from_now
       api_update_issue_token(
         "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
         {
