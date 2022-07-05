@@ -4,7 +4,7 @@ class IssueToken < ApplicationRecord
 
   before_create do
     self.token = Digest::SHA256.hexdigest SecureRandom.hex
-    self.valid_until = 30.days.from_now
+    self.valid_until = 90.days.from_now
   end
 
   def self.find_by_token!(token)
