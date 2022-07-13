@@ -69,7 +69,7 @@ gem 'connection_pool'
 gem 'redis-objects'
 gem 'redis-store'
 
-gem 'mini_racer'
+gem 'therubyracer'
 gem 'rack-cors'
 gem 'rails-healthcheck'
 
