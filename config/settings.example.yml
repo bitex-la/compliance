@@ -51,6 +51,8 @@ defaults: &defaults
 
   cache_store: <%= ENV.fetch('CACHE_STORE' ){ '/tmp/cache/compliance' } %>
 
+  observation_token_hours: 2160 # 90 days
+
 production:
   <<: *defaults
 

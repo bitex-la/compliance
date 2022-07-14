@@ -72,3 +72,5 @@ test:
     debug: true
     allowed_origins:
       - '*'
+
+  observation_token_hours: 2160 # 90 days
