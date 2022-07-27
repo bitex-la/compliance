@@ -206,7 +206,7 @@ class Issue < ApplicationRecord
   end
 
   def self.ransackable_scopes(auth_object = nil)
-    %i(active by_person_type by_person_tag by_person_tpi)
+    %i(active by_person_type by_person_tag)
   end
 
   def self.ransackable_scopes_skip_sanitize_args

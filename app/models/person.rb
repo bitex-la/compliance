@@ -161,7 +161,7 @@ class Person < ApplicationRecord
   end)
 
   def self.ransackable_scopes(auth_object = nil)
-    %i(by_person_type by_person_tpi)
+    %i(by_person_type)
   end
 
   def name
