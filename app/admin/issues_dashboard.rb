@@ -1,6 +1,8 @@
 #encoding: utf-8
 ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   menu priority: 1
+  
+  includes(:person)
 
   actions :index
 
@@ -102,12 +104,6 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
     column(:defer_until)
     column('')  do |o|
       link_to('Edit', edit_person_issue_url(o.person, o)) if o.editable?
-    end
-  end
-
-  controller do
-    def scoped_collection
-      end_of_association_chain.includes(:person)
     end
   end
 end
