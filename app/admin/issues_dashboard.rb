@@ -1,6 +1,8 @@
 #encoding: utf-8
 ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   menu priority: 1
+  
+  includes(:person)
 
   actions :index
 
@@ -26,6 +28,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   filter :natural_docket_seed_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_docket_seed_legal_name_or_legal_entity_docket_seed_commercial_name_cont, label: "Company Name"
   filter :by_person_type, as: :select, collection: Person.person_types
+  filter :person_tpi, as: :select, collection: Person.tpis, label: 'By Person TPI'
   filter :note_seeds_title_or_note_seeds_body_cont, label: "Notes"
   filter :domicile_seeds_street_address_or_argentina_invoicing_detail_seed_address_cont, label: "Street Address"
   filter :domicile_seeds_street_number_or_argentina_invoicing_detail_seed_address_cont, label: "Street Number"
@@ -84,6 +87,9 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
     end
     column(:person_state) do |o|
       o.person.state
+    end
+    column :tpi, sortable: 'people.tpi' do |o|
+      o.person.tpi
     end
     column(:reason) do |o|
       tags = o.tags.any? ? "(#{o.tags.pluck(:name).join(' - ')})" : ''

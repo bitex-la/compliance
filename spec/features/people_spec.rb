@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe 'people' do
@@ -112,5 +114,56 @@ describe 'people' do
     seed2.issue.reject!
     visit "people/#{person.id}"
     expect(page).to have_content('Michael Jhonson')
+  end
+
+  context 'when having multiple people with tpi' do
+    before(:each) do
+      person1 = create(:empty_person,
+                       tpi: 'usd_20001_to_50000')
+      issue1 = create(:basic_issue, person: person1)
+      create(:full_natural_docket_seed,
+             person: person1,
+             issue: issue1,
+             first_name: 'Michael',
+             last_name: 'Jhonson')
+      person2 = create(:empty_person,
+                       tpi: 'usd_5001_to_10000')
+      issue2 = create(:basic_issue, person: person2)
+      create(:full_natural_docket_seed,
+             person: person2,
+             issue: issue2,
+             first_name: 'John',
+             last_name: 'Doe')
+      login_as compliance_admin_user
+      visit 'people'
+    end
+
+    it 'it filters by tpi' do
+      find('#q_tpi_input').click
+      within '.select2-results__options' do
+        find('li', text: 'usd_20001_to_50000').click
+      end
+      click_on 'Filter'
+
+      expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_20001_to_50000'
+
+      find('#q_tpi_input').click
+      within '.select2-results__options' do
+        find('li', text: 'usd_5001_to_10000').click
+      end
+      click_on 'Filter'
+
+      expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_5001_to_10000'
+      expect(page.find('tbody').find('tr:nth-child(1)')).to have_no_content 'usd_20001_to_50000'
+    end
+
+    it 'it sorts them by tpi' do
+      visit 'dashboards'
+      click_link 'All'
+      click_link 'Tpi'
+      expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_20001_to_50000'
+      click_link 'Tpi'
+      expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_5001_to_10000'
+    end
   end
 end
