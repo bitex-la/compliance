@@ -53,6 +53,10 @@ defaults: &defaults
 
   observation_token_hours: 2160 # 90 days
 
+  cors:
+    allowed_origins: '*'
+    debug: false
+
 production:
   <<: *defaults
 
