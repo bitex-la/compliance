@@ -184,6 +184,31 @@ describe 'Dashboard' do
     end
   end
 
+  describe 'filters' do
+    before(:each) do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person)
+      create(:full_natural_docket_seed,
+             person: person,
+             issue: issue,
+             first_name: 'Michael',
+             last_name: 'Jhonson')
+      login_as admin_user
+      visit '/'
+      click_link 'All'
+    end
+    context 'when need to get especific issue' do
+      it 'it filters by isssue id' do
+        fill_in :q_id_eq, with: 1
+        click_on 'Filter'
+        expect(page).to have_content('Michael Jhonson')
+        fill_in :q_id_eq, with: (1 + rand(6))
+        click_on 'Filter'
+        expect(page).to have_no_content('Michael Jhonson')
+      end
+    end
+  end
+
   describe 'filter and ordering by tpi' do
     before(:each) do
       person1 = create(:empty_person,

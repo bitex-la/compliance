@@ -1,7 +1,8 @@
-#encoding: utf-8
-ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
+# frozen_string_literal: true
+
+ActiveAdmin.register Issue, sort_order: :priority_desc, as: 'Dashboard' do
   menu priority: 1
-  
+
   includes(:person)
 
   actions :index
@@ -17,54 +18,52 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   scope :future
   scope :all
 
-  filter :email_seeds_address_cont, label: "Email"
-  filter :identification_seeds_number_or_argentina_invoicing_detail_seed_tax_id_or_chile_invoicing_detail_seed_tax_id_cont, label: "ID Number"
-  filter :natural_docket_seed_first_name_cont, label: "First Name"
-  filter :natural_docket_seed_last_name_cont,  label: "Last Name"
+  filter :id_eq, label: 'By issue id'
+  filter :email_seeds_address_cont, label: 'Email'
+  filter :identification_seeds_number_or_argentina_invoicing_detail_seed_tax_id_or_chile_invoicing_detail_seed_tax_id_cont, label: 'ID Number'
+  filter :natural_docket_seed_first_name_cont, label: 'First Name'
+  filter :natural_docket_seed_last_name_cont,  label: 'Last Name'
   filter :natural_docket_seed_nationality_eq,
-    label: 'Nationality', as: :autocomplete,
-    url: proc { search_country_people_path },
-    required: false, wrapper_html: { style: "list-style: none" }
-  filter :natural_docket_seed_expected_investment, label: "Expected Investment", as: :numeric
-  filter :legal_entity_docket_seed_legal_name_or_legal_entity_docket_seed_commercial_name_cont, label: "Company Name"
+         label: 'Nationality', as: :autocomplete,
+         url: proc { search_country_people_path },
+         required: false, wrapper_html: { style: 'list-style: none' }
+  filter :natural_docket_seed_expected_investment, label: 'Expected Investment', as: :numeric
+  filter :legal_entity_docket_seed_legal_name_or_legal_entity_docket_seed_commercial_name_cont, label: 'Company Name'
   filter :by_person_type, as: :select, collection: Person.person_types
   filter :person_tpi, as: :select, collection: Person.tpis, label: 'By Person TPI'
-  filter :note_seeds_title_or_note_seeds_body_cont, label: "Notes"
-  filter :domicile_seeds_street_address_or_argentina_invoicing_detail_seed_address_cont, label: "Street Address"
-  filter :domicile_seeds_street_number_or_argentina_invoicing_detail_seed_address_cont, label: "Street Number"
-  filter :domicile_seeds_postal_code_or_argentina_invoicing_detail_seed_address_cont, label: "Postal Code"
-  filter :natural_docket_seed_politically_exposed_eq, as: :select, label: "Is PEP"
+  filter :note_seeds_title_or_note_seeds_body_cont, label: 'Notes'
+  filter :domicile_seeds_street_address_or_argentina_invoicing_detail_seed_address_cont, label: 'Street Address'
+  filter :domicile_seeds_street_number_or_argentina_invoicing_detail_seed_address_cont, label: 'Street Number'
+  filter :domicile_seeds_postal_code_or_argentina_invoicing_detail_seed_address_cont, label: 'Postal Code'
+  filter :natural_docket_seed_politically_exposed_eq, as: :select, label: 'Is PEP'
   filter :reason
-  filter :tags_id , as: :select, collection: proc { Tag.issues }, multiple: true
-  filter :by_person_tag , as: :select, collection: proc { Tag.people }, multiple: true
+  filter :tags_id, as: :select, collection: proc { Tag.issues }, multiple: true
+  filter :by_person_tag, as: :select, collection: proc { Tag.people }, multiple: true
   filter :created_at
   filter :updated_at
 
-  { approve:  'approved',
+  { approve: 'approved',
     complete: 'completed',
-    dismiss:  'dismissed',
-    reject:   'rejected',
-    abandon:  'abandoned'
-  }.each do |action, state|
-    batch_action action, if: proc { authorized?(action, Issue) } do |ids, inputs|
+    dismiss: 'dismissed',
+    reject: 'rejected',
+    abandon: 'abandoned' }.each do |action, state|
+    batch_action action, if: proc { authorized?(action, Issue) } do |ids, _inputs|
       authorize!(action, Issue)
 
       errors = []
       notices = []
       Issue.where(id: ids).find_each do |issue|
-        begin
-          issue.send("#{action}!")
-          notices << "Issue #{issue.id} #{state}"
-        rescue ActiveRecord::RecordInvalid => invalid
-          errors <<
-            if invalid.record.errors.full_messages.present?
-              "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}" 
-            else
-              "Issue #{issue.id}: #{invalid.message}"
-            end
-        rescue AASM::InvalidTransition, StandardError => e
-          errors << "Issue #{issue.id}: #{e.message}"
-        end
+        issue.send("#{action}!")
+        notices << "Issue #{issue.id} #{state}"
+      rescue ActiveRecord::RecordInvalid => invalid
+        errors <<
+          if invalid.record.errors.full_messages.present?
+            "Issue #{issue.id}: #{invalid.record.errors.full_messages.join('-')}"
+          else
+            "Issue #{issue.id}: #{invalid.message}"
+          end
+      rescue AASM::InvalidTransition, StandardError => e
+        errors << "Issue #{issue.id}: #{e.message}"
       end
       flash[:error] = errors.join(', ') unless errors.empty?
       flash[:notice] = notices.join(', ') unless notices.empty?
