@@ -17,6 +17,7 @@ ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
   scope :future
   scope :all
 
+  filter :id_eq, label: 'By issue id'
   filter :email_seeds_address_cont, label: "Email"
   filter :identification_seeds_number_or_argentina_invoicing_detail_seed_tax_id_or_chile_invoicing_detail_seed_tax_id_cont, label: "ID Number"
   filter :natural_docket_seed_first_name_cont, label: "First Name"
