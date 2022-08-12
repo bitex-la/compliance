@@ -20,7 +20,7 @@ class Affinity < AffinityBase
   end
 
   def related_one(current_person)
-    return related_person if person == current_person
-    return person if related_person == current_person
+    return Person.unscoped.find(related_person_id) if person_id == current_person&.id
+    return person if related_person_id == current_person&.id
   end
 end
