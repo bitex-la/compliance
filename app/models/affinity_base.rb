@@ -1,6 +1,6 @@
 class AffinityBase < ApplicationRecord
   self.abstract_class = true
-  belongs_to :related_person, -> { unscoped }, class_name: 'Person'
+  belongs_to :related_person, class_name: 'Person'
   validates  :affinity_kind, inclusion: { in: AffinityKind.all }
   validate   :linked_once_by_affinity
   validate   :not_linked_to_itself
