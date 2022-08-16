@@ -7,7 +7,7 @@ class IssueToken < ApplicationRecord
     self.valid_until = Settings.observation_token_hours.hours.from_now
   end
 
-  def self.find_by_non_expired_token!(token)
+  def self.find_by_token!(token)
     issue_token = find_by!(token: token)
     raise IssueTokenNotValidError if issue_token.valid_until < Time.current
 
