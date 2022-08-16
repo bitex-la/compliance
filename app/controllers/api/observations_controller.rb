@@ -45,7 +45,7 @@ class Api::ObservationsController < Api::EntityController
   def check_validity_token(token, observation_id)
     IssueToken
       .includes(:observations)
-      .where(observations: { id: observation_id }).find_by_token!(token)
+      .where(observations: { id: observation_id }).find_by_non_expired_token!(token)
   end
 
   def context

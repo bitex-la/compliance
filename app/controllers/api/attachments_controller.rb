@@ -46,7 +46,7 @@ class Api::AttachmentsController < Api::EntityController
   end
 
   def check_validity_token(token)
-    IssueToken.find_by_token!(token)
+    IssueToken.find_by_non_expired_token!(token)
   end
 
   def issue_token
