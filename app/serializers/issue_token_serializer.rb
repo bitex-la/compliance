@@ -9,4 +9,8 @@ class IssueTokenSerializer
   attribute :expired do |object|
     !object.valid_token?
   end
+
+  attribute :approved do |object|
+    object.issue.approved?
+  end
 end
