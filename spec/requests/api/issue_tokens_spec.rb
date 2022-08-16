@@ -54,7 +54,7 @@ describe IssueToken do
     expect(api_response.data.attributes.state).to eq('answered')
 
     api_get("/issue_tokens/#{issue_token.token}/show_by_token")
-    expect(api_response.included).to be nil
+    expect(api_response.included).to be_empty
   end
 
   it 'returns expired true when all answered' do
@@ -76,7 +76,7 @@ describe IssueToken do
 
     api_get("/issue_tokens/#{issue_token.token}/show_by_token")
     expect(api_response.data.attributes.expired).to be_truthy
-    expect(api_response.included).to be nil
+    expect(api_response.included).to be_empty
   end
 
   it 'replies to an observation' do
