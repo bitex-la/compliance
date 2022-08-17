@@ -166,4 +166,18 @@ describe 'people' do
       expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_5001_to_10000'
     end
   end
+
+  it 'works' do
+    argentina_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-PY')
+    chile_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-CL')
+    argentina_person = create(:light_natural_person, tags: [argentina_tag])
+    chile_person = create(:light_natural_person, tags: [chile_tag])
+    argentina_person.affinities.create!(person: argentina_person,
+                                        affinity_kind: AffinityKind.payer,
+                                        related_person: chile_person)
+    compliance_admin_user.update!(tags: [argentina_tag])
+
+    login_as compliance_admin_user
+    visit "people/#{argentina_person.id}"
+  end
 end
