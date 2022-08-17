@@ -100,10 +100,9 @@ class Person < ApplicationRecord
   scope :by_admin_user_tags, -> {
     return unless (tags = AdminUser.current_admin_user&.active_tags.presence)
 
-    person_tagging = PersonTagging.select(:person_id)
-    where.not(id: person_tagging).
-      or(where(id: person_tagging.where(tag_id: tags))).
-      distinct
+    where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
+      OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
+      }, tags).distinct
   }
 
   def natural_docket
