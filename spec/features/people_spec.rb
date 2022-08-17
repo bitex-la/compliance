@@ -167,11 +167,16 @@ describe 'people' do
     end
   end
 
-  it 'works' do
+  it 'renders correctly people thats related to others with a not common tag' do
     argentina_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-AR')
     chile_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-CL')
     argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
+                         .tap(&:reload)
+                         .tap { |p| p.natural_docket.update!(first_name: 'Ricardo', last_name: 'Molina') }
     chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+                     .tap(&:reload)
+                     .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
+
     argentina_person.affinities.create!(person: argentina_person,
                                         affinity_kind: AffinityKind.payer,
                                         related_person: chile_person)
@@ -179,5 +184,7 @@ describe 'people' do
 
     login_as compliance_admin_user
     visit "people/#{argentina_person.id}"
+
+    expect(page).to have_content('Ricardo Molina')
   end
 end
