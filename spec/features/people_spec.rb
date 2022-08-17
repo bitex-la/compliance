@@ -168,10 +168,10 @@ describe 'people' do
   end
 
   it 'works' do
-    argentina_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-PY')
+    argentina_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-AR')
     chile_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-CL')
-    argentina_person = create(:light_natural_person, tags: [argentina_tag])
-    chile_person = create(:light_natural_person, tags: [chile_tag])
+    argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
+    chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
     argentina_person.affinities.create!(person: argentina_person,
                                         affinity_kind: AffinityKind.payer,
                                         related_person: chile_person)
