@@ -176,15 +176,23 @@ describe 'people' do
     chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
                      .tap(&:reload)
                      .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
+    chile_person2 = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+                     .tap(&:reload)
+                     .tap { |p| p.natural_docket.update!(first_name: 'Marcelo', last_name: 'Ruiz') }
 
     argentina_person.affinities.create!(person: argentina_person,
                                         affinity_kind: AffinityKind.payer,
                                         related_person: chile_person)
+    chile_person.affinities.create!(person: chile_person,
+                                    affinity_kind: AffinityKind.payer,
+                                    related_person: chile_person2)
     compliance_admin_user.update!(tags: [argentina_tag])
 
     login_as compliance_admin_user
     visit "people/#{argentina_person.id}"
-
     expect(page).to have_content('Ricardo Molina')
+
+    visit "people/#{chile_person.id}"
+    expect(page).to have_content('Pablito Ruiz')
   end
 end
