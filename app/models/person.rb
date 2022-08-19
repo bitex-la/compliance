@@ -169,6 +169,10 @@ class Person < ApplicationRecord
     "(#{id}) #{person_info_name || person_info_email}"
   end
 
+  def related_name
+    "#{person_info_name || person_info_email}"
+  end
+
   def person_info
     [ "(#{id})",
       person_info_name,

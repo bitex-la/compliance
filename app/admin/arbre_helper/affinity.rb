@@ -11,11 +11,15 @@ module ArbreHelpers
           link_to from.name, from 
         end
         row(:related_person) do
-          link_to to.name, to
+          if to
+            link_to to.name, to
+          else
+            affinity.unscoped_related_one(source).related_name
+          end
         end
 
         row(:affinity_kind) do
-          affinity.get_label(self.resource)
+          affinity.unscoped_get_label(self.resource)
         end
         row(:created_at)
         row(:issue)
