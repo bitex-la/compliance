@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-ActiveAdmin.register Issue, sort_order: :priority_desc, as: "Dashboard" do
-  batch_action :testing_with_authorize do |ids, inputs|
+ActiveAdmin.register Issue, sort_order: :priority_desc, as: 'Dashboard' do
+  batch_action :testing_with_authorize do |ids, _inputs|
     authorize!(:approve, Issue)
     Issue.find(ids).first.approve!
   end
 
-  batch_action :testing_without_authorize do |ids, inputs|
+  batch_action :testing_without_authorize do |ids, _inputs|
     flash[:notice] = 'Does not enforce authorization'
     Issue.find(ids).first.approve!
     redirect_to dashboards_url
@@ -20,11 +22,11 @@ describe 'Dashboard' do
     it 'shows success for every state' do
       login_as admin_user
       {
-        approve:  'approved',
+        approve: 'approved',
         complete: 'completed',
-        dismiss:  'dismissed',
-        reject:   'rejected',
-        abandon:  'abandoned'
+        dismiss: 'dismissed',
+        reject: 'rejected',
+        abandon: 'abandoned'
       }.each do |action, state|
 
         issues = 10.times.map do
@@ -48,7 +50,7 @@ describe 'Dashboard' do
       login_as create(:operations_admin_user)
       basic_issue = create(:basic_issue)
       visit '/'
-      
+
       click_link 'All'
       find(:css, '#collection_selection_toggle_all').set(true)
       click_link 'Batch Action'
@@ -91,7 +93,7 @@ describe 'Dashboard' do
       rejected_issue = create(:basic_issue)
       rejected_issue.reject!
 
-      person = create(:new_natural_person, :with_new_client_reason) 
+      person = create(:new_natural_person, :with_new_client_reason)
       approved_issue = person.issues.reload.last
       approved_issue.approve!
 
@@ -131,12 +133,12 @@ describe 'Dashboard' do
       end
 
       expect(indexes.sort).to eq([indexes[2],
-        indexes[1],
-        indexes[0],
-        indexes[6],
-        indexes[5],
-        indexes[4],
-        indexes[3]])
+                                  indexes[1],
+                                  indexes[0],
+                                  indexes[6],
+                                  indexes[5],
+                                  indexes[4],
+                                  indexes[3]])
     end
   end
 
@@ -179,6 +181,85 @@ describe 'Dashboard' do
       click_on 'Filter'
 
       expect(page).to have_content('Displaying all 5 Dashboards')
+    end
+  end
+
+  describe 'filters' do
+    before(:each) do
+      person = create(:empty_person)
+      issue = create(:basic_issue, person: person)
+      create(:full_natural_docket_seed,
+             person: person,
+             issue: issue,
+             first_name: 'Michael',
+             last_name: 'Jhonson')
+      login_as admin_user
+      visit '/'
+      click_link 'All'
+    end
+    context 'when need to get especific issue' do
+      it 'it filters by isssue id' do
+        fill_in :q_id_eq, with: 1
+        click_on 'Filter'
+        expect(page).to have_content('Michael Jhonson')
+        fill_in :q_id_eq, with: (1 + rand(6))
+        click_on 'Filter'
+        expect(page).to have_no_content('Michael Jhonson')
+      end
+    end
+  end
+
+  describe 'filter and ordering by tpi' do
+    before(:each) do
+      person1 = create(:empty_person,
+                       tpi: 'usd_20001_to_50000')
+      issue1 = create(:basic_issue, person: person1)
+      create(:full_natural_docket_seed,
+             person: person1,
+             issue: issue1,
+             first_name: 'Michael',
+             last_name: 'Jhonson')
+      person2 = create(:empty_person,
+                       tpi: 'usd_5001_to_10000')
+      issue2 = create(:basic_issue, person: person2)
+      create(:full_natural_docket_seed,
+             person: person2,
+             issue: issue2,
+             first_name: 'John',
+             last_name: 'Doe')
+      login_as admin_user
+      visit '/'
+      click_link 'All'
+    end
+
+    context 'when having multiple people with tpi' do
+      it 'it filters by tpi' do
+        find('#q_person_tpi_input').click
+        within '.select2-results__options' do
+          find('li', text: 'usd_20001_to_50000').click
+        end
+        click_on 'Filter'
+
+        expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_20001_to_50000'
+
+        find('#q_person_tpi_input').click
+        within '.select2-results__options' do
+          find('li', text: 'usd_5001_to_10000').click
+        end
+        click_on 'Filter'
+
+        expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_5001_to_10000'
+        expect(page.find('tbody').find('tr:nth-child(1)')).to have_no_content 'usd_20001_to_50000'
+      end
+
+      it 'it sorts them by tpi' do
+        visit 'dashboards'
+        click_link 'All'
+        click_link 'Tpi'
+        expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_20001_to_50000'
+        click_link 'Tpi'
+        expect(page.find('tbody').find('tr:nth-child(1)')).to have_content 'usd_5001_to_10000'
+      end
     end
   end
 end

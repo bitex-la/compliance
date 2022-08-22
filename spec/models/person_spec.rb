@@ -76,6 +76,18 @@ RSpec.describe Person, type: :model do
     expect(person.reload.person_info).to eq("(1) *☺: Joe Doe *✉: admin@example.com *☎: +5491125410470 *WA: ✓")
   end
 
+  it 'returns natural person info with name on rejected issues' do
+    issue = create(:new_natural_person_issue)
+    issue.reject!
+    expect(issue.person.reload.person_info).to eq("(1) *☺: Joe Doe")
+  end
+
+  it 'returns legal entity person info with name on rejected issues' do
+    issue = create(:new_legal_entity_issue)
+    issue.reject!
+    expect(issue.person.reload.person_info).to eq("(1) *🏭: E Corp")
+  end
+
   it 'knows which fruits can be replaced' do
     new_phone = create :full_phone, person: person
     person.reload.phones.first.update(replaced_by: new_phone)

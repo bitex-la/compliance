@@ -68,6 +68,7 @@ ActiveAdmin.register Person do
   filter :natural_dockets_expected_investment, label: "Expected Investment", as: :numeric
   filter :legal_entity_dockets_legal_name_or_legal_entity_dockets_commercial_name_cont, label: "Company Name"
   filter :by_person_type, as: :select, collection: Person.person_types
+  filter :tpi, as: :select, collection: proc { Person.tpis }, label: "By Person TPI"
   filter :notes_title_or_notes_body_cont, label: "Notes"
   filter :domiciles_street_address_or_argentina_invoicing_details_address_cont, label: "Street Address"
   filter :domiciles_street_number_or_argentina_invoicing_details_address_cont, label: "Street Number"
@@ -77,7 +78,7 @@ ActiveAdmin.register Person do
   filter :updated_at
   filter :risk
   filter :regularity
-  filter :tags_id , as: :select, collection: proc { Tag.people }, multiple: true
+  filter :tags_id, as: :select, collection: proc { Tag.people }, multiple: true
 
   scope :fresh, default: true
   scope :pending
@@ -108,6 +109,10 @@ ActiveAdmin.register Person do
     process_download_profile resource, EventLogKind.download_profile_full
   end
 
+  member_action :download_profile_history, method: :post do
+    process_download_profile resource, EventLogKind.download_profile_history
+  end
+
   form do |f|
     if resource.new_record?
       AdminUser.current_admin_user.tags.each do |t|
@@ -128,7 +133,14 @@ ActiveAdmin.register Person do
     end
     
     f.inputs 'Basics' do
-      f.input :risk, as:  :select, collection: %w(low medium high)
+      f.input :risk, as: :select, collection: %w(low medium high)
+      f.input :tpi, as: :select, collection: %w(unknown
+                                                usd_1_to_5000
+                                                usd_5001_to_10000
+                                                usd_10001_to_20000
+                                                usd_20001_to_50000
+                                                usd_50001_to_100000
+                                                usd_100001)
     end
 
     ArbreHelpers::Form.has_many_form self, f, :comments do |cf, context|
@@ -151,6 +163,7 @@ ActiveAdmin.register Person do
     column :state
     column :risk
     column :regularity
+    column :tpi
     column :person_type
     column(:tags) do |o|
       o.tags.pluck(:name).join(' - ')
@@ -178,7 +191,7 @@ ActiveAdmin.register Person do
     column :updated_at
   end
 
-  show as: :grid, columns: 2 do      
+  show as: :grid, columns: 2 do
     if resource.issues.empty?
       div class: 'flash flash_danger' do
         "This person has no created issues. Please create a new issue to add information."
@@ -192,13 +205,17 @@ ActiveAdmin.register Person do
     end
   
     if authorized?(:download_profile_basic, resource) || 
-      authorized?(:download_profile_full, resource)
+      authorized?(:download_profile_full, resource) ||
+      authorized?(:download_profile_history, resource)
       dropdown_menu 'Download Profile', class: 'dropdown_menu dropdown_other_actions' do
         if authorized?(:download_profile_basic, resource)
           item 'Basic', download_profile_basic_person_path, method: :post
         end
         if authorized?(:download_profile_full, resource)
           item 'Full', download_profile_full_person_path, method: :post
+        end
+        if authorized?(:download_profile_history, resource)
+          item 'History', download_profile_history_person_path, method: :post
         end
       end
       br  
@@ -213,6 +230,7 @@ ActiveAdmin.register Person do
               row :state
               row :risk
               row :regularity
+              row :tpi
             end
           end
           column do

@@ -33,7 +33,7 @@ module ArbreHelpers
     end
 
     def self.has_many_attachments(context, form)
-      ArbreHelpers::Form.has_many_form context, form, :attachments do |af, ctx|  
+      ArbreHelpers::Form.has_many_form context, form, :attachments, new_button_enabled: false do |af, ctx|
         a = af.object
         if a.persisted?
           af.input :_destroy, as: :boolean, required: false, label: 'Remove', class: "check_box_remove"
@@ -45,7 +45,8 @@ module ArbreHelpers
         else
           af.input :document, as: :file, label: "Attachment"
         end
-      end  
+      end
+      form.input :multiple_documents, as: :file, label: "Add Attachments", input_html: { multiple: true }, hint: "Max. size per file 10MB"
     end
 
     def self.attachments_list(context, attachments)

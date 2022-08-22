@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev mysql-server libmysqlclient-dev nodejs \
     libmagickwand-dev imagemagick tzdata file \
     redis-server \ 
+    default-jre \
     && apt-get clean
 
 # Install rbenv
@@ -33,8 +34,8 @@ ENV RAILS_FOLDER=/usr/local/compliance
 RUN mkdir /usr/local/rbenv/plugins \
     && git clone https://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build \
     && /usr/local/rbenv/plugins/ruby-build/install.sh \
-    && rbenv install 2.5.7 \
-    && rbenv global 2.5.7 \
+    && rbenv install 2.5.9 \
+    && rbenv global 2.5.9 \
     && gem install bundler:1.17.3 \
     && rbenv rehash
 
@@ -51,13 +52,25 @@ RUN service mysql start \
     && redis-server --daemonize yes --port 0 --unixsocket /tmp/redis.sock --unixsocketperm 775 \
     && cd /usr/local/compliance && bundle exec rails db:setup
 
-EXPOSE 5000
+ARG ELASTICMQ_VERSION
+ENV ELASTICMQ_VERSION ${ELASTICMQ_VERSION:-1.2.1}
+
+RUN mkdir -p /opt/elasticmq/log /opt/elasticmq/lib /opt/elasticmq/config
+RUN curl -sfLo /opt/elasticmq/lib/elasticmq.jar https://s3-eu-west-1.amazonaws.com/softwaremill-public/elasticmq-server-${ELASTICMQ_VERSION}.jar
+
+EXPOSE 5000 9324 9325
+
+ARG BRANCH=master
+ENV BRANCH ${BRANCH}
 
 CMD service mysql start \
   && redis-server --daemonize yes --port 0 --unixsocket /tmp/redis.sock --unixsocketperm 775 \
   && cd /usr/local/compliance \
-  && git pull origin master \
+  && git checkout ${BRANCH} \
+  && git pull origin ${BRANCH} \
   && cp /usr/local/compliance/docker/standalone/settings.yml /usr/local/compliance/config/settings.yml \
+  && cp /usr/local/compliance/docker/standalone/elasticmq.conf /opt/elasticmq.conf \
+  && (java -Dconfig.file=/opt/elasticmq.conf -jar /opt/elasticmq/lib/elasticmq.jar &) \
   && bundle install \
   && bundle exec rake db:migrate \
   && bundle exec rails s -p 5000 -b '0.0.0.0'

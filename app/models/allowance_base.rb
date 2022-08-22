@@ -5,4 +5,5 @@ class AllowanceBase < ApplicationRecord
   def name_body
     "#{amount} #{kind}"
   end
+  enum tpi: Person::TPI_VALUES
 end

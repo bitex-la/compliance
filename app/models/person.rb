@@ -2,10 +2,10 @@ class Person < ApplicationRecord
   include AASM
   include Loggable
 
-  after_create :log_state_new
-  after_save :log_if_enabled
-  after_save :log_state_changes
-  after_save :expire_action_cache
+  after_commit :log_state_new, on: :create
+  after_commit :log_if_enabled
+  after_commit :log_state_changes
+  after_commit :expire_action_cache
 
   belongs_to :regularity, class_name: "PersonRegularity"
 
@@ -81,6 +81,15 @@ class Person < ApplicationRecord
   end
 
   enum risk: %i(low medium high)
+
+  TPI_VALUES = { usd_1_to_5000: 1,
+                 usd_5001_to_10000: 2,
+                 usd_10001_to_20000: 3,
+                 usd_20001_to_50000: 4,
+                 usd_50001_to_100000: 5,
+                 usd_100001: 6 }.freeze
+  enum tpi: { unknown: 0 }.merge(TPI_VALUES)
+
 
   # This default_scope allow filter person with allowed
   # admin tags
@@ -178,6 +187,12 @@ class Person < ApplicationRecord
           "*☺: #{found.name_body}"
         elsif (found = issues.active.map(&:legal_entity_docket_seed).compact.last)
           "*🏭: #{found.name_body}"
+        else
+          if (found = issues.map(&:natural_docket_seed).compact.last)
+            "*☺: #{found.name_body}"
+          elsif (found = issues.map(&:legal_entity_docket_seed).compact.last)
+            "*🏭: #{found.name_body}"
+          end
         end
     end
   end
@@ -390,6 +405,14 @@ class Person < ApplicationRecord
 
   def generate_pdf_profile(include_affinities = false, include_risk_scores = false)
     PersonProfile.generate_pdf(self, include_affinities, include_risk_scores)
+  end
+
+  def generate_profile_history_csv
+    PersonProfile::CsvGenerator.generate_profile_history_for(self)
+  end
+
+  def generate_observations_history_csv
+    PersonProfile::CsvGenerator.generate_observations_history_for(self)
   end
 
   def expire_action_cache

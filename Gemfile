@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.5.7'
+ruby '2.5.9'
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
@@ -32,6 +32,7 @@ gem 'devise'
 gem 'cancancan'
 gem 'draper'
 gem 'aws-sdk-s3', '~> 1.30.0'
+gem 'aws-sdk-sqs', '~> 1.10.0'
 gem "paperclip", "~>6.1.0"
 gem 'aasm'
 gem 'rubyzip'
@@ -69,6 +70,8 @@ gem 'redis-objects'
 gem 'redis-store'
 
 gem 'therubyracer'
+gem 'rack-cors'
+gem 'rails-healthcheck'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

@@ -10,6 +10,16 @@ defaults: &defaults
     access_key: some_access_key
     secret: some_secret
 
+  sqs:
+    credentials:
+      access_key_id: some_access_key
+      secret_access_key: some_secret
+      region: us-east-1
+
+    port: 9324
+    queue: http://localhost:9324/000000000000/event-log.fifo
+    publish: true
+
   mysql:
     username: root
     password: 
@@ -32,6 +42,13 @@ defaults: &defaults
     cache_url: 'unix:/tmp/redis.sock'
     namespace: 'compliance'
     pool_size: 8
+
+  cors:
+    debug: true
+    allowed_origins:
+      - "*"
+
+  observation_token_hours: 2160 # 90 days
 
 production:
   <<: *defaults

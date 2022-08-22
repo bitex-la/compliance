@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  scope 'api', defaults: {format: :json} do
+    ::Healthcheck.routes(self)
+  end
+
   namespace :api do
     resources :people, only: [:create, :show, :index, :update] do
       member do
@@ -117,6 +121,13 @@ Rails.application.routes.draw do
 
     resource :system do
       post :truncate
+    end
+
+    resources :issue_tokens do
+      get :show_by_token
+      resources :observations, only: [:update] do
+        resources :attachments, only: [:create]
+      end
     end
   end
 

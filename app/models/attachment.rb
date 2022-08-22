@@ -11,6 +11,8 @@ class Attachment < ApplicationRecord
   validates :person, presence: true
   validate :person_cannot_be_removed_once_set
 
+  after_validation :clean_paperclip_errors
+
   before_save :classify_type
   after_save{ person.expire_action_cache }
 
@@ -31,30 +33,42 @@ class Attachment < ApplicationRecord
     end
     all + %w[fund_deposits fund_withdrawals fund_transfers]
   end
- 
-  validates_attachment :document,
-    content_type: {
-      content_type: [
-        'image/bmp',
-        'image/jpeg',
-        'image/jpg',
-        'image/gif',
-        'image/png',
-        'application/pdf',
-        'application/zip',
-        'application/x-rar-compressed'
-    ]}
 
-  validates_attachment_file_name :document, matches: [
-    /bmp|BMP\z/,
-    /png|PNG\z/,
-    /jpg|JPG\z/,
-    /jpeg|JPEG\z/,
-    /pdf|PDF\z/,
-    /gif|GIF\z/,
-    /zip|ZIP\z/,
-    /rar|RAR\z/,
-  ]
+  validates_attachment_content_type :document,
+                                    content_type: %w[
+                                      image/bmp
+                                      image/jpeg
+                                      image/jpg
+                                      image/gif
+                                      image/png
+                                      application/pdf
+                                      application/doc
+                                      application/msword
+                                      application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                                      application/vnd.ms-excel
+                                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                    ],
+                                    message: lambda {|attachment, metadata| "File #{attachment.document_file_name} has an invalid content type." }
+
+  validates_attachment_file_name :document,
+                                 matches: [
+                                   /bmp|BMP\z/,
+                                   /png|PNG\z/,
+                                   /jpg|JPG\z/,
+                                   /jpeg|JPEG\z/,
+                                   /pdf|PDF\z/,
+                                   /gif|GIF\z/,
+                                   /doc|DOC\z/,
+                                   /docx|DOCX\z/,
+                                   /xls|XLS\z/,
+                                   /xlsx|XLSX\z/
+                                 ],
+                                 message: lambda {|attachment, metadata| "File #{attachment.document_file_name} contains an invalid file name." }
+
+  validates_attachment_size :document,
+                            less_than: 10.megabytes,
+                            message: lambda {|attachment, metadata| "File #{attachment.document_file_name} size must be lower than 10MB." },
+                            if: lambda { |attachment| attachment.document.dirty? }
 
   def attached_to_something
     return unless attached_to.nil?
@@ -103,6 +117,10 @@ class Attachment < ApplicationRecord
 
   def issue
     attached_to_seed.try(:issue)
+  end
+
+  def clean_paperclip_errors
+    errors.delete(:document)
   end
 
   private

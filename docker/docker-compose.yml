@@ -9,11 +9,20 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./tmp/db:/var/lib/mysql
+      - ~/tmp/db:/var/lib/mysql
   redis_cache:
     image: redis:6
     command: redis-server
     volumes:
-      - ./tmp/redis:/var/lib/redis
+      - ~/tmp/redis:/var/lib/redis
     ports:
       - "6379:6379"
+  sqs:
+    image: softwaremill/elasticmq:1.2.1
+    ports:
+      - "9324:9324"
+      - "9325:9325"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./standalone/elasticmq.conf:/opt/elasticmq.conf

@@ -29,7 +29,7 @@ describe Issue do
         .group_by{|i| i.type }
         .map{|a,b| [a, b.count ] }.to_h
         .should == {
-          "attachments"=>66, 
+          "attachments"=>108,
           "email_seeds"=>2, 
           "emails"=>2, 
           "identification_seeds"=>2, 
@@ -115,7 +115,7 @@ describe Issue do
       observation_id = api_response.data.id
 
       assert_logging(issue.observations.last, :create_entity, 1)
-      assert_logging(issue.reload, :observe_issue, 1)
+      assert_logging(issue.reload, :observe_issue, 1, false)
 
       api_get("/issues/#{issue.id}")
 
@@ -243,6 +243,23 @@ describe Issue do
       end.to change{issue.reload.defer_until}
 
       expect(issue.reload.defer_until).to eq defer_until
+    end
+
+    it 'add tag on issue update' do
+      issue_tag = create(:issue_tag)
+      issue = create(:basic_issue)
+
+      expect do
+        api_update("/issues/#{issue.id}", {
+          type: 'issues',
+          id: issue.id,
+          relationships: {
+            tags: { data: [{ id: issue_tag.id, type: 'tags' }] }
+          }
+        })
+      end.to change { issue.reload.tags.count }
+
+      expect(issue.tags.first.id).to eq(issue_tag.id)
     end
   end
 

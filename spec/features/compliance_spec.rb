@@ -48,8 +48,8 @@ describe 'an admin user' do
     issue = Issue.last
     observation = Observation.last
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 4)
-    assert_logging(issue.reload, :observe_issue, 1)
+    assert_logging(issue, :update_entity, 4, false)
+    assert_logging(issue.reload, :observe_issue, 1, false)
 
     %i(identification_seeds domicile_seeds allowance_seeds).each do |seed|
       issue.send(seed).count.should == 1
@@ -60,7 +60,7 @@ describe 'an admin user' do
       .first.document_file_name).to eq('áñ_simple_微信图片.jpg')
 
     expect(issue.domicile_seeds.first.attachments
-      .first.document_file_name).to eq('áñ_simple_微信图片.zip')
+      .first.document_file_name).to eq('áñ_simple_微信图片.jpg')
 
     expect(issue.allowance_seeds.first.attachments
       .first.document_file_name).to eq('áñ_simple_微信图片.gif')
@@ -87,8 +87,8 @@ describe 'an admin user' do
 
     within '.extra_info' do
       expect(page)
-        .to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
+        .to have_content "link: https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n"
+      expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
     end
 
     assert_logging(issue, :update_entity, 7)
@@ -128,8 +128,8 @@ describe 'an admin user' do
     end
 
     within '.extra_info' do
-      expect(page).to have_content "link: #{"https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n".truncate(40, omission:'...')}"
-      expect(page).to have_content 'title: de 18 mil familias de clase media - P...'
+      expect(page).to have_content "link: https://issuu.com/mop_chile0/docs/15_proyectos_de_restauraci_n"
+      expect(page).to have_content 'title: de 18 mil familias de clase media - PDF - DocPlayer'
     end
 
     click_link 'Enable'
@@ -140,8 +140,8 @@ describe 'an admin user' do
     
     click_link 'Edit Person'
     click_link 'Disable'
-    assert_logging(issue.person, :enable_person, 1)
-    assert_logging(issue.person, :disable_person, 1)
+    assert_logging(issue.person, :enable_person, 1, false)
+    assert_logging(issue.person, :disable_person, 1, false)
     expect(issue.person.reload.enabled).to be_falsey
     expect(issue.person.state).to eq('disabled')
 
@@ -378,7 +378,7 @@ describe 'an admin user' do
     click_button 'Update Issue'
 
     assert_logging(issue, :update_entity, 6)
-    assert_logging(issue.reload, :observe_issue, 2)
+    assert_logging(issue.reload, :observe_issue, 2, false)
 
     Observation.where(issue: issue).count.should == 2
     issue.reload.should be_observed
@@ -402,7 +402,7 @@ describe 'an admin user' do
     }
 
     assert_logging(issue, :update_entity, 7)
-    assert_logging(issue.reload, :observe_issue, 2)
+    assert_logging(issue.reload, :observe_issue, 2, false)
 
     assert_response 200
 
@@ -488,7 +488,6 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.identification_seeds") do
-      click_link "Add New Attachment"
       fill_attachment('identification_seeds', 'jpg')
     end
 
@@ -516,8 +515,7 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.domicile_seeds") do
-      click_link "Add New Attachment"
-      fill_attachment('domicile_seeds', 'zip')
+      fill_attachment('domicile_seeds', 'jpg')
     end
 
     find('li[title="Allowances"] a').click
@@ -538,7 +536,6 @@ describe 'an admin user' do
     )
 
     within(".has_many_container.allowance_seeds") do
-      click_link "Add New Attachment"
       fill_attachment('allowance_seeds', 'gif')
     end
 
@@ -561,7 +558,6 @@ describe 'an admin user' do
     }, false)
 
     within("#natural_docket_seed") do
-      click_link "Add New Attachment"
       fill_attachment('natural_docket_seed', 'png', false)
     end
 
@@ -572,7 +568,7 @@ describe 'an admin user' do
 
     issue = Issue.last
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue.reload, :observe_issue, 1)
+    assert_logging(issue.reload, :observe_issue, 1, false)
     observation = Observation.last
     issue.should be_observed
     observation.should be_new
@@ -610,7 +606,7 @@ describe 'an admin user' do
     click_link "Approve"
     
     issue.reload.should be_approved
-    assert_logging(person, :enable_person, 1)
+    assert_logging(person, :enable_person, 1, false)
 
     old_domicile = Domicile.first
     new_domicile = Domicile.last
@@ -634,7 +630,7 @@ describe 'an admin user' do
     new_allowance.replaced_by_id.should be_nil
 
     # Here we validate that attachments are copy to the new fruit (when applies)
-    new_identification.attachments.count.should == 12
+    new_identification.attachments.count.should == 19
     new_natural_docket.attachments.count.should == 1
 
     person.should be_enabled
@@ -646,7 +642,7 @@ describe 'an admin user' do
     issue = person.issues.reload.last
     issue.complete!
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 1)
+    assert_logging(issue, :update_entity, 1, false)
     login_as compliance_admin_user
     click_on "Fresh"
     visit "/people/#{issue.person.id}/issues/#{issue.id}"
@@ -788,7 +784,7 @@ describe 'an admin user' do
     api_update "/observations/#{wc_observation.id}", {
       type: 'observations',
       id: wc_observation.id,
-      attributes: {reply: nil}
+      attributes: {reply: 'Ok'}
     }
 
     click_button 'Update Issue'
@@ -824,7 +820,7 @@ describe 'an admin user' do
 
     issue.reload.should be_answered
     assert_logging(Issue.last, :update_entity, 4)
-    assert_logging(issue.reload, :observe_issue, 1)
+    assert_logging(issue.reload, :observe_issue, 1, false)
     Observation.last.should be_answered
     click_link 'Reject'
     person.reload.should be_enabled
@@ -837,7 +833,7 @@ describe 'an admin user' do
     issue.complete!
 
     assert_logging(issue, :create_entity, 1)
-    assert_logging(issue, :update_entity, 1)
+    assert_logging(issue, :update_entity, 1, false)
 
     login_as compliance_admin_user
     click_on 'Answered'
@@ -886,8 +882,7 @@ describe 'an admin user' do
         })
 
         find(:css, "#issue_domicile_seeds_attributes_0_attachments_attributes_0__destroy").set(true)
-        click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'gif', true, 0, 11)
+        fill_attachment('domicile_seeds', 'gif', true)
       end
 
       click_button "Update Issue"
@@ -895,7 +890,7 @@ describe 'an admin user' do
       issue.should be_draft
 
       assert_logging(issue, :create_entity, 1)
-      assert_logging(issue, :update_entity, 3)
+      assert_logging(issue, :update_entity, 3, false)
 
       click_link "Approve"
       issue.reload.should be_approved
@@ -906,7 +901,7 @@ describe 'an admin user' do
 
       old_domicile.replaced_by_id.should == new_domicile.id
       new_domicile.replaced_by_id.should be_nil
-      new_domicile.attachments.count.should == 11
+      new_domicile.attachments.count.should == 18
     end
 
     it 'can add new seeds' do
@@ -935,7 +930,6 @@ describe 'an admin user' do
       )
 
       within(".has_many_container.identification_seeds") do
-        click_link "Add New Attachment"
         fill_attachment('identification_seeds', 'jpg')
       end
 
@@ -954,15 +948,14 @@ describe 'an admin user' do
         apartment: 'C'
       })
       within(".has_many_container.domicile_seeds fieldset:nth-of-type(1)") do
-        click_link "Add New Attachment"
-        fill_attachment('domicile_seeds', 'zip')
+        fill_attachment('domicile_seeds', 'jpg')
       end
 
       click_button "Update Issue"
       issue.should be_draft
 
       assert_logging(Issue.last, :create_entity, 1)
-      assert_logging(Issue.last, :update_entity, 3)
+      assert_logging(Issue.last, :update_entity, 3, false)
 
       click_link "Approve"
       issue.reload.should be_approved
@@ -1024,15 +1017,12 @@ describe 'an admin user' do
       )
 
       within(".has_many_container.identification_seeds") do
-        within first(".has_many_container.attachments") do
-          click_link "Add New Attachment"
-          fill_attachment('identification_seeds', 'jpg', true, 0, 11)
-        end
+        fill_attachment('identification_seeds', 'jpg', true)
       end
 
       click_button 'Update Issue'
       assert_logging(issue, :create_entity, 1)
-      assert_logging(issue, :update_entity, 5) 
+      assert_logging(issue, :update_entity, 5, false)
 
 
       visit "/people/#{person.id}/issues/#{issue.id}"

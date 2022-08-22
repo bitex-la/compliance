@@ -8,7 +8,7 @@ jobs:
   build:
     parallelism: 5
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.9-node-browsers
         environment:
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 4
@@ -23,7 +23,22 @@ jobs:
       
       - run:
           name: Configuring settings
-          command: cp .circleci/settings.yml config/settings.yml
+          command: |
+            cp .circleci/settings.yml config/settings.yml
+            sudo chown `whoami`:`whoami` /opt
+            cp docker/standalone/elasticmq.conf /opt/elasticmq.conf
+
+      - run:
+          name: Download ElasticMQ
+          command: |
+            mkdir -p /opt/elasticmq/log /opt/elasticmq/lib /opt/elasticmq/config
+            curl -sfLo /opt/elasticmq/lib/elasticmq.jar https://s3-eu-west-1.amazonaws.com/softwaremill-public/elasticmq-server-1.2.1.jar
+
+      - run:
+          name: Start ElasticMQ
+          command: /usr/bin/java -Dconfig.file=/opt/elasticmq.conf -jar /opt/elasticmq/lib/elasticmq.jar
+          background: true
+
       - ruby/install-deps
       - run:
           name: Wait for DB
@@ -31,6 +46,9 @@ jobs:
       - run:
           name: Wait for Redis
           command: dockerize -wait tcp://localhost:6379 -timeout 1m
+      - run:
+          name: Wait for ElasticMQ
+          command: dockerize -wait tcp://localhost:9324 -timeout 1m
       
       - run: bundle exec rails db:create db:schema:load db:migrate --trace
 
@@ -63,14 +81,14 @@ jobs:
 
   notify:
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.9-node-browsers
     steps:
       - slack/status:
           channel: devs-alerts
 
   coverage:
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.9-node-browsers
     steps:
       - checkout
       - attach_workspace:
@@ -88,7 +106,7 @@ jobs:
   
   brakeman:
     docker: 
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.9-node-browsers
     steps:
       - checkout
       - run:
@@ -104,7 +122,7 @@ jobs:
 
   trigger_build:
     docker:
-      - image: circleci/ruby:2.5.7-node-browsers
+      - image: circleci/ruby:2.5.9-node-browsers
     steps:
       - checkout
       - run:
@@ -128,5 +146,4 @@ workflows:
       - notify:
           requires:
             - build
-      
-  
+

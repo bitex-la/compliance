@@ -7,7 +7,7 @@ class IssueSerializer
   build_belongs_to :person
   
   build_has_one :natural_docket_seed, :legal_entity_docket_seed, 
-    :argentina_invoicing_detail_seed, :chile_invoicing_detail_seed
+    :argentina_invoicing_detail_seed, :chile_invoicing_detail_seed, :issue_token
 
   build_has_many :allowance_seeds, :workflows, :observations, :domicile_seeds,
     :identification_seeds, :phone_seeds, :email_seeds, 

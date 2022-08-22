@@ -99,6 +99,13 @@ RSpec.describe Issue, type: :model do
     expect(Issue.last.defer_until).to eq Date.current
   end
 
+  it 'returns latest issue_token' do
+    first_token = IssueToken.create!(issue: basic_issue)
+    second_token = IssueToken.create!(issue: basic_issue)
+    expect(basic_issue.reload.issue_token).not_to eq first_token
+    expect(basic_issue.reload.issue_token).to eq second_token
+  end
+
   describe 'affinity_to_tag' do
     let(:issue) { create(:basic_issue, person: create(:empty_person)) } 
     let(:related_person) { create(:empty_person) } 
@@ -524,7 +531,7 @@ RSpec.describe Issue, type: :model do
       obs.update(reply: 'check out the reply')
       issue.reload.should be_observed
       issue.save
-      assert_logging(issue.reload, :observe_issue, 2)
+      assert_logging(issue.reload, :observe_issue, 2, false)
 
       Timecop.travel 1.second.from_now
       issue.update_column(:aasm_state, 'answered')
@@ -752,6 +759,42 @@ RSpec.describe Issue, type: :model do
       expect(basic_issue).to be_valid
       basic_issue.save!
       expect(basic_issue.defer_until).to eq defer
+    end
+  end
+
+  describe '.all_observations' do
+    context 'observations without observable' do
+      let(:issue) { create(:basic_issue, person: create(:empty_person)) }
+
+      it 'only returns observations for client scope' do
+        observation = create(:observation, issue: issue, observable: nil)
+        robot_observation = create(:robot_observation, issue: issue, observable: nil)
+        expect(issue.all_observations).to eq([observation])
+      end
+
+      it 'only returns observations in new state' do
+        observation = create(:observation, issue: issue, observable: nil)
+        answered_observation = create(:observation, issue: issue, reply: 'A reply', observable: nil)
+        expect(issue.all_observations).to eq([observation])
+      end
+    end
+
+    context 'observations with observable' do
+      let(:issue) { create(:basic_issue, person: create(:empty_person)) }
+
+      it 'only returns observations for client scope' do
+        domicile_seed = create(:full_domicile_seed, issue: issue)
+        observation = create(:observation, issue: issue, observable: domicile_seed)
+        robot_observation = create(:robot_observation, issue: issue, observable: domicile_seed)
+        expect(issue.all_observations).to eq([observation])
+      end
+
+      it 'only returns observations in new state' do
+        domicile_seed = create(:full_domicile_seed, issue: issue)
+        observation = create(:observation, issue: issue, observable: domicile_seed)
+        answered_observation = create(:observation, issue: issue, reply: 'A reply', observable: domicile_seed)
+        expect(issue.all_observations).to eq([observation])
+      end
     end
   end
 end

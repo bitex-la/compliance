@@ -8,6 +8,7 @@ class Issue < ApplicationRecord
 
   has_many :issue_taggings
   has_many :tags, through: :issue_taggings
+  has_one :issue_token, -> { order id: :desc }
   accepts_nested_attributes_for :issue_taggings, allow_destroy: true
 
   ransack_alias :state, :aasm_state
@@ -22,8 +23,9 @@ class Issue < ApplicationRecord
   end
 
   after_save :sync_observed_status
-  after_save :log_if_needed
-  after_save{ person.expire_action_cache }
+  after_commit :generate_token
+  after_commit :log_if_needed
+  after_commit { person.expire_action_cache }
 
   validate :defer_until_cannot_be_in_the_past
 
@@ -111,7 +113,7 @@ class Issue < ApplicationRecord
       .where(entity: self, verb_id: EventLogKind.send(:observe_issue).id)
       .last
 
-    if has_open_observations? 
+    if has_open_observations?
       last_obv = observations.where(aasm_state: 'new').last
       if !last_logged
         log_state_change(:observe_issue)
@@ -250,8 +252,9 @@ class Issue < ApplicationRecord
       # Admins and migrations may create "already answered" observations.
       transitions from: [:observed, :draft, :new, :answered], to: :answered
     
-      after do 
+      after do
         log_state_change(:answer_issue) if aasm.from_state != :answered
+        invalidate_token
       end
     end
 
@@ -375,7 +378,28 @@ class Issue < ApplicationRecord
 
     all
   end
-  
+
+  def all_observations
+    all = []
+    all << observations.to_a.select { |obs| obs.observable.nil? }
+    HAS_MANY.each do |assoc|
+      send(assoc).each do |association|
+        next unless association
+
+        all << association.observations
+      end
+    end
+
+    HAS_ONE.each do |assoc|
+      association = send(assoc)
+      next unless association
+
+      all << association.observations
+    end
+
+    all.flatten.select { |obs| obs.client? && obs.new? }
+  end
+
   def all_seeds
     HAS_MANY.map{|a| send(a).try(:to_a) }.compact.flatten +
       HAS_ONE.map{|a| send(a) }.compact
@@ -392,6 +416,14 @@ class Issue < ApplicationRecord
   end
 
   private
+
+  def generate_token
+    IssueToken.create!(issue: self) if all_observations.count.positive? && !issue_token&.valid_token?
+  end
+
+  def invalidate_token
+    issue_token.invalidate! if issue_token
+  end
 
   def lock_expired?
     return false if lock_expiration.nil?
