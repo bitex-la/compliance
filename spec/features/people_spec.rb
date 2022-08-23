@@ -177,12 +177,21 @@ describe 'people' do
                      .tap(&:reload)
                      .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
     chile_person2 = create(:full_natural_person, tags: [chile_tag], country: 'CL')
-                     .tap(&:reload)
-                     .tap { |p| p.natural_docket.update!(first_name: 'Marcelo', last_name: 'Ruiz') }
+                      .tap(&:reload)
+                      .tap { |p| p.natural_docket.update!(first_name: 'Marcelo', last_name: 'Ruiz') }
+
+    chile_person3 = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+                      .tap(&:reload)
+                      .tap { |p| p.natural_docket.update!(first_name: 'Jorge', last_name: 'Ruiz') }
 
     argentina_person.affinities.create!(person: argentina_person,
                                         affinity_kind: AffinityKind.payer,
                                         related_person: chile_person)
+
+    chile_person3.affinities.create!(person: chile_person3,
+                                        affinity_kind: AffinityKind.payer,
+                                        related_person: argentina_person)
+
     chile_person.affinities.create!(person: chile_person,
                                     affinity_kind: AffinityKind.payer,
                                     related_person: chile_person2)
@@ -195,6 +204,9 @@ describe 'people' do
     find("a[href='#Affinities-tab']").click
     expect(page).to have_content('Pablito Ruiz')
     expect(page).not_to have_link('Pablito Ruiz')
+
+    expect(page).to have_content('Jorge Ruiz')
+    expect(page).not_to have_link('Jorge Ruiz')
 
     # TODO: We should test this returns 404
     #visit "people/#{chile_person.id}"

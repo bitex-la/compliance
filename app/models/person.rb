@@ -270,11 +270,11 @@ class Person < ApplicationRecord
   end
 
   def all_affinities
-    Affinity.current.where(person: self).or(related_affinities)
+    Affinity.unscoped.current.where(person: self).or(related_affinities)
   end
 
   def related_affinities
-    Affinity.current.where(related_person: self)
+    Affinity.unscoped.current.where(related_person: self)
   end
 
   def public_notes
