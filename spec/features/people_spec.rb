@@ -192,12 +192,7 @@ describe 'people' do
     visit "people/#{argentina_person.id}"
     expect(page).to have_content('Ricardo Molina')
 
-    find("a[href='#Affinities-tab']").click
+    visit "people/#{chile_person.id}"
     expect(page).to have_content('Pablito Ruiz')
-    expect(page).not_to have_link('Pablito Ruiz')
-
-    # TODO: We should test this returns 404
-    #visit "people/#{chile_person.id}"
-    #expect(page).to have_content('Pablito Ruiz')
   end
 end

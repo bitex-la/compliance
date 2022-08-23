@@ -102,7 +102,8 @@ class Person < ApplicationRecord
 
     where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
       OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
-      }, tags).distinct
+      OR people.id IN (SELECT related_person_id FROM affinities WHERE person_id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?)))
+      }, tags, tags).distinct
   }
 
   def natural_docket
