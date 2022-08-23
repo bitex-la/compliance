@@ -23,4 +23,14 @@ class Affinity < AffinityBase
     return related_person if person == current_person
     return person if related_person == current_person
   end
+
+  def unscoped_get_label(current_person)
+    return affinity_kind.code  if person_id == current_person.id
+    return affinity_kind.inverse  if related_person_id == current_person.id
+  end
+
+  def unscoped_related_one(current_person)
+    return Person.unscoped.find(related_person_id) if person_id == current_person.id
+    return Person.unscoped.find(person_id) if related_person_id == current_person.id
+  end
 end

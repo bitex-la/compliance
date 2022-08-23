@@ -46,6 +46,10 @@ FactoryBot.define do
   factory :full_natural_person, class: Person do
     risk { :medium }
 
+    transient do
+      country { nil }
+    end
+
     after(:create) do |person, evaluator|
       person.enable!
       # A full natural person should have at least the issue that created it.
@@ -62,13 +66,17 @@ FactoryBot.define do
         full_email
         full_note
         full_affinity
-        full_fund_deposit
-        full_fund_withdrawal
         salary_allowance
         savings_allowance
       ).each do |name|
         create name, person: person
       end
+
+      attrs = { person: person }
+      attrs[:country] = evaluator.country if evaluator.country.present?
+
+      create :full_fund_deposit, **attrs
+      create :full_fund_withdrawal, **attrs
     end
 
     trait :with_fixed_email do
