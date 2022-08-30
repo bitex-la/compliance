@@ -31,11 +31,12 @@ describe IssueToken do
     expect(api_response.included.map(&:type).uniq).to eq(['observations'])
   end
 
-  it 'responds with 410 error when token is invalid' do
+  it 'returns 200 on expired' do
     issue_token = IssueToken.where(issue: issue).first
     Timecop.travel 91.days.from_now
 
-    api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 410)
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 200)
+    expect(api_response.data.attributes.expired).to be_truthy
   end
 
   it 'does not return observations when they are answered' do
@@ -52,8 +53,30 @@ describe IssueToken do
     end
     expect(api_response.data.attributes.state).to eq('answered')
 
-    api_get("/issue_tokens/#{issue_token.token}/show_by_token", {}, 410)
-    expect(api_response.included).to be nil
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
+    expect(api_response.included).to be_empty
+  end
+
+  it 'returns expired true when all answered' do
+    issue_token = IssueToken.where(issue: issue).first
+    observations = issue_token.observations
+
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
+    expect(api_response.data.attributes.expired).to be_falsey
+
+    observations.each do |observation|
+      api_update_issue_token(
+        "/issue_tokens/#{issue_token.token}/observations/#{observation.id}",
+        type: 'observations',
+        id: observation.id,
+        attributes: { reply: 'Some reply here' }
+      )
+    end
+    expect(api_response.data.attributes.state).to eq('answered')
+
+    api_get("/issue_tokens/#{issue_token.token}/show_by_token")
+    expect(api_response.data.attributes.expired).to be_truthy
+    expect(api_response.included).to be_empty
   end
 
   it 'replies to an observation' do
