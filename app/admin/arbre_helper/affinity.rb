@@ -6,6 +6,7 @@ module ArbreHelpers
         from = source
         to = affinity.related_one(source)
         affinity_kind_label = affinity.get_label(source)
+        read_unscoped_affinity = false
 
         row(:person) do
           link_to from.name, from
@@ -14,6 +15,7 @@ module ArbreHelpers
           if to
             link_to to.name, to
           else
+            read_unscoped_affinity = true
             affinity.unscoped_related_one(source).related_name
           end
         end
@@ -22,7 +24,7 @@ module ArbreHelpers
           affinity.unscoped_get_label(self.resource)
         end
         row(:created_at)
-        row(:issue)
+        row(:issue) unless read_unscoped_affinity
 
         if Settings.features.affinity_summary
           row(:summary) do
