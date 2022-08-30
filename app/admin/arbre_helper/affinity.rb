@@ -52,15 +52,22 @@ module ArbreHelpers
           span do
             strong "#{fruit.class.name}#{suffix}"
           end
+          columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
+          attachments = include_attachments ? fruit.attachments : []
+
+          if columns.empty? || attachments.empty?
+            span do
+              strong "Empty"
+            end
+          end
           ul do
-            columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
             columns.each do |column|
               value = fruit.public_send(column)
               next if value.blank?
               li "#{column}: #{value}"
             end
             if include_attachments
-              fruit.attachments.map do |attachment|
+              attachments.map do |attachment|
                 li do
                   link_to attachment.document_file_name, attachment.document_url
                 end
