@@ -94,6 +94,12 @@ module ArbreHelpers
       end
     end
 
+    def self.relevant_columns_for_fruit(fruit, others = [])
+      columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
+      columns.map { |c| c.gsub(/_id$/,'') } -
+        %w(id person issue created_at updated_at replaces extra_info external_link)
+    end
+
     def self.fruit_show_section(context, fruit, others = [])
       context.instance_eval do
         if fruit.class.name == "Affinity"
@@ -101,9 +107,7 @@ module ArbreHelpers
             ArbreHelpers::Affinity.affinity_card(self, fruit)
           end
         else
-          columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
-          columns = columns.map{|c| c.gsub(/_id$/,'') } -
-            %w(id person issue created_at updated_at replaces extra_info external_link)
+          columns = ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit, others)
           attributes_table_for fruit do
             row(:show){|o| link_to o.name, o }
             columns.each do |n|
