@@ -57,6 +57,9 @@ defaults: &defaults
     allowed_origins: '*'
     debug: false
 
+  features:
+    affinity_summary: true
+
 production:
   <<: *defaults
 

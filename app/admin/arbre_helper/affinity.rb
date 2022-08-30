@@ -23,17 +23,21 @@ module ArbreHelpers
         end
         row(:created_at)
         row(:issue)
-        row(:summary) do
-          related_person = to || affinity.unscoped_related_one(source)
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.natural_dockets.last, blacklisted_attrs: %w(expected_investment politically_exposed politically_exposed_reason), include_attachments: true)
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.legal_entity_dockets.last, blacklisted_attrs: %w(regulated_entity operations_with_third_party_funds), include_attachments: true)
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.identifications.last, include_attachments: true)
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.argentina_invoicing_details.last, include_attachments: true)
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.domiciles.last, include_attachments: true)
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.risk_scores.find { |rs| rs.provider == 'worldcheck' }, include_attachments: true)
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.emails, only_attrs: %w(address))
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.phones, only_attrs: %w(number phone_kind country))
-          ArbreHelpers::Affinity.affinity_summary(context, related_person.allowances.last, only_attrs: %w(), include_attachments: true)
+
+        if Settings.features.affinity_summary
+          row(:summary) do
+            related_person = to || affinity.unscoped_related_one(source)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.natural_dockets.last,blacklisted_attrs: %w(expected_investment politically_exposed politically_exposed_reason), include_attachments: true)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.legal_entity_dockets.last, blacklisted_attrs: %w(regulated_entity operations_with_third_party_funds), include_attachments: true)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.identifications.last, include_attachments: true)
+            # FIXME: We have to specify the attributes for ArgentinaInvoicingDetails given that tax_id column is wrongly called by ::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.argentina_invoicing_details.last, include_attachments: true, only_attrs: %w(vat_status tax_id tax_id_kind receipt_kind full_name address country))
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.domiciles.last, include_attachments: true)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.risk_scores.find { |rs| rs.provider == 'worldcheck' }, include_attachments: true)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.emails, only_attrs: %w(address))
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.phones, only_attrs: %w(number phone_kind country))
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.allowances.last, only_attrs: %w(), include_attachments: true)
+          end
         end
       end
     end
@@ -51,9 +55,16 @@ module ArbreHelpers
           ul do
             columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
             columns.each do |column|
-              value = fruit.public_send(column) if fruit.respond_to?(column)
+              value = fruit.public_send(column)
               next if value.blank?
               li "#{column}: #{value}"
+            end
+            if include_attachments
+              fruit.attachments.map do |attachment|
+                li do
+                  link_to attachment.document_file_name, attachment.document_url
+                end
+              end
             end
           end
         end
