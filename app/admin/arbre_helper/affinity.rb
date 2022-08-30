@@ -5,7 +5,6 @@ module ArbreHelpers
         source = self.resource.try(:person) || self.resource
         from = source
         to = affinity.related_one(source)
-        affinity_kind_label = affinity.get_label(source)
         read_unscoped_affinity = false
 
         row(:person) do
