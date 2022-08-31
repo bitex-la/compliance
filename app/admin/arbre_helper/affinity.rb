@@ -48,18 +48,21 @@ module ArbreHelpers
 
         fruits_or_fruit_to_a = Array(fruits_or_fruit)
         fruits_or_fruit_to_a.each_with_index do |fruit, idx|
-          suffix = fruits_or_fruit_to_a.size > 1 ? "##{idx}" : ""
-          span do
-            strong "#{fruit.class.model_name.human}#{suffix}"
-          end
           columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
           attachments = include_attachments ? fruit.attachments : []
 
+          span do
+            suffix = fruits_or_fruit_to_a.size > 1 ? "##{idx}" : ""
+            strong "#{fruit.class.model_name.human}#{suffix}"
+          end
+
           if columns.empty? && attachments.empty?
+            br
             span do
               strong "Empty"
             end
           end
+
           ul do
             columns.each do |column|
               value = fruit.public_send(column)
