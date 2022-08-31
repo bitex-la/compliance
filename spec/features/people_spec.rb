@@ -168,6 +168,8 @@ describe 'people' do
   end
 
   it 'renders correctly people thats related to others with a not common tag' do
+    Settings.features['affinity_summary'] = true
+
     argentina_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-AR')
     chile_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-CL')
     argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')

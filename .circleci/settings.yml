@@ -41,6 +41,9 @@ defaults: &defaults
     namespace: 'compliance'
     pool_size: 8
 
+  features:
+    affinity_summary: true
+
 production:
   <<: *defaults
 
