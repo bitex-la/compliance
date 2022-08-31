@@ -55,7 +55,7 @@ module ArbreHelpers
           columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
           attachments = include_attachments ? fruit.attachments : []
 
-          if columns.empty? || attachments.empty?
+          if columns.empty? && attachments.empty?
             span do
               strong "Empty"
             end
