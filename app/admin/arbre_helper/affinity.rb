@@ -51,7 +51,7 @@ module ArbreHelpers
         fruits_or_fruit_to_a.each_with_index do |fruit, idx|
           suffix = fruits_or_fruit_to_a.size > 1 ? "##{idx}" : ""
           span do
-            strong "#{fruit.class.name}#{suffix}"
+            strong "#{fruit.class.model_name.human}#{suffix}"
           end
           columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
           attachments = include_attachments ? fruit.attachments : []
@@ -65,7 +65,7 @@ module ArbreHelpers
             columns.each do |column|
               value = fruit.public_send(column)
               next if value.blank?
-              li "#{column}: #{value}"
+              li "#{fruit.class.human_attribute_name(column)}: #{value}"
             end
             if include_attachments
               attachments.map do |attachment|
