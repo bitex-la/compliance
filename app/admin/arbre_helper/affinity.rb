@@ -77,7 +77,8 @@ module ArbreHelpers
           end
         end
 
-        # This return nil is on purpose because ActiveAdmin will try to render something out if it an ActiveRecord::Base or ActiveRecord::Relation is given
+        # This returns nil on purpose because ActiveAdmin will try to render something out if its an
+        # ActiveRecord::Base or ActiveRecord::Relation
         nil
       end
     end
