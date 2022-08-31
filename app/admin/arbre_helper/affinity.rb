@@ -49,7 +49,12 @@ module ArbreHelpers
         fruits_or_fruit_to_a = Array(fruits_or_fruit)
         fruits_or_fruit_to_a.each_with_index do |fruit, idx|
           columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
-          attachments = include_attachments ? fruit.attachments : []
+          attachments = if include_attachments
+                          # We have to use unscoped here to skip PersonScopeable.
+                          Attachment.unscoped.where(attached_to_fruit: fruit, person_id: fruit.person_id)
+                        else
+                          []
+                        end
 
           span do
             suffix = fruits_or_fruit_to_a.size > 1 ? "##{idx}" : ""
