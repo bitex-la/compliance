@@ -51,7 +51,7 @@ module ArbreHelpers
           columns = only_attrs || (::ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit) - blacklisted_attrs)
           attachments = if include_attachments
                           # We have to use unscoped here to skip PersonScopeable.
-                          Attachment.unscoped.where(attached_to_fruit: fruit, person_id: fruit.person_id)
+                          ::Attachment.unscoped.where(attached_to_fruit: fruit, person_id: fruit.person_id)
                         else
                           []
                         end
