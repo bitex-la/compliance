@@ -96,8 +96,15 @@ module ArbreHelpers
 
     def self.relevant_columns_for_fruit(fruit, others = [])
       columns = fruit.class.columns.map(&:name) - others.map(&:to_s)
-      columns.map { |c| c.gsub(/_id$/,'') } -
-        %w(id person issue created_at updated_at replaces extra_info external_link)
+      excluded_columns = %w(id person issue created_at updated_at replaces extra_info external_link)
+      displayable_columns = columns.map do |c|
+        # We don't want to show columns whose value is an ID. Instead, we prefer returning the object that is associated to that ID.
+        # However, there are some cases where an ID is just a value, for example: "tax_id".
+        # Therefore, we check if the fruit responds to the method without an id, if it does, we return it.
+        method_without_id = c.gsub(/_id$/,'')
+        fruit.respond_to?(method_without_id) ? method_without_id : c
+      end
+      displayable_columns - excluded_columns
     end
 
     def self.fruit_show_section(context, fruit, others = [])
