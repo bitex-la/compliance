@@ -88,7 +88,7 @@ module ArbreHelpers
         
         ArbreHelpers::Layout.tab_with_counter_for(self, title, all.count, icon, text) do
           ArbreHelpers::Layout.panel_grid(self, all) do |d|
-            ArbreHelpers::Fruit.fruit_show_section(self, d)
+            ArbreHelpers::Fruit.fruit_show_section(self, d, detailed_affinity: true)
           end
         end
       end
@@ -107,11 +107,11 @@ module ArbreHelpers
       displayable_columns - excluded_columns
     end
 
-    def self.fruit_show_section(context, fruit, others = [])
+    def self.fruit_show_section(context, fruit, others = [], detailed_affinity:)
       context.instance_eval do
         if fruit.class.name == "Affinity"
           attributes_table_for fruit do
-            ArbreHelpers::Affinity.affinity_card(self, fruit)
+            ArbreHelpers::Affinity.affinity_card(self, fruit, detailed_affinity: detailed_affinity)
           end
         else
           columns = ArbreHelpers::Fruit.relevant_columns_for_fruit(fruit, others)
@@ -159,7 +159,7 @@ module ArbreHelpers
         h3 "Current Fruits"
         if all.any?
           ArbreHelpers::Layout.panel_only(self, all) do |f|
-            ArbreHelpers::Fruit.fruit_show_section(self, f)
+            ArbreHelpers::Fruit.fruit_show_section(self, f, detailed_affinity: false)
           end          
         else
           ArbreHelpers::Layout.alert(self, "No items available", "info")
