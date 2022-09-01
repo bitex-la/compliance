@@ -35,9 +35,11 @@ module ArbreHelpers
               ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
               unless related_person.whitelabeler?
                 related_person.all_affinities.each do |related_person_affinity|
+                  next if related_person_affinity == source
                   ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person_affinity.unscoped_related_one(related_person))
                 end
               end
+              nil
             end
           end
         end
