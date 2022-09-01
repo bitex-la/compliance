@@ -369,6 +369,10 @@ class Person < ApplicationRecord
     tags.delete(Tag.find_or_create_by(name: tag_name))
   end
 
+  def whitelabeler?
+    tags.find { |t| t.name.match(/whitelabeler/i) }
+  end
+
   aasm do
     state :new, initial: true
     state :enabled

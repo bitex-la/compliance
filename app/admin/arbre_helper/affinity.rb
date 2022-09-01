@@ -33,8 +33,10 @@ module ArbreHelpers
               ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
             when :legal_entity
               ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
-              related_person.all_affinities.each do |related_person_affinity|
-                ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person_affinity.unscoped_related_one(related_person))
+              unless related_person.whitelabeler?
+                related_person.all_affinities.each do |related_person_affinity|
+                  ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person_affinity.unscoped_related_one(related_person))
+                end
               end
             end
           end
