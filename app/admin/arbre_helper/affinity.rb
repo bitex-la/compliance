@@ -71,8 +71,7 @@ module ArbreHelpers
           ul do
             columns.each do |column|
               value = fruit.public_send(column)
-              next if value.blank?
-              li "#{fruit.class.human_attribute_name(column)}: #{value}"
+              li "#{fruit.class.human_attribute_name(column)}: #{value}" if value.present? || value.is_a?(TrueClass) || value.is_a?(FalseClass)
             end
             if include_attachments
               attachments.map do |attachment|
