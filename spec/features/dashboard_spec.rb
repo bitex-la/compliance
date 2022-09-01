@@ -184,8 +184,8 @@ describe 'Dashboard' do
     end
   end
 
-  describe 'filters' do
-    before(:each) do
+  describe 'filtering by an specific issue' do
+    it 'it filters by issue id' do
       person = create(:empty_person)
       issue = create(:basic_issue, person: person)
       create(:full_natural_docket_seed,
@@ -196,16 +196,12 @@ describe 'Dashboard' do
       login_as admin_user
       visit '/'
       click_link 'All'
-    end
-    context 'when need to get especific issue' do
-      it 'it filters by isssue id' do
-        fill_in :q_id_eq, with: 1
-        click_on 'Filter'
-        expect(page).to have_content('Michael Jhonson')
-        fill_in :q_id_eq, with: (1 + rand(6))
-        click_on 'Filter'
-        expect(page).to have_no_content('Michael Jhonson')
-      end
+      fill_in :q_id_eq, with: issue.id
+      click_on 'Filter'
+      expect(page).to have_content('Michael Jhonson')
+      fill_in :q_id_eq, with: issue.id + 1
+      click_on 'Filter'
+      expect(page).to have_no_content('Michael Jhonson')
     end
   end
 
