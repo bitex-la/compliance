@@ -227,8 +227,8 @@ describe 'people' do
                      .tap(&:reload)
                      .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
     chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag], country: 'CL')
-                      .tap(&:reload)
-                      .tap { |p| p.legal_entity_docket.update!(legal_name: 'E Corp') }
+                           .tap(&:reload)
+                           .tap { |p| p.legal_entity_docket.update!(legal_name: 'E Corp') }
 
     argentina_person.affinities.create!(person: argentina_person,
                                         affinity_kind: AffinityKind.payer,
@@ -249,6 +249,44 @@ describe 'people' do
     expect(page).not_to have_link('E Corp')
 
     expect(page).to have_content('Pablito Ruiz')
+    expect(page).not_to have_link('Pablito Ruiz')
+  end
+
+  it 'doesnt render legal entity affinities for whitelabeler' do
+    Settings.features['affinity_summary'] = true
+
+    argentina_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-AR')
+    chile_tag = create(:base_person_tag, tag_type: :person, name: 'active-in-CL')
+    whitelabeler_tag = create(:base_person_tag, tag_type: :person, name: 'Whitelabeler-CL')
+    argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
+                         .tap(&:reload)
+                         .tap { |p| p.natural_docket.update!(first_name: 'Ricardo', last_name: 'Molina') }
+    chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+                     .tap(&:reload)
+                     .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
+    chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag, whitelabeler_tag], country: 'CL')
+                           .tap(&:reload)
+                           .tap { |p| p.legal_entity_docket.update!(legal_name: 'E Corp') }
+
+    argentina_person.affinities.create!(person: argentina_person,
+                                        affinity_kind: AffinityKind.payer,
+                                        related_person: chile_legal_entity)
+
+    chile_person.affinities.create!(person: chile_person,
+                                    affinity_kind: AffinityKind.stakeholder,
+                                    related_person: chile_legal_entity)
+
+    compliance_admin_user.update!(tags: [argentina_tag])
+
+    login_as compliance_admin_user
+    visit "people/#{argentina_person.id}"
+    expect(page).to have_content('Ricardo Molina')
+
+    find("a[href='#Affinities-tab']").click
+    expect(page).to have_content('E Corp')
+    expect(page).not_to have_link('E Corp')
+
+    expect(page).not_to have_content('Pablito Ruiz')
     expect(page).not_to have_link('Pablito Ruiz')
   end
 end
