@@ -28,18 +28,30 @@ module ArbreHelpers
         if Settings.features.affinity_summary
           row(:summary) do
             related_person = to || affinity.unscoped_related_one(source)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.natural_dockets.last, blacklisted_attrs: %w(expected_investment), include_attachments: true)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.legal_entity_dockets.last, include_attachments: true)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.identifications.last, include_attachments: true)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.argentina_invoicing_details.last, include_attachments: true)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.domiciles.last, include_attachments: true)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.risk_scores.find { |rs| rs.provider == 'worldcheck' }, include_attachments: true)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.emails, only_attrs: %w(address))
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.phones, only_attrs: %w(number phone_kind country))
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.allowances.last, only_attrs: %w(), include_attachments: true)
+            case related_person.person_type
+            when :natural_person
+              ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
+            when :legal_entity
+              ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
+              related_person.all_affinities.each do |related_person_affinity|
+                ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person_affinity.unscoped_related_one(source))
+              end
+            end
           end
         end
       end
+    end
+
+    def self.render_affinity_summmary_for_person(context, related_person)
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.natural_dockets.last, blacklisted_attrs: %w(expected_investment), include_attachments: true)
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.legal_entity_dockets.last, include_attachments: true)
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.identifications.last, include_attachments: true)
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.argentina_invoicing_details.last, include_attachments: true)
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.domiciles.last, include_attachments: true)
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.risk_scores.find { |rs| rs.provider == 'worldcheck' }, include_attachments: true)
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.emails, only_attrs: %w(address))
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.phones, only_attrs: %w(number phone_kind country))
+      ArbreHelpers::Affinity.affinity_summary(context, related_person.allowances.last, only_attrs: %w(), include_attachments: true)
     end
 
     def self.affinity_summary(context, fruits_or_fruit, blacklisted_attrs: [], only_attrs: nil, include_attachments: false)
