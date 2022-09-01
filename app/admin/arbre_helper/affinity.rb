@@ -1,6 +1,6 @@
 module ArbreHelpers
   class Affinity
-    def self.affinity_card(context, affinity)
+    def self.affinity_card(context, affinity, detailed_affinity:)
       context.instance_eval do
         source = self.resource.try(:person) || self.resource
         from = source
@@ -25,7 +25,7 @@ module ArbreHelpers
         row(:created_at)
         row(:issue) unless read_unscoped_affinity
 
-        if Settings.features.affinity_summary
+        if Settings.features.affinity_summary && detailed_affinity
           row(:summary) do
             related_person = to || affinity.unscoped_related_one(source)
             case related_person.person_type
@@ -34,9 +34,21 @@ module ArbreHelpers
             when :legal_entity
               ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
               unless related_person.whitelabeler?
-                related_person.all_affinities.each do |related_person_affinity|
-                  next if related_person_affinity == source
-                  ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person_affinity.unscoped_related_one(related_person))
+                legal_entity_affinities = related_person.all_affinities
+
+                if legal_entity_affinities.any?
+                  span do
+                    strong do
+                      "#{related_person.related_name} Affinities"
+                    end
+                  end
+                  br
+                end
+
+                legal_entity_affinities.each do |related_person_affinity|
+                  relevant_person = related_person_affinity.unscoped_related_one(related_person)
+                  next if relevant_person == from
+                  ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, relevant_person)
                 end
               end
               nil
