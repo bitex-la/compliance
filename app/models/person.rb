@@ -370,7 +370,7 @@ class Person < ApplicationRecord
   end
 
   def whitelabeler?
-    @whitelabeler_tag ||= tags.find { |t| t.name.match(/whitelabeler/i) }
+    tags.find { |t| t.name.match(/whitelabeler/i) }
   end
 
   aasm do
