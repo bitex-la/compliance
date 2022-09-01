@@ -28,8 +28,8 @@ module ArbreHelpers
         if Settings.features.affinity_summary
           row(:summary) do
             related_person = to || affinity.unscoped_related_one(source)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.natural_dockets.last,blacklisted_attrs: %w(expected_investment politically_exposed politically_exposed_reason), include_attachments: true)
-            ArbreHelpers::Affinity.affinity_summary(context, related_person.legal_entity_dockets.last, blacklisted_attrs: %w(regulated_entity operations_with_third_party_funds), include_attachments: true)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.natural_dockets.last, blacklisted_attrs: %w(expected_investment), include_attachments: true)
+            ArbreHelpers::Affinity.affinity_summary(context, related_person.legal_entity_dockets.last, include_attachments: true)
             ArbreHelpers::Affinity.affinity_summary(context, related_person.identifications.last, include_attachments: true)
             ArbreHelpers::Affinity.affinity_summary(context, related_person.argentina_invoicing_details.last, include_attachments: true)
             ArbreHelpers::Affinity.affinity_summary(context, related_person.domiciles.last, include_attachments: true)
