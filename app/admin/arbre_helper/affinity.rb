@@ -62,9 +62,9 @@ module ArbreHelpers
               ::ArbreHelpers::Affinity.render_affinity_information(context, related_person_affinity, origin_person)
             end
           end
-        else
-          nil
         end
+
+        nil
       end
     end
 
