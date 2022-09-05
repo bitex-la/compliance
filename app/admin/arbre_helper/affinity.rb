@@ -47,7 +47,7 @@ module ArbreHelpers
             legal_entity_affinity_people = related_person
                                              .all_affinities
                                              .map { |related_person_affinity| related_person_affinity.unscoped_related_one(related_person) }
-                                             .select { |relevant_person| relevant_person != related_person || relevant_person != origin_person }
+                                             .reject { |relevant_person| relevant_person == related_person || relevant_person == origin_person }
 
             if legal_entity_affinity_people.any?
               span do
