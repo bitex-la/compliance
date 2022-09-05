@@ -28,13 +28,15 @@ module ArbreHelpers
         if Settings.features.affinity_summary && detailed_affinity
           row(:summary) do
             related_person = to || affinity.unscoped_related_one(source)
-            ::ArbreHelpers::Affinity.render_affinity_information(context, related_person)
+            ::ArbreHelpers::Affinity.render_affinity_information(context, related_person, related_person)
           end
         end
       end
     end
 
-    def self.render_affinity_information(context, related_person)
+    # In order to avoid an endless loop of affinities, the origin_person param is the root of the affinity tree that starts rendering
+    # its affinities. It's used as a mark to avoid rendering more than once that resource.
+    def self.render_affinity_information(context, related_person, origin_person)
       case related_person.person_type
       when :natural_person
         ::ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
@@ -44,7 +46,7 @@ module ArbreHelpers
           legal_entity_affinity_people = related_person
                                            .all_affinities
                                            .map { |related_person_affinity| related_person_affinity.unscoped_related_one(related_person) }
-                                           .select { |relevant_person| relevant_person != related_person }
+                                           .select { |relevant_person| relevant_person != related_person || relevant_person != origin_person }
 
           if legal_entity_affinity_people.any?
             span do
@@ -56,7 +58,7 @@ module ArbreHelpers
           end
 
           legal_entity_affinity_people.each do |related_person_affinity|
-            ::ArbreHelpers::Affinity.render_affinity_information(context, related_person_affinity)
+            ::ArbreHelpers::Affinity.render_affinity_information(context, related_person_affinity, origin_person)
           end
         end
       else
