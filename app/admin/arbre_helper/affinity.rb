@@ -28,33 +28,43 @@ module ArbreHelpers
         if Settings.features.affinity_summary && detailed_affinity
           row(:summary) do
             related_person = to || affinity.unscoped_related_one(source)
-            case related_person.person_type
-            when :natural_person
-              ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
-            when :legal_entity
-              ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
-              unless related_person.whitelabeler?
-                legal_entity_affinities = related_person.all_affinities
+            ::ArbreHelpers::Affinity.render_affinity_information(context, related_person, related_person)
+          end
+        end
+      end
+    end
 
-                if legal_entity_affinities.any?
-                  span do
-                    strong do
-                      "#{related_person.related_name} Affinities"
-                    end
-                  end
-                  br
-                end
+    # In order to avoid an endless loop of affinities, the origin_person param is the root of the affinity tree that starts rendering
+    # its affinities. It's used as a mark to avoid rendering more than once that resource.
+    def self.render_affinity_information(context, related_person, origin_person)
+      context.instance_eval do
+        case related_person.person_type
+        when :natural_person
+          ::ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
+        when :legal_entity
+          ::ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
+          unless related_person.whitelabeler?
+            legal_entity_affinity_people = related_person
+                                             .all_affinities
+                                             .map { |related_person_affinity| related_person_affinity.unscoped_related_one(related_person) }
+                                             .reject { |relevant_person| relevant_person == related_person || relevant_person == origin_person }
 
-                legal_entity_affinities.each do |related_person_affinity|
-                  relevant_person = related_person_affinity.unscoped_related_one(related_person)
-                  next if relevant_person == from
-                  ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, relevant_person)
+            if legal_entity_affinity_people.any?
+              span do
+                strong do
+                  "#{related_person.related_name} Affinities"
                 end
               end
-              nil
+              br
+            end
+
+            legal_entity_affinity_people.each do |related_person_affinity|
+              ::ArbreHelpers::Affinity.render_affinity_information(context, related_person_affinity, origin_person)
             end
           end
         end
+
+        nil
       end
     end
 
