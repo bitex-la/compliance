@@ -37,6 +37,7 @@ module ArbreHelpers
     # In order to avoid an endless loop of affinities, the origin_person param is the root of the affinity tree that starts rendering
     # its affinities. It's used as a mark to avoid rendering more than once that resource.
     def self.render_affinity_information(context, related_person, origin_person)
+      Rails.logger.info("Related Person##{related_person.id}: #{related_person&.related_name}, Origin##{origin_person&.id}: #{origin_person&.related_name}")
       context.instance_eval do
         case related_person.person_type
         when :natural_person
@@ -59,6 +60,7 @@ module ArbreHelpers
             end
 
             legal_entity_affinity_people.each do |related_person_affinity|
+              Rails.logger.info("Related Person##{related_person.id} #{related_person_affinity&.related_name} affinities:")
               ::ArbreHelpers::Affinity.render_affinity_information(context, related_person_affinity, origin_person)
             end
           end
