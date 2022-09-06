@@ -221,13 +221,13 @@ describe 'people' do
     end
 
     it 'renders legal entity affinities' do
-      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
+      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR', include_affinity: false)
                            .tap(&:reload)
                            .tap { |p| p.natural_docket.update!(first_name: 'Ricardo', last_name: 'Molina') }
-      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL', include_affinity: false)
                        .tap(&:reload)
                        .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
-      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag], country: 'CL')
+      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag], country: 'CL', include_affinity: false)
                              .tap(&:reload)
                              .tap { |p| p.legal_entity_docket.update!(legal_name: 'E Corp') }
 
@@ -254,13 +254,13 @@ describe 'people' do
     end
 
     it 'doesnt render legal entity affinities for whitelabeler' do
-      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
+      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR', include_affinity: false)
                            .tap(&:reload)
                            .tap { |p| p.natural_docket.update!(first_name: 'Ricardo', last_name: 'Molina') }
-      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL', include_affinity: false)
                        .tap(&:reload)
                        .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
-      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag, whitelabeler_tag], country: 'CL')
+      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag, whitelabeler_tag], country: 'CL', include_affinity: false)
                              .tap(&:reload)
                              .tap { |p| p.legal_entity_docket.update!(legal_name: 'E Corp') }
 

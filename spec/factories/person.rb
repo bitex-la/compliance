@@ -48,6 +48,7 @@ FactoryBot.define do
 
     transient do
       country { nil }
+      include_affinity { true }
     end
 
     after(:create) do |person, evaluator|
@@ -65,7 +66,6 @@ FactoryBot.define do
         full_phone
         full_email
         full_note
-        full_affinity
         salary_allowance
         savings_allowance
       ).each do |name|
@@ -77,6 +77,7 @@ FactoryBot.define do
 
       create :full_fund_deposit, **attrs
       create :full_fund_withdrawal, **attrs
+      create :full_affinity, person: person if evaluator.include_affinity
     end
 
     trait :with_fixed_email do
@@ -114,6 +115,7 @@ FactoryBot.define do
 
     transient do
       country { nil }
+      include_affinity { true }
     end
 
     after(:create) do |person, evaluator|
@@ -131,7 +133,6 @@ FactoryBot.define do
         full_phone
         full_email
         full_note
-        full_affinity
         heavy_allowance
       ).each do |name|
         create name, person: person
@@ -141,6 +142,7 @@ FactoryBot.define do
       attrs[:country] = evaluator.country if evaluator.country.present?
       create :full_fund_deposit, **attrs
       create :full_fund_withdrawal, **attrs
+      create :full_affinity, person: person if evaluator.include_affinity
     end
   end
 
