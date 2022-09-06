@@ -1,5 +1,28 @@
 module ArbreHelpers
   class Affinity
+    def self.obtain_affinity_tree(related_person, origin_person, already_gotten_affinities = [related_person.id, origin_person.id])
+      case (related_person_type = related_person.person_type)
+      when :natural_person
+        [related_person, []]
+      when :legal_entity
+        return [related_person, []] if related_person.whitelabeler?
+
+        legal_entity_affinity_people = related_person
+                                         .all_affinities
+                                         .map { |related_person_affinity| related_person_affinity.unscoped_related_one(related_person) }
+                                         .reject { |relevant_person| relevant_person == related_person }
+                                         .reject { |relevant_person| relevant_person.id.in?(already_gotten_affinities) }
+
+        already_gotten_affinities = [related_person.id].concat(already_gotten_affinities).uniq
+        [
+          related_person,
+          legal_entity_affinity_people.map { |p| self.obtain_affinity_tree(p, origin_person, already_gotten_affinities) }
+        ]
+      else
+        raise "Unknown #{related_person_type}"
+      end
+    end
+
     def self.affinity_card(context, affinity, detailed_affinity:)
       context.instance_eval do
         source = self.resource.try(:person) || self.resource
@@ -27,8 +50,8 @@ module ArbreHelpers
 
         if Settings.features.affinity_summary && detailed_affinity
           row(:summary) do
-            related_person = to || affinity.unscoped_related_one(source)
-            ::ArbreHelpers::Affinity.render_affinity_information(context, related_person, related_person)
+            recursive_structure = ::ArbreHelpers::Affinity.obtain_recursive(affinity.unscoped_related_one(source), source)
+            ::ArbreHelpers::Affinity.render_affinity_information(context, recursive_structure)
           end
         end
       end
@@ -36,31 +59,25 @@ module ArbreHelpers
 
     # In order to avoid an endless loop of affinities, the origin_person param is the root of the affinity tree that starts rendering
     # its affinities. It's used as a mark to avoid rendering more than once that resource.
-    def self.render_affinity_information(context, related_person, origin_person)
-      context.instance_eval do
-        case related_person.person_type
-        when :natural_person
-          ::ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
-        when :legal_entity
-          ::ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
-          unless related_person.whitelabeler?
-            legal_entity_affinity_people = related_person
-                                             .all_affinities
-                                             .map { |related_person_affinity| related_person_affinity.unscoped_related_one(related_person) }
-                                             .reject { |relevant_person| relevant_person == related_person || relevant_person == origin_person }
+    def self.render_affinity_information(context, recursive_structure)
+      person, person_affinities = recursive_structure
 
-            if legal_entity_affinity_people.any?
+      context.instance_eval do
+        case person.person_type
+        when :natural_person
+          ::ArbreHelpers::Affinity.render_affinity_summary_for_person(context, person)
+        when :legal_entity
+          ::ArbreHelpers::Affinity.render_affinity_summary_for_person(context, person)
+          person_affinities.each_with_index do |affinity_person, idx|
+            if idx.zero?
               span do
                 strong do
-                  "#{related_person.related_name} Affinities"
+                  "#{affinity_person.related_name} Affinities"
                 end
               end
               br
             end
-
-            legal_entity_affinity_people.each do |related_person_affinity|
-              ::ArbreHelpers::Affinity.render_affinity_information(context, related_person_affinity, origin_person)
-            end
+            ::ArbreHelpers::Affinity.render_affinity_information(context, affinity_person, person_affinities)
           end
         end
 
@@ -68,7 +85,7 @@ module ArbreHelpers
       end
     end
 
-    def self.render_affinity_summmary_for_person(context, related_person)
+    def self.render_affinity_summary_for_person(context, related_person)
       context.instance_eval do
         span do
           strong do
