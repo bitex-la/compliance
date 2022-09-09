@@ -1,8 +1,17 @@
 class AffinityGraphBuilder
   attr_reader :edges
+  attr_reader :affinity, :parent
+  private :affinity, :parent
 
-  def initialize
+  def initialize(parent, affinity)
     @edges = []
+    @affinity = affinity
+    @parent = parent
+  end
+
+  def build_graph
+    child = affinity.unscoped_related_one(parent)
+    build_affinity_graph(parent, child)
   end
 
   def build_affinity_graph(parent_person, child_person, already_gotten_affinities = [child_person.id, parent_person.id])
@@ -21,34 +30,6 @@ class AffinityGraphBuilder
       legal_entity_affinity_people.each do |child_of_child|
         build_affinity_graph(child_person, child_of_child, new_already_gotten_affinities)
       end
-    else
-      raise "Unknown #{related_person_type}"
-    end
-  end
-
-  def obtain_affinity_tree(parent_person, child_person, already_gotten_affinities = [child_person.id, parent_person.id])
-    add_to_edge(parent_person, child_person)
-
-    case (related_person_type = child_person.person_type)
-    when :natural_person
-      [child_person, []]
-    when :legal_entity
-      # Not rendering whitelabelers affinities is a requirements definition given that they have thousands of relationships and
-      # we don't need to show this information in the affinity tab.
-      return [child_person, []] if child_person.whitelabeler?
-
-      legal_entity_affinity_people = child_person
-                                       .all_affinities
-                                       .map { |related_person_affinity| related_person_affinity.unscoped_related_one(child_person) }
-                                       .reject { |relevant_person| relevant_person.id.in?(already_gotten_affinities) }
-
-      new_already_gotten_affinities = [child_person.id].concat(already_gotten_affinities).uniq
-      [
-        child_person,
-        legal_entity_affinity_people.each do |child_of_child|
-          obtain_affinity_tree(child_person, child_of_child, new_already_gotten_affinities)
-        end
-      ]
     else
       raise "Unknown #{related_person_type}"
     end

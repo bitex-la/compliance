@@ -51,9 +51,8 @@ describe AffinityGraphBuilder do
                                     related_person: colombus_group)
 
     first_affinity = colombus_group.all_affinities.first
-    first_affinity_person = first_affinity.unscoped_related_one(colombus_group)
-    first_affinity_edges = AffinityGraphBuilder.new
-                                               .tap { |p| p.build_affinity_graph(colombus_group, first_affinity_person) }
+    first_affinity_edges = AffinityGraphBuilder.new(colombus_group, first_affinity)
+                                               .tap(&:build_graph)
                                                .edges
 
     expect(first_affinity_edges).to match_array([
@@ -64,9 +63,8 @@ describe AffinityGraphBuilder do
                                           ])
 
     second_affinity = colombus_group.all_affinities.second
-    second_affinity_person = second_affinity.unscoped_related_one(colombus_group)
-    second_affinity_edges = AffinityGraphBuilder.new
-                                                .tap { |p| p.build_affinity_graph(colombus_group, second_affinity_person) }
+    second_affinity_edges = AffinityGraphBuilder.new(colombus_group, second_affinity)
+                                                .tap(&:build_graph)
                                                 .edges
 
     expect(second_affinity_edges).to match_array([
