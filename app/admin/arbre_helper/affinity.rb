@@ -29,6 +29,7 @@ module ArbreHelpers
           row(:summary) do
             graph = ::AffinityGraphBuilder.new(source, affinity).build_graph
             graph.each_vertex do |related_person|
+              next if related_person == source
               ArbreHelpers::Affinity.render_affinity_summary_for_person(context, related_person)
               graph.each_adjacent(related_person).with_index do |affinity_person, idx|
                 if idx.zero?
