@@ -1,3 +1,6 @@
+require 'rgl/adjacency'
+require 'rgl/dot'
+
 class AffinityGraphBuilder
   attr_reader :edges
   attr_reader :affinity, :parent
@@ -9,9 +12,17 @@ class AffinityGraphBuilder
     @parent = parent
   end
 
-  def build_graph
+  def build_edges
     child = affinity.unscoped_related_one(parent)
     build_affinity_graph(parent, child)
+    edges
+  end
+
+  def build_graph
+    built_edges = build_edges
+    edge_names = built_edges.map { |a| a.map(&:name) }.flatten
+    dg = RGL::DirectedAdjacencyGraph[*edge_names]
+    dg.write_to_graphic_file('jpg')
   end
 
   def build_affinity_graph(parent_person, child_person, already_gotten_affinities = [child_person.id, parent_person.id])
