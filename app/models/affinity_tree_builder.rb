@@ -56,6 +56,6 @@ class AffinityTreeBuilder
 
   def add_to_edge(parent_person, child_person)
     Rails.logger.info("Add edge: #{[parent_person.name, child_person.name]}")
-    edges.push([parent_person.name, child_person.name])
+    edges.push([parent_person, child_person])
   end
 end
