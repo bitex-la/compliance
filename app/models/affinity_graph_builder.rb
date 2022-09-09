@@ -1,4 +1,4 @@
-class AffinityTreeBuilder
+class AffinityGraphBuilder
   attr_reader :edges
 
   def initialize
@@ -19,7 +19,7 @@ class AffinityTreeBuilder
                                        .map { |related_person_affinity| related_person_affinity.unscoped_related_one(child_person) }
                                        .reject { |relevant_person| relevant_person.id.in?(already_gotten_affinities) }
       legal_entity_affinity_people.each do |child_of_child|
-        obtain_affinity_tree(child_person, child_of_child, new_already_gotten_affinities)
+        build_affinity_graph(child_person, child_of_child, new_already_gotten_affinities)
       end
     else
       raise "Unknown #{related_person_type}"

@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-describe AffinityTreeBuilder do
+describe AffinityGraphBuilder do
   let!(:argentina_tag) { create(:base_person_tag, tag_type: :person, name: 'active-in-AR') }
   let!(:chile_tag) { create(:base_person_tag, tag_type: :person, name: 'active-in-CL') }
   let!(:an_tag) { create(:base_person_tag, tag_type: :person, name: 'active-in-AN') }
 
-  it 'builds proper affinity tree' do
+  it 'returns relations for each affinity' do
     colombus_group = create(:full_legal_entity_person, tags: [an_tag, argentina_tag], country: 'CH', include_affinity: false)
                        .tap(&:reload)
                        .tap { |p| p.legal_entity_docket.update!(commercial_name: 'Grupo Colombus', legal_name: 'Grupo Colombus') }
@@ -52,9 +52,9 @@ describe AffinityTreeBuilder do
 
     first_affinity = colombus_group.all_affinities.first
     first_affinity_person = first_affinity.unscoped_related_one(colombus_group)
-    first_affinity_edges = AffinityTreeBuilder.new
-                                              .tap { |p| p.build_affinity_graph(colombus_group, first_affinity_person) }
-                                              .edges
+    first_affinity_edges = AffinityGraphBuilder.new
+                                               .tap { |p| p.build_affinity_graph(colombus_group, first_affinity_person) }
+                                               .edges
 
     expect(first_affinity_edges).to match_array([
                                             [colombus_group, colombus_holding],
@@ -65,9 +65,9 @@ describe AffinityTreeBuilder do
 
     second_affinity = colombus_group.all_affinities.second
     second_affinity_person = second_affinity.unscoped_related_one(colombus_group)
-    second_affinity_edges = AffinityTreeBuilder.new
-                                               .tap { |p| p.build_affinity_graph(colombus_group, second_affinity_person) }
-                                               .edges
+    second_affinity_edges = AffinityGraphBuilder.new
+                                                .tap { |p| p.build_affinity_graph(colombus_group, second_affinity_person) }
+                                                .edges
 
     expect(second_affinity_edges).to match_array([
                                                    [colombus_group, colombus_group_manager]
