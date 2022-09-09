@@ -339,6 +339,8 @@ describe 'people' do
       login_as compliance_admin_user
       visit "people/#{colombus_group.id}"
       expect(page).to have_content('Group Colombus')
+
+      find("a[href='#Affinities-tab']").click
       expect(page).to have_content('Colombus Holding')
       expect(page).to have_content('Colombus Holding Affinities')
       expect(page).to have_content('Vinoscoop')
