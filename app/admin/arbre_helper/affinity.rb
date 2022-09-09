@@ -27,16 +27,11 @@ module ArbreHelpers
 
         if Settings.features.affinity_summary && detailed_affinity
           row(:summary) do
-            related_person = to || affinity.unscoped_related_one(source)
-            case related_person.person_type
-            when :natural_person
-              ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
-            when :legal_entity
-              ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, related_person)
-              unless related_person.whitelabeler?
-                legal_entity_affinities = related_person.all_affinities
-
-                if legal_entity_affinities.any?
+            graph = ::AffinityGraphBuilder.new(source, affinity).build_graph
+            graph.each_vertex do |related_person|
+              ArbreHelpers::Affinity.render_affinity_summary_for_person(context, related_person)
+              graph.each_adjacent(related_person).with_index do |affinity_person, idx|
+                if idx.zero?
                   span do
                     strong do
                       "#{related_person.related_name} Affinities"
@@ -45,20 +40,17 @@ module ArbreHelpers
                   br
                 end
 
-                legal_entity_affinities.each do |related_person_affinity|
-                  relevant_person = related_person_affinity.unscoped_related_one(related_person)
-                  next if relevant_person == from
-                  ArbreHelpers::Affinity.render_affinity_summmary_for_person(context, relevant_person)
-                end
+                ArbreHelpers::Affinity.render_affinity_summary_for_person(context, affinity_person)
               end
-              nil
             end
+
+            nil
           end
         end
       end
     end
 
-    def self.render_affinity_summmary_for_person(context, related_person)
+    def self.render_affinity_summary_for_person(context, related_person)
       context.instance_eval do
         span do
           strong do

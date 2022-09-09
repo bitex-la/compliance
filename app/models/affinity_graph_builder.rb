@@ -20,9 +20,8 @@ class AffinityGraphBuilder
 
   def build_graph
     built_edges = build_edges
-    edge_names = built_edges.map { |a| a.map(&:name) }.flatten
-    dg = RGL::DirectedAdjacencyGraph[*edge_names]
-    dg.write_to_graphic_file('jpg')
+    edge_names = built_edges.flatten
+    RGL::DirectedAdjacencyGraph[*edge_names]
   end
 
   def build_affinity_graph(parent_person, child_person, already_gotten_affinities = [child_person.id, parent_person.id])
