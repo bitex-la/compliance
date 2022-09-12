@@ -26,7 +26,8 @@ class AffinityGraphBuilder
 
   def build_affinity_graph(parent_person, child_person, already_gotten_affinities = [child_person.id, parent_person.id])
     case (related_person_type = child_person.person_type)
-    when :natural_person
+    when :natural_person, nil
+      # person_type is nil when it doesn't have a natural nor a legal entity docket yet
       add_to_edge(parent_person, child_person)
     when :legal_entity
       add_to_edge(parent_person, child_person)
@@ -41,7 +42,7 @@ class AffinityGraphBuilder
         build_affinity_graph(child_person, child_of_child, new_already_gotten_affinities)
       end
     else
-      raise "Unknown #{related_person_type}"
+      raise "Unknown #{related_person_type} Person##{child_person.id}"
     end
   end
 
