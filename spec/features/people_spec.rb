@@ -175,6 +175,8 @@ describe 'people' do
     let!(:argentina_tag) { create(:base_person_tag, tag_type: :person, name: 'active-in-AR') }
     let!(:chile_tag) { create(:base_person_tag, tag_type: :person, name: 'active-in-CL') }
     let!(:whitelabeler_tag) { create(:base_person_tag, tag_type: :person, name: 'Whitelabeler-CL') }
+    let!(:an_tag) { create(:base_person_tag, tag_type: :person, name: 'active-in-AN') }
+
 
     it 'renders correctly people thats related to others with a not common tag' do
       argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
@@ -221,13 +223,13 @@ describe 'people' do
     end
 
     it 'renders legal entity affinities' do
-      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
+      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR', include_affinity: false)
                            .tap(&:reload)
                            .tap { |p| p.natural_docket.update!(first_name: 'Ricardo', last_name: 'Molina') }
-      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL', include_affinity: false)
                        .tap(&:reload)
                        .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
-      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag], country: 'CL')
+      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag], country: 'CL', include_affinity: false)
                              .tap(&:reload)
                              .tap { |p| p.legal_entity_docket.update!(legal_name: 'E Corp') }
 
@@ -254,13 +256,13 @@ describe 'people' do
     end
 
     it 'doesnt render legal entity affinities for whitelabeler' do
-      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR')
+      argentina_person = create(:full_natural_person, tags: [argentina_tag], country: 'AR', include_affinity: false)
                            .tap(&:reload)
                            .tap { |p| p.natural_docket.update!(first_name: 'Ricardo', last_name: 'Molina') }
-      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL')
+      chile_person = create(:full_natural_person, tags: [chile_tag], country: 'CL', include_affinity: false)
                        .tap(&:reload)
                        .tap { |p| p.natural_docket.update!(first_name: 'Pablito', last_name: 'Ruiz') }
-      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag, whitelabeler_tag], country: 'CL')
+      chile_legal_entity = create(:full_legal_entity_person, tags: [chile_tag, whitelabeler_tag], country: 'CL', include_affinity: false)
                              .tap(&:reload)
                              .tap { |p| p.legal_entity_docket.update!(legal_name: 'E Corp') }
 
@@ -284,6 +286,66 @@ describe 'people' do
 
       expect(page).not_to have_content('Pablito Ruiz')
       expect(page).not_to have_link('Pablito Ruiz')
+    end
+
+    it 'renders complex affinities' do
+      colombus_group = create(:full_legal_entity_person, tags: [an_tag, argentina_tag], country: 'CH', include_affinity: false)
+                         .tap(&:reload)
+                         .tap { |p| p.legal_entity_docket.update!(commercial_name: 'Grupo Colombus', legal_name: 'Grupo Colombus') }
+
+      colombus_holding = create(:full_legal_entity_person, tags: [an_tag, argentina_tag], country: 'CH', include_affinity: false)
+                           .tap(&:reload)
+                           .tap { |p| p.legal_entity_docket.update!(commercial_name: 'Colombus Holding', legal_name: 'Colombus Holding') }
+
+      the_h_group = create(:full_legal_entity_person, tags: [an_tag], country: 'CH', include_affinity: false)
+                      .tap(&:reload)
+                      .tap { |p| p.legal_entity_docket.update!(commercial_name: 'The H Group', legal_name: 'The H Group') }
+
+      vinoscoop = create(:full_legal_entity_person, tags: [an_tag], country: 'CH', include_affinity: false)
+                    .tap(&:reload)
+                    .tap { |p| p.legal_entity_docket.update!(commercial_name: 'Vinoscoop', legal_name: 'Vinoscoop') }
+
+      lara_h_group_owner = create(:full_natural_person, tags: [an_tag], country: 'CH', include_affinity: false)
+                             .tap(&:reload)
+                             .tap { |p| p.natural_docket.update!(first_name: 'Lara', last_name: 'Ermar') }
+
+      colombus_group_manager = create(:full_natural_person, tags: [an_tag], country: 'AR', include_affinity: false)
+                                 .tap(&:reload)
+                                 .tap { |p| p.natural_docket.update!(first_name: 'Bernard', last_name: 'Ruiz') }
+
+      lara_h_group_owner.affinities.create!(person: lara_h_group_owner,
+                                            affinity_kind: AffinityKind.owner,
+                                            related_person: the_h_group)
+
+      colombus_holding.affinities.create!(person: colombus_holding,
+                                          affinity_kind: AffinityKind.stakeholder,
+                                          related_person: colombus_group)
+
+      colombus_holding.affinities.create!(person: colombus_holding,
+                                          affinity_kind: AffinityKind.payer,
+                                          related_person: vinoscoop)
+
+      colombus_holding.affinities.create!(person: colombus_holding,
+                                          affinity_kind: AffinityKind.owner,
+                                          related_person: the_h_group)
+
+      colombus_group_manager.affinities.create!(person: colombus_group_manager,
+                                                affinity_kind: AffinityKind.manager,
+                                                related_person: colombus_group)
+
+
+      compliance_admin_user.update!(tags: [argentina_tag])
+
+      login_as compliance_admin_user
+      visit "people/#{colombus_group.id}"
+      expect(page).to have_content('Grupo Colombus')
+
+      find("a[href='#Affinities-tab']").click
+      expect(page).to have_content('Colombus Holding')
+      expect(page).to have_content('Colombus Holding Affinities')
+      expect(page).to have_content('Vinoscoop')
+      expect(page).to have_content('The H Group')
+      expect(page).to have_content('The H Group Affinities')
     end
   end
 end

@@ -317,6 +317,7 @@ GEM
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     orm_adapter (0.5.0)
+    pairing_heap (1.0.0)
     paperclip (6.1.0)
       activemodel (>= 4.2.0)
       activesupport (>= 4.2.0)
@@ -392,6 +393,11 @@ GEM
     responders (3.0.0)
       actionpack (>= 5.0)
       railties (>= 5.0)
+    rexml (3.2.5)
+    rgl (0.5.9)
+      pairing_heap (>= 0.3.0)
+      rexml (~> 3.2, >= 3.2.4)
+      stream (~> 0.5.3)
     rotp (4.0.2)
       addressable (~> 2.5)
     rspec-core (3.8.0)
@@ -458,6 +464,7 @@ GEM
     sshkit (1.18.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    stream (0.5.5)
     strip_attributes (1.8.0)
       activemodel (>= 3.0, < 6.0)
     temple (0.8.0)
@@ -558,6 +565,7 @@ DEPENDENCIES
   rails-jquery-autocomplete
   redis-objects
   redis-store
+  rgl
   rspec-rails
   rspec_junit_formatter (= 0.2.2)
   rubocop
