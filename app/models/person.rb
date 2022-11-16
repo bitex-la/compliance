@@ -102,8 +102,7 @@ class Person < ApplicationRecord
 
     where(%{people.id NOT IN (SELECT person_id FROM person_taggings)
       OR people.id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?))
-      OR people.id IN (SELECT related_person_id FROM affinities WHERE person_id IN (SELECT person_id FROM person_taggings WHERE tag_id IN (?)))
-      }, tags, tags).distinct
+      }, tags).distinct
   }
 
   def natural_docket
@@ -271,11 +270,11 @@ class Person < ApplicationRecord
   end
 
   def all_affinities
-    Affinity.current.where(person: self).or(related_affinities)
+    Affinity.unscoped.current.where(person: self).or(related_affinities)
   end
 
   def related_affinities
-    Affinity.current.where(related_person: self)
+    Affinity.unscoped.current.where(related_person: self)
   end
 
   def public_notes
@@ -368,6 +367,10 @@ class Person < ApplicationRecord
     return unless tag_name
 
     tags.delete(Tag.find_or_create_by(name: tag_name))
+  end
+
+  def whitelabeler?
+    tags.find { |t| t.name.match(/whitelabeler/i) }
   end
 
   aasm do

@@ -48,6 +48,7 @@ FactoryBot.define do
 
     transient do
       country { nil }
+      include_affinity { true }
     end
 
     after(:create) do |person, evaluator|
@@ -65,7 +66,6 @@ FactoryBot.define do
         full_phone
         full_email
         full_note
-        full_affinity
         salary_allowance
         savings_allowance
       ).each do |name|
@@ -77,6 +77,7 @@ FactoryBot.define do
 
       create :full_fund_deposit, **attrs
       create :full_fund_withdrawal, **attrs
+      create :full_affinity, person: person if evaluator.include_affinity
     end
 
     trait :with_fixed_email do
@@ -112,6 +113,11 @@ FactoryBot.define do
   factory :full_legal_entity_person, class: Person do
     risk { :medium }
 
+    transient do
+      country { nil }
+      include_affinity { true }
+    end
+
     after(:create) do |person, evaluator|
       person.enable!
       # A full natural person should have at least the issue that created it.
@@ -127,13 +133,16 @@ FactoryBot.define do
         full_phone
         full_email
         full_note
-        full_affinity
-        full_fund_deposit
-        full_fund_withdrawal
         heavy_allowance
       ).each do |name|
         create name, person: person
       end
+
+      attrs = { person: person }
+      attrs[:country] = evaluator.country if evaluator.country.present?
+      create :full_fund_deposit, **attrs
+      create :full_fund_withdrawal, **attrs
+      create :full_affinity, person: person if evaluator.include_affinity
     end
   end
 
