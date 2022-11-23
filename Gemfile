@@ -73,6 +73,7 @@ gem 'redis-store'
 gem 'rack-cors'
 gem 'rails-healthcheck'
 gem 'rgl'
+gem 'base32'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

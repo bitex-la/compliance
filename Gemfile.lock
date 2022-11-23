@@ -135,6 +135,7 @@ GEM
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sigv4 (1.0.3)
+    base32 (0.3.4)
     bcrypt (3.1.13)
     bindex (0.5.0)
     bootstrap-sass (3.4.1)
@@ -517,6 +518,7 @@ DEPENDENCIES
   appsignal
   aws-sdk-s3 (~> 1.30.0)
   aws-sdk-sqs (~> 1.10.0)
+  base32
   bootstrap-sass
   brakeman
   bullet
