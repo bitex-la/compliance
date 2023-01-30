@@ -170,6 +170,15 @@ ActiveAdmin.register Issue do
 
     f.input :person_id, as: :hidden
 
+    div style: 'overflow: auto' do
+      div class: 'right' do
+        f.actions do
+          f.action :submit
+          f.cancel_link({action: (resource.persisted? ? :show : :index) })
+        end
+      end
+    end
+
     tabs do
       ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
         columns do
@@ -473,11 +482,6 @@ ActiveAdmin.register Issue do
           ArbreHelpers::Attachment.has_many_attachments(context, rs)
         end
       end
-    end
-
-    f.actions do
-      f.action :submit
-      f.cancel_link({action: (resource.persisted? ? :show : :index) })
     end
   end
 
