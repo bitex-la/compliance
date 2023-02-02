@@ -415,6 +415,17 @@ class Issue < ApplicationRecord
     end
   end
 
+  def self.show_created_ago?(state)
+    ['fresh', 'answered', 'draft', 'observed', 'future'].include?(state)
+  end
+
+  def created_ago
+    return unless Issue.show_created_ago?(state)
+
+    days = ((DateTime.now.utc - created_at) / 1.day).to_i
+    "#{days} day".pluralize(days)
+  end
+
   private
 
   def generate_token
