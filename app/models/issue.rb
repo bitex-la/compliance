@@ -416,7 +416,7 @@ class Issue < ApplicationRecord
   end
 
   def self.show_created_ago?(state)
-    ['fresh', 'answered', 'draft', 'observed', 'future'].include?(state)
+    [nil, 'new', 'fresh', 'answered', 'draft', 'observed', 'future'].include?(state)
   end
 
   def created_ago
