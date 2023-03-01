@@ -106,6 +106,59 @@ RSpec.describe Issue, type: :model do
     expect(basic_issue.reload.issue_token).to eq second_token
   end
 
+  describe 'created ago' do
+    it 'returns 0 days when state is future' do
+      expect(future_issue.created_ago).not_to eq nil
+      expect(future_issue.created_ago).to eq '0 days'
+      expect(Issue.show_created_ago?(future_issue.state)).to eq true
+    end
+
+    it 'returns 1 day when state is draft' do
+      basic_issue.update(created_at: 1.days.ago)
+      expect(basic_issue.created_ago).not_to eq nil
+      expect(basic_issue.created_ago).to eq '1 day'
+      expect(Issue.show_created_ago?(basic_issue.state)).to eq true
+    end
+
+    it 'returns 2 days when state is observed' do
+      basic_issue.update(created_at: 2.days.ago, state: 'observed')
+      expect(basic_issue.created_ago).not_to eq nil
+      expect(basic_issue.created_ago).to eq '2 days'
+      expect(Issue.show_created_ago?(basic_issue.state)).to eq true
+    end
+
+    it 'returns 3 days when state is answered' do
+      basic_issue.update(created_at: 3.days.ago, state: 'answered')
+      expect(basic_issue.created_ago).not_to eq nil
+      expect(basic_issue.created_ago).to eq '3 days'
+      expect(Issue.show_created_ago?(basic_issue.state)).to eq true
+    end
+
+    it 'returns nil when state is dismissed' do
+      basic_issue.dismiss!
+      expect(basic_issue.created_ago).to eq nil
+      expect(Issue.show_created_ago?(basic_issue.state)).to eq false
+    end
+
+    it 'returns nil when state is abandoned' do
+      basic_issue.abandon!
+      expect(basic_issue.created_ago).to eq nil
+      expect(Issue.show_created_ago?(basic_issue.state)).to eq false
+    end
+
+    it 'returns nil when state is rejected' do
+      basic_issue.reject!
+      expect(basic_issue.created_ago).to eq nil
+      expect(Issue.show_created_ago?(basic_issue.state)).to eq false
+    end
+
+    it 'returns nil when state is approved' do
+      basic_issue.approve!
+      expect(basic_issue.created_ago).to eq nil
+      expect(Issue.show_created_ago?(basic_issue.state)).to eq false
+    end
+  end
+
   describe 'affinity_to_tag' do
     let(:issue) { create(:basic_issue, person: create(:empty_person)) } 
     let(:related_person) { create(:empty_person) } 

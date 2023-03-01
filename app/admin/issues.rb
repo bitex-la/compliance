@@ -19,10 +19,11 @@ ActiveAdmin.register Issue do
       tags = o.tags.any? ? "(#{o.tags.pluck(:name).join(' - ')})" : ''
       "#{o.reason} #{tags}"
     end
-    column(:person_tags) do |o| 
+    column(:person_tags) do |o|
       o.person.tags.pluck(:name).join(' - ')
     end
     column(:state)
+    column(:created_ago) if Issue.show_created_ago?(params['scope'])
     column(:created_at)
     column(:updated_at)
     column(:defer_until)
@@ -486,7 +487,6 @@ ActiveAdmin.register Issue do
   end
 
   show do
-    
     if resource.persisted? && resource.future? && !resource.observations.empty?
       div class: 'flash flash_danger' do
         "The observations will not be shown until the issue is visible"
@@ -503,6 +503,7 @@ ActiveAdmin.register Issue do
               row :state
               row :person
               row :reason
+              row :created_ago if resource.created_ago
             end
           end
           column do
