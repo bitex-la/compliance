@@ -18,4 +18,12 @@ class ArgentinaInvoicingDetailBase < ApplicationRecord
   def name_body
     "#{tax_id_kind} #{tax_id}"
   end
+
+  def tax
+    "#{tax_id}"
+  end
+
+  def tax_id_regx
+    '^0-9'
+  end
 end
