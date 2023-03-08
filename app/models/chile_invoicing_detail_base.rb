@@ -11,4 +11,12 @@ class ChileInvoicingDetailBase < ApplicationRecord
   def name_body
     "RUT #{tax_id}"
   end
+
+  def tax
+    "#{tax_id}"
+  end
+
+  def tax_id_regx
+    '^0-9k-kK-K'
+  end
 end
