@@ -16,7 +16,7 @@ namespace :normalization do
           
           invoicing_seeds.each do | seed |
             puts "Updating seed #{ seed.id }"
-            tax_id_normalized = seed.tax_id.delete(seed.tax_id_regx)
+            tax_id_normalized = seed&.tax_id&.delete(seed.tax_id_regx) || ''
             ActiveRecord::Base.connection.execute("update #{ klass.name.underscore }s set tax_id_normalized = '#{tax_id_normalized}' where id = #{ seed.id }")
           end
 
