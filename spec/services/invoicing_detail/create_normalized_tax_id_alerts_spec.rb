@@ -14,6 +14,7 @@ describe ArgentinaInvoicingDetailSeed do
       country: 'ar',
       issue: first_issue
     )
+    first_issue.complete!
 
     second_person = create(:empty_person)
     second_issue = create(:basic_issue, person: second_person)
@@ -27,21 +28,23 @@ describe ArgentinaInvoicingDetailSeed do
       country: 'ar',
       issue: second_issue
     )
+    second_issue.complete!
+    second_issue.reload
     
-    expect(first_seed.issue.person.risk_score_seeds.count).to eq(0)
-    expect(first_seed.issue.person.affinity_seeds.count).to eq(0)
+    expect(first_issue.risk_score_seeds.count).to eq(0)
+    expect(first_issue.affinity_seeds.count).to eq(0)
     
-    expect(second_seed.issue.person.risk_score_seeds.count).to eq(1)
-    expect(second_seed.issue.person.risk_score_seeds.first.issue_id).to eq(second_issue.id)
-    expect(second_seed.issue.person.risk_score_seeds.first.score).to eq('High')
-    expect(second_seed.issue.person.risk_score_seeds.first.provider).to eq('Compliance Legacy')
-    expect(second_seed.issue.person.risk_score_seeds.first.extra_info).to eq('El TAX ID ingresado por el usuario ya se encuentra registrado')
-    expect(second_seed.issue.person.risk_score_seeds.first.external_link).to eq("/people/#{first_person.id}")
+    expect(second_issue.risk_score_seeds.count).to eq(1)
+    expect(second_issue.risk_score_seeds.first.issue_id).to eq(second_issue.id)
+    expect(second_issue.risk_score_seeds.first.score).to eq('High')
+    expect(second_issue.risk_score_seeds.first.provider).to eq('Compliance Legacy')
+    expect(second_issue.risk_score_seeds.first.extra_info).to eq('El TAX ID ingresado por el usuario ya se encuentra registrado')
+    expect(second_issue.risk_score_seeds.first.external_link).to eq("/people/#{first_person.id}")
     
-    expect(second_seed.issue.person.affinity_seeds.count).to eq(1)
-    expect(second_seed.issue.person.affinity_seeds.first.issue_id).to eq(second_issue.id)
-    expect(second_seed.issue.person.affinity_seeds.first.affinity_kind_id).to eq(AffinityKind.compliance_liaison.id)
-    expect(second_seed.issue.person.affinity_seeds.first.related_person_id).to eq(first_person.id)
+    expect(second_issue.affinity_seeds.count).to eq(1)
+    expect(second_issue.affinity_seeds.first.issue_id).to eq(second_issue.id)
+    expect(second_issue.affinity_seeds.first.affinity_kind_id).to eq(AffinityKind.compliance_liaison.id)
+    expect(second_issue.affinity_seeds.first.related_person_id).to eq(first_person.id)
 
     third_person = create(:empty_person)
     third_issue = create(:basic_issue, person: third_person)
@@ -55,9 +58,11 @@ describe ArgentinaInvoicingDetailSeed do
       country: 'ar',
       issue: third_issue
     )
+    third_issue.complete!
+    third_issue.reload
 
-    expect(third_seed.issue.person.risk_score_seeds.count).to eq(1)
-    expect(third_seed.issue.person.affinity_seeds.count).to eq(2)
+    expect(third_issue.risk_score_seeds.count).to eq(1)
+    expect(third_issue.affinity_seeds.count).to eq(2)
   end
 end
 
@@ -84,6 +89,7 @@ describe ChileInvoicingDetailSeed do
       vat_status_code: :inscripto,
       issue: second_issue
     )
+    second_issue.complete!
     
     expect(first_seed.issue.person.risk_score_seeds.count).to eq(0)
     expect(first_seed.issue.person.affinity_seeds.count).to eq(0)
@@ -110,6 +116,7 @@ describe ChileInvoicingDetailSeed do
       vat_status_code: :inscripto,
       issue: third_issue
     )
+    third_issue.complete!
     
     expect(third_seed.issue.person.risk_score_seeds.count).to eq(1)
     expect(third_seed.issue.person.affinity_seeds.count).to eq(2)
