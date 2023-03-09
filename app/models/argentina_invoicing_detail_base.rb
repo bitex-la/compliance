@@ -8,7 +8,7 @@ class ArgentinaInvoicingDetailBase < ApplicationRecord
   validates :receipt_kind, inclusion: { in: ReceiptKind.all }
   validates :vat_status, inclusion: { in: VatStatusKind.all }
 
-  validates :vat_status_id, :tax_id, :full_name, :address, :country,
+  validates :vat_status_id, :tax_id, :full_name, :address, :country, :tax_id_normalized,
     length: { maximum: 255 }
 
   ransackable_static_belongs_to :tax_id_kind
