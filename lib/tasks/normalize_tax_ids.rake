@@ -2,7 +2,8 @@ namespace :normalization do
   task normalize_tax_ids: :environment do
 
     def normalize_tax_ids
-      [ ArgentinaInvoicingDetailSeed, ChileInvoicingDetailSeed ].each do | klass |
+      [ ArgentinaInvoicingDetailSeed, ArgentinaInvoicingDetail,
+        ChileInvoicingDetailSeed, ChileInvoicingDetail ].each do | klass |
         puts ' '
         puts "Running for #{ klass.name }"
         puts '-----------------'
