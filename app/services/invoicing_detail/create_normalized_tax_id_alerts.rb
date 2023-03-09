@@ -26,9 +26,7 @@ module InvoicingDetail
     end
   
     def search_duplicates_normalized_tax_id
-      mysql_regx = "[#{ invoicing_seed.tax_id_regx }]+"
-      inner_join_query = "INNER JOIN issues ON issues.id = #{invoicing_class.name.underscore}s.issue_id and issues.person_id != #{invoicing_seed.issue.person_id}"
-      invoicing_class.joins(inner_join_query).select(:issue_id).where("REGEXP_REPLACE(tax_id, '#{ mysql_regx }' , '') = '#{ tax_id_normalized }'")
+      invoicing_class.select(:issue_id).where("tax_id_normalized = #{ tax_id_normalized }")
     end
   
     def create_risk_score(tax_id_duplicates)

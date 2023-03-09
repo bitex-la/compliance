@@ -1,7 +1,11 @@
 class ChileInvoicingDetailSeed < ChileInvoicingDetailBase
   include Garden::Seed
 
-  after_create do
+  before_save do
+    self.tax_id_normalized = self.tax_id.delete(self.tax_id_regx)
+  end
+
+  def on_complete
     create_normalized_tax_id_alerts
   end
 
