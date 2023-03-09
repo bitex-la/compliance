@@ -7,7 +7,7 @@ namespace :normalization do
         puts "Running for #{ klass.name }"
         puts '-----------------'
 
-        limit = 2
+        limit = 500
         offset = 0
         running = true
 
