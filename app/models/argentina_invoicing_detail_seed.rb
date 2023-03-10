@@ -6,7 +6,7 @@ class ArgentinaInvoicingDetailSeed < ArgentinaInvoicingDetailBase
   end
 
   before_save do
-    self.tax_id_normalized = self&.tax_id&.delete(self.tax_id_regx) || ''
+    self.tax_id_normalized = normalize_tax_id
   end 
 
   def on_complete

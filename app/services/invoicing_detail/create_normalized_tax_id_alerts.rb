@@ -12,6 +12,8 @@ module InvoicingDetail
     end
   
     def process_request
+      return if invoicing_seed.normalize_tax_id.nil?
+
       tax_id_duplicates = search_duplicates_normalized_tax_id
       return if tax_id_duplicates.empty?
   
@@ -21,13 +23,9 @@ module InvoicingDetail
   
     private
   
-    def tax_id_normalized
-      invoicing_seed&.tax_id&.delete(invoicing_seed.tax_id_regx) || ''
-    end
-  
     def search_duplicates_normalized_tax_id
       inner_join_query = "INNER JOIN issues ON issues.id = #{ invoicing_class.name.underscore }s.issue_id and issues.person_id != #{ invoicing_seed.issue.person_id }"
-      invoicing_class.joins(inner_join_query).select(:issue_id).where("tax_id_normalized = '#{ tax_id_normalized }'")
+      invoicing_class.joins(inner_join_query).select(:issue_id).where("tax_id_normalized = '#{ invoicing_seed.tax_id_normalized }'")
     end
   
     def create_risk_score(tax_id_duplicates)
