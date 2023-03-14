@@ -8,20 +8,9 @@ namespace :normalization do
         puts "Running for #{ klass.name }"
         puts '-----------------'
 
-        limit = 500
-        offset = 0
-        running = true
-
-        while running
-          invoicing_seeds = klass.order(:id).limit(limit).offset(offset)
-          
-          invoicing_seeds.each do | seed |
-            puts "Updating seed #{ seed.id } - normalize_tax_id => #{ seed.normalize_tax_id }"
-            ActiveRecord::Base.connection.execute("update #{ klass.name.underscore }s set tax_id_normalized = '#{ seed.normalize_tax_id }' where id = #{ seed.id }")
-          end
-
-          offset += limit
-          running = !invoicing_seeds.empty?
+        klass.find_each do | seed |
+          puts "Updating seed #{ seed.id } - normalize_tax_id => #{ seed.normalize_tax_id }"
+          seed.update_columns(tax_id_normalized: seed.normalize_tax_id)
         end
       end
     end
