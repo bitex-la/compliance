@@ -12,6 +12,6 @@ class ChileInvoicingDetailSeed < ChileInvoicingDetailBase
   private
   
   def create_normalized_tax_id_alerts
-    InvoicingDetail::CreateNormalizedTaxIdAlerts.call(self)
+    NormalizedIdentificationAlerts::CreateChileInvoicingAlerts.call(self)
   end
 end

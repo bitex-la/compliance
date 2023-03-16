@@ -16,6 +16,6 @@ class ArgentinaInvoicingDetailSeed < ArgentinaInvoicingDetailBase
   private 
 
   def create_normalized_tax_id_alerts
-    InvoicingDetail::CreateNormalizedTaxIdAlerts.call(self)
+    NormalizedIdentificationAlerts::CreateArgentinaInvoicingAlerts.call(self)
   end
 end

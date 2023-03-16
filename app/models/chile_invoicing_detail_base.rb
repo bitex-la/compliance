@@ -16,12 +16,8 @@ class ChileInvoicingDetailBase < ApplicationRecord
     "#{tax_id}"
   end
 
-  def tax_id_regx
-    '^0-9k-kK-K'
-  end
-
   def normalize_tax_id
-    result = self.tax_id&.delete(self.tax_id_regx)
+    result = self.tax_id&.delete(Util::NormalizeIdentifications.chile_tax_id_regx)
     return if result&.empty?
     result
   end
