@@ -25,25 +25,27 @@ describe ChileInvoicingDetailSeed do
 
   describe 'normalize_tax_id' do
     it 'receives tax id with the correct conditions and returns tax id normalized' do 
-      seed = ChileInvoicingDetailSeed.new(
+      seed = ChileInvoicingDetailSeed.create(
         tax_id: '12-345.678.9-K!',
         giro: 'Venta de Electrodomesticos',
         ciudad: 'Santiago',
         comuna: 'Las condes',
         vat_status_code: :inscripto,
+        issue: create(:basic_issue)
       )
-      expect(seed.normalize_tax_id).to eq('123456789K')
+      expect(seed.tax_id_normalized).to eq('123456789K')
     end
 
     it 'receives tax id without the right conditions and return nil' do 
-      seed = ChileInvoicingDetailSeed.new(
+      seed = ChileInvoicingDetailSeed.create(
         tax_id: 'abcdef',
         giro: 'Venta de Electrodomesticos',
         ciudad: 'Santiago',
         comuna: 'Las condes',
         vat_status_code: :inscripto,
+        issue: create(:basic_issue)
       )
-      expect(seed.normalize_tax_id).to eq(nil)
+      expect(seed.tax_id_normalized).to eq(nil)
     end
   end
 end

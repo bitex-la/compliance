@@ -54,4 +54,48 @@ describe IdentificationSeed do
 
     expect(seed.issuer).to eq('MX')
   end
+
+  describe 'Chile normalize_number' do
+    it 'receives number with the correct conditions and returns tax id normalized' do 
+      seed = IdentificationSeed.create(
+        identification_kind_id: IdentificationKind.national_id.id,
+        number: '12.3456.789-K',
+        issuer: 'CL',
+        issue: create(:basic_issue)
+      )
+      expect(seed.number_normalized).to eq('123456789K')
+    end
+
+    it 'receives tax id without the right conditions and return nil' do 
+      seed = IdentificationSeed.create(
+        identification_kind_id: IdentificationKind.national_id.id,
+        number: 'abcdef',
+        issuer: 'CL',
+        issue: create(:basic_issue)
+      )
+      expect(seed.number_normalized).to eq(nil)
+    end
+  end
+
+  describe 'Argentina normalize_number' do
+    it 'receives number with the correct conditions and returns tax id normalized' do 
+      seed = IdentificationSeed.create(
+        identification_kind_id: IdentificationKind.national_id.id,
+        number: '34.579.157',
+        issuer: 'AR',
+        issue: create(:basic_issue)
+      )
+      expect(seed.number_normalized).to eq('34579157')
+    end
+
+    it 'receives tax id without the right conditions and return nil' do 
+      seed = IdentificationSeed.create(
+        identification_kind_id: IdentificationKind.national_id.id,
+        number: 'abcdef',
+        issuer: 'AR',
+        issue: create(:basic_issue)
+      )
+      expect(seed.number_normalized).to eq(nil)
+    end
+  end
 end

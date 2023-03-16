@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_09_201252) do
+ActiveRecord::Schema.define(version: 2023_03_14_195347) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -452,12 +452,14 @@ ActiveRecord::Schema.define(version: 2023_03_09_201252) do
     t.boolean "copy_attachments"
     t.date "expires_at"
     t.date "archived_at"
+    t.string "number_normalized"
     t.index ["archived_at"], name: "index_identification_seeds_on_archived_at"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
     t.index ["identification_kind_id"], name: "index_identification_seeds_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
     t.index ["issuer"], name: "index_identification_seeds_on_issuer"
     t.index ["number"], name: "index_identification_seeds_on_number"
+    t.index ["number_normalized"], name: "index_identification_seeds_on_number_normalized"
     t.index ["replaces_id"], name: "index_identification_seeds_on_replaces_id"
   end
 
@@ -474,11 +476,13 @@ ActiveRecord::Schema.define(version: 2023_03_09_201252) do
     t.string "public_registry_book"
     t.string "public_registry_extra_data"
     t.date "archived_at"
+    t.string "number_normalized"
     t.index ["archived_at"], name: "index_identifications_on_archived_at"
     t.index ["identification_kind_id"], name: "index_identifications_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identifications_on_issue_id"
     t.index ["issuer"], name: "index_identifications_on_issuer"
     t.index ["number"], name: "index_identifications_on_number"
+    t.index ["number_normalized"], name: "index_identifications_on_number_normalized"
     t.index ["person_id"], name: "index_identifications_on_person_id"
     t.index ["replaced_by_id"], name: "index_identifications_on_replaced_by_id"
   end
