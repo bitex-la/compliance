@@ -12,15 +12,13 @@ class IdentificationBase < ApplicationRecord
     "#{identification_kind} #{number}, #{issuer}"
   end
 
-  def number_regx
+  def identification_regx
     return Util::NormalizeIdentifications.argentina_tax_id_regx if self.issuer == 'AR'
     return Util::NormalizeIdentifications.chile_tax_id_regx if self.issuer == 'CL'
     ''
   end
 
   def normalize_number
-    result = self.number&.delete(self.number_regx)
-    return if result&.empty?
-    result
+    Util::NormalizeIdentifications.normalize_tax_id(self.number, self.identification_regx)
   end
 end
