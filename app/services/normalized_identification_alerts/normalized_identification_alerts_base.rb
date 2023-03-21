@@ -14,7 +14,8 @@ module NormalizedIdentificationAlerts
     
     def process_request
       duplicates = search_duplicates
-      return if duplicates&.empty?
+      return unless duplicates
+      return if duplicates.empty?
 
       create_risk_score(duplicates)
       create_related_affinities(duplicates)

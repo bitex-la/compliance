@@ -8,7 +8,7 @@ namespace :normalization do
         puts "Running for #{ klass.name }"
         puts '-----------------'
 
-        klass.find_each do | seed |
+        klass.where(tax_id_normalized: nil).find_each do | seed |
           normalize_tax_id = seed.normalize_tax_id 
           puts "Updating seed #{ seed.id } - normalize_tax_id => #{ normalize_tax_id }"
           seed.update_columns(tax_id_normalized: normalize_tax_id)
@@ -22,7 +22,7 @@ namespace :normalization do
         puts "Running for #{ klass.name }"
         puts '-----------------'
 
-        klass.where(issuer: ['AR', 'CL']).find_each do | seed |
+        klass.where(number_normalized: nil, issuer: ['AR', 'CL']).find_each do | seed |
           normalize_number = seed.normalize_number
           puts "Updating seed #{ seed.id } - normalize_number => #{ normalize_number }"
           seed.update_columns(number_normalized: normalize_number)
