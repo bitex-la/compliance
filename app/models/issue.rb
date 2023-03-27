@@ -242,6 +242,8 @@ class Issue < ApplicationRecord
 
     event :complete do
       transitions from: [:draft, :new], to: :new
+
+      after { all_seeds.each(&:on_complete) }
     end
 
     event :observe do

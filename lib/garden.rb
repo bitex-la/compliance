@@ -40,6 +40,8 @@ module Garden
         issue&.person || super
       end
 
+      def on_complete; end
+
       belongs_to :fruit, class_name: naming.fruit, optional: true
       has_many :attachments, as: :attached_to_seed
 

@@ -41,4 +41,34 @@ describe ArgentinaInvoicingDetailSeed do
 
     expect(seed.country).to eq('AR')
   end
+
+  describe 'normalize_tax_id' do
+    it 'receives tax id with the correct conditions and returns tax id normalized' do 
+      seed = ArgentinaInvoicingDetailSeed.create(
+        vat_status_code: 'monotributo',
+        tax_id: '20-34.579.157-5',
+        tax_id_kind_code: 'cuit',
+        receipt_kind_code: 'a',
+        full_name: 'Julio Iglesias',
+        address: 'Jujuy 3421',
+        country: 'ar',
+        issue: create(:basic_issue)
+      )
+      expect(seed.tax_id_normalized).to eq('20345791575')
+    end
+
+    it 'receives tax id without the right conditions and return nil' do 
+      seed = ArgentinaInvoicingDetailSeed.create(
+        vat_status_code: 'monotributo',
+        tax_id: 'abcdefg',
+        tax_id_kind_code: 'cuit',
+        receipt_kind_code: 'a',
+        full_name: 'Julio Iglesias',
+        address: 'Jujuy 3421',
+        country: 'ar',
+        issue: create(:basic_issue)
+      )
+      expect(seed.tax_id_normalized).to eq(nil)
+    end
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_10_194954) do
+ActiveRecord::Schema.define(version: 2023_03_14_195347) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -145,6 +145,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.string "country", null: false
     t.date "expires_at"
     t.date "archived_at"
+    t.string "tax_id_normalized"
     t.index ["address"], name: "index_argentina_invoicing_detail_seeds_on_address"
     t.index ["archived_at"], name: "index_argentina_invoicing_detail_seeds_on_archived_at"
     t.index ["country"], name: "index_argentina_invoicing_detail_seeds_on_country"
@@ -155,6 +156,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.index ["replaces_id"], name: "index_argentina_invoicing_detail_seeds_on_replaces_id"
     t.index ["tax_id"], name: "index_argentina_invoicing_detail_seeds_on_tax_id"
     t.index ["tax_id_kind_id"], name: "index_argentina_invoicing_detail_seeds_on_tax_id_kind_id"
+    t.index ["tax_id_normalized"], name: "index_argentina_invoicing_detail_seeds_on_tax_id_normalized"
     t.index ["vat_status_id"], name: "index_argentina_invoicing_detail_seeds_on_vat_status_id"
   end
 
@@ -172,6 +174,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.string "address"
     t.string "country", null: false
     t.date "archived_at"
+    t.string "tax_id_normalized"
     t.index ["address"], name: "index_argentina_invoicing_details_on_address"
     t.index ["archived_at"], name: "index_argentina_invoicing_details_on_archived_at"
     t.index ["country"], name: "index_argentina_invoicing_details_on_country"
@@ -182,6 +185,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.index ["replaced_by_id"], name: "index_argentina_invoicing_details_on_replaced_by_id"
     t.index ["tax_id"], name: "index_argentina_invoicing_details_on_tax_id"
     t.index ["tax_id_kind_id"], name: "index_argentina_invoicing_details_on_tax_id_kind_id"
+    t.index ["tax_id_normalized"], name: "index_argentina_invoicing_details_on_tax_id_normalized"
     t.index ["vat_status_id"], name: "index_argentina_invoicing_details_on_vat_status_id"
   end
 
@@ -218,6 +222,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.integer "vat_status_id"
     t.date "expires_at"
     t.date "archived_at"
+    t.string "tax_id_normalized"
     t.index ["archived_at"], name: "index_chile_invoicing_detail_seeds_on_archived_at"
     t.index ["comuna"], name: "index_chile_invoicing_detail_seeds_on_comuna"
     t.index ["fruit_id"], name: "index_chile_invoicing_detail_seeds_on_fruit_id"
@@ -225,6 +230,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.index ["issue_id"], name: "index_chile_invoicing_detail_seeds_on_issue_id"
     t.index ["replaces_id"], name: "index_chile_invoicing_detail_seeds_on_replaces_id"
     t.index ["tax_id"], name: "index_chile_invoicing_detail_seeds_on_tax_id"
+    t.index ["tax_id_normalized"], name: "index_chile_invoicing_detail_seeds_on_tax_id_normalized"
     t.index ["vat_status_id"], name: "index_chile_invoicing_detail_seeds_on_vat_status_id"
   end
 
@@ -240,6 +246,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.bigint "replaced_by_id"
     t.integer "vat_status_id"
     t.date "archived_at"
+    t.string "tax_id_normalized"
     t.index ["archived_at"], name: "index_chile_invoicing_details_on_archived_at"
     t.index ["comuna"], name: "index_chile_invoicing_details_on_comuna"
     t.index ["giro"], name: "index_chile_invoicing_details_on_giro"
@@ -247,6 +254,7 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.index ["person_id"], name: "index_chile_invoicing_details_on_person_id"
     t.index ["replaced_by_id"], name: "index_chile_invoicing_details_on_replaced_by_id"
     t.index ["tax_id"], name: "index_chile_invoicing_details_on_tax_id"
+    t.index ["tax_id_normalized"], name: "index_chile_invoicing_details_on_tax_id_normalized"
     t.index ["vat_status_id"], name: "index_chile_invoicing_details_on_vat_status_id"
   end
 
@@ -444,12 +452,14 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.boolean "copy_attachments"
     t.date "expires_at"
     t.date "archived_at"
+    t.string "number_normalized"
     t.index ["archived_at"], name: "index_identification_seeds_on_archived_at"
     t.index ["fruit_id"], name: "index_identification_seeds_on_fruit_id"
     t.index ["identification_kind_id"], name: "index_identification_seeds_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identification_seeds_on_issue_id"
     t.index ["issuer"], name: "index_identification_seeds_on_issuer"
     t.index ["number"], name: "index_identification_seeds_on_number"
+    t.index ["number_normalized"], name: "index_identification_seeds_on_number_normalized"
     t.index ["replaces_id"], name: "index_identification_seeds_on_replaces_id"
   end
 
@@ -466,11 +476,13 @@ ActiveRecord::Schema.define(version: 2022_05_10_194954) do
     t.string "public_registry_book"
     t.string "public_registry_extra_data"
     t.date "archived_at"
+    t.string "number_normalized"
     t.index ["archived_at"], name: "index_identifications_on_archived_at"
     t.index ["identification_kind_id"], name: "index_identifications_on_identification_kind_id"
     t.index ["issue_id"], name: "index_identifications_on_issue_id"
     t.index ["issuer"], name: "index_identifications_on_issuer"
     t.index ["number"], name: "index_identifications_on_number"
+    t.index ["number_normalized"], name: "index_identifications_on_number_normalized"
     t.index ["person_id"], name: "index_identifications_on_person_id"
     t.index ["replaced_by_id"], name: "index_identifications_on_replaced_by_id"
   end
