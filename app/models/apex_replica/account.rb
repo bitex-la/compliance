@@ -1,3 +1,4 @@
+return
 module ApexReplica
   class Account < Base
     self.primary_key = :account_id
