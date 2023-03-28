@@ -1,3 +1,4 @@
+return
 module ApexReplica
   class User < Base
     has_many :user_configs
