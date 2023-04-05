@@ -1,3 +1,4 @@
+return
 module ApexReplica
   class AccountConfig < Base
     self.table_name = 'account_config'

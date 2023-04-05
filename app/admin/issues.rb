@@ -19,10 +19,11 @@ ActiveAdmin.register Issue do
       tags = o.tags.any? ? "(#{o.tags.pluck(:name).join(' - ')})" : ''
       "#{o.reason} #{tags}"
     end
-    column(:person_tags) do |o| 
+    column(:person_tags) do |o|
       o.person.tags.pluck(:name).join(' - ')
     end
     column(:state)
+    column(:created_ago) if Issue.show_created_ago?(params['scope'])
     column(:created_at)
     column(:updated_at)
     column(:defer_until)
@@ -169,6 +170,15 @@ ActiveAdmin.register Issue do
     end
 
     f.input :person_id, as: :hidden
+
+    div style: 'overflow: auto' do
+      div class: 'right' do
+        f.actions do
+          f.action :submit
+          f.cancel_link({action: (resource.persisted? ? :show : :index) })
+        end
+      end
+    end
 
     tabs do
       ArbreHelpers::Layout.tab_for(self, 'Base', 'info') do
@@ -474,15 +484,9 @@ ActiveAdmin.register Issue do
         end
       end
     end
-
-    f.actions do
-      f.action :submit
-      f.cancel_link({action: (resource.persisted? ? :show : :index) })
-    end
   end
 
   show do
-    
     if resource.persisted? && resource.future? && !resource.observations.empty?
       div class: 'flash flash_danger' do
         "The observations will not be shown until the issue is visible"
@@ -499,6 +503,7 @@ ActiveAdmin.register Issue do
               row :state
               row :person
               row :reason
+              row :created_ago if resource.created_ago
             end
           end
           column do

@@ -1,3 +1,4 @@
+return
 module ApexReplica
   class Base < ActiveRecord::Base
     self.abstract_class = true
