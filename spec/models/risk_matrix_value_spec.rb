@@ -65,15 +65,15 @@ describe RiskMatrixValue do
     expect(risk_matrix_value.risk_value_transaction_desc).to eq(500.0)
     expect(risk_matrix_value.risk_value_activity).to eq(20)
     expect(risk_matrix_value.risk_value_activity_desc).to eq(@low_activity)
-    expect(risk_matrix_value.risk_value_politically_exposed).to eq(0)
+    expect(risk_matrix_value.risk_value_politically_exposed).to eq(1)
     expect(risk_matrix_value.risk_value_politically_exposed_desc).to eq('NO')
     expect(risk_matrix_value.risk_value_persont_type).to eq(5)
     expect(risk_matrix_value.risk_value_persont_type_desc).to eq(:natural_person)
     expect(risk_matrix_value.risk_value_income_means).to eq(5)
     expect(risk_matrix_value.risk_value_income_means_desc).to eq('Transferencia bancaria')
     expect(risk_matrix_value.risk_value_commercial_history).to eq(5)
-    expect(risk_matrix_value.risk_value_commercial_history_desc).to eq('Satifactorio')
-    expect(risk_matrix_value.risk_value_result[0]).to eq(124)
+    expect(risk_matrix_value.risk_value_commercial_history_desc).to eq('Satisfactorio')
+    expect(risk_matrix_value.risk_value_result[0]).to eq(125)
     expect(risk_matrix_value.risk_value_result[1]).to eq('MEDIUM')
   end
 
@@ -102,7 +102,7 @@ describe RiskMatrixValue do
     expect(risk_matrix_value.risk_value_income_means).to eq(5)
     expect(risk_matrix_value.risk_value_income_means_desc).to eq('Transferencia bancaria')
     expect(risk_matrix_value.risk_value_commercial_history).to eq(5)
-    expect(risk_matrix_value.risk_value_commercial_history_desc).to eq('Satifactorio')
+    expect(risk_matrix_value.risk_value_commercial_history_desc).to eq('Satisfactorio')
     expect(risk_matrix_value.risk_value_result[0]).to eq(144)
     expect(risk_matrix_value.risk_value_result[1]).to eq('MEDIUM')
   end

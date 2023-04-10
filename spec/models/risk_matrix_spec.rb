@@ -45,11 +45,11 @@ describe RiskMatrix do
     expect(risk_matrix.product).to eq('(20) - Operó')
     expect(risk_matrix.transaction_value).to eq('(20) - $300.0')
     expect(risk_matrix.activity).to eq('(20) - 13011 - Producción de semillas híbridas de cereales y oleaginosas')
-    expect(risk_matrix.politically_exposed).to eq('(0) - NO')
+    expect(risk_matrix.politically_exposed).to eq('(1) - NO')
     expect(risk_matrix.person_type).to eq('(5) - natural_person')
     expect(risk_matrix.income_means).to eq('(5) - Transferencia bancaria')
-    expect(risk_matrix.comercial_history).to eq('(5) - Satifactorio')
-    expect(risk_matrix.result).to eq('(124) - MEDIUM')
+    expect(risk_matrix.comercial_history).to eq('(5) - Satisfactorio')
+    expect(risk_matrix.result).to eq('(125) - MEDIUM')
   end
 
   it 'Risk matrix legal_entity MEDIUM' do
@@ -68,7 +68,7 @@ describe RiskMatrix do
     expect(risk_matrix.politically_exposed).to eq('(0) - NO')
     expect(risk_matrix.person_type).to eq('(12) - legal_entity')
     expect(risk_matrix.income_means).to eq('(5) - Transferencia bancaria')
-    expect(risk_matrix.comercial_history).to eq('(5) - Satifactorio')
+    expect(risk_matrix.comercial_history).to eq('(5) - Satisfactorio')
     expect(risk_matrix.result).to eq('(144) - MEDIUM')
   end
 end

@@ -49,7 +49,8 @@ class RiskMatrixValue
   end
 
   def risk_value_politically_exposed
-    natural_docket&.politically_exposed ? 60 : 0
+    return 0 if @person.person_type == :legal_entity
+    natural_docket&.politically_exposed ? 60 : 1
   end
 
   def risk_value_politically_exposed_desc
@@ -77,7 +78,7 @@ class RiskMatrixValue
   end
 
   def risk_value_commercial_history_desc
-    commercial_history_count > 0 ? 'Negativo' : 'Satifactorio'
+    commercial_history_count > 0 ? 'Negativo' : 'Satisfactorio'
   end
 
   def risk_value_result
@@ -135,8 +136,8 @@ class RiskMatrixValue
   end
 
   def residence_value
-    return 0 if person_nationality != country_code and domicile&.country != country_code
-    return risk_value_nationality if person_nationality == country_code and domicile&.country != country_code
+    # return 0 if person_nationality != country_code and domicile&.country != country_code
+    # return risk_value_nationality if person_nationality == country_code and domicile&.country != country_code
     risk_value_nationality + risk_value_domicile
   end
 
