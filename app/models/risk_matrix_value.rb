@@ -136,6 +136,7 @@ class RiskMatrixValue
   end
 
   def residence_value
+    # TODO: lack defining solution
     # return 0 if person_nationality != country_code and domicile&.country != country_code
     # return risk_value_nationality if person_nationality == country_code and domicile&.country != country_code
     risk_value_nationality + risk_value_domicile
@@ -155,8 +156,8 @@ class RiskMatrixValue
 
   def activity_value
     return 40 if @person.person_type == :legal_entity
-    return 0 unless natural_docket&.job_title
+    return 40 unless natural_docket&.job_title
     code = "a#{natural_docket.job_title.split('-')[0]&.strip}"
-    RiskActivity.find_by_code(code)&.value || 0
+    RiskActivity.find_by_code(code)&.value || 40
   end
 end
