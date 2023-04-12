@@ -20,7 +20,7 @@ class RiskMatrixValue
   end
 
   def risk_value_domicile_desc
-    domicile&.name_body
+    "#{domicile&.state}, #{domicile&.name_body}"
   end
 
   def risk_value_product
