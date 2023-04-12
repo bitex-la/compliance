@@ -84,8 +84,8 @@ class RiskMatrixValue
   def risk_value_result
     risk_value_sum = residence_value + risk_value_product + risk_value_transaction + risk_value_activity + 
                      risk_value_politically_exposed + risk_value_persont_type + risk_value_income_means + risk_value_commercial_history
-    return [risk_value_sum, 'LOW'] if risk_value_sum < 100
-    risk_value_sum < 200 ? [risk_value_sum, 'MEDIUM'] : [risk_value_sum, 'HIGH']
+    return [risk_value_sum, 'LOW'] if risk_value_sum < 101
+    risk_value_sum < 201 ? [risk_value_sum, 'MEDIUM'] : [risk_value_sum, 'HIGH']
   end
   
   private
