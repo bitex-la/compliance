@@ -136,9 +136,6 @@ class RiskMatrixValue
   end
 
   def residence_value
-    # TODO: under review
-    # return 0 if person_nationality != country_code and domicile&.country != country_code
-    # return risk_value_nationality if person_nationality == country_code and domicile&.country != country_code
     risk_value_nationality + risk_value_domicile
   end
 
