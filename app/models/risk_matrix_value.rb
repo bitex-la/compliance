@@ -149,7 +149,7 @@ class RiskMatrixValue
 
   def commercial_history_count
     if @commercial_history.nil?
-      @commercial_history = RiskScore.where(provider: ['google', 'worldcheck'], person_id: @person.id).count
+      @commercial_history = RiskScore.where(provider: ['google', 'worldcheck'], person_id: @person.id, score: 'red').count
     end
     @commercial_history
   end

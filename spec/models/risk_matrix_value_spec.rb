@@ -18,8 +18,9 @@ describe RiskMatrixValue do
     Domicile.create(person_id: @natural_person.id, issue_id: @natural_person_issue.id, country: @natural_contry, state: 'Córdoba', city: 'Córdoba', street_address: 'Bv San Juan', street_number: '373' )
     FundDeposit.create(person_id: @natural_person.id, amount: 200, currency_id: 5, country: @natural_contry, exchange_rate_adjusted_amount: 40, deposit_date: Time.now, external_id: 'CashDeposit_1', deposit_method_id: 1)
     FundWithdrawal.create(person_id: @natural_person.id, amount: 100, currency_id: 5, country: @natural_contry, exchange_rate_adjusted_amount: 20, withdrawal_date: Time.now, external_id: 'CashWithdrawal_1')
-    RiskScore.create(person_id: @natural_person.id, issue_id: @natural_person_issue.id, provider: 'google')
-    RiskScore.create(person_id: @natural_person.id, issue_id: @natural_person_issue.id, provider: 'worldcheck')
+    RiskScore.create(person_id: @natural_person.id, issue_id: @natural_person_issue.id, provider: 'google', score: 'red')
+    RiskScore.create(person_id: @natural_person.id, issue_id: @natural_person_issue.id, provider: 'worldcheck', score: 'red')
+    RiskScore.create(person_id: @natural_person.id, issue_id: @natural_person_issue.id, provider: 'worldcheck', score: 'green')
     @natural_person.reload
 
     risk_matrix_value = RiskMatrix.new(@natural_person)
