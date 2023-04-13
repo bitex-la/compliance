@@ -32,8 +32,8 @@ class RiskMatrixValue
   end
 
   def risk_value_transaction
-    return 20 if transaction_value_sum <= 720000
-    transaction_value_sum <= 5000000 ? 40 : 60
+    return 20 if transaction_value_sum <= Settings.risk_matrix.transaction_value.low
+    transaction_value_sum <= Settings.risk_matrix.transaction_value.high ? 40 : 60
   end
 
   def risk_value_transaction_desc
