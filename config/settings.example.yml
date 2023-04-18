@@ -60,6 +60,11 @@ defaults: &defaults
   features:
     affinity_summary: true
 
+  risk_matrix:
+    transaction_value:
+      low: 720000
+      high: 5000000
+
 production:
   <<: *defaults
 

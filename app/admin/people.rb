@@ -365,6 +365,11 @@ ActiveAdmin.register Person do
           end
         end
       end
+
+      ArbreHelpers::Layout.tab_with_counter_for(self, 'Risk Matrix', 1, 'flag') do
+        attributes_table_for RiskMatrix.new(resource), :nationality, :residence, :product, :transaction_value, :activity,
+                                                       :politically_exposed,:person_type, :income_means, :comercial_history, :result, :created_at
+      end
     end
   end
 end
