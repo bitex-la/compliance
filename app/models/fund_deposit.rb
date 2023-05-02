@@ -33,6 +33,10 @@ class FundDeposit < ApplicationRecord
     "##{id}: #{amount} #{currency_code} #{deposit_method_code}"
   end
 
+  def self.deposits_fiat_only_condition
+    where(currency_id: Currency.all.select(&:is_fiat?)) if AdminUser.current_admin_user&.fiat_only?
+  end
+    
   private
 
   def refresh_person_regularity!

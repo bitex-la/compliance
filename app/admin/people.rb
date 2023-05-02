@@ -297,7 +297,7 @@ ActiveAdmin.register Person do
 
       ArbreHelpers::Layout.tab_with_counter_for(self, 'Fund Movements', fund_movements_count, 'university') do
         panel 'Fund Deposits' , class: 'fund_deposits' do
-          table_for resource.fund_deposits do           
+          table_for resource.fund_deposits do
             column :deposit_date
             column :amount
             column :currency
@@ -311,7 +311,7 @@ ActiveAdmin.register Person do
         end
 
         panel 'Fund Withdrawals' , class: 'fund_withdrawals' do
-          table_for resource.fund_withdrawals do           
+          table_for resource.fund_withdrawals do
             column :withdrawal_date
             column :amount
             column :currency
@@ -324,7 +324,7 @@ ActiveAdmin.register Person do
         end
 
         panel 'Received Transfers' , class: 'received_transfers' do
-          table_for resource.received_transfers do           
+          table_for resource.received_transfers do
             column :transfer_date
             column :source_person
             column :amount
@@ -337,7 +337,7 @@ ActiveAdmin.register Person do
         end
 
         panel 'Sent Transfers' , class: 'sent_transfers' do
-          table_for resource.sent_transfers do           
+          table_for resource.sent_transfers do
             column :transfer_date
             column :target_person
             column :amount
