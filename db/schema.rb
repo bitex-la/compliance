@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_14_195347) do
+ActiveRecord::Schema.define(version: 2023_04_25_175347) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "namespace"
@@ -642,6 +642,7 @@ ActiveRecord::Schema.define(version: 2023_03_14_195347) do
     t.date "expires_at"
     t.boolean "public", default: false, null: false
     t.date "archived_at"
+    t.integer "note_type", default: 0, null: false
     t.index ["archived_at"], name: "index_note_seeds_on_archived_at"
     t.index ["fruit_id"], name: "index_note_seeds_on_fruit_id"
     t.index ["issue_id"], name: "index_note_seeds_on_issue_id"
@@ -659,6 +660,7 @@ ActiveRecord::Schema.define(version: 2023_03_14_195347) do
     t.bigint "replaced_by_id"
     t.boolean "public", default: false, null: false
     t.date "archived_at"
+    t.integer "note_type", default: 0, null: false
     t.index ["archived_at"], name: "index_notes_on_archived_at"
     t.index ["issue_id"], name: "index_notes_on_issue_id"
     t.index ["person_id"], name: "index_notes_on_person_id"
@@ -834,8 +836,6 @@ ActiveRecord::Schema.define(version: 2023_03_14_195347) do
     t.index ["issue_id"], name: "index_workflows_on_issue_id"
   end
 
-  add_foreign_key "admin_user_taggings", "admin_users"
-  add_foreign_key "admin_user_taggings", "tags"
   add_foreign_key "affinities", "affinities", column: "replaced_by_id"
   add_foreign_key "affinities", "affinity_seeds"
   add_foreign_key "affinities", "people"
