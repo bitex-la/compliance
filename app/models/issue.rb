@@ -147,13 +147,15 @@ class Issue < ApplicationRecord
     identification_seeds
     phone_seeds
     email_seeds
-    note_seeds
     affinity_seeds
     risk_score_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
+
+  has_many :note_seeds, -> { notes_fiat_only_condition }
+  accepts_nested_attributes_for :note_seeds, allow_destroy: true
 
   has_many :workflows
   accepts_nested_attributes_for :workflows, allow_destroy: true

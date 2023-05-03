@@ -93,6 +93,10 @@ module ArbreHelpers
       context.instance_eval do
         h3 "Other Seeds"
         seeds = relation.others_active_seeds(resource)
+
+        # Only to NodeSeed
+        seeds = seeds.where(note_type: 'crypto_note') if relation.name == 'NoteSeed' && AdminUser.current_admin_user&.fiat_only?
+
         if seeds.any?
           ArbreHelpers::Layout.panel_only(self, seeds) do |s|
             ArbreHelpers::Seed.seed_show_section(self, s, [:issue] + extra)

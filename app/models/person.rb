@@ -50,6 +50,7 @@ class Person < ApplicationRecord
   has_many :sent_transfers, -> { transfers_fiat_only_condition }, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
   has_many :fund_deposits, -> { deposits_fiat_only_condition }
   has_many :fund_withdrawals, -> { withdrawals_fiat_only_condition }
+  has_many :notes, -> { notes_fiat_only_condition }
 
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true

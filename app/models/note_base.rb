@@ -10,6 +10,10 @@ class NoteBase < ApplicationRecord
     title || body
   end
 
-  NOTE_TYPE_VALUES = { fiat_note: 1, cripto_note: 2 }.freeze
-  enum note_type: { unknown: 0 }.merge(NOTE_TYPE_VALUES)
+  NOTE_TYPE_VALUES = { fiat_note: 1, crypto_note: 2 }.freeze
+  enum note_type: { other: 0 }.merge(NOTE_TYPE_VALUES)
+
+  def self.notes_fiat_only_condition
+    where(note_type: NOTE_TYPE_VALUES[:crypto_note]) if AdminUser.current_admin_user&.fiat_only?
+  end
 end
