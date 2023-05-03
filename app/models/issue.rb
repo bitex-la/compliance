@@ -148,6 +148,7 @@ class Issue < ApplicationRecord
     phone_seeds
     email_seeds
     affinity_seeds
+    note_seeds
     risk_score_seeds
   }.each do |relationship|
     has_many relationship
