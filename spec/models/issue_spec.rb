@@ -5,7 +5,7 @@ RSpec.describe Issue, type: :model do
     create: -> (person_id) { Issue.create!(person_id: person_id) },
     change_person: -> (obj, person_id){ obj.person_id = person_id }
 
-  let(:invalid_issue) { described_class.new } 
+  let(:invalid_issue) { described_class.new }
   let(:empty_issue) { create(:basic_issue) }
   let(:basic_issue) { create(:basic_issue) }
   let(:future_issue) { create(:future_issue) }
@@ -382,8 +382,8 @@ RSpec.describe Issue, type: :model do
       person = create :empty_person
       issue = person.issues.create
       expires_at = 1.month.from_now.to_date
-      issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
-      issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
+      issue.note_seeds.create(title: 'title', body: 'body', expires_at: expires_at)
+      issue.risk_score_seeds.create(score: 'score', expires_at: expires_at)
     
       issue.save!
 

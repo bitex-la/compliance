@@ -141,6 +141,8 @@ class Issue < ApplicationRecord
    accepts_nested_attributes_for :natural_docket_seed, allow_destroy: true,
     reject_if: proc { |attr| attr['first_name'].blank? && attr['last_name'].blank? }
 
+ 
+
   HAS_MANY = %i{
     allowance_seeds
     domicile_seeds
@@ -148,13 +150,17 @@ class Issue < ApplicationRecord
     phone_seeds
     email_seeds
     affinity_seeds
-    note_seeds
     risk_score_seeds
   }.each do |relationship|
     has_many relationship
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
 
+  #has_many :note_seeds, -> {
+  #  if AdminUser.current_admin_user&.fiat_only?
+  #    where(note_type: NoteBase.note_types[:crypto_note]) 
+  #  end
+  #}
   has_many :note_seeds, -> { notes_fiat_only_condition }
   accepts_nested_attributes_for :note_seeds, allow_destroy: true
 
@@ -164,7 +170,8 @@ class Issue < ApplicationRecord
   has_many :observations
   accepts_nested_attributes_for :observations,
     reject_if: proc { |attr| attr['scope'].blank? || attr['observation_reason_id'].blank? }
-
+  
+  HAS_MANY.push :note_seeds
   scope :with_relations, -> {
     includes(
       :person,

@@ -11,10 +11,10 @@ class Person < ApplicationRecord
 
   ransack_alias :state, :aasm_state
 
+  #fund_deposits
+  #fund_withdrawals
   HAS_MANY_PLAIN = %i{
     issues
-    fund_deposits
-    fund_withdrawals
     attachments
   }.each do |relationship|
     has_many relationship
@@ -28,7 +28,6 @@ class Person < ApplicationRecord
     allowances
     phones
     emails
-    notes
     argentina_invoicing_details
     chile_invoicing_details
     affinities
@@ -50,7 +49,17 @@ class Person < ApplicationRecord
   has_many :sent_transfers, -> { transfers_fiat_only_condition }, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
   has_many :fund_deposits, -> { deposits_fiat_only_condition }
   has_many :fund_withdrawals, -> { withdrawals_fiat_only_condition }
-  has_many :notes, -> { notes_fiat_only_condition }
+  
+  #has_many :notes, -> { notes_fiat_only_condition }
+  has_many :notes, -> {
+    if AdminUser.current_admin_user&.fiat_only?
+      where("notes.replaced_by_id is NULL").where("notes.archived_at is NULL OR notes.archived_at > ?", Date.current).where(note_type: NoteBase.note_types[:crypto_note]) 
+    else
+      where("notes.replaced_by_id is NULL").where("notes.archived_at is NULL OR notes.archived_at > ?", Date.current)
+    end
+  }
+  has_many :notes_history, class_name: 'Note'
+  has_many :note_seeds, through: :issues, class_name: 'NoteSeed'
 
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true
