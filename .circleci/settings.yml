@@ -49,6 +49,9 @@ defaults: &defaults
       low: 720000
       high: 5000000
 
+  fiat_only:
+    audit_emails: [ 'admin@example.com']
+
 production:
   <<: *defaults
 
