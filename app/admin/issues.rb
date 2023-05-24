@@ -222,6 +222,7 @@ ActiveAdmin.register Issue do
               nf.input :body, input_html: {rows: 3}
               nf.input :expires_at, as: :datepicker
               nf.input :archived_at, as: :datepicker
+              nf.input :note_type
               ArbreHelpers::Attachment.has_many_attachments(context, nf)
             end
           end
@@ -526,7 +527,7 @@ ActiveAdmin.register Issue do
           h3 "Current Note Seeds"
           if seeds = resource.note_seeds.presence
             ArbreHelpers::Layout.panel_grid(self, seeds) do |d|
-              attributes_table_for d, :public,  :fruit, :created_at, :updated_at, :expires_at
+              attributes_table_for d, :public, :fruit, :created_at, :updated_at, :expires_at, :note_type
               para d.body
               ArbreHelpers::Attachment.attachments_list self, (d.fruit.try(:attachments) || d.attachments)
             end
