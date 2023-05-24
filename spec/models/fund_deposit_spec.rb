@@ -224,4 +224,18 @@ RSpec.describe FundDeposit do
     expect { create(:an_fund_deposit, person: alice) }
       .not_to change { alice.tags }
   end
+
+  it 'filter deposits by fiat currencies when user admin is auditor' do
+    admin_user = create(:admin_user)
+    AdminUser.current_admin_user = admin_user 
+    Settings.fiat_only['audit_emails'] = [ admin_user.email ]
+    new_person = create(:empty_person)
+    create(:full_fund_deposit, person: new_person, currency: Currency.find_by_code('ars'))
+    create(:full_fund_deposit, person: new_person, currency: Currency.find_by_code('usd'))
+    create(:full_fund_deposit, person: new_person, currency: Currency.find_by_code('btc'))
+    create(:full_fund_deposit, person: new_person, currency: Currency.find_by_code('ada'))
+    fund_deposits = new_person.fund_deposits
+    expect(fund_deposits.count).to eq 2
+    fund_deposits.each { |d| expect(d.currency.is_fiat?).to eq true}
+  end
 end

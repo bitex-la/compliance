@@ -23,4 +23,8 @@ class FundTransfer < ApplicationRecord
     where(source_person_id: Person.by_admin_user_tags)
       .or(FundTransfer.where(target_person_id: Person.by_admin_user_tags))
   end
+
+  def self.transfers_fiat_only_condition
+    where(currency_id: Currency.all.select(&:is_fiat?)) if AdminUser.current_admin_user&.fiat_only?
+  end
 end

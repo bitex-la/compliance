@@ -29,6 +29,10 @@ class FundWithdrawal < ApplicationRecord
     "##{id}: #{amount} #{currency_code} #{country}"
   end
 
+  def self.withdrawals_fiat_only_condition
+    where(currency_id: Currency.all.select(&:is_fiat?)) if AdminUser.current_admin_user&.fiat_only?
+  end
+
   private
 
   def refresh_person_country_tagging!

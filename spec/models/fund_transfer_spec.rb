@@ -36,4 +36,23 @@ describe FundTransfer do
                    )
     assert_logging(object, :create_entity, 1)
   end
+
+  it 'filter transfers by fiat currencies when user admin is auditor' do
+    admin_user = create(:admin_user)
+    AdminUser.current_admin_user = admin_user 
+    Settings.fiat_only['audit_emails'] = [ admin_user.email ]
+
+    create(:fund_transfer, source_person: source_person, target_person: target_person, currency: Currency.find_by_code('ars'))
+    create(:fund_transfer, source_person: source_person, target_person: target_person, currency: Currency.find_by_code('usd'))
+    create(:fund_transfer, source_person: source_person, target_person: target_person, currency: Currency.find_by_code('btc'))
+    create(:fund_transfer, source_person: source_person, target_person: target_person, currency: Currency.find_by_code('ada'))
+
+    sent_transfers = source_person.sent_transfers
+    expect(sent_transfers.count).to eq 2
+    sent_transfers.each { |d| expect(d.currency.is_fiat?).to eq true }
+
+    received_transfers = target_person.received_transfers
+    expect(received_transfers.count).to eq 2
+    sent_transfers.each { |d| expect(d.currency.is_fiat?).to eq true }    
+  end
 end
