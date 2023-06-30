@@ -65,6 +65,10 @@ defaults: &defaults
       low: 720000
       high: 5000000
 
+  fiat_only:
+    start_date: '20230701' #format: 'YYYYMMDD'
+    audit_emails: [ 'admin@example.com']
+
 production:
   <<: *defaults
 
