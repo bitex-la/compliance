@@ -67,7 +67,7 @@ defaults: &defaults
 
   fiat_only:
     start_date: '20230701' #format: 'YYYYMMDD'
-    audit_emails: [ 'admin@example.com']
+    audit_emails: [ 'auditor@example.com']
 
 production:
   <<: *defaults

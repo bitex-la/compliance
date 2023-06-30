@@ -156,6 +156,7 @@ class Issue < ApplicationRecord
 
   has_many :note_seeds, -> { note_seeds_condition }
   accepts_nested_attributes_for :note_seeds, allow_destroy: true
+  HAS_MANY.push :note_seeds
 
   has_many :workflows
   accepts_nested_attributes_for :workflows, allow_destroy: true
