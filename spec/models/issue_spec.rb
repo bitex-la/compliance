@@ -382,8 +382,8 @@ RSpec.describe Issue, type: :model do
       person = create :empty_person
       issue = person.issues.create
       expires_at = 1.month.from_now.to_date
-      issue.note_seeds.create(title:'title', body: 'body', expires_at:expires_at)
-      issue.risk_score_seeds.create(score:'score', expires_at:expires_at)
+      issue.note_seeds.create(title:'title', body: 'body', expires_at: expires_at)
+      issue.risk_score_seeds.create(score:'score', expires_at: expires_at)
     
       issue.save!
 
@@ -395,7 +395,7 @@ RSpec.describe Issue, type: :model do
       
       person.reload
 
-      issue_notes = person.issues[-2]
+      issue_notes = person.issues.last
       expect(issue_notes).to_not be(issue)
       expect(issue_notes.defer_until).to eq(expires_at)
       expect(issue_notes.state).to eq('new')
@@ -404,7 +404,7 @@ RSpec.describe Issue, type: :model do
 
       expect(Issue.future).to include issue_notes
 
-      risk_issue = person.issues.last
+      risk_issue = person.issues[-2]
       expect(risk_issue).to_not be(issue)
       expect(risk_issue.defer_until).to eq(expires_at)
       expect(risk_issue.state).to eq('new')
