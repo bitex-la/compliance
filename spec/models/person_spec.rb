@@ -508,4 +508,26 @@ RSpec.describe Person, type: :model do
       [person1, person2, person3, person4]
     end
   end
+
+  it 'filter person notes when user admin is auditor' do
+    admin_user = create(:admin_user)
+    AdminUser.current_admin_user = admin_user 
+    Settings.fiat_only['start_date'] = (Date.today - 1).strftime('%Y%m%d')
+    Settings.fiat_only['audit_emails'] = [ admin_user.email ]
+
+    new_person = create(:empty_person)
+    new_issue = create(:basic_issue)
+    create(:full_note_seed, issue: new_issue, person: new_person)
+    create(:full_note_seed, issue: new_issue, person: new_person)
+    create(:full_note_seed, issue: new_issue, person: new_person)
+
+    new_issue.approve!
+
+    new_person.notes.reload
+    expect(new_person.notes.count).to eq 3
+
+    Settings.fiat_only['start_date'] = (Date.today + 1).strftime('%Y%m%d')
+    new_person.notes.reload
+    expect(new_person.notes.count).to eq 0
+  end
 end

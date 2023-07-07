@@ -154,7 +154,7 @@ class Issue < ApplicationRecord
     accepts_nested_attributes_for relationship, allow_destroy: true
   end
 
-  has_many :note_seeds, -> { note_seeds_condition }
+  has_many :note_seeds, -> { note_base_conditions }
   accepts_nested_attributes_for :note_seeds, allow_destroy: true
   HAS_MANY.push :note_seeds
 
