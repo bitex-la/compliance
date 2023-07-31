@@ -20,6 +20,11 @@ class Person < ApplicationRecord
     has_many relationship
   end
 
+  def self.has_many_relationship_history(rel_name)
+    has_many "#{rel_name.plural}_history".to_sym, class_name: rel_name.fruit
+    has_many rel_name.seed_plural.to_sym, through: :issues, class_name: rel_name.seed
+  end
+
   HAS_MANY_REPLACEABLE = %i{
     domiciles
     identifications
@@ -28,7 +33,6 @@ class Person < ApplicationRecord
     allowances
     phones
     emails
-    notes
     argentina_invoicing_details
     chile_invoicing_details
     affinities
@@ -39,15 +43,23 @@ class Person < ApplicationRecord
       where("#{rel_name.plural}.replaced_by_id is NULL")
       .where("#{rel_name.plural}.archived_at is NULL OR #{rel_name.plural}.archived_at > ?", Date.current)
     }
-
-    has_many "#{rel_name.plural}_history".to_sym, class_name: rel_name.fruit
-    has_many rel_name.seed_plural.to_sym, through: :issues, class_name: rel_name.seed
+    
+    has_many_relationship_history(rel_name)
   end
 
+  has_many :notes, -> {
+    note_base_conditions
+    .where('notes.replaced_by_id is NULL').where('notes.archived_at is NULL OR notes.archived_at > ?', Date.current)
+  }
+  has_many_relationship_history(Garden::Naming.new(:notes))
+
+  HAS_MANY_REPLACEABLE.push :notes
   HAS_MANY = HAS_MANY_REPLACEABLE + HAS_MANY_PLAIN
 
-  has_many :received_transfers, :class_name => 'FundTransfer', :foreign_key => 'target_person_id'
-  has_many :sent_transfers, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
+  has_many :received_transfers, -> { transfers_fiat_only_condition }, :class_name => 'FundTransfer', :foreign_key => 'target_person_id'
+  has_many :sent_transfers, -> { transfers_fiat_only_condition }, :class_name => 'FundTransfer', :foreign_key => 'source_person_id'
+  has_many :fund_deposits, -> { deposits_fiat_only_condition }
+  has_many :fund_withdrawals, -> { withdrawals_fiat_only_condition }
 
   has_many :comments, as: :commentable
   accepts_nested_attributes_for :comments, allow_destroy: true

@@ -37,4 +37,11 @@ describe AdminUser do
     admin.disable!
     expect(admin.active).to eq(false)
   end
+
+  it 'admin fiat only' do
+    admin = create(:admin_user)
+    expect(admin.fiat_only?).to eq(false)
+    Settings.fiat_only['audit_emails'] = [ admin.email ]
+    expect(admin.fiat_only?).to eq(true)
+  end
 end

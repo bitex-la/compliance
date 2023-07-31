@@ -74,6 +74,10 @@ class AdminUser < ApplicationRecord
     tags.reload
   end
 
+  def fiat_only?
+    Settings.fiat_only.audit_emails.include? self.email
+  end
+
   private
 
   def set_api_token

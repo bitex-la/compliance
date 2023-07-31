@@ -48,6 +48,10 @@ defaults: &defaults
     transaction_value:
       low: 720000
       high: 5000000
+  
+  fiat_only:
+    start_date: '20230701'
+    audit_emails: ['auditor@example.com']
 
 production:
   <<: *defaults
