@@ -50,6 +50,10 @@ defaults: &defaults
 
   observation_token_hours: 2160 # 90 days
 
+  fiat_only:
+    start_date: '20230701'
+    audit_emails: ['auditor@example.com']
+
 production:
   <<: *defaults
 
